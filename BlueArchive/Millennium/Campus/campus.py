@@ -7,19 +7,20 @@ system: every storey of every face is an instance of the kit curtain wall
 any storey look out through the *real* facade.
 
 ``build_campus(campus_json)`` places towers, hero buildings, the Kivotos city,
-the halo rings and the sun, and returns a lookup used by room placement
-(``room_matrix``).
+the halo rings and the sun.  Each tower gets a collection of its own
+(returned as ``towers[id]``), so the tower hosting a room can be addressed
+as a unit -- it is the only geometry that can hide the room's ink lines.
+Room placement inside a tower is :func:`room_matrix`.
 """
 from __future__ import annotations
 
-import json
 import math
 import os
 
 import bpy
 from mathutils import Matrix, Vector
 
-from Core import scene as SC
+from Core import jsonio, scene as SC
 from Core.gn import GN, asset, get_asset
 from .. import CW, LEVELS
 from ..Kit import materials as M
@@ -104,8 +105,7 @@ def tower():
 
 # ------------------------------------------------------------------ assembly
 def load(path=None):
-    with open(path or os.path.join(HERE, "campus.json"), encoding="utf-8") as f:
-        return json.load(f)
+    return jsonio.load(path or os.path.join(HERE, "campus.json"))
 
 
 def tower_matrix(tdef):
@@ -154,6 +154,7 @@ def build_campus(campus=None, collection=None, city=True, halo=True, towers=True
         tcol = SC.collection("Towers", parent=col)
         for t in campus["towers"]:
             stripe = t.get("style") == "stripe"
+            tc = SC.collection(f"TOWER_{t['id']}", parent=tcol)
             ob = SC.gn_object(f"TOWER_{t['id']}", get_asset("MIL.Campus.Tower"), {
                 "Width X": t["size"][0], "Width Y": t["size"][1], "Storeys": t["storeys"],
                 "Crown Height": t.get("crown", 8.0), "Style": 1 if stripe else 0,
@@ -161,9 +162,9 @@ def build_campus(campus=None, collection=None, city=True, halo=True, towers=True
                 "Frame Material": white_fin if stripe else frame,
                 "Glass Material": dark_glass if stripe else glass,
                 "Spandrel Material": span, "Slab Material": slab, "Core Material": core,
-                "Crown Material": crown}, collection=tcol)
+                "Crown Material": crown}, collection=tc)
             ob.matrix_world = tower_matrix(t)
-            out["towers"][t["id"]] = ob
+            out["towers"][t["id"]] = tc
     if city:
         ccol = SC.collection("Kivotos_City", parent=col)
         mats = {

@@ -3,16 +3,28 @@ Core.render -- render settings and the compositor "look" pipeline.
 
 Handles the compositor API change in Blender 5.0 (``scene.node_tree`` ->
 ``scene.compositing_node_group`` with a Group Output) and the Glare node's
-properties -> sockets change, so shot files stay portable across 4.2 .. 5.x.
+properties -> sockets change, so shot files stay portable across 4.4 .. 5.x.
+
+Animations render to a PNG frame sequence that survives interruption
+(:func:`frame_output`, :func:`unfinished_frames`) and is assembled into the
+video by a sequencer scene (:func:`video_scene`).
 """
 from __future__ import annotations
+
+import math
+import os
 
 import bpy
 
 from .nodes import Tree
 from .gn import set_menu
 
-__all__ = ["setup_cycles", "color_management", "compositor", "render_still"]
+__all__ = ["setup_cycles", "color_management", "compositor", "lines", "LINES_LAYER",
+           "frame_output", "frame_paths", "unfinished_frames", "video_scene",
+           "use_gpu_if_available", "render_still"]
+
+LINES_LAYER = "Lines"
+_PNG_END = b"\x00\x00\x00\x00IEND\xaeB`\x82"
 
 
 def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_indirect=10.0,
@@ -105,7 +117,7 @@ def _set(node, name, value):
     # silently ignore parameters that do not exist in this version
 
 
-def compositor(look: dict | None = None):
+def compositor(look: dict | None = None, lines_layer: str | None = None):
     """Build the compositor graph from a ``look`` dict::
 
         {"bloom": {"threshold": 1.0, "size": 7, "strength": 0.6},
@@ -114,6 +126,10 @@ def compositor(look: dict | None = None):
          "lift": [r,g,b], "gamma": [r,g,b], "gain": [r,g,b],
          "hue_sat": {"hue": 0.5, "saturation": 1.0, "value": 1.0},
          "curves": {"C": [[x,y],...], "R": [...], "G": [...], "B": [...]}}
+
+    ``lines_layer`` (from :func:`lines`) is laid over the render first, with
+    the premultiplied over Freestyle itself uses on a combined pass, so the
+    exposure and grade see the ink lines as part of the image.
     """
     look = look or {}
     sc = bpy.context.scene
@@ -137,7 +153,19 @@ def compositor(look: dict | None = None):
         sc.use_nodes = True
         t = Tree(nodetree=sc.node_tree, clear=True)
     rl = t.n("CompositorNodeRLayers")
+    rl.n.layer = sc.view_layers[0].name
     img = rl["Image"]
+
+    if lines_layer:
+        ink = t.n("CompositorNodeRLayers")
+        ink.n.layer = lines_layer
+        over = t.n("CompositorNodeAlphaOver")
+        background, foreground = [s for s in over.n.inputs if s.type == "RGBA"][:2]
+        t.link(img, background)
+        t.link(ink["Freestyle"], foreground)
+        _set(over, "Straight Alpha", False)
+        _set(over, "premul", 1.0)
+        img = over.o
 
     if "exposure" in look:
         ex = t.n("CompositorNodeExposure", img, look["exposure"])
@@ -228,8 +256,17 @@ def lines(cfg: dict | None):
     """Freestyle ink lines (the painted-BG outline pass).
 
     cfg = {"thickness": px at 100 %, "color": [r,g,b], "alpha": a,
-           "crease_deg": angle, "collections": [names]}"""
+           "crease_deg": angle, "collections": [names], "occluders": [names]}
+
+    Freestyle builds its view map from every mesh of the view layer it runs
+    on and only then picks the line set's ``collections``; on the main layer
+    it would trace the whole city behind the windows every frame.  The lines
+    get a view layer of their own instead, holding the ``collections`` and
+    the ``occluders`` that can hide them and rendering no surfaces; its
+    strokes come out as the layer's Freestyle pass, which :func:`compositor`
+    lays over the image.  Returns the layer name (None without lines)."""
     sc = bpy.context.scene
+    sc.view_layers[0].use_freestyle = False
     if not cfg:
         sc.render.use_freestyle = False
         return None
@@ -239,11 +276,21 @@ def lines(cfg: dict | None):
     except TypeError:
         pass
     sc.render.line_thickness = 1.0
-    vl = sc.view_layers[0]
+    cols = cfg.get("collections") or []
+    keep = set(cols) | set(cfg.get("occluders") or [])
+    vl = sc.view_layers.get(LINES_LAYER) or sc.view_layers.new(LINES_LAYER)
+    missing = keep - _keep_only(vl.layer_collection, keep)
+    if missing:
+        raise KeyError(f"lines: no collection {sorted(missing)} in the scene")
+    for flag in ("use_solid", "use_sky", "use_strand", "use_volumes"):
+        setattr(vl, flag, False)
+    vl.samples = 1
+    vl.cycles.use_denoising = False
     fs = vl.freestyle_settings
     fs.mode = "EDITOR"
-    fs.crease_angle = __import__("math").radians(cfg.get("crease_deg", 140.0))
+    fs.crease_angle = math.radians(cfg.get("crease_deg", 140.0))
     fs.use_culling = True
+    fs.as_render_pass = True
     for ls in list(fs.linesets):
         fs.linesets.remove(ls)
     ls = fs.linesets.new("Ink")
@@ -254,7 +301,6 @@ def lines(cfg: dict | None):
     ls.select_border = True
     ls.select_crease = True
     ls.select_external_contour = True
-    cols = cfg.get("collections") or []
     if cols:
         ls.select_by_collection = True
         ls.collection = bpy.data.collections[cols[0]]
@@ -263,47 +309,131 @@ def lines(cfg: dict | None):
     st.alpha = cfg.get("alpha", 0.5)
     st.thickness = cfg.get("thickness", 1.2)
     st.chaining = "PLAIN"
-    return ls
+    return vl.name
 
 
-def _output_kind(kind):
+def _keep_only(layer_collection, keep):
+    """Exclude every child layer collection that neither is in ``keep`` nor
+    leads to one, top-down (Blender applies an exclude change to the whole
+    subtree); returns the names from ``keep`` found below."""
+    found = set()
+    for child in layer_collection.children:
+        below = {c.name for c in child.collection.children_recursive} & keep
+        child.exclude = child.name not in keep and not below
+        if child.name in keep:
+            found |= {child.name} | below
+        elif below:
+            found |= _keep_only(child, keep)
+    return found
+
+
+def _output_kind(kind, scene=None):
     """Image settings for 'IMAGE' or 'VIDEO' output (Blender 5.x splits the
     file formats by ``media_type``; 4.x has one flat list)."""
-    im = bpy.context.scene.render.image_settings
+    im = (scene or bpy.context.scene).render.image_settings
     if hasattr(im, "media_type"):
         im.media_type = "VIDEO" if kind == "VIDEO" else "IMAGE"
     return im
 
 
-def video_output(path, fps=30):
-    """Render the frame range to an H.264 MP4 at ``path`` (a PNG sequence
-    when this Blender build has no FFmpeg).  Returns the output path."""
+def frame_output(prefix, fps=30):
+    """Render the frame range as the PNG sequence ``<prefix>####.png``.
+    Frames already on disk are kept, so a stopped animation render carries
+    on where it stopped; the caller keeps frames of different inputs apart
+    by giving each its own ``prefix`` folder.  Returns ``prefix``."""
     sc = bpy.context.scene
     sc.render.fps = int(round(fps))
     sc.render.fps_base = 1.0
-    sc.render.filepath = path
-    if bpy.app.ffmpeg.supported:
-        im = _output_kind("VIDEO")
-        im.file_format = "FFMPEG"
-        ff = sc.render.ffmpeg
-        ff.format = "MPEG4"
-        ff.codec = "H264"
-        for attr, val in (("constant_rate_factor", "HIGH"), ("ffmpeg_preset", "GOOD"),
-                          ("audio_codec", "NONE"), ("gopsize", int(round(fps)))):
-            try:
-                setattr(ff, attr, val)
-            except (AttributeError, TypeError):
-                pass
-    else:
-        im = _output_kind("IMAGE")
-        im.file_format = "PNG"
-    return path
+    sc.render.filepath = prefix
+    sc.render.use_overwrite = False
+    sc.render.use_placeholder = False
+    im = _output_kind("IMAGE")
+    im.file_format = "PNG"
+    im.color_depth = "8"
+    return prefix
+
+
+def frame_paths(scene=None):
+    """{frame: absolute file path} of the scene's frame range."""
+    sc = scene or bpy.context.scene
+    return {f: sc.render.frame_path(frame=f) for f in range(sc.frame_start, sc.frame_end + 1)}
+
+
+def _frame_complete(path):
+    try:
+        with open(path, "rb") as f:
+            f.seek(-len(_PNG_END), os.SEEK_END)
+            return f.read() == _PNG_END
+    except OSError:
+        return False
+
+
+def unfinished_frames(scene=None):
+    """Frames of the scene's range not on disk yet.  A frame file cut short
+    by an interrupted render is deleted, so the next render redoes it
+    instead of skipping it."""
+    sc = scene or bpy.context.scene
+    missing = []
+    for frame, path in frame_paths(sc).items():
+        if not _frame_complete(path):
+            if os.path.exists(path):
+                os.remove(path)
+            missing.append(frame)
+    return missing
+
+
+def video_scene(video, name, scene=None):
+    """Scene ``name`` that assembles ``scene``'s frame sequence into an H.264
+    MP4 at ``video`` in the sequencer; rendering it (Ctrl+F12 with the scene
+    active) writes the video.  The frames are display-referred, so the
+    Standard view transform passes their colours through unchanged."""
+    sc = scene or bpy.context.scene
+    vs = bpy.data.scenes.get(name) or bpy.data.scenes.new(name)
+    r = vs.render
+    pct = sc.render.resolution_percentage
+    r.resolution_x = sc.render.resolution_x * pct // 100
+    r.resolution_y = sc.render.resolution_y * pct // 100
+    r.resolution_percentage = 100
+    r.fps, r.fps_base = sc.render.fps, sc.render.fps_base
+    vs.frame_start, vs.frame_end = 1, sc.frame_end - sc.frame_start + 1
+    vs.view_settings.view_transform = "Standard"
+    vs.view_settings.look = "None"
+    vs.view_settings.exposure = 0.0
+    vs.view_settings.gamma = 1.0
+    vs.display_settings.display_device = "sRGB"
+    se = vs.sequence_editor_create()
+    for strip in list(se.strips):
+        se.strips.remove(strip)
+    prefix = sc.render.filepath
+    folder = prefix[:len(prefix) - len(bpy.path.basename(prefix))]
+    names = [os.path.basename(p) for p in frame_paths(sc).values()]
+    strip = se.strips.new_image("Frames", folder + names[0], channel=1, frame_start=1)
+    for n in names[1:]:
+        strip.elements.append(n)
+    strip.colorspace_settings.name = "sRGB"
+    r.use_sequencer = True
+    r.use_compositing = False
+    r.filepath = video
+    im = _output_kind("VIDEO", vs)
+    im.file_format = "FFMPEG"
+    ff = r.ffmpeg
+    ff.format = "MPEG4"
+    ff.codec = "H264"
+    for attr, val in (("constant_rate_factor", "HIGH"), ("ffmpeg_preset", "GOOD"),
+                      ("audio_codec", "NONE"), ("gopsize", r.fps)):
+        try:
+            setattr(ff, attr, val)
+        except (AttributeError, TypeError):
+            pass
+    return vs
 
 
 def use_gpu_if_available():
-    """Render Cycles on the GPU when this machine has one.  Only touches the
-    Cycles preferences when no compute backend is configured yet; returns
-    the backend in use or None (CPU)."""
+    """Render Cycles on the GPU when this machine has one, and denoise there
+    too (OpenImageDenoise on the CPU costs a GPU render ~6 s per 1080p frame,
+    and again for the Freestyle strokes).  Only touches the Cycles
+    preferences when no compute backend is configured yet; returns the
+    backend in use or None (CPU)."""
     try:
         prefs = bpy.context.preferences.addons["cycles"].preferences
     except (KeyError, AttributeError):
@@ -328,6 +458,7 @@ def use_gpu_if_available():
     backend = getattr(prefs, "compute_device_type", "NONE")
     if backend != "NONE":
         sc.cycles.device = "GPU"
+        sc.cycles.denoising_use_gpu = True
         return backend
     return None
 

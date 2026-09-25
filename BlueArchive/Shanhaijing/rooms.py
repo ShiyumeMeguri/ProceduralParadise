@@ -19,22 +19,20 @@ into a campus scene by giving the root a transform.
 """
 from __future__ import annotations
 
-import json
 import math
 import os
 
 import bpy
 from mathutils import Matrix, Vector
 
-from Core import scene as SC
+from Core import jsonio, scene as SC
 from Core.gn import get_asset
 from . import LEVELS, TIMBER
 from .Kit import materials as M
 
 
 def load_room(room_dir):
-    with open(os.path.join(room_dir, "room.json"), encoding="utf-8") as f:
-        return json.load(f)
+    return jsonio.load(os.path.join(room_dir, "room.json"))
 
 
 def _rot(r):

@@ -10,13 +10,13 @@ Rooms   room definitions (one folder per room) built from the kit
 asset reads its defaults from it so the whole academy stays dimensionally and
 visually consistent.
 """
-import json
 import os
+
+from Core import jsonio
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(HERE, "Academy.json"), encoding="utf-8") as _f:
-    ACADEMY = json.load(_f)
+ACADEMY = jsonio.load(os.path.join(HERE, "Academy.json"))
 
 PALETTE = {k: tuple(v) for k, v in ACADEMY["palette"].items()}
 MOD = ACADEMY["modules"]

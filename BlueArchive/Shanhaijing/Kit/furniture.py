@@ -11,10 +11,10 @@ inlay lines on tops and red silk cushions with a gold piping line.
 """
 from __future__ import annotations
 
-import json
 import math
 import os
 
+from Core import jsonio
 from Core.gn import GN, asset, get_asset
 from .architecture import flat_sweep, solid, STAND
 from .. import FURN
@@ -186,8 +186,7 @@ def chair():
 
 # ------------------------------------------------------------ display shelf
 def _load(name):
-    with open(os.path.join(DATA, name), encoding="utf-8") as f:
-        return json.load(f)
+    return jsonio.load(os.path.join(DATA, name))
 
 
 def keyhole_points(gx, gz, r, pw, base_z, n=64):

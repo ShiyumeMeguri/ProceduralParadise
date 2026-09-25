@@ -8,14 +8,23 @@ animation -- and saves it to the git-ignored ``Build/`` folder
 
 * Blender UI: Scripting workspace -> Text Editor -> Open
   ``BlueArchive/build.py`` -> Run Script.  The scene is built in place and
-  saved; press Ctrl+F12 to render the showcase video.
-* Command line (any Blender 4.2+):
+  saved; Ctrl+F12 renders the showcase frames (stop it any time, Ctrl+F12
+  again carries on), and Ctrl+F12 in the ``<Animation> Video`` scene then
+  assembles them into the MP4.
+* Command line (any Blender 4.4+):
 
       blender -b -P BlueArchive/build.py
       blender -b -P BlueArchive/build.py -- --render-animation
       blender -b -P BlueArchive/build.py -- Millennium/Rooms/ClubRoom --render still.png
 
 * ``bpy`` Python module:  ``python BlueArchive/build.py [room] [options]``
+
+Animation frames are a PNG sequence in ``video/<Animation>/<inputs>/`` next
+to the video, where ``<inputs>`` identifies everything they depend on: the
+Blender build, the options that change the picture and every project module
+and JSON file the build loaded.  Frames on disk are never rendered twice,
+and frames of other inputs never mix into a sequence -- a changed scene
+simply renders into a folder of its own.
 
 Arguments (all optional)
 ------------------------
@@ -27,7 +36,8 @@ room                 room folder relative to BlueArchive/ (default Millennium/Ro
 --no-save            do not write the .blend
 --render PATH        render the shot camera (the painting's framing) to PATH (png)
 --view NAME          render an alternate camera from the shot's "views" instead
---render-animation [PATH]  render the camera animation to PATH
+--render-animation [PATH]  render the camera animation's missing frames and
+                     assemble them into the MP4 at PATH
                      (default: <Build folder>/video/<Animation>.mp4)
 --samples N          override Cycles samples
 --scale S            resolution scale (e.g. 0.5 for previews)
@@ -39,7 +49,7 @@ room                 room folder relative to BlueArchive/ (default Millennium/Ro
 from __future__ import annotations
 
 import argparse
-import json
+import hashlib
 import math
 import os
 import sys
@@ -147,13 +157,30 @@ def build_dir(room_rel):
     return os.path.join(BUILD_DIR, parts[0], parts[-1])
 
 
-def _load_json(path):
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
+_OUTPUT_OPTIONS = {"out", "no_save", "render", "view", "render_animation"}
+
+
+def _fingerprint(args):
+    """Identity of everything an animation's frames depend on: the Blender
+    build, every option that changes the picture, and the content of each
+    project module and JSON file the build loaded."""
+    from Core import jsonio
+    h = hashlib.sha256(f"{bpy.app.version_string} {bpy.app.build_hash.decode()}".encode())
+    for k, v in sorted(vars(args).items()):
+        if k not in _OUTPUT_OPTIONS:
+            h.update(f"|{k}={v!r}".encode())
+    modules = {os.path.abspath(m.__file__) for m in list(sys.modules.values())
+               if getattr(m, "__file__", None) and os.path.abspath(m.__file__).startswith(ROOT + os.sep)}
+    modules.add(os.path.join(HERE, "build.py"))
+    for path in sorted(modules | jsonio.LOADED):
+        h.update(os.path.relpath(path, ROOT).encode())
+        with open(path, "rb") as f:
+            h.update(f.read())
+    return h.hexdigest()
 
 
 def build(args):
-    from Core import scene as SC, camera as CAM, render as RND
+    from Core import jsonio, scene as SC, camera as CAM, render as RND
     room_dir = os.path.join(HERE, args.room)
     academy = academy_of(args.room)
     __import__(academy, fromlist=["rooms", "Kit"])
@@ -165,7 +192,7 @@ def build(args):
     room_def = rooms.load_room(room_dir)
     defaults = room_def.get("defaults", {})
     shot_name = args.shot or defaults.get("shot")
-    shot = _load_json(os.path.join(room_dir, "shots", f"{shot_name}.json")) if shot_name else {}
+    shot = jsonio.load(os.path.join(room_dir, "shots", f"{shot_name}.json")) if shot_name else {}
 
     # ---- shot-level look parameters must be known before materials are built
     kit_mats = __import__(f"{academy}.Kit.materials", fromlist=["PARAMS"])
@@ -178,13 +205,15 @@ def build(args):
     if args.standalone or not has_campus or "placement" not in room_def:
         M_room = Matrix.Identity(4)
         rb = rooms.build_room(room_dir, M_room, in_tower=False)
+        occluders = []
     else:
         campus_mod = __import__(f"{academy}.Campus.campus", fromlist=["build_campus", "room_matrix"])
         campus = campus_mod.load()
-        campus_mod.build_campus(campus, city=not args.no_city, halo=not args.no_halo,
-                                exterior=shot.get("exterior"))
+        towers = campus_mod.build_campus(campus, city=not args.no_city, halo=not args.no_halo,
+                                         exterior=shot.get("exterior"))["towers"]
         M_room = campus_mod.room_matrix(campus, room_def["placement"])
         rb = rooms.build_room(room_dir, M_room, in_tower=True)
+        occluders = [towers[room_def["placement"]["tower"]].name]
 
     # ---- sky + sun
     KS.build_world(shot.get("sky"))
@@ -217,11 +246,13 @@ def build(args):
         look_exposure = look.get("exposure", 0.0)
         look["exposure"] = look_exposure + exposure
         RND.color_management(r.get("view", "AgX"), r.get("look"), 0.0)
-        comp = RND.compositor(look)
+        lines_layer = None
         if look.get("lines") and not args.no_lines:
             cfg = dict(look["lines"])
             cfg.setdefault("collections", [f"ROOM_{room_def['id']}"])
-            RND.lines(cfg)
+            cfg.setdefault("occluders", occluders)
+            lines_layer = RND.lines(cfg)
+        comp = RND.compositor(look, lines_layer)
     else:
         RND.color_management(r.get("view", "AgX"), r.get("look"), exposure)
     if args.scale or r.get("scale"):
@@ -247,8 +278,8 @@ def build_animation(room_dir, name, shot, M_room, comp, look_exposure=0.0, expos
     room frame; ``"camera": "shot"`` starts from the painting's framing.  A
     key's ``exposure`` (stops, default: the shot's) is keyed on the
     compositor exposure, ahead of the grade."""
-    from Core import anim as ANIM, camera as CAM
-    spec = _load_json(os.path.join(room_dir, "animations", f"{name}.json"))
+    from Core import anim as ANIM, camera as CAM, jsonio
+    spec = jsonio.load(os.path.join(room_dir, "animations", f"{name}.json"))
     keys = []
     for k in spec["keys"]:
         k = dict(k)
@@ -275,9 +306,10 @@ def build_animation(room_dir, name, shot, M_room, comp, look_exposure=0.0, expos
                 frame_end=int(max(k["frame"] for k in keys)))
 
 
-def activate_animation(ctx, samples=None):
+def activate_animation(ctx, samples, video, inputs):
     """Make the animation the scene's render: camera, frame range, fps,
-    resolution, samples and the video output next to the saved .blend."""
+    resolution, samples, the PNG frames in ``<video minus extension>/<inputs>/``
+    and the ``<Animation> Video`` scene that assembles them into ``video``."""
     from Core import render as RND
     sc = ctx["scene"]
     a = ctx["animation"]
@@ -288,7 +320,9 @@ def activate_animation(ctx, samples=None):
     W, H = spec.get("resolution", (1920, 1080))
     sc.render.resolution_x, sc.render.resolution_y = W, H
     sc.cycles.samples = samples or spec.get("samples", sc.cycles.samples)
-    RND.video_output(f"//video/{spec['id']}_", fps=spec.get("fps", 30))
+    stem = os.path.splitext(video)[0]
+    RND.frame_output(f"{stem}/{inputs}/{bpy.path.basename(stem)}_", fps=spec.get("fps", 30))
+    ctx["video_scene"] = RND.video_scene(video, f"{spec['id']} Video", sc)
 
 
 def activate_still(ctx, view_name=None):
@@ -330,22 +364,33 @@ def main(argv=None):
     args = parse(argv)
     ctx = build(args)
     sc = ctx["scene"]
-    out = args.out or os.path.join(build_dir(args.room), f"{os.path.basename(args.room.rstrip('/'))}.blend")
-    if ctx["animation"] is not None:
-        activate_animation(ctx, args.samples)
+    out = os.path.abspath(args.out or os.path.join(build_dir(args.room), f"{os.path.basename(args.room.rstrip('/'))}.blend"))
+    anim = ctx["animation"]
+    if anim is not None:
+        video_id = anim["spec"]["id"]
+        video = os.path.abspath(args.render_animation) if args.render_animation else \
+            os.path.join(os.path.dirname(out), "video", f"{video_id}.mp4")
+        in_blend = video if args.render_animation or args.no_save else f"//video/{video_id}.mp4"
+        activate_animation(ctx, args.samples, in_blend, _fingerprint(args)[:16])
     backend = RND.use_gpu_if_available()
     print(f"[build] Cycles device: {backend or 'CPU'}")
     if not args.no_save:
-        os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
-        bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(out), compress=True)
-        print(f"[build] saved {os.path.abspath(out)}")
-    if args.render_animation is not None and ctx["animation"] is not None:
-        spec = ctx["animation"]["spec"]
-        path = args.render_animation or os.path.join(build_dir(args.room), "video", f"{spec['id']}_")
-        activate_animation(ctx, args.samples)
-        RND.video_output(os.path.abspath(path), fps=spec.get("fps", 30))
-        bpy.ops.render.render(animation=True)
-        print(f"[build] rendered animation -> {os.path.abspath(path)}")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        bpy.ops.wm.save_as_mainfile(filepath=out, compress=True)
+        print(f"[build] saved {out}")
+    if anim is not None and (not args.no_save or args.render_animation is not None):
+        missing = RND.unfinished_frames(sc)
+        total = sc.frame_end - sc.frame_start + 1
+        frames_dir = os.path.dirname(RND.frame_paths(sc)[sc.frame_start])
+        print(f"[build] animation frames rendered: {total - len(missing)}/{total} in {frames_dir}")
+        if args.render_animation is not None:
+            if missing:
+                bpy.ops.render.render(animation=True)
+                missing = RND.unfinished_frames(sc)
+                if missing:
+                    raise RuntimeError(f"{len(missing)} frames were not rendered, first {missing[0]}")
+            bpy.ops.render.render(animation=True, scene=ctx["video_scene"].name)
+            print(f"[build] video -> {video}")
     if args.render:
         activate_still(ctx, args.view)
         RND.render_still(os.path.abspath(args.render), use_compositor=not args.no_look)

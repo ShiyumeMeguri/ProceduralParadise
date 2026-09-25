@@ -11,7 +11,8 @@
 
 ## 快速开始（本地 Blender）
 
-需要 Blender 4.2 以上，已在 **Blender 4.5 LTS** 与 **5.2 LTS** 上验证。不需要安装任何额外的 Python 包。
+需要 Blender 4.4 以上（视频合成用到 4.4 起的序列编辑器接口），最近一次在 **Blender 5.3** 上验证。
+不需要安装任何额外的 Python 包。
 
 **在 Blender 界面里：**
 
@@ -21,10 +22,16 @@
    `CAM_BG_Milleniumclub` 和配布视频机位 `CAM_Showcase`。场景会自动另存为
 
    `Build/Millennium/ClubRoom/ClubRoom.blend`（`Build/` 在 `.gitignore` 里，不会进仓库）；
-4. **Ctrl+F12** 渲染配布视频（1920×1080，30 fps，28 秒），输出到 `Build/Millennium/ClubRoom/video/`。
-   单帧预览按 F12；想渲染原画机位，把 `CAM_BG_Milleniumclub` 设为活动相机、分辨率改为 1280×900。
+4. **Ctrl+F12** 逐帧渲染配布视频（1920×1080，30 fps，28 秒）的 PNG 序列到
+   `Build/Millennium/ClubRoom/video/Showcase/<输入标识>/`。随时可以停，再按 Ctrl+F12 从断点接着渲，
+   已经渲好的帧不会重渲；全部渲完后切到场景 **Showcase Video** 再按 Ctrl+F12，合成
+   `video/Showcase.mp4`。单帧预览按 F12；想渲染原画机位，把 `CAM_BG_Milleniumclub` 设为活动相机、分辨率改为 1280×900。
 
-若本机有显卡且 Cycles 还没配置计算设备，脚本会自动启用 GPU（OptiX / CUDA / HIP / Metal / oneAPI）。
+`<输入标识>` 由 Blender 版本、影响画面的参数和本次构建读入的全部代码与 JSON 算出：改了场景再构建，
+新帧进新文件夹，旧帧原样保留、绝不混进新视频；改回原样会接着用原来那批帧。
+
+若本机有显卡且 Cycles 还没配置计算设备，脚本会自动启用 GPU（OptiX / CUDA / HIP / Metal / oneAPI），
+降噪也放在显卡上做。长片建议用下面的命令行渲染，比在界面里按 Ctrl+F12 快。
 
 **命令行：**
 
@@ -32,7 +39,7 @@
 # 默认：构建并保存 Build/Millennium/ClubRoom/ClubRoom.blend
 blender -b -P BlueArchive/build.py
 
-# 构建并直接渲染配布视频（默认输出 Build/Millennium/ClubRoom/video/Showcase_0001-0840.mp4）
+# 构建、渲染还缺的帧并合成配布视频 Build/Millennium/ClubRoom/video/Showcase.mp4（可随时中断，重跑接着渲）
 blender -b -P BlueArchive/build.py -- --render-animation
 
 # 快速试看：1/4 分辨率、12 采样、不画描边

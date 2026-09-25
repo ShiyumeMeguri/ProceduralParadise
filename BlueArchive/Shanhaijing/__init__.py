@@ -9,13 +9,13 @@ Rooms   room definitions (one folder per room) built from the kit
 take their default dimensions and colours from it so every Shanhaijing room
 shares one architectural language.
 """
-import json
 import os
+
+from Core import jsonio
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(HERE, "Academy.json"), encoding="utf-8") as _f:
-    ACADEMY = json.load(_f)
+ACADEMY = jsonio.load(os.path.join(HERE, "Academy.json"))
 
 PALETTE = {k: tuple(v) for k, v in ACADEMY["palette"].items()}
 LEVELS = ACADEMY["levels"]

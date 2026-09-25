@@ -11,9 +11,9 @@ XY plane, +Y up).
 """
 from __future__ import annotations
 
-import json
 import os
 
+from Core import jsonio
 from Core.gn import GN, asset
 from .architecture import STAND
 
@@ -21,8 +21,7 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "shanhai
 
 
 def load():
-    with open(DATA, encoding="utf-8") as f:
-        return json.load(f)
+    return jsonio.load(DATA)
 
 
 @asset("SHJ.Emblem", "Signage")
