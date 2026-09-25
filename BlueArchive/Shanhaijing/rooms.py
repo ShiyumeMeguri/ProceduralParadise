@@ -110,12 +110,13 @@ class RoomBuilder:
             self.obj("BeamY", "SHJ.Arch.Beam", {"Length": yb["y1"] - yb["y0"], "Width": bw,
                                                "Height": tz - zb},
                      {"Material": mat_y}, (x, yb["y0"], zb), 90.0, "Structure")
-        # cross (X) beams under the timber ceiling
+        # cross (X) beams under the timber ceiling (their soffit 2 mm above the Y beams' so the
+        # two never share a face plane where they cross)
         xb = S["x_beams"]
         for y in xb["y"]:
             self.obj("BeamX", "SHJ.Arch.Beam", {"Length": xb["x1"] - xb["x0"], "Width": bw,
-                                               "Height": tz - zb},
-                     {"Material": mat_x}, (xb["x0"], y, zb), 0.0, "Structure")
+                                               "Height": tz - zb - 0.002},
+                     {"Material": mat_x}, (xb["x0"], y, zb + 0.002), 0.0, "Structure")
         # hanging blocks between the plaster ceiling and the Y beams
         hp = S.get("plaster_posts")
         if hp:

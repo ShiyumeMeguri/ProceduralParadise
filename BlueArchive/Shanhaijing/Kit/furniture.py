@@ -8,6 +8,11 @@ face on y = 0 and their body towards +Y, centred on X.
 The hardwood pieces follow one family: square rosewood members with eased
 edges, rows of copper studs on the outward faces of legs and posts, pale
 inlay lines on tops and red silk cushions with a gold piping line.
+
+Pieces are built from overlapping boxes, but never so that two boxes share a
+face plane where they overlap: coincident faces shadow each other in a path
+tracer and render as black patches, so rails sit a hair inside the legs'
+faces, boards are set back from the carcass front, and so on.
 """
 from __future__ import annotations
 
@@ -158,7 +163,10 @@ def chair():
     fx, fy = hw - s * 0.5, hd - s * 0.5
     ft = 0.045                                     # seat frame height
     # front legs
-    fl = g.box(s * -0.5, s * -0.5, 0.0, s * 0.5, s * 0.5, sh)
+    # no coplanar overlaps anywhere (they shadow each other in a path tracer): the legs stop
+    # just under the seat top and the seat rails sit a hair inside the legs' outer faces
+    e = 0.0005
+    fl = g.box(s * -0.5, s * -0.5, 0.0, s * 0.5, s * 0.5, sh - 0.003)
     legs = g.join(g.move(fl, fx * -1.0, fy * -1.0, 0.0), g.move(fl, fx, fy * -1.0, 0.0))
     # rear legs -> back posts: straight to the seat, then raked backwards
     def rake_shear(geo, x_in=0.0):
@@ -169,32 +177,33 @@ def chair():
 
     posts = []
     for sx in (-1.0, 1.0):
-        post = g.cube(g.vec(s, s * 0.92, bh), 2, 2, 8)
+        post = g.cube(g.vec(s, s * 0.9, bh), 2, 2, 8)
         post = g.move(post, fx * sx, fy, bh * 0.5)
         posts.append(rake_shear(post, fx * sx * -0.04))
     # seat frame
-    frame = g.join(g.box(hw * -1.0, hd * -1.0, sh - ft, hw, hd * -1.0 + s * 0.6, sh),
-                   g.box(hw * -1.0, hd - s * 0.6, sh - ft, hw, hd, sh),
-                   g.box(hw * -1.0, hd * -1.0, sh - ft, hw * -1.0 + s * 0.6, hd, sh),
-                   g.box(hw - s * 0.6, hd * -1.0, sh - ft, hw, hd, sh),
+    frame = g.join(g.box(hw * -1.0 + e, hd * -1.0 + e, sh - ft, hw - e, hd * -1.0 + s * 0.6, sh),
+                   g.box(hw * -1.0 + e, hd - s * 0.6, sh - ft, hw - e, hd - e, sh),
+                   g.box(hw * -1.0 + e, hd * -1.0 + s * 0.6, sh - ft, hw * -1.0 + s * 0.6, hd - s * 0.6, sh),
+                   g.box(hw - s * 0.6, hd * -1.0 + s * 0.6, sh - ft, hw - e, hd - s * 0.6, sh),
                    g.box(hw * -1.0 + 0.02, hd * -1.0 + 0.02, sh - 0.02, hw - 0.02, hd - 0.02, sh - 0.005))
     # crest rail and splat (follow the rake)
     crest = g.box(fx * -0.96 - s * 0.5, fy + rake - 0.02, bh - 0.05, fx * 0.96 + s * 0.5, fy + rake + 0.025, bh)
     splat = g.cube(g.vec(spw, 0.022, bh - 0.04 - sh - 0.02), 2, 2, 6)
     splat = rake_shear(g.move(splat, 0.0, fy, (bh - 0.04 + sh + 0.02) * 0.5))
-    back_rail = g.box(fx * -1.0, fy - 0.012, sh + 0.02, fx, fy + 0.012, sh + 0.06)
     # stepped stretchers: front lowest, sides higher, back middle
     sr = 0.011
     stre = g.join(g.rod(g.vec(fx * -1.0, fy * -1.0, 0.09), g.vec(fx, fy * -1.0, 0.09), sr, 8),
                   g.rod(g.vec(fx * -1.0, fy * -1.0, 0.2), g.vec(fx * -1.0, fy, 0.2), sr, 8),
                   g.rod(g.vec(fx, fy * -1.0, 0.2), g.vec(fx, fy, 0.2), sr, 8),
                   g.rod(g.vec(fx * -1.0, fy, 0.15), g.vec(fx, fy, 0.15), sr, 8))
-    wood = g.mat(g.join(legs, *posts, frame, crest, splat, back_rail, stre), m_wood)
+    wood = g.mat(g.join(legs, *posts, frame, crest, splat, stre), m_wood)
     # cushion with gold piping
-    cush = solid(g, g.fill(g.fillet(g.rect(sw - 0.02, sd - 0.02), 0.025, 4)), ct)
-    cush = g.move(cush, z=sh)
-    pipe = flat_sweep(g, g.fillet(g.rect(sw - 0.09, sd - 0.09), 0.02, 3), 0.005, 0.003)
-    pipe = g.move(pipe, z=sh + ct + 0.0012)
+    # the cushion sits inside the seat frame, which shows as a dark border all round
+    cw, cd_ = sw - s * 0.7, sd - s * 0.7
+    cush = solid(g, g.fill(g.fillet(g.rect(cw, cd_), 0.015, 4)), ct)
+    cush = g.move(cush, z=sh - 0.02)
+    pipe = flat_sweep(g, g.fillet(g.rect(cw - 0.06, cd_ - 0.06), 0.012, 3), 0.005, 0.003)
+    pipe = g.move(pipe, z=sh - 0.02 + ct + 0.0012)
     # studs: front faces of the front legs, front faces of the back posts
     rows = [_studs(g, fx * sx, fy * -1.0 - s * 0.5, 0.06, sh - 0.06, pitch, 0.006, (0.0, -1.0))
             for sx in (-1.0, 1.0)]
@@ -280,17 +289,19 @@ def bogu_shelf():
     back = solid(g, g.fill(g.join(frame_o, outline(hole)), mode="NGONS"), 0.02)
     back = g.transform(back, t=(0.0, d, 0.0), r=STAND)
     # --- carcass: sides, top board, stepped cornice; plinth
+    # parts never share a face plane where they overlap (coplanar overlaps shadow each other
+    # in a path tracer): the top board sits between the sides, boards and dividers are set back
     carcass = g.join(g.box(-hw, 0.0, ph, -hw + fw, d, top), g.box(hw - fw, 0.0, ph, hw, d, top),
-                     g.box(-hw, 0.0, top - fw, hw, d, top),
+                     g.box(-hw + fw, 0.0, top - fw, hw - fw, d, top),
                      g.box(-hw - 0.04, -0.04, top, hw + 0.04, d + 0.02, top + ch * 0.6),
                      g.box(-hw - 0.08, -0.08, top + ch * 0.6, hw + 0.08, d + 0.03, H))
     plinth = g.box(-hw, -0.02, 0.0, hw, d, ph)
     # --- boards, dividers and corner scrolls from the design
     parts = []
     for x0, x1, z in D["shelves"]:
-        parts.append(_board(g, x0, x1, z - bt * 0.5, z + bt * 0.5, 0.0, d - 0.03))
+        parts.append(_board(g, x0, x1, z - bt * 0.5, z + bt * 0.5, 0.003, d - 0.03))
     for x, z0, z1 in D["dividers"]:
-        parts.append(_board(g, x - bt * 0.5, x + bt * 0.5, z0, z1, 0.0, d - 0.03, per_m=2))
+        parts.append(_board(g, x - bt * 0.5, x + bt * 0.5, z0, z1, 0.006, d - 0.033, per_m=2))
     for x, z, sxn, szn in D.get("brackets", []):
         tri = outline([(0.0, 0.0), (0.11 * sxn, 0.0), (0.0, 0.11 * szn)])
         tri = solid(g, g.fill(tri), 0.012)
@@ -344,13 +355,16 @@ def display_counter():
     mid = g.box(hl * -1.0, 0.0, sz, hl, D, sz + bh)
     top = g.box(hl * -1.0, 0.0, H - th, hl, D, H - 0.012)
     back = g.box(hl * -1.0, D - 0.02, ph, hl, D, H - th)
-    post = g.box(0.0, 0.0, 0.0, f, f, H - 0.012)
-    posts = g.join(g.move(post, hl * -1.0, 0.0, 0.0), g.move(post, hl - f, 0.0, 0.0),
-                   g.move(post, hl * -1.0, D - f, 0.0), g.move(post, hl - f, D - f, 0.0))
+    # corner posts a hair inside the blocks' outer faces (no coplanar overlaps)
+    e = 0.0005
+    posts = g.join(g.box(hl * -1.0 + e, e, 0.0, hl * -1.0 + f, f, H - 0.012),
+                   g.box(hl - f, e, 0.0, hl - e, f, H - 0.012),
+                   g.box(hl * -1.0 + e, D - f, 0.0, hl * -1.0 + f, D - e, H - 0.012),
+                   g.box(hl - f, D - f, 0.0, hl - e, D - e, H - 0.012))
     # front mullions every ~pitch
     nm = g.max(g.math("FLOOR", L / pitch), 1.0)
     mpts = g.mesh_line(nm - 1.0, g.vec(hl * -1.0 + L / nm - f * 0.5, 0.0, 0.0), g.vec(L / nm, 0.0, 0.0))
-    mull = g.realize(g.iop(g.mesh_to_points(mpts), g.box(0.0, 0.0, 0.0, f, f * 0.8, H - 0.012)))
+    mull = g.realize(g.iop(g.mesh_to_points(mpts), g.box(0.0, e, 0.0, f, f * 0.8, H - 0.012)))
     # key-fret bands: thin plates proud of the front and end faces
     def bands(z0, z1):
         return g.join(g.box(hl * -1.0, -0.004, z0, hl, 0.0, z1),
