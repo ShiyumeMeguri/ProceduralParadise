@@ -1,0 +1,71 @@
+{
+  "id": "Shanhaijing",
+  "name": "Shanhaijing Senior Secondary School",
+  "name_ja": "山海経高級中学校",
+  "name_zh": "山海经高级中学",
+  "units": "metres, Z up",
+  "notes": ["Design system shared by every Shanhaijing building, room and prop.", "Architecture is a modern hall dressed as a southern-Chinese timber interior: lacquered columns with red sleeves, timber beam grids with hanging posts (垂柱), plaster ceilings, cream wall panels with round lattice windows.", "Values were derived from the photogrammetric solve of BG_ShanTeaHouse_Night (see Rooms/TeaHouse/README.md)."],
+  "levels": {
+    "plaster_ceiling": 5.9,
+    "timber_ceiling": 5.6,
+    "beam_bottom": 5.27,
+    "hanging_post_bottom": 5.0,
+    "sleeve_top": 2.04,
+    "architrave_bottom": 2.85,
+    "architrave_top": 3.82,
+    "dado": 0.95,
+    "wall_panel_top": 3.4
+  },
+  "timber": {
+    "beam_width": 0.26,
+    "beam_depth": 0.33,
+    "hanging_post": 0.2,
+    "hanging_disc_radius": 0.16,
+    "plank_width": 0.14,
+    "column_diameter": 0.28,
+    "structural_column_diameter": 0.44
+  },
+  "furniture": {
+    "table_height": 0.754,
+    "table_size": 1.02,
+    "seat_height": 0.5,
+    "chair_height": 1.05,
+    "stud_pitch": 0.075
+  },
+  "floor": {
+    "plank_length": 1.4,
+    "plank_width": 0.33,
+    "stagger": 0.5
+  },
+  "palette": {
+    "plaster": [0.5, 0.47, 0.42],
+    "plaster_band": [0.46, 0.4, 0.32],
+    "wall_cream": [0.78, 0.6, 0.38],
+    "timber_dark": [0.12, 0.065, 0.035],
+    "timber_red": [0.26, 0.11, 0.05],
+    "timber_plank": [0.16, 0.1, 0.055],
+    "lacquer_black": [0.08, 0.06, 0.045],
+    "lacquer_red": [0.2, 0.03, 0.018],
+    "lacquer_blue_black": [0.06, 0.08, 0.1],
+    "gold": [0.85, 0.62, 0.26],
+    "gold_olive": [0.34, 0.3, 0.12],
+    "rosewood": [0.2, 0.09, 0.05],
+    "table_inlay": [0.78, 0.56, 0.3],
+    "cushion_red": [0.55, 0.04, 0.035],
+    "floor_light": [0.62, 0.5, 0.36],
+    "floor_grain": [0.3, 0.23, 0.16],
+    "porcelain_white": [0.86, 0.84, 0.8],
+    "porcelain_blue": [0.05, 0.12, 0.45],
+    "celadon": [0.7, 0.74, 0.66],
+    "jade_green": [0.12, 0.22, 0.14],
+    "leaf_green": [0.09, 0.3, 0.06],
+    "lantern_red": [0.95, 0.06, 0.04],
+    "brass": [0.9, 0.62, 0.3],
+    "stone_lion": [0.62, 0.62, 0.6],
+    "cloud_panel": [0.3, 0.17, 0.07],
+    "cloud_blue": [0.2, 0.45, 0.9],
+    "logo_ink": [0.05, 0.08, 0.16],
+    "logo_paper": [0.62, 0.58, 0.48],
+    "night_glass": [0.05, 0.1, 0.25]
+  }
+}

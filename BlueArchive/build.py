@@ -172,8 +172,10 @@ def build(args):
     kit_mats.PARAMS.clear()
     kit_mats.PARAMS.update(shot.get("materials", {}))
 
-    # ---- exterior + room placement
-    if args.standalone:
+    # ---- exterior + room placement (academies without a campus model, or
+    # rooms without a placement, are built standalone)
+    has_campus = os.path.isdir(os.path.join(HERE, academy, "Campus"))
+    if args.standalone or not has_campus or "placement" not in room_def:
         M_room = Matrix.Identity(4)
         rb = rooms.build_room(room_dir, M_room, in_tower=False)
     else:
@@ -187,8 +189,9 @@ def build(args):
     # ---- sky + sun
     KS.build_world(shot.get("sky"))
     sun = shot.get("sun", {"azimuth": 245, "elevation": 38, "strength": 4.0})
-    KS.add_sun(sun["azimuth"], sun["elevation"], sun.get("strength", 4.0),
-               angle_deg=sun.get("angle", 1.5))
+    if sun:                                    # "sun": null for night shots
+        KS.add_sun(sun["azimuth"], sun["elevation"], sun.get("strength", 4.0),
+                   angle_deg=sun.get("angle", 1.5))
 
     # ---- cameras
     cam = None

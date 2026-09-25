@@ -1,0 +1,3105 @@
+{
+  "id": "TeaHouse",
+  "name": "Shan tea house (山海经茶楼) main hall, night",
+  "academy": "Shanhaijing",
+  "defaults": {
+    "shot": "BG_ShanTeaHouse_Night",
+    "animation": "Showcase"
+  },
+  "notes": ["Room frame: origin = inner corner of the left wall and the (unseen) front wall, +X across the hall towards the colonnade, +Y deep into the hall, Z up; metres.", "Main hall X 0-9.65 (left wall to the colonnade), right hall X 9.65-19.3, back wall at Y 22.3.", "Plaster ceiling 5.9 m over Y 0-14.95; timber board ceiling 5.6 m behind the fascia; all timber beams 5.27-5.60 m.", "Positions were measured on BG_ShanTeaHouse_Night with the photogrammetric camera (see README)."],
+  "size": [19.3, 22.3],
+  "structure": {
+    "beam_bottom": 5.27,
+    "timber_ceiling": 5.6,
+    "plaster_ceiling": 5.9,
+    "y_beams": {
+      "x": [0.55, 1.85, 5.4, 9.65, 13.9, 17.45],
+      "y0": 0.0,
+      "y1": 22.3
+    },
+    "x_beams": {
+      "y": [15.08, 18.58, 22.17],
+      "x0": 0.0,
+      "x1": 19.3
+    },
+    "plaster_posts": {
+      "y": 11.1,
+      "bottom": 5.0,
+      "on": [1.85, 5.4, 9.65, 13.9, 17.45],
+      "size": 0.2
+    },
+    "timber_posts": {
+      "x": [1.85, 5.4, 9.65, 13.9, 17.45],
+      "y": [15.08, 18.58, 22.17],
+      "bottom": 4.75,
+      "size": 0.18,
+      "disc": 0.15,
+      "skip": [[5.4, 22.17], [9.65, 22.17], [13.9, 22.17], [17.45, 22.17]]
+    }
+  },
+  "parts": [
+    {
+      "asset": "SHJ.Arch.Slab",
+      "name": "Floor",
+      "loc": [-2.0, 0.0, -0.2],
+      "inputs": {
+        "Size X": 21.3,
+        "Size Y": 22.3,
+        "Thickness": 0.2
+      },
+      "mat": {
+        "Material": "SHJ.FloorWood"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Slab",
+      "name": "PlasterCeiling",
+      "loc": [-2.0, 0.0, 5.9],
+      "inputs": {
+        "Size X": 21.3,
+        "Size Y": 14.95,
+        "Thickness": 0.15
+      },
+      "mat": {
+        "Material": "SHJ.Plaster"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Slab",
+      "name": "CeilingBand",
+      "loc": [0.0, 11.63, 5.885],
+      "inputs": {
+        "Size X": 19.3,
+        "Size Y": 0.49,
+        "Thickness": 0.015
+      },
+      "mat": {
+        "Material": "SHJ.PlasterBand"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "Fascia",
+      "loc": [-2.0, 14.95, 5.6],
+      "inputs": {
+        "Length": 21.3,
+        "Height": 0.3,
+        "Thickness": 0.08
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberPlanks"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Slab",
+      "name": "BoardCeiling",
+      "loc": [-2.0, 14.95, 5.6],
+      "inputs": {
+        "Size X": 21.3,
+        "Size Y": 7.35,
+        "Thickness": 0.1
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "BackWall",
+      "loc": [0.0, 22.3, 0.0],
+      "inputs": {
+        "Length": 6.5,
+        "Height": 5.6,
+        "Thickness": 0.3,
+        "Hole": 1,
+        "Hole X": 1.88,
+        "Hole Z": 2.36,
+        "Hole Radius": 0.93
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "BackWall",
+      "loc": [6.5, 22.3, 0.0],
+      "inputs": {
+        "Length": 7.199999999999999,
+        "Height": 5.6,
+        "Thickness": 0.3,
+        "Hole": 1,
+        "Hole X": 4.61,
+        "Hole Z": 2.36,
+        "Hole Radius": 0.9
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "BackWall",
+      "loc": [13.7, 22.3, 0.0],
+      "inputs": {
+        "Length": 5.600000000000001,
+        "Height": 5.6,
+        "Thickness": 0.3,
+        "Hole": 1,
+        "Hole X": 2.58,
+        "Hole Z": 2.5,
+        "Hole Radius": 0.93
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "LeftBayBack",
+      "loc": [-2.0, 22.3, 0.0],
+      "inputs": {
+        "Length": 2.0,
+        "Height": 5.6,
+        "Thickness": 0.3,
+        "Hole": 2,
+        "Hole X": 1.0,
+        "Hole Z": 2.9,
+        "Hole Width": 1.84,
+        "Hole Height": 4.0
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "LeftBaySide",
+      "loc": [-2.0, 12.5, 0.0],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 9.8,
+        "Height": 5.6,
+        "Thickness": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "LeftBayFront",
+      "loc": [0.0, 12.5, 0.0],
+      "rot": 180.0,
+      "inputs": {
+        "Length": 2.0,
+        "Height": 5.6,
+        "Thickness": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "LeftBayHead",
+      "loc": [0.0, 12.5, 4.95],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 9.8,
+        "Height": 0.95,
+        "Thickness": 0.25
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "LeftWall",
+      "loc": [0.0, 0.0, 0.0],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 12.5,
+        "Height": 5.9,
+        "Thickness": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "RightWall",
+      "loc": [19.3, 22.3, 0.0],
+      "rot": -90.0,
+      "inputs": {
+        "Length": 22.3,
+        "Height": 5.9,
+        "Thickness": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "FrontWall",
+      "loc": [19.3, 0.0, 0.0],
+      "rot": 180.0,
+      "inputs": {
+        "Length": 21.3,
+        "Height": 5.9,
+        "Thickness": 0.3,
+        "Hole": 2,
+        "Hole X": 11.65,
+        "Hole Z": 1.5,
+        "Hole Width": 2.4,
+        "Hole Height": 3.0
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.GridLattice",
+      "name": "LatticeWindow",
+      "loc": [-1.92, 22.45, 0.9],
+      "inputs": {
+        "Width": 1.84,
+        "Height": 4.0,
+        "Pitch": 0.1
+      },
+      "mat": {
+        "Lattice Material": "SHJ.LatticeBlue",
+        "Glass Material": "SHJ.GlassNight"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "WindowPanel",
+      "loc": [0.55, 22.26, 0.12],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 3.28,
+        "Thickness": 0.04,
+        "Hole": 1,
+        "Hole X": 1.33,
+        "Hole Z": 2.24,
+        "Hole Radius": 0.93
+      },
+      "mat": {
+        "Material": "SHJ.WallCream",
+        "Reveal Material": "SHJ.WallCream"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.PanelFrame",
+      "name": "WindowPanelFrame",
+      "loc": [0.55, 22.26, 0.12],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 3.28,
+        "Border": 0.07,
+        "Depth": 0.03
+      },
+      "mat": {
+        "Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.PanelFrame",
+      "name": "Dado",
+      "loc": [0.55, 22.255, 0.9],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 0.06,
+        "Border": 0.06,
+        "Depth": 0.03,
+        "Sides": false
+      },
+      "mat": {
+        "Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.RoundWindow",
+      "name": "RoundWindow",
+      "loc": [1.88, 22.4, 2.36],
+      "inputs": {
+        "Radius": 0.93,
+        "Lattice Edge": 0.172
+      },
+      "mat": {
+        "Ring Material": "SHJ.TimberDark",
+        "Lattice Material": "SHJ.LatticeWood",
+        "Glass Material": "SHJ.GlassNight"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "WindowPanel",
+      "loc": [9.78, 22.26, 0.12],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 3.28,
+        "Thickness": 0.04,
+        "Hole": 1,
+        "Hole X": 1.33,
+        "Hole Z": 2.24,
+        "Hole Radius": 0.9
+      },
+      "mat": {
+        "Material": "SHJ.WallCream",
+        "Reveal Material": "SHJ.WallCream"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.PanelFrame",
+      "name": "WindowPanelFrame",
+      "loc": [9.78, 22.26, 0.12],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 3.28,
+        "Border": 0.07,
+        "Depth": 0.03
+      },
+      "mat": {
+        "Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.PanelFrame",
+      "name": "Dado",
+      "loc": [9.78, 22.255, 0.9],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 0.06,
+        "Border": 0.06,
+        "Depth": 0.03,
+        "Sides": false
+      },
+      "mat": {
+        "Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.RoundWindow",
+      "name": "RoundWindow",
+      "loc": [11.11, 22.4, 2.36],
+      "inputs": {
+        "Radius": 0.9,
+        "Lattice Edge": 0.167
+      },
+      "mat": {
+        "Ring Material": "SHJ.TimberDark",
+        "Lattice Material": "SHJ.LatticeWood",
+        "Glass Material": "SHJ.GlassNight"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "WindowPanel",
+      "loc": [14.95, 22.26, 0.12],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 3.28,
+        "Thickness": 0.04,
+        "Hole": 1,
+        "Hole X": 1.33,
+        "Hole Z": 2.38,
+        "Hole Radius": 0.93
+      },
+      "mat": {
+        "Material": "SHJ.WallCream",
+        "Reveal Material": "SHJ.WallCream"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.PanelFrame",
+      "name": "WindowPanelFrame",
+      "loc": [14.95, 22.26, 0.12],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 3.28,
+        "Border": 0.07,
+        "Depth": 0.03
+      },
+      "mat": {
+        "Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.PanelFrame",
+      "name": "Dado",
+      "loc": [14.95, 22.255, 0.9],
+      "inputs": {
+        "Length": 2.66,
+        "Height": 0.06,
+        "Border": 0.06,
+        "Depth": 0.03,
+        "Sides": false
+      },
+      "mat": {
+        "Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.RoundWindow",
+      "name": "RoundWindow",
+      "loc": [16.28, 22.4, 2.5],
+      "inputs": {
+        "Radius": 0.93,
+        "Lattice Edge": 0.172
+      },
+      "mat": {
+        "Ring Material": "SHJ.TimberDark",
+        "Lattice Material": "SHJ.LatticeWood",
+        "Glass Material": "SHJ.GlassNight"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Plaque",
+      "name": "Plaque",
+      "loc": [2.41, 22.24, 4.2],
+      "inputs": {
+        "Length": 9.0,
+        "Height": 0.575,
+        "Thickness": 0.06
+      },
+      "mat": {
+        "Board Material": "SHJ.Plaque",
+        "Frame Material": "SHJ.Gold"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Beam",
+      "name": "Architrave",
+      "loc": [9.65, 3.2, 2.85],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 11.75,
+        "Width": 0.22,
+        "Height": 0.45
+      },
+      "mat": {
+        "Material": "SHJ.LacquerBlack"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Beam",
+      "name": "ArchitraveBoard",
+      "loc": [9.65, 3.2, 3.3],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 11.75,
+        "Width": 0.14,
+        "Height": 0.15
+      },
+      "mat": {
+        "Material": "SHJ.TimberDark"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Beam",
+      "name": "ArchitraveUpper",
+      "loc": [9.65, 3.2, 3.45],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 11.75,
+        "Width": 0.22,
+        "Height": 0.45
+      },
+      "mat": {
+        "Material": "SHJ.LacquerBlack"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.WaveBand",
+      "name": "WaveBandUpper",
+      "loc": [9.539, 3.2, 3.62],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 11.75,
+        "Wavelength": 0.17,
+        "Amplitude": 0.05
+      },
+      "mat": {
+        "Material": "SHJ.Gold"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.WaveBand",
+      "name": "WaveBandLower",
+      "loc": [9.539, 3.2, 2.95],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 11.75,
+        "Wavelength": 0.6,
+        "Amplitude": 0.0,
+        "Fillet Gap": 0.2
+      },
+      "mat": {
+        "Material": "SHJ.Gold"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Medallions",
+      "name": "ArchitraveMedallions",
+      "loc": [9.538, 7.2, 2.92],
+      "rot": 90.0,
+      "inputs": {
+        "Count": 3,
+        "Size": 0.3,
+        "Gap": 0.04
+      },
+      "mat": {
+        "Material": "SHJ.Gold"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Brace",
+      "name": "BraceRed",
+      "loc": [9.65, 7.585, 2.04],
+      "rot": 90.0,
+      "inputs": {
+        "Reach": 0.75,
+        "Rise": 0.81,
+        "Width": 0.2
+      },
+      "mat": {
+        "Material": "SHJ.LacquerBlack",
+        "Gold Material": "SHJ.Gold"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Brace",
+      "name": "BraceThin",
+      "loc": [9.65, 11.97, 2.04],
+      "rot": 90.0,
+      "inputs": {
+        "Reach": 0.75,
+        "Rise": 0.81,
+        "Width": 0.2
+      },
+      "mat": {
+        "Material": "SHJ.LacquerBlack",
+        "Gold Material": "SHJ.Gold"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.HangingPost",
+      "name": "ArchitravePost",
+      "loc": [9.65, 14.75, 3.9],
+      "inputs": {
+        "Length": 1.25,
+        "Size": 0.16,
+        "Disc Radius": 0.1
+      },
+      "mat": {
+        "Material": "SHJ.LacquerBlack",
+        "Disc Material": "SHJ.Gold"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.LogoWall",
+      "name": "LogoWall",
+      "loc": [11.414, 13.813, 0.0],
+      "rot": -73.99,
+      "inputs": {
+        "Length": 4.39,
+        "Left Panel": 1.31,
+        "Centre Panel": 1.82,
+        "Lintel Bottom": 3.22,
+        "Emblem X": 2.236,
+        "Emblem Z": 1.885
+      },
+      "mat": {
+        "Frame Material": "SHJ.LacquerBlack",
+        "Cloud Material": "SHJ.CloudPanel",
+        "Paper Material": "SHJ.LogoPaper",
+        "Ink Material": "SHJ.LogoInk",
+        "Gold Material": "SHJ.Gold",
+        "Boarding Material": "SHJ.TimberPlanks"
+      }
+    },
+    {
+      "asset": "SHJ.Furn.Pedestal",
+      "name": "LionLeftPedestal",
+      "loc": [11.239, 13.227, 0.0],
+      "rot": -73.99,
+      "inputs": {
+        "Size": 0.56,
+        "Height": 1.12
+      },
+      "mat": {
+        "Material": "SHJ.Stone",
+        "Cap Material": "SHJ.TimberDark"
+      },
+      "col": "Props"
+    },
+    {
+      "asset": "SHJ.Prop.Lion",
+      "name": "LionLeft",
+      "loc": [11.239, 13.227, 1.12],
+      "rot": -58.989999999999995,
+      "inputs": {
+        "Height": 0.95,
+        "Mirror": false
+      },
+      "mat": {
+        "Material": "SHJ.Stone"
+      },
+      "col": "Props"
+    },
+    {
+      "asset": "SHJ.Furn.Pedestal",
+      "name": "LionRightPedestal",
+      "loc": [12.197, 9.887, 0.0],
+      "rot": -73.99,
+      "inputs": {
+        "Size": 0.56,
+        "Height": 1.12
+      },
+      "mat": {
+        "Material": "SHJ.Stone",
+        "Cap Material": "SHJ.TimberDark"
+      },
+      "col": "Props"
+    },
+    {
+      "asset": "SHJ.Prop.Lion",
+      "name": "LionRight",
+      "loc": [12.197, 9.887, 1.12],
+      "rot": -103.99,
+      "inputs": {
+        "Height": 0.95,
+        "Mirror": true
+      },
+      "mat": {
+        "Material": "SHJ.Stone"
+      },
+      "col": "Props"
+    },
+    {
+      "asset": "SHJ.Furn.BoguShelf",
+      "name": "BoguShelf",
+      "loc": [6.35, 21.85, 0.0],
+      "mat": {
+        "Carcass Material": "SHJ.LacquerBlack",
+        "Board Material": "SHJ.GoldOlive",
+        "Back Material": "SHJ.TimberPlanks",
+        "Plinth Material": "SHJ.JadePanel",
+        "Door Material": "SHJ.DoorWood",
+        "Gate Rim Material": "SHJ.JadePanel"
+      },
+      "col": "Furniture"
+    },
+    {
+      "asset": "SHJ.Furn.DisplayCounter",
+      "name": "Counter",
+      "loc": [0.53, 13.85, 0.0],
+      "rot": 90.0,
+      "inputs": {
+        "Length": 6.9,
+        "Depth": 0.53,
+        "Height": 1.0
+      },
+      "mat": {
+        "Frame Material": "SHJ.LacquerBlack",
+        "Glass Material": "SHJ.GlassCase",
+        "Band Material": "SHJ.JadePanel",
+        "Shelf Material": "SHJ.TimberDark"
+      },
+      "col": "Furniture"
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [4.231, 22.05, 3.218],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.17253333333333334,
+        "Height": 0.09705000000000001
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [4.447, 22.05, 3.218],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.17253333333333334,
+        "Height": 0.09705000000000001
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [4.663, 22.05, 3.218],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.17253333333333334,
+        "Height": 0.09705000000000001
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [5.123, 22.05, 3.087],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.333,
+        "Height": 0.14985
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [3.898, 22.05, 2.567],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.533,
+        "Height": 0.165
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [4.396, 22.05, 2.567],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.417,
+        "Width": 0.302
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [5.113, 22.05, 2.228],
+      "col": "Props",
+      "inputs": {
+        "Shape": 3,
+        "Height": 0.53,
+        "Width": 0.354
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [4.326, 22.05, 1.798],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.402,
+        "Height": 0.1809
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [4.885, 22.05, 1.818],
+      "col": "Props",
+      "inputs": {
+        "Shape": 3,
+        "Height": 0.274,
+        "Width": 0.227
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW2"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [5.134, 22.05, 1.818],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.276,
+        "Width": 0.229
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Panda",
+      "name": "Panda",
+      "loc": [4.386, 22.05, 1.068],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Height": 0.563
+      },
+      "mat": {
+        "White Material": "SHJ.PandaWhite",
+        "Dark Material": "SHJ.PandaBlack"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Panda",
+      "name": "Panda",
+      "loc": [5.374, 22.05, 1.068],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Height": 0.618
+      },
+      "mat": {
+        "White Material": "SHJ.PandaWhite",
+        "Dark Material": "SHJ.PandaBlack"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [3.77, 22.05, 0.987],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.309,
+        "Width": 0.196
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW2"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [5.406, 22.05, 0.43],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.527,
+        "Height": 0.213
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [7.52, 22.05, 3.127],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.391,
+        "Height": 0.156
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [8.098, 22.05, 3.297],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.1264,
+        "Height": 0.0711
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [8.256, 22.05, 3.297],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.1264,
+        "Height": 0.0711
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [8.414, 22.05, 3.297],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.1264,
+        "Height": 0.0711
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [7.658, 22.05, 2.258],
+      "col": "Props",
+      "inputs": {
+        "Shape": 0,
+        "Height": 0.626,
+        "Width": 0.255
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [8.374, 22.05, 2.498],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.381,
+        "Height": 0.17145000000000002
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [8.88, 22.05, 2.498],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.438,
+        "Height": 0.1971
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [7.516, 22.05, 1.818],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.12346666666666668,
+        "Height": 0.06945000000000001
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [7.67, 22.05, 1.818],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.12346666666666668,
+        "Height": 0.06945000000000001
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfCup",
+      "loc": [7.824, 22.05, 1.818],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.12346666666666668,
+        "Height": 0.06945000000000001
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [8.327, 22.05, 1.818],
+      "col": "Props",
+      "inputs": {
+        "Shape": 4,
+        "Height": 0.476,
+        "Width": 0.333
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [8.734, 22.05, 1.948],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.242,
+        "Height": 0.1089
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfBottle",
+      "loc": [7.123, 22.05, 1.198],
+      "col": "Props",
+      "inputs": {
+        "Shape": 4,
+        "Height": 0.266,
+        "Width": 0.1425
+      },
+      "mat": {
+        "Material": "SHJ.PinkGlass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfBottle",
+      "loc": [7.313, 22.05, 1.198],
+      "col": "Props",
+      "inputs": {
+        "Shape": 4,
+        "Height": 0.266,
+        "Width": 0.1425
+      },
+      "mat": {
+        "Material": "SHJ.PinkGlass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfBottle",
+      "loc": [7.503, 22.05, 1.198],
+      "col": "Props",
+      "inputs": {
+        "Shape": 4,
+        "Height": 0.266,
+        "Width": 0.1425
+      },
+      "mat": {
+        "Material": "SHJ.PinkGlass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [8.819, 22.05, 1.138],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.412,
+        "Width": 0.218
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [9.087, 22.05, 1.138],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.414,
+        "Width": 0.221
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW2"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "ShelfVase",
+      "loc": [8.965, 22.05, 0.43],
+      "col": "Props",
+      "inputs": {
+        "Shape": 4,
+        "Height": 0.505,
+        "Width": 0.366
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bowl",
+      "name": "ShelfBowl",
+      "loc": [7.234, 22.05, 0.43],
+      "col": "Props",
+      "inputs": {
+        "Diameter": 0.5,
+        "Height": 0.177
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Planter",
+      "name": "ShelfPlanter",
+      "loc": [3.652, 22.0, 3.82],
+      "col": "Props",
+      "inputs": {
+        "Length": 0.4641,
+        "Width": 0.3,
+        "Height": 0.16
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW",
+        "Soil Material": "SHJ.Soil"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Ivy",
+      "name": "ShelfIvy",
+      "loc": [3.652, 22.0, 3.97],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Runners": 9,
+        "Spread": 0.34,
+        "Drop": 0.55,
+        "Seed": 0
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Planter",
+      "name": "ShelfPlanter",
+      "loc": [4.467, 22.0, 3.82],
+      "col": "Props",
+      "inputs": {
+        "Length": 0.51595,
+        "Width": 0.3,
+        "Height": 0.16
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW",
+        "Soil Material": "SHJ.Soil"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Ivy",
+      "name": "ShelfIvy",
+      "loc": [4.467, 22.0, 3.97],
+      "col": "Props",
+      "rot": 37.0,
+      "inputs": {
+        "Runners": 9,
+        "Spread": 0.34,
+        "Drop": 0.65,
+        "Seed": 7
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Planter",
+      "name": "ShelfPlanter",
+      "loc": [5.746, 22.0, 3.82],
+      "col": "Props",
+      "inputs": {
+        "Length": 0.49044999999999994,
+        "Width": 0.3,
+        "Height": 0.16
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW",
+        "Soil Material": "SHJ.Soil"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Ivy",
+      "name": "ShelfIvy",
+      "loc": [5.746, 22.0, 3.97],
+      "col": "Props",
+      "rot": 74.0,
+      "inputs": {
+        "Runners": 9,
+        "Spread": 0.34,
+        "Drop": 0.75,
+        "Seed": 14
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Planter",
+      "name": "ShelfPlanter",
+      "loc": [7.007, 22.0, 3.82],
+      "col": "Props",
+      "inputs": {
+        "Length": 0.53635,
+        "Width": 0.3,
+        "Height": 0.16
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW",
+        "Soil Material": "SHJ.Soil"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Ivy",
+      "name": "ShelfIvy",
+      "loc": [7.007, 22.0, 3.97],
+      "col": "Props",
+      "rot": 111.0,
+      "inputs": {
+        "Runners": 9,
+        "Spread": 0.34,
+        "Drop": 0.55,
+        "Seed": 21
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Planter",
+      "name": "ShelfPlanter",
+      "loc": [8.137, 22.0, 3.82],
+      "col": "Props",
+      "inputs": {
+        "Length": 0.6018,
+        "Width": 0.3,
+        "Height": 0.16
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW",
+        "Soil Material": "SHJ.Soil"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Ivy",
+      "name": "ShelfIvy",
+      "loc": [8.137, 22.0, 3.97],
+      "col": "Props",
+      "rot": 148.0,
+      "inputs": {
+        "Runners": 9,
+        "Spread": 0.34,
+        "Drop": 0.65,
+        "Seed": 28
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Planter",
+      "name": "ShelfPlanter",
+      "loc": [9.038, 22.0, 3.82],
+      "col": "Props",
+      "inputs": {
+        "Length": 0.5202,
+        "Width": 0.3,
+        "Height": 0.16
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW",
+        "Soil Material": "SHJ.Soil"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Ivy",
+      "name": "ShelfIvy",
+      "loc": [9.038, 22.0, 3.97],
+      "col": "Props",
+      "rot": 185.0,
+      "inputs": {
+        "Runners": 9,
+        "Spread": 0.34,
+        "Drop": 0.75,
+        "Seed": 35
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Furn.Pedestal",
+      "name": "PlantStand",
+      "loc": [2.95, 21.55, 0.0],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size": 0.42,
+        "Height": 0.8
+      },
+      "mat": {
+        "Material": "SHJ.Rosewood",
+        "Cap Material": "SHJ.Rosewood"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "PlantPot",
+      "loc": [2.95, 21.55, 0.8],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.52,
+        "Width": 0.44
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bush",
+      "name": "Shrub",
+      "loc": [2.95, 21.55, 1.22],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.3,
+        "Height": 0.3,
+        "Seed": 29
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Furn.Pedestal",
+      "name": "PlantStand",
+      "loc": [9.45, 21.55, 0.0],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size": 0.42,
+        "Height": 0.62
+      },
+      "mat": {
+        "Material": "SHJ.Rosewood",
+        "Cap Material": "SHJ.Rosewood"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "PlantPot",
+      "loc": [9.45, 21.55, 0.62],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.52,
+        "Width": 0.44
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Bush",
+      "name": "Shrub",
+      "loc": [9.45, 21.55, 1.04],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.3,
+        "Height": 0.3,
+        "Seed": 94
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "FloorVase",
+      "loc": [9.2, 14.85, 0.0],
+      "col": "Props",
+      "inputs": {
+        "Shape": 2,
+        "Height": 1.5,
+        "Width": 0.5
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainLilac"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Grass",
+      "name": "FloorVaseGrass",
+      "loc": [9.2, 14.85, 1.42],
+      "col": "Props",
+      "inputs": {
+        "Blades": 34,
+        "Height": 1.7,
+        "Spread": 0.4,
+        "Blade Width": 0.03,
+        "Seed": 5
+      },
+      "mat": {
+        "Material": "SHJ.Grass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 10.7, 0.57],
+      "col": "Props",
+      "rot": -21.116152821005237,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 11.08, 0.57],
+      "col": "Props",
+      "rot": 17.697352407013312,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 11.46, 0.57],
+      "col": "Props",
+      "rot": -27.60221833580718,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 11.84, 0.57],
+      "col": "Props",
+      "rot": -38.414625882154105,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Brass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 12.22, 0.57],
+      "col": "Props",
+      "rot": 33.43640344701751,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 12.6, 0.57],
+      "col": "Props",
+      "rot": -22.24574594477459,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Brass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 12.98, 0.57],
+      "col": "Props",
+      "rot": -11.1804072399839,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 13.36, 0.57],
+      "col": "Props",
+      "rot": 26.149734321941907,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 13.74, 0.57],
+      "col": "Props",
+      "rot": -22.84796539368668,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 14.12, 0.57],
+      "col": "Props",
+      "rot": 26.313603902273556,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 14.5, 0.57],
+      "col": "Props",
+      "rot": 24.035827083437297,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 14.88, 0.57],
+      "col": "Props",
+      "rot": -26.814539247840674,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 15.26, 0.57],
+      "col": "Props",
+      "rot": 10.158048193050405,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Brass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 15.64, 0.57],
+      "col": "Props",
+      "rot": 36.8738370267441,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 16.02, 0.57],
+      "col": "Props",
+      "rot": -33.062539789206255,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Brass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 16.4, 0.57],
+      "col": "Props",
+      "rot": -13.007801966845129,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterTeapot",
+      "loc": [0.27, 16.78, 0.57],
+      "col": "Props",
+      "rot": 0.4763020568332266,
+      "inputs": {
+        "Scale": 1.25
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 10.62, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 10.88, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 11.14, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 11.4, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 11.66, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 11.92, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 12.18, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 12.44, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 12.7, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 12.96, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 13.22, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 13.48, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 13.74, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 14.0, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 14.26, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 14.52, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 14.78, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 15.04, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 15.3, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 15.56, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 15.82, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 16.08, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 16.34, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxGreen",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 16.6, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.27, 16.86, 0.22],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.26,
+        "Lid": 0.3
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "GiftBox",
+      "loc": [0.3, 11.0, 1.004],
+      "col": "Props",
+      "rot": -9.073560019929747,
+      "inputs": {
+        "Size X": 0.28,
+        "Size Y": 0.2,
+        "Size Z": 0.09,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.GiftBlue",
+        "Lid Material": "SHJ.GiftBlue"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "GiftBox",
+      "loc": [0.3, 11.25, 1.004],
+      "col": "Props",
+      "rot": 2.5270149107980693,
+      "inputs": {
+        "Size X": 0.28,
+        "Size Y": 0.2,
+        "Size Z": 0.09,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.GiftBlue",
+        "Lid Material": "SHJ.GiftBlue"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "GiftBox",
+      "loc": [0.3, 11.5, 1.004],
+      "col": "Props",
+      "rot": -4.391335767675626,
+      "inputs": {
+        "Size X": 0.28,
+        "Size Y": 0.2,
+        "Size Z": 0.09,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.GiftBlue",
+        "Lid Material": "SHJ.GiftBlue"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "GiftBox",
+      "loc": [0.3, 11.75, 1.004],
+      "col": "Props",
+      "rot": 0.6924358975884441,
+      "inputs": {
+        "Size X": 0.28,
+        "Size Y": 0.2,
+        "Size Z": 0.09,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.GiftBlue",
+        "Lid Material": "SHJ.GiftBlue"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "GiftBox",
+      "loc": [0.3, 12.05, 1.004],
+      "col": "Props",
+      "rot": -0.5751982777001388,
+      "inputs": {
+        "Size X": 0.28,
+        "Size Y": 0.2,
+        "Size Z": 0.09,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.GiftBlue",
+        "Lid Material": "SHJ.GiftBlue"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Tablet",
+      "name": "MenuTablet",
+      "loc": [0.3, 14.85, 1.004],
+      "col": "Props",
+      "rot": 90.0,
+      "inputs": {
+        "Width": 0.26,
+        "Height": 0.34
+      },
+      "mat": {
+        "Screen Material": "SHJ.GiftBlue",
+        "Body Material": "SHJ.LacquerBlack"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Vase",
+      "name": "CounterVase",
+      "loc": [0.27, 14.27, 1.004],
+      "col": "Props",
+      "inputs": {
+        "Shape": 1,
+        "Height": 0.7,
+        "Width": 0.36
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainBW"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Grass",
+      "name": "CounterGrass",
+      "loc": [0.27, 14.27, 1.6],
+      "col": "Props",
+      "inputs": {
+        "Blades": 24,
+        "Height": 1.2,
+        "Spread": 0.3,
+        "Blade Width": 0.025,
+        "Seed": 11
+      },
+      "mat": {
+        "Material": "SHJ.Grass"
+      }
+    }
+  ],
+  "column_types": {
+    "red": {
+      "inputs": {
+        "Radius": 0.14,
+        "Base Height": 0.12,
+        "Base Radius": 0.2,
+        "Dado Height": 0.47,
+        "Sleeve Bottom": 0.47,
+        "Sleeve Top": 2.04,
+        "Ring Width": 0.035
+      },
+      "mat": {
+        "Shaft Material": "SHJ.LacquerBlack",
+        "Sleeve Material": "SHJ.LacquerRed",
+        "Base Material": "SHJ.Stone",
+        "Gold Material": "SHJ.Gold",
+        "Dado Material": "SHJ.LacquerBlack"
+      }
+    },
+    "blackgold": {
+      "inputs": {
+        "Radius": 0.22,
+        "Base Height": 0.14,
+        "Base Radius": 0.3,
+        "Sleeve Top": 0.0,
+        "Capital Height": 0.3,
+        "Ring Width": 0.04
+      },
+      "mat": {
+        "Shaft Material": "SHJ.LacquerBlackGold",
+        "Sleeve Material": "SHJ.LacquerRed",
+        "Base Material": "SHJ.Stone",
+        "Gold Material": "SHJ.Gold",
+        "Dado Material": "SHJ.LacquerBlack"
+      }
+    },
+    "black": {
+      "inputs": {
+        "Radius": 0.21,
+        "Base Height": 0.14,
+        "Base Radius": 0.28,
+        "Sleeve Top": 0.0,
+        "Capital Height": 0.12,
+        "Ring Width": 0.04
+      },
+      "mat": {
+        "Shaft Material": "SHJ.LacquerBlack",
+        "Sleeve Material": "SHJ.LacquerRed",
+        "Base Material": "SHJ.Stone",
+        "Gold Material": "SHJ.Gold",
+        "Dado Material": "SHJ.LacquerBlack"
+      }
+    }
+  },
+  "columns": [
+    {
+      "name": "ColRed",
+      "type": "red",
+      "x": 9.65,
+      "y": 7.585,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColRed",
+      "type": "red",
+      "x": 9.65,
+      "y": 11.97,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColRed",
+      "type": "red",
+      "x": 9.65,
+      "y": 3.2,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColBlackGold",
+      "type": "blackgold",
+      "x": 9.65,
+      "y": 16.97,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColBlackGold",
+      "type": "blackgold",
+      "x": 0.6,
+      "y": 9.5,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColBlackGold",
+      "type": "blackgold",
+      "x": 0.6,
+      "y": 3.2,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColBlack",
+      "type": "black",
+      "x": 0.0,
+      "y": 17.7,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColBlackGold",
+      "type": "blackgold",
+      "x": 0.51,
+      "y": 22.05,
+      "inputs": {
+        "Height": 5.27
+      }
+    },
+    {
+      "name": "ColBlack",
+      "type": "black",
+      "x": 14.41,
+      "y": 22.08,
+      "inputs": {
+        "Height": 5.27
+      }
+    }
+  ],
+  "tables": {
+    "types": {
+      "tea": {
+        "asset": "SHJ.Furn.TeaTable",
+        "inputs": {
+          "Width": 1.02,
+          "Depth": 1.02,
+          "Height": 0.754
+        },
+        "mat": {
+          "Top Material": "SHJ.TableTop",
+          "Frame Material": "SHJ.Rosewood",
+          "Inlay Material": "SHJ.Inlay",
+          "Stud Material": "SHJ.Stud"
+        }
+      }
+    },
+    "chair": {
+      "asset": "SHJ.Furn.Chair",
+      "dist": 0.6,
+      "inputs": {
+        "Back Height": 1.05
+      },
+      "mat": {
+        "Wood Material": "SHJ.Rosewood",
+        "Cushion Material": "SHJ.CushionRed",
+        "Piping Material": "SHJ.Gold",
+        "Stud Material": "SHJ.Stud"
+      }
+    },
+    "items": [
+      {
+        "id": "T1",
+        "x": 2.273,
+        "y": 6.449,
+        "chairs": [
+          {
+            "id": "T1.ChairW",
+            "side": "W",
+            "dist": 0.407,
+            "dy": -0.269
+          },
+          {
+            "id": "T1.ChairE",
+            "side": "E",
+            "dist": 0.447,
+            "dy": -0.269
+          }
+        ],
+        "props": [
+          {
+            "asset": "SHJ.Prop.Teapot",
+            "name": "Teapot",
+            "loc": [0.03, 0.4],
+            "inputs": {
+              "Scale": 1.0
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.Tray",
+            "name": "Tray",
+            "loc": [-0.1, 0.44],
+            "inputs": {
+              "Radius": 0.1
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.SnackPlate",
+            "name": "SnackPlate",
+            "loc": [0.1, 0.05],
+            "inputs": {
+              "Radius": 0.1,
+              "Count": 4,
+              "Seed": 1
+            },
+            "mat": {
+              "Plate Material": "SHJ.Plate",
+              "Food Material": "SHJ.Snack"
+            }
+          }
+        ]
+      },
+      {
+        "id": "T2",
+        "x": 4.865,
+        "y": 6.46,
+        "chairs": [
+          {
+            "id": "T2.ChairW",
+            "side": "W",
+            "dist": 0.615,
+            "dy": -0.03
+          },
+          {
+            "id": "T2.ChairE",
+            "side": "E",
+            "dist": 0.555,
+            "dy": -0.06
+          }
+        ],
+        "props": [
+          {
+            "asset": "SHJ.Prop.Teapot",
+            "name": "Teapot",
+            "loc": [0.05, 0.35],
+            "inputs": {
+              "Scale": 1.0
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.Tray",
+            "name": "Tray",
+            "loc": [-0.12, 0.38],
+            "inputs": {
+              "Radius": 0.1
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.SnackPlate",
+            "name": "SnackPlate",
+            "loc": [0.25, 0.2],
+            "inputs": {
+              "Radius": 0.1,
+              "Count": 4,
+              "Seed": 2
+            },
+            "mat": {
+              "Plate Material": "SHJ.Plate",
+              "Food Material": "SHJ.Snack"
+            }
+          }
+        ]
+      },
+      {
+        "id": "T3",
+        "x": 7.32,
+        "y": 6.47,
+        "chairs": [
+          {
+            "id": "T3.ChairW",
+            "side": "W",
+            "dist": 0.6
+          },
+          {
+            "id": "T3.ChairE",
+            "side": "E",
+            "dist": 0.6
+          }
+        ],
+        "props": [
+          {
+            "asset": "SHJ.Prop.Teapot",
+            "name": "Teapot",
+            "loc": [0.1, 0.3],
+            "inputs": {
+              "Scale": 1.0
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.Tray",
+            "name": "Tray",
+            "loc": [-0.05, 0.33],
+            "inputs": {
+              "Radius": 0.1
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.SnackPlate",
+            "name": "SnackPlate",
+            "loc": [0.2, 0.1],
+            "inputs": {
+              "Radius": 0.1,
+              "Count": 4,
+              "Seed": 3
+            },
+            "mat": {
+              "Plate Material": "SHJ.Plate",
+              "Food Material": "SHJ.Snack"
+            }
+          }
+        ]
+      },
+      {
+        "id": "T4",
+        "x": 2.34,
+        "y": 10.5,
+        "inputs": {
+          "Width": 1.25,
+          "Depth": 1.25,
+          "Height": 0.66
+        },
+        "chairs": [
+          {
+            "id": "T4.ChairW",
+            "side": "W",
+            "dist": 0.72
+          },
+          {
+            "id": "T4.ChairE",
+            "side": "E",
+            "dist": 0.72
+          }
+        ],
+        "props": [
+          {
+            "asset": "SHJ.Prop.Teapot",
+            "name": "Teapot",
+            "loc": [0.1, 0.3],
+            "inputs": {
+              "Scale": 1.0
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.Tray",
+            "name": "Tray",
+            "loc": [-0.1, 0.2],
+            "inputs": {
+              "Radius": 0.1
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.SnackPlate",
+            "name": "SnackPlate",
+            "loc": [0.3, 0.0],
+            "inputs": {
+              "Radius": 0.1,
+              "Count": 4,
+              "Seed": 4
+            },
+            "mat": {
+              "Plate Material": "SHJ.Plate",
+              "Food Material": "SHJ.Snack"
+            }
+          }
+        ]
+      },
+      {
+        "id": "T9",
+        "x": 2.0,
+        "y": 12.4,
+        "chairs": [
+          {
+            "id": "T9.ChairW",
+            "side": "W",
+            "dist": 0.62
+          },
+          {
+            "id": "T9.ChairE",
+            "side": "E",
+            "dist": 0.62
+          }
+        ],
+        "props": [
+          {
+            "asset": "SHJ.Prop.Teapot",
+            "name": "Teapot",
+            "loc": [0.0, 0.2],
+            "inputs": {
+              "Scale": 1.0
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.Tray",
+            "name": "Tray",
+            "loc": [0.2, 0.1],
+            "inputs": {
+              "Radius": 0.1
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.SnackPlate",
+            "name": "SnackPlate",
+            "loc": [-0.2, 0.0],
+            "inputs": {
+              "Radius": 0.1,
+              "Count": 4,
+              "Seed": 9
+            },
+            "mat": {
+              "Plate Material": "SHJ.Plate",
+              "Food Material": "SHJ.Snack"
+            }
+          }
+        ]
+      },
+      {
+        "id": "T5",
+        "x": 4.42,
+        "y": 9.11,
+        "chairs": [
+          {
+            "id": "T5.ChairW",
+            "side": "W",
+            "dist": 0.55,
+            "dy": -0.6
+          },
+          {
+            "id": "T5.ChairE",
+            "side": "E",
+            "dist": 0.28,
+            "dy": -0.6,
+            "rot": 180
+          }
+        ],
+        "props": [
+          {
+            "asset": "SHJ.Prop.Teapot",
+            "name": "Teapot",
+            "loc": [0.15, 0.2],
+            "inputs": {
+              "Scale": 1.0
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.Tray",
+            "name": "Tray",
+            "loc": [0.0, 0.1],
+            "inputs": {
+              "Radius": 0.1
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.SnackPlate",
+            "name": "SnackPlate",
+            "loc": [0.3, 0.0],
+            "inputs": {
+              "Radius": 0.1,
+              "Count": 4,
+              "Seed": 5
+            },
+            "mat": {
+              "Plate Material": "SHJ.Plate",
+              "Food Material": "SHJ.Snack"
+            }
+          }
+        ]
+      },
+      {
+        "id": "T6",
+        "x": 6.1,
+        "y": 8.5,
+        "inputs": {
+          "Width": 1.65,
+          "Depth": 1.0
+        },
+        "chairs": [
+          {
+            "id": "T6.ChairW",
+            "side": "W",
+            "dist": 0.9,
+            "dy": 0.3
+          },
+          {
+            "id": "T6.ChairE",
+            "side": "E",
+            "dist": 0.3,
+            "dy": 0.62,
+            "rot": 180
+          }
+        ],
+        "props": []
+      },
+      {
+        "id": "T7",
+        "x": 5.58,
+        "y": 15.6,
+        "inputs": {
+          "Height": 0.72
+        },
+        "chairs": [
+          {
+            "id": "T7.ChairW",
+            "side": "W",
+            "dist": 0.62,
+            "mat": {
+              "Cushion Material": "SHJ.CushionRed"
+            }
+          }
+        ],
+        "props": []
+      },
+      {
+        "id": "T8",
+        "x": 7.9,
+        "y": 13.4,
+        "chairs": [
+          {
+            "id": "T8.ChairW",
+            "side": "W",
+            "dist": 0.62
+          },
+          {
+            "id": "T8.ChairE",
+            "side": "E",
+            "dist": 0.62
+          }
+        ],
+        "props": [
+          {
+            "asset": "SHJ.Prop.Teapot",
+            "name": "Teapot",
+            "loc": [0.03, 0.38],
+            "inputs": {
+              "Scale": 1.0
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.Tray",
+            "name": "Tray",
+            "loc": [-0.1, 0.33],
+            "inputs": {
+              "Radius": 0.1
+            },
+            "mat": {
+              "Material": "SHJ.Brass"
+            }
+          },
+          {
+            "asset": "SHJ.Prop.SnackPlate",
+            "name": "SnackPlate",
+            "loc": [0.12, 0.02],
+            "inputs": {
+              "Radius": 0.1,
+              "Count": 4,
+              "Seed": 8
+            },
+            "mat": {
+              "Plate Material": "SHJ.Plate",
+              "Food Material": "SHJ.Snack"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "lanterns": {
+    "light_power": 8.0,
+    "light_color": [1.0, 0.45, 0.25],
+    "defaults": {
+      "inputs": {
+        "Count": 3,
+        "Diameter": 0.6,
+        "Drop": 1.0,
+        "Pitch": 0.755
+      }
+    },
+    "strings": [
+      {
+        "id": "LanternsLeft",
+        "x": 1.29,
+        "y": 11.56,
+        "z": 5.9,
+        "inputs": {
+          "Diameter": 0.6,
+          "Drop": 1.0,
+          "Pitch": 0.755
+        }
+      },
+      {
+        "id": "LanternsLeftSmall",
+        "x": 1.03,
+        "y": 15.44,
+        "z": 5.6,
+        "inputs": {
+          "Diameter": 0.36,
+          "Drop": 2.0,
+          "Pitch": 0.4
+        }
+      },
+      {
+        "id": "LanternsMiddle",
+        "x": 9.25,
+        "y": 16.64,
+        "z": 5.6,
+        "inputs": {
+          "Diameter": 0.35,
+          "Drop": 1.85,
+          "Pitch": 0.4
+        }
+      },
+      {
+        "id": "LanternsRight",
+        "x": 12.18,
+        "y": 10.33,
+        "z": 5.9,
+        "inputs": {
+          "Diameter": 0.6,
+          "Drop": 1.43,
+          "Pitch": 0.71
+        }
+      }
+    ]
+  },
+  "downlights": {
+    "sets": [
+      {
+        "radius": 0.06,
+        "power": 110.0,
+        "angle": 75.0,
+        "blend": 0.7,
+        "color": [1.0, 0.88, 0.72],
+        "at": [[0.8, 16.3, 5.6], [3.8, 16.3, 5.6], [8.1, 16.3, 5.6], [12.5, 16.3, 5.6], [16.8, 16.3, 5.6], [0.8, 19.8, 5.6], [3.8, 19.8, 5.6], [8.1, 19.8, 5.6], [12.5, 19.8, 5.6], [16.8, 19.8, 5.6]]
+      },
+      {
+        "radius": 0.07,
+        "power": 240.0,
+        "angle": 90.0,
+        "blend": 0.8,
+        "color": [1.0, 0.9, 0.78],
+        "at": [
+          [1.3, 3.5, 5.9],
+          [3.6, 3.5, 5.9],
+          [5.9, 3.5, 5.9],
+          [8.2, 3.5, 5.9],
+          [1.3, 6.5, 5.9],
+          [3.6, 6.5, 5.9],
+          [5.9, 6.5, 5.9],
+          [8.2, 6.5, 5.9],
+          [1.3, 9.5, 5.9],
+          [3.6, 9.5, 5.9],
+          [5.9, 9.5, 5.9],
+          [8.2, 9.5, 5.9],
+          [11.5, 3.5, 5.9],
+          [14.5, 3.5, 5.9],
+          [17.5, 3.5, 5.9],
+          [11.5, 6.5, 5.9],
+          [14.5, 6.5, 5.9],
+          [17.5, 6.5, 5.9]
+        ]
+      }
+    ]
+  },
+  "lights": [
+    {
+      "type": "SPOT",
+      "name": "WallWasher",
+      "loc": [3.7, 21.95, 5.16],
+      "rot": [8, 0, 0],
+      "power": 160.0,
+      "color": [1.0, 0.8, 0.55],
+      "angle": 130,
+      "blend": 1.0,
+      "radius": 0.04
+    },
+    {
+      "type": "SPOT",
+      "name": "WallWasher",
+      "loc": [7.5, 21.95, 5.16],
+      "rot": [8, 0, 0],
+      "power": 160.0,
+      "color": [1.0, 0.8, 0.55],
+      "angle": 130,
+      "blend": 1.0,
+      "radius": 0.04
+    },
+    {
+      "type": "SPOT",
+      "name": "WallWasher",
+      "loc": [11.37, 21.95, 5.16],
+      "rot": [8, 0, 0],
+      "power": 160.0,
+      "color": [1.0, 0.8, 0.55],
+      "angle": 130,
+      "blend": 1.0,
+      "radius": 0.04
+    },
+    {
+      "type": "SPOT",
+      "name": "PanelWash",
+      "loc": [2.3, 20.2, 5.45],
+      "rot": [30.61, 0, 0],
+      "power": 520.0,
+      "color": [1.0, 0.85, 0.62],
+      "angle": 60,
+      "blend": 0.6,
+      "radius": 0.05,
+      "hidden": true
+    },
+    {
+      "type": "SPOT",
+      "name": "PanelWash",
+      "loc": [11.11, 20.2, 5.45],
+      "rot": [30.61, 0, 0],
+      "power": 420.0,
+      "color": [1.0, 0.85, 0.62],
+      "angle": 60,
+      "blend": 0.6,
+      "radius": 0.05,
+      "hidden": true
+    },
+    {
+      "type": "SPOT",
+      "name": "PanelWash",
+      "loc": [16.28, 20.2, 5.45],
+      "rot": [31.33, 0, 0],
+      "power": 300.0,
+      "color": [1.0, 0.85, 0.62],
+      "angle": 60,
+      "blend": 0.6,
+      "radius": 0.05,
+      "hidden": true
+    },
+    {
+      "type": "SPOT",
+      "name": "PanelWash",
+      "loc": [4.8, 20.2, 5.45],
+      "rot": [32.87, 0, 0],
+      "power": 420.0,
+      "color": [1.0, 0.85, 0.62],
+      "angle": 62,
+      "blend": 0.6,
+      "radius": 0.05,
+      "hidden": true
+    },
+    {
+      "type": "SPOT",
+      "name": "PanelWash",
+      "loc": [7.9, 20.2, 5.45],
+      "rot": [32.87, 0, 0],
+      "power": 420.0,
+      "color": [1.0, 0.85, 0.62],
+      "angle": 62,
+      "blend": 0.6,
+      "radius": 0.05,
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "CounterLight",
+      "loc": [0.27, 13.85, 0.96],
+      "rot": [0, 0, 90],
+      "power": 60.0,
+      "color": [1.0, 0.9, 0.75],
+      "size": [6.6, 0.3],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "LogoWash",
+      "loc": [9.9, 11.2, 3.4],
+      "rot": [65, 0, -74],
+      "power": 110.0,
+      "color": [1.0, 0.92, 0.8],
+      "size": [3.0, 0.2],
+      "hidden": true
+    },
+    {
+      "type": "POINT",
+      "name": "GardenLamp",
+      "loc": [1.88, 23.6, 1.7],
+      "power": 40.0,
+      "color": [1.0, 0.62, 0.3],
+      "radius": 0.15
+    },
+    {
+      "type": "POINT",
+      "name": "GardenLamp",
+      "loc": [11.1, 23.6, 1.6],
+      "power": 40.0,
+      "color": [1.0, 0.62, 0.3],
+      "radius": 0.15
+    },
+    {
+      "type": "POINT",
+      "name": "GardenLamp",
+      "loc": [16.28, 23.6, 1.8],
+      "power": 30.0,
+      "color": [1.0, 0.62, 0.3],
+      "radius": 0.15
+    },
+    {
+      "type": "POINT",
+      "name": "GardenLamp",
+      "loc": [-1.0, 23.8, 2.0],
+      "power": 50.0,
+      "color": [1.0, 0.62, 0.3],
+      "radius": 0.15
+    }
+  ]
+}

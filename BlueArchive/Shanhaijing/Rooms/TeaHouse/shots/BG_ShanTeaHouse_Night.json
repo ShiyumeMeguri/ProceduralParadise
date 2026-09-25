@@ -1,0 +1,76 @@
+{
+  "id": "BG_ShanTeaHouse_Night",
+  "reference": "../Reference/BG_ShanTeaHouse_Night.webp",
+  "notes": "Camera from the photogrammetric solve of the reference (two-point perspective: verticals vertical, horizon at y = 498.25 px, vanishing points of the room axes at x = 2646.5 and 253.1 px; principal point x assumed at the image centre).  Location/yaw in the ROOM frame.",
+  "camera": {
+    "resolution": [1280, 900],
+    "focal_px": 881.1,
+    "principal_px": [640.0, 498.25],
+    "location": [2.0, 3.0, 1.0],
+    "yaw_deg": -23.71,
+    "pitch_deg": 0.0,
+    "roll_deg": 0.0
+  },
+  "sky": {
+    "zenith": [0.004, 0.008, 0.03],
+    "mid": [0.01, 0.025, 0.08],
+    "horizon": [0.03, 0.06, 0.16],
+    "mid_pos": 0.15,
+    "ground": [0.01, 0.012, 0.02],
+    "strength": 1.0,
+    "cloud": {
+      "coverage": 0.0,
+      "strength": 0.0
+    }
+  },
+  "sun": null,
+  "render": {
+    "samples": 128,
+    "scale": 1.0,
+    "view": "Standard",
+    "look": null,
+    "exposure": 0.0
+  },
+  "look": {
+    "glow": {
+      "threshold": 1.0,
+      "size": 7,
+      "strength": 0.25,
+      "quality": "Medium"
+    }
+  },
+  "materials": {
+    "plank_offset": [0.0, 0.2],
+    "plank_stagger": 0.37,
+    "plank_jitter": 0.35,
+    "floor_grain_strength": 0.75,
+    "floor_roughness": 0.35,
+    "lantern_emission": 1.2,
+    "lantern_gold_emission": 0.3,
+    "cloud_glow": 0.08,
+    "downlight_emission": 30.0,
+    "table_coat": 0.3
+  },
+  "views": {
+    "reverse": {
+      "location": [8.5, 20.5, 1.6],
+      "target": [3.0, 2.0, 1.4],
+      "lens": 20.0
+    },
+    "shelf": {
+      "location": [6.35, 15.5, 1.5],
+      "target": [6.35, 22.3, 2.0],
+      "lens": 24.0
+    },
+    "logo": {
+      "location": [6.0, 8.0, 1.5],
+      "target": [12.0, 11.8, 1.8],
+      "lens": 26.0
+    },
+    "aisle": {
+      "location": [3.8, 1.0, 1.55],
+      "target": [3.8, 20.0, 1.9],
+      "lens": 20.0
+    }
+  }
+}
