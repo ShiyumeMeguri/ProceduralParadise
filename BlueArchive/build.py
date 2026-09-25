@@ -125,6 +125,10 @@ def build(args):
         look["exposure"] = look.get("exposure", 0.0) + exposure
         RND.color_management(r.get("view", "AgX"), r.get("look"), 0.0)
         RND.compositor(look)
+        if look.get("lines"):
+            cfg = dict(look["lines"])
+            cfg.setdefault("collections", [f"ROOM_{room_def['id']}"])
+            RND.lines(cfg)
     else:
         RND.color_management(r.get("view", "AgX"), r.get("look"), exposure)
     if args.scale or r.get("scale"):

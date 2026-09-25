@@ -1,12 +1,12 @@
 {
   "id": "ClubRoom",
   "name": "Millennium Club Room (BG_Milleniumclub)",
-  "notes": ["Room frame: origin = inner glass line x front wall, finished floor. +X into the room (east), +Y along the facade (north), Z up.", "Everything snaps to the Millennium modules (0.3 planning / 1.2 tile / 1.5 facade / 6.0 bay).", "Placement in the campus: tower MIL-A, storey 24, west facade, facade bays starting at tower-local y = -6.0."],
+  "notes": ["Room frame: origin = inner glass line x front wall, finished floor. +X into the room (east), +Y along the facade (north), Z up.", "Everything snaps to the Millennium modules (0.3 planning / 1.2 tile / 1.5 facade / 6.0 bay).", "Placement in the campus: tower MIL-A, storey 24, west facade, room origin at tower-local y = -5.7 (facade mullions at room y = 1.2 + 1.5k, fitted to the painted mullions)."],
   "placement": {
     "tower": "MIL-A",
     "storey": 24,
     "facade": "west",
-    "facade_offset": -6.0
+    "facade_offset": -5.7
   },
   "size": [10.5, 24.0],
   "ceiling": {
@@ -28,7 +28,7 @@
     "trim_width": 0.06
   },
   "curtain_wall": {
-    "first_mullion": 0.0,
+    "first_mullion": 1.2,
     "module": 1.5
   },
   "walls": [

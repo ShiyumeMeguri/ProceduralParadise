@@ -18,9 +18,9 @@
       "name": "Research Tower B",
       "center": [-704.5, 589.4],
       "rotation": 0.0,
-      "size": [34.0, 34.0],
+      "size": [26.0, 26.0],
       "storeys": 31,
-      "crown": 10.2,
+      "crown": 3.0,
       "style": "stripe",
       "core_inset": 9.0
     },
@@ -29,9 +29,9 @@
       "name": "Research Tower C",
       "center": [-667.5, 603.9],
       "rotation": 0.0,
-      "size": [28.0, 26.0],
+      "size": [24.0, 23.0],
       "storeys": 32,
-      "crown": 8.3,
+      "crown": 3.0,
       "style": "stripe",
       "core_inset": 9.0
     },
@@ -60,24 +60,26 @@
   ],
   "hero_buildings": [
     {
-      "id": "cyl_glass",
+      "id": "glass_setback",
       "type": "tower",
-      "shape": 1,
+      "shape": 0,
       "center": [-784.2, 773.0],
-      "size": [41.0, 41.0],
+      "size": [34.0, 30.0],
       "height": 157.8,
-      "crown": 6.0,
-      "material": "glass_teal"
+      "crown": 14.0,
+      "material": "glass_grey",
+      "crown_inset": 5.0
     },
     {
       "id": "white_tower",
       "type": "tower",
       "shape": 0,
       "center": [-685.4, 919.1],
-      "size": [30.0, 26.0],
+      "size": [26.0, 22.0],
       "height": 181.4,
-      "crown": 8.0,
-      "material": "white_grid"
+      "crown": 2.0,
+      "material": "white_grid",
+      "crown_inset": 1.0
     },
     {
       "id": "glass_block_L",
@@ -102,24 +104,109 @@
     "block": 58.0,
     "clear_radius": 320.0,
     "height_min": 14.0,
-    "height_max": 150.0,
+    "height_max": 120.0,
     "cluster_scale": 0.0011,
     "seed": 7,
     "near_height_scale": 0.45,
     "far_height_scale": 1.35
   },
   "halo": {
-    "center": [-2266.0, 1984.0, 606.0],
-    "inner_radius": 260.0,
-    "outer_radius": 1500.0,
-    "rings": 13,
-    "band_width": 3.2,
-    "tilt_deg": 6.0,
-    "seed": 4,
-    "dots": 140,
-    "dot_size": 3.0,
+    "notes": ["Holographic halo field over Kivotos: systems of concentric rings (world space, metres).", "Placement fitted to the rings painted in BG_Milleniumclub: each painted ring family was matched by a concentric-ellipse Hough search, then back-projected from the solved camera onto a ring plane at 606 m altitude (tilt from the painted ellipse aspect). Ring tube thickness = 0.85 px at the reference camera."],
     "color": [0.6, 0.96, 1.0],
-    "strength": 3.2
+    "strength": 2.0,
+    "systems": [
+      {
+        "id": "L",
+        "center": [-2629.6, 2207.9, 606.0],
+        "normal": [-0.0835, 0.0705, 0.994],
+        "thickness": 2.5,
+        "rings": [
+          {
+            "radius": 260.4,
+            "markers": 2
+          },
+          {
+            "radius": 299.4,
+            "markers": 1,
+            "gap": 0.05
+          },
+          {
+            "radius": 435.9,
+            "markers": 3
+          },
+          {
+            "radius": 479.8,
+            "markers": 2,
+            "gap": 0.1
+          }
+        ]
+      },
+      {
+        "id": "R",
+        "center": [-2209.1, 3269.6, 606.0],
+        "normal": [-0.0708, 0.1055, 0.9919],
+        "thickness": 2.9,
+        "rings": [
+          {
+            "radius": 581.3,
+            "markers": 3
+          },
+          {
+            "radius": 308.8,
+            "dotted": true,
+            "dots": 220
+          },
+          {
+            "radius": 152.7,
+            "markers": 1
+          }
+        ]
+      },
+      {
+        "id": "RR",
+        "center": [-1793.6, 3403.4, 606.0],
+        "normal": [-0.2102, 0.4024, 0.891],
+        "thickness": 2.8,
+        "rings": [
+          {
+            "radius": 156.9,
+            "markers": 1
+          },
+          {
+            "radius": 223.7,
+            "gap": 0.15
+          }
+        ]
+      },
+      {
+        "id": "T",
+        "center": [-1377.1, 1478.0, 606.0],
+        "normal": [-0.2362, 0.2564, 0.9373],
+        "thickness": 1.5,
+        "rings": [
+          {
+            "radius": 102.6,
+            "gap": 0.2
+          },
+          {
+            "radius": 130.6,
+            "markers": 1
+          }
+        ]
+      },
+      {
+        "id": "TL",
+        "center": [-1570.7, 1315.4, 606.0],
+        "normal": [-0.122, 0.1032, 0.9871],
+        "thickness": 1.5,
+        "rings": [
+          {
+            "radius": 77.2,
+            "gap": 0.35
+          }
+        ]
+      }
+    ]
   },
   "sun": {
     "azimuth": 245.0,

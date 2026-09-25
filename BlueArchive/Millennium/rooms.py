@@ -57,6 +57,7 @@ class RoomBuilder:
             self.curtain_wall()
         self.ceiling()
         self.walls()
+        self.closures()
         self.columns()
         self.lights()
         self.sign()
@@ -155,6 +156,33 @@ class RoomBuilder:
                               "Glass Material": M.get("MIL.DoorGlass")},
                              loc=dp, rot_z=math.degrees(door_ang))
                 pos = s1
+
+    def closures(self):
+        """Partition closures: where a wall meets the glass line between two
+        facade mullions, a closure profile (wall thickness + one mullion)
+        seals the joint -- the standard curtain-wall detail that lets a room
+        sit at any 0.3 m offset along the facade.  Skipped where a column
+        already covers the junction."""
+        T = self.R.get("wall_thickness", 0.2)
+        md, mw = CW["mullion_depth"], CW["mullion_width"]
+        ext = CW.get("exterior_cap", 0.06)
+        cols = self.R.get("columns", [])
+        for w in self.R["walls"]:
+            side = {"+Y": 1.0, "-Y": -1.0}.get(w["face"])
+            if side is None:
+                continue
+            for px, py in (w["from"], w["to"]):
+                if abs(px) > 1e-3:
+                    continue
+                yc = py - side * T * 0.5          # centre of the wall body
+                if any(c["center"][0] - c["size"][0] * 0.5 <= 0.01
+                       and abs(c["center"][1] - yc) <= (c["size"][1] + T) * 0.5 + 1e-3
+                       for c in cols):
+                    continue
+                self.obj(f"Closure_{w['id']}", "MIL.Arch.Column",
+                         {"Width X": md + ext, "Width Y": T + mw, "Height": CW["head_height"],
+                          "Material": M.get("MIL.Mullion")},
+                         loc=((md - ext) * 0.5, yc, 0.0))
 
     def columns(self):
         H = self.R["ceiling"]["datum"]

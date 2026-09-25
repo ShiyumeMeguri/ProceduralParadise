@@ -65,7 +65,7 @@ def marble():
         ex = t.min(fx, 1.0 - fx)
         ey = t.min(fy, 1.0 - fy)
         edge = t.min(ex, ey) * tile                  # distance to joint (m)
-        grout = t.map_range(edge, 0.003, 0.0055, 1.0, 0.0)
+        grout = t.map_range(edge, 0.004, 0.0075, 1.0, 0.0)
         rnd = t.n("ShaderNodeTexWhiteNoise", cell, props={"noise_dimensions": "3D"})["Color"]
         # per-tile pattern offset + slight rotation of the vein direction
         Pm = P * 0.55 + rnd * 37.0
@@ -81,13 +81,13 @@ def marble():
         fine_v = S.ramp(t, fine, [(0.0, (0.55, 0.55, 0.55, 1)), (0.03, (0, 0, 0, 1)),
                                   (1.0, (0, 0, 0, 1))])["Color"]
         cloud = S.ramp(t, dist, [(0.3, (0, 0, 0, 1)), (0.75, (0.35, 0.35, 0.35, 1))])["Color"]
-        v = t.n("ShaderNodeRGBToBW", veins).o + t.n("ShaderNodeRGBToBW", fine_v).o * 0.6 \
-            + t.n("ShaderNodeRGBToBW", cloud).o * 0.35
+        v = t.n("ShaderNodeRGBToBW", veins).o * 0.8 + t.n("ShaderNodeRGBToBW", fine_v).o * 0.35 \
+            + t.n("ShaderNodeRGBToBW", cloud).o * 0.5
         base = S.mix_rgb(t, t.clamp01(v), C("marble_base"), C("marble_vein"))
         col = S.mix_rgb(t, grout, base, C("grout"))
         rough = t.mix(grout, 0.045, 0.55)
-        b = S.bsdf(t, Base_Color=col, Roughness=rough, Specular_IOR_Level=0.35,
-                   Coat_Weight=0.15, Coat_Roughness=0.03)
+        b = S.bsdf(t, Base_Color=col, Roughness=rough, Specular_IOR_Level=0.28,
+                   Coat_Weight=0.1, Coat_Roughness=0.03)
         return b["BSDF"]
     return S.material("MIL.Marble", build)
 
@@ -179,7 +179,7 @@ def chair_white():
 
 @_reg("MIL.ChairBlue")
 def chair_blue():
-    return S.principled("MIL.ChairBlue", C("chair_blue"), roughness=0.38, specular=0.3)
+    return S.principled("MIL.ChairBlue", C("chair_blue"), roughness=0.55, specular=0.15)
 
 
 @_reg("MIL.CushionBlue")
@@ -236,8 +236,13 @@ def holo_edge():
 def holo_panel():
     """Frosted, faintly self-lit acrylic sign panel."""
     def build(t: Tree):
-        b = S.bsdf(t, Base_Color=(0.78, 0.86, 0.96, 1), Roughness=0.18, Specular_IOR_Level=0.6,
-                   Emission_Color=(0.75, 0.88, 1.0, 1), Emission_Strength=0.35)["BSDF"]
+        # lighter header band across the top ~15 % of the panel (object Z)
+        z = t.sep(t.n("ShaderNodeTexCoord")["Object"])[2]
+        zmax = PARAMS.get("holo_panel_height", 2.84)
+        band = t.map_range(z, zmax * 0.80, zmax * 0.86, 0.0, 1.0)
+        col = S.mix_rgb(t, band, (0.58, 0.7, 0.9, 1), (0.8, 0.9, 1.0, 1))
+        b = S.bsdf(t, Base_Color=col, Roughness=0.18, Specular_IOR_Level=0.6,
+                   Emission_Color=col, Emission_Strength=t.mix(band, 0.12, 0.3))["BSDF"]
         return b
     return S.material("MIL.HoloPanel", build)
 

@@ -142,3 +142,85 @@ def grade_nodes(t, img, g):
     mapping.update()
     dec = t.n(gamma, cv.o, 2.2).o
     return dec
+
+
+def fit_grade_hist(render, ref, n_knots=17, smooth=0.5, min_slope=0.35, max_slope=3.0,
+                   mask=None):
+    """Distribution-matching grade: per-channel tone curves that map the
+    render's cumulative histogram onto the reference's.  Unlike a pixelwise
+    regression it cannot 'regress to the mean', so contrast is preserved.
+    Returns the same dict layout as :func:`fit_grade` (identity matrix)."""
+    qs = np.linspace(0.0, 1.0, 201)
+    curves = {}
+    for c, name in enumerate("RGB"):
+        a = render[..., c].ravel()
+        b = ref[..., c].ravel()
+        if mask is not None:
+            a = a[mask.ravel()]
+            b = b[mask.ravel()]
+        qa = np.quantile(a, qs)
+        qb = np.quantile(b, qs)
+        knots = np.linspace(0, 1, n_knots)
+        # invert render CDF: for each knot x find the quantile level, then
+        # read the reference value at that level
+        lvl = np.interp(knots, qa, qs, left=0.0, right=1.0)
+        ys = np.interp(lvl, qs, qb)
+        # outside the render's range extrapolate with unit slope
+        ys = np.where(knots < qa[0], qb[0] - (qa[0] - knots), ys)
+        ys = np.where(knots > qa[-1], qb[-1] + (knots - qa[-1]), ys)
+        ys = smooth * ys + (1 - smooth) * np.convolve(np.pad(ys, 1, mode="edge"),
+                                                      [1 / 3, 1 / 3, 1 / 3], "valid")
+        step = knots[1] - knots[0]
+        for i in range(1, len(ys)):
+            ys[i] = min(max(ys[i], ys[i - 1] + min_slope * step), ys[i - 1] + max_slope * step)
+        ys = np.clip(ys, 0, 1)
+        curves[name] = [[float(x), float(v)] for x, v in zip(knots, ys)]
+    return {"matrix": np.eye(3).tolist(), "offset": [0.0, 0.0, 0.0], "curves": curves}
+
+
+def fit_grade_patches(render_patches, ref_patches, n_knots=17, min_slope=0.3, max_slope=3.0,
+                      reg=0.05):
+    """Colour-chart style calibration: ``render_patches`` / ``ref_patches``
+    are (N,3) arrays of mean sRGB colours of the same semantic regions
+    (sky, walls, lit/shadowed floor, desk tops, chairs...).
+
+    Step 1 fits a 3x3 matrix + offset (ridge towards identity) on the patch
+    pairs; step 2 fits per-channel monotone curves through the residual
+    (isotonic regression + linear interpolation between patch values,
+    unit-slope extrapolation at the ends).  Because patches are reliable
+    region means, the fit neither smears contrast (pixelwise regression)
+    nor depends on image composition (histogram matching)."""
+    X = np.asarray(render_patches, float)
+    Y = np.asarray(ref_patches, float)
+    Xa = np.concatenate([X, np.ones((len(X), 1))], 1)
+    lam = reg * len(X)
+    prior = np.vstack([np.eye(3), np.zeros((1, 3))])
+    L = lam * np.eye(4)
+    L[3, 3] = lam * 4.0
+    M = np.linalg.solve(Xa.T @ Xa + L, Xa.T @ Y + L @ prior)
+    Z = Xa @ M
+    knots = np.linspace(0, 1, n_knots)
+    curves = {}
+    for c, name in enumerate("RGB"):
+        order = np.argsort(Z[:, c])
+        z, y = Z[order, c], Y[order, c].copy()
+        # isotonic regression (pool adjacent violators)
+        blocks = [[v, 1] for v in y]
+        i = 0
+        while i < len(blocks) - 1:
+            if blocks[i][0] > blocks[i + 1][0]:
+                v = (blocks[i][0] * blocks[i][1] + blocks[i + 1][0] * blocks[i + 1][1]) / (blocks[i][1] + blocks[i + 1][1])
+                blocks[i] = [v, blocks[i][1] + blocks[i + 1][1]]
+                del blocks[i + 1]
+                i = max(i - 1, 0)
+            else:
+                i += 1
+        yi = np.concatenate([[b[0]] * b[1] for b in blocks])
+        ys = np.interp(knots, z, yi)
+        ys = np.where(knots < z[0], yi[0] - (z[0] - knots), ys)
+        ys = np.where(knots > z[-1], yi[-1] + (knots - z[-1]), ys)
+        step = knots[1] - knots[0]
+        for k in range(1, len(ys)):
+            ys[k] = min(max(ys[k], ys[k - 1] + min_slope * step), ys[k - 1] + max_slope * step)
+        curves[name] = [[float(a), float(np.clip(b, 0, 1))] for a, b in zip(knots, ys)]
+    return {"matrix": M[:3].T.tolist(), "offset": M[3].tolist(), "curves": curves}

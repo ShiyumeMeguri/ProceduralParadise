@@ -213,6 +213,48 @@ def compositor(look: dict | None = None):
     return t
 
 
+def lines(cfg: dict | None):
+    """Freestyle ink lines (the painted-BG outline pass).
+
+    cfg = {"thickness": px at 100 %, "color": [r,g,b], "alpha": a,
+           "crease_deg": angle, "collections": [names]}"""
+    sc = bpy.context.scene
+    if not cfg:
+        sc.render.use_freestyle = False
+        return None
+    sc.render.use_freestyle = True
+    try:
+        sc.render.line_thickness_mode = "RELATIVE"
+    except TypeError:
+        pass
+    sc.render.line_thickness = 1.0
+    vl = bpy.context.view_layer
+    fs = vl.freestyle_settings
+    fs.mode = "EDITOR"
+    fs.crease_angle = __import__("math").radians(cfg.get("crease_deg", 140.0))
+    fs.use_culling = True
+    for ls in list(fs.linesets):
+        fs.linesets.remove(ls)
+    ls = fs.linesets.new("Ink")
+    ls.select_by_visibility = True
+    ls.visibility = "VISIBLE"
+    ls.select_by_edge_types = True
+    ls.select_silhouette = True
+    ls.select_border = True
+    ls.select_crease = True
+    ls.select_external_contour = True
+    cols = cfg.get("collections") or []
+    if cols:
+        ls.select_by_collection = True
+        ls.collection = bpy.data.collections[cols[0]]
+    st = ls.linestyle
+    st.color = tuple(cfg.get("color", (0.08, 0.16, 0.3)))
+    st.alpha = cfg.get("alpha", 0.5)
+    st.thickness = cfg.get("thickness", 1.2)
+    st.chaining = "PLAIN"
+    return ls
+
+
 def render_still(path, use_compositor=True):
     sc = bpy.context.scene
     sc.render.filepath = path

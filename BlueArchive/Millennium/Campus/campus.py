@@ -149,7 +149,7 @@ def build_campus(campus=None, collection=None, city=True, halo=True, towers=True
                              haze=hz["haze"], haze_dist=ex["haze_dist"] * 3.0)
     crown = M.get("MIL.TrimWhite")
     white_fin = KC.plain_material("MIL.FinWhite", (0.86, 0.91, 0.97), rough=0.4, glow=ex["glow"] * 0.5, **hz)
-    dark_glass = KC.plain_material("MIL.DarkGlass", (0.3, 0.5, 0.74), rough=0.32, glow=ex["glow"] * 0.3, **hz)
+    dark_glass = KC.plain_material("MIL.DarkGlass", (0.42, 0.6, 0.8), rough=0.32, glow=ex["glow"] * 0.3, **hz)
     if towers:
         tcol = SC.collection("Towers", parent=col)
         for t in campus["towers"]:
@@ -170,6 +170,7 @@ def build_campus(campus=None, collection=None, city=True, halo=True, towers=True
             "glass_teal": KC.facade_material("KIV.Facade.GlassTeal", glass=(0.3, 0.72, 0.8), frame=(0.75, 0.88, 0.92), vertical=True, glow=ex["glow"], **hz),
             "white_grid": KC.facade_material("KIV.Facade.WhiteGrid", glass=(0.55, 0.75, 0.92), frame=(0.95, 0.97, 1.0), glow=ex["glow"], **hz),
             "glass_blue": KC.facade_material("KIV.Facade.GlassBlue", glass=(0.35, 0.6, 0.9), frame=(0.8, 0.88, 0.95), glass_ratio=0.85, glow=ex["glow"], **hz),
+            "glass_grey": KC.facade_material("KIV.Facade.GlassGrey", glass=(0.22, 0.4, 0.48), frame=(0.62, 0.74, 0.8), floor_h=3.6, glass_ratio=0.96, band_ratio=0.78, glow=ex["glow"] * 0.5, **hz),
         }
         c = campus["city"]
         blocks = SC.gn_object("KIV_CityBlocks", get_asset("KIV.CityBlocks"), {
@@ -185,7 +186,9 @@ def build_campus(campus=None, collection=None, city=True, halo=True, towers=True
                 ob = SC.gn_object(f"KIV_{h['id']}", get_asset("KIV.Tower"), {
                     "Shape": h.get("shape", 0), "Width": h["size"][0], "Depth": h["size"][1],
                     "Height": h["height"], "Crown Height": h.get("crown", 6.0),
-                    "Material": mats[h.get("material", "white_grid")], "Crown Material": mats["white_grid"]},
+                    "Crown Inset": h.get("crown_inset", 3.0), "Mast Height": h.get("mast", 0.0),
+                    "Material": mats[h.get("material", "white_grid")],
+                    "Crown Material": mats[h.get("crown_material", h.get("material", "white_grid"))]},
                     location=(*h["center"], 0.0), collection=ccol)
             elif h["type"] == "arena":
                 band = KC.plain_material("KIV.ArenaBand", (0.93, 0.96, 1.0), rough=0.4, glow=ex["glow"] * 0.6, **hz)
@@ -201,16 +204,5 @@ def build_campus(campus=None, collection=None, city=True, halo=True, towers=True
             location=(-c["extent"] * 1.3, -c["extent"] * 1.3, 0.0), collection=ccol)
     if halo:
         hcol = SC.collection("Kivotos_Halo", parent=col)
-        h = campus["halo"]
-        ob = SC.gn_object("KIV_Halo", get_asset("KIV.HaloRings"), {
-            "Inner Radius": h["inner_radius"], "Outer Radius": h["outer_radius"],
-            "Rings": h["rings"], "Seed": h.get("seed", 4),
-            "Band Width": h.get("band_width", 6.0), "Dots per Ring": h.get("dots", 90),
-            "Dot Size": h.get("dot_size", 5.0),
-            "Material": KS.halo_material(color=tuple(h.get("color", (0.55, 0.95, 1.0))),
-                                         strength=h.get("strength", 5.0))},
-            collection=hcol)
-        a = next(t for t in campus["towers"] if t["id"] == "MIL-A")
-        KS.place_halo(ob, h["center"], tilt_toward=(*a["center"], 0.0), tilt_deg=h.get("tilt_deg", 0.0))
-        out["halo"] = ob
+        out["halo"] = KS.build_halo(campus["halo"], collection=hcol)
     return out

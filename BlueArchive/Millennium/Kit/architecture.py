@@ -32,7 +32,7 @@ def curtain_wall():
                   desc="Number of mullions (computed by the builder from Length/Module)")
     mw = g.inp("Mullion Width", default=CW["mullion_width"], subtype="DISTANCE", panel="Profile")
     md = g.inp("Mullion Depth", default=CW["mullion_depth"], subtype="DISTANCE", panel="Profile")
-    ext = g.inp("Exterior Cap", default=0.06, subtype="DISTANCE", panel="Profile")
+    ext = g.inp("Exterior Cap", default=CW.get("exterior_cap", 0.06), subtype="DISTANCE", panel="Profile")
     sill_h = g.inp("Sill Height", default=CW["sill_height"], subtype="DISTANCE", panel="Rails")
     sill_d = g.inp("Sill Depth", default=0.2, subtype="DISTANCE", panel="Rails")
     rail_z = g.inp("Rail Height", default=CW["rail_height"], subtype="DISTANCE", panel="Rails")

@@ -7,8 +7,9 @@ Kivotos sky: stylised daytime atmosphere + the holographic halo rings.
   ``clusters`` (direction + radius + density), exactly like a matte painter
   blocking cloud masses -- yet they live in world space, so every camera sees
   the same sky.
-* ``KIV.HaloRings`` -- real geometry: concentric glowing bands of constant
-  width, dotted rings and node markers.
+* ``KIV.HaloRing`` / ``build_halo`` -- real geometry: systems of concentric
+  glowing rings (tubes of constant apparent width, arcs, dotted rings, node
+  markers) floating over the city.
 """
 from __future__ import annotations
 
@@ -26,6 +27,8 @@ DEFAULT_SKY = {
     "zenith": [0.03, 0.3, 0.95],
     "mid": [0.12, 0.62, 1.0],
     "horizon": [0.35, 0.88, 1.0],
+    "mid_pos": 0.14,          # sin(elevation) of the mid colour stop
+    "zenith_pos": 0.6,
     "ground": [0.45, 0.62, 0.78],
     "strength": 1.0,
     "camera_boost": 1.0,
@@ -56,8 +59,8 @@ def build_world(cfg=None, name="Kivotos.Sky"):
     d = t.vmath("NORMALIZE", t.n("ShaderNodeTexCoord")["Generated"])
     dx, dy, dz = t.sep(d)
     up = t.map_range(dz, 0.0, 1.0, 0.0, 1.0)
-    grad = S.ramp(t, up, [(0.0, (*c["horizon"], 1)), (0.14, (*c["mid"], 1)),
-                          (0.6, (*c["zenith"], 1)), (1.0, (*c["zenith"], 1))])["Color"]
+    grad = S.ramp(t, up, [(0.0, (*c["horizon"], 1)), (c.get("mid_pos", 0.14), (*c["mid"], 1)),
+                          (c.get("zenith_pos", 0.6), (*c["zenith"], 1)), (1.0, (*c["zenith"], 1))])["Color"]
 
     # ---- cumulus layer in azimuth/elevation space
     az = t.math("ARCTAN2", dx, dy)                        # radians, 0 = +Y
@@ -118,44 +121,47 @@ def add_sun(azimuth_deg, elevation_deg, strength=4.0, color=(1.0, 0.98, 0.95), a
 
 
 # ------------------------------------------------------------------ halo rings
-@asset("KIV.HaloRings", "Kivotos")
-def halo_rings():
-    """Holographic halo: concentric glowing bands of constant width (some
-    broken into arcs), dotted rings, centred on the origin in the XY plane."""
-    g = GN("KIV.HaloRings", halo_rings.__doc__)
-    r0 = g.inp("Inner Radius", default=150.0, subtype="DISTANCE")
-    r1 = g.inp("Outer Radius", default=1000.0, subtype="DISTANCE")
-    n = g.inp("Rings", "INT", default=8, min=1)
-    wdt = g.inp("Band Width", default=6.0, subtype="DISTANCE")
-    seed = g.inp("Seed", "INT", default=4)
-    gaps = g.inp("Arc Gaps", default=0.62, subtype="FACTOR", desc="higher = fewer gaps")
-    dots = g.inp("Dots per Ring", "INT", default=90)
-    dsize = g.inp("Dot Size", default=5.0, subtype="DISTANCE")
+@asset("KIV.HaloRing", "Kivotos")
+def halo_ring():
+    """One holographic halo ring in the local XY plane, centred on the origin.
+
+    The ring is a thin round tube, so it reads as a line of constant width
+    from any direction.  ``Gap`` breaks it into arcs (seeded), ``Dotted``
+    replaces the line by a row of dots, and ``Markers`` adds short brighter
+    node dashes along the ring."""
+    g = GN("KIV.HaloRing", halo_ring.__doc__)
+    R = g.inp("Radius", default=300.0, subtype="DISTANCE")
+    th = g.inp("Thickness", default=4.0, subtype="DISTANCE", desc="tube diameter")
+    gap = g.inp("Gap", default=0.0, subtype="FACTOR", desc="share of the ring left open")
+    seed = g.inp("Seed", "INT", default=0)
+    dotted = g.inp("Dotted", "BOOL", default=False)
+    ndots = g.inp("Dot Count", "INT", default=180, min=3)
+    marks = g.inp("Markers", "INT", default=3, min=0)
+    mlen = g.inp("Marker Length", default=14.0, subtype="DISTANCE")
     m = g.inp("Material", "MATERIAL")
-    pts = g.mesh_to_points(g.mesh_line(n, (0, 0, 0), (1, 0, 0)))
-    idx = g.index()
-    t = idx / g.max(g.math("SUBTRACT", n, 1), 1)
-    jitter = g.random(-0.3, 0.3, seed, idx) / g.max(n, 1)
-    rad = r0 + (r1 - r0) * g.math("POWER", g.clamp01(t + jitter), 1.3)
-    pts = g.store(pts, "ring_r", rad, dtype="FLOAT")
-    circle = g.circle(1.0, 360)
-    rr = g.n("GeometryNodeInputNamedAttribute", Name="ring_r", props={"data_type": "FLOAT"}).o
-    rings = g.realize(g.iop(pts, circle, scale=g.vec(rr, rr, rr)))
-    P = g.position()
-    px, py, pz = g.sep(P)
+
+    # edge loop -> delete gap vertices -> arcs (mesh-to-curve splits at gaps)
+    loop = g.sweep(g.circle(R, 720), None, False)
+    px, py, _ = g.sep(g.position())
     ang = g.math("ARCTAN2", py, px)
-    rr2 = g.n("GeometryNodeInputNamedAttribute", Name="ring_r", props={"data_type": "FLOAT"}).o
-    gap = g.n("ShaderNodeTexNoise", g.vec(ang * 1.2, rr2 * 0.01, 0.0), Scale=1.4,
-              props={"noise_dimensions": "3D"})["Fac"]
-    rings = g.delete(rings, g.compare(gap, gaps, "GREATER_THAN"))
-    bands = g.sweep(rings, g.rect(wdt, g.math("MULTIPLY", wdt, 0.1)), False)
-    rad3 = r0 * 1.35 + g.index() * (r1 - r0) * 0.27
-    drings = g.realize(g.iop(g.mesh_to_points(g.mesh_line(3, (0, 0, 0), (1, 0, 0))), circle,
-                             scale=g.vec(rad3, rad3, 1.0)))
-    dpts = g.n("GeometryNodeCurveToPoints", drings, Count=dots, props={"mode": "COUNT"}).o
-    dot = g.n("GeometryNodeMeshUVSphere", Segments=10, Rings=5, Radius=1.0)["Mesh"]
-    dotted = g.realize(g.iop(dpts, dot, scale=g.vec(dsize, dsize, g.math("MULTIPLY", dsize, 0.2))))
-    g.result(g.mat(g.join(bands, dotted), m))
+    sd = g.math("MULTIPLY", seed, 7.31)
+    nz = g.n("ShaderNodeTexNoise", g.vec(g.cos(ang) * 1.3, g.sin(ang) * 1.3, sd), Scale=1.0,
+             Detail=0.0, props={"noise_dimensions": "3D"})["Fac"]
+    loop = g.delete(loop, g.compare(nz, g.map_range(gap, 0.0, 1.0, 0.2, 0.8), "LESS_THAN"))
+    arcs = g.n("GeometryNodeMeshToCurve", loop).o
+    solid = g.tube(arcs, th * 0.5, 6, caps=True)
+    dpts = g.n("GeometryNodeCurveToPoints", arcs, Count=ndots, props={"mode": "COUNT"}).o
+    dot = g.n("GeometryNodeMeshUVSphere", Segments=8, Rings=4, Radius=1.0)["Mesh"]
+    dots = g.realize(g.iop(dpts, dot, scale=th * 0.9))
+    ring = g.switch(dotted, solid, dots)
+
+    # node markers: short dashes tangent to the ring at seeded angles
+    mp = g.mesh_to_points(g.mesh_line(marks, (0, 0, 0), (0, 0, 0)))
+    a = g.random(0.0, 6.2831853, g.math("ADD", seed, 11), g.index())
+    mp = g.set_pos(mp, pos=g.vec(g.cos(a) * R, g.sin(a) * R, 0.0))
+    dash = g.transform(g.cylinder(1.0, 1.0, 8), r=(1.5707963, 0.0, 0.0), s=(1.0, 1.0, 1.0))
+    mk = g.iop(mp, dash, rot=g.vec(0.0, 0.0, a), scale=g.vec(th * 1.1, mlen, th * 1.1))
+    g.result(g.mat(g.join(ring, g.realize(mk)), m))
     return g
 
 
@@ -167,16 +173,33 @@ def halo_material(name="Kivotos.Halo", color=(0.55, 0.95, 1.0), strength=5.0, al
     return S.material(name, build)
 
 
-def place_halo(ob, center, tilt_toward=None, tilt_deg=0.0):
-    """Position the halo; optionally tilt its plane by ``tilt_deg`` about the
-    horizontal axis perpendicular to the direction of ``tilt_toward`` (e.g.
-    the viewer), so the near side dips towards it."""
-    ob.location = Vector(center)
-    if tilt_toward is not None and tilt_deg:
-        v = Vector(tilt_toward) - Vector(center)
-        v.z = 0.0
-        if v.length > 1e-6:
-            v.normalize()
-            axis = Vector((-v.y, v.x, 0.0))
-            ob.rotation_euler = Matrix.Rotation(math.radians(-tilt_deg), 4, axis).to_euler()
-    return ob
+def build_halo(cfg, collection=None, name="KIV_Halo"):
+    """Place the halo field described by ``cfg``::
+
+        {"color": [...], "strength": 3.0,
+         "systems": [{"id", "center": [x,y,z], "normal": [nx,ny,nz],
+                      "rings": [{"radius", "thickness", "gap", "seed",
+                                 "dotted", "dots", "markers"}, ...]}, ...]}
+
+    Each system is a set of concentric rings in one plane (an empty carries
+    the plane, the rings are its children), so a system can be moved or
+    re-tilted as a unit.  Returns the list of system empties."""
+    from Core import scene as SC
+    from Core.gn import get_asset
+    mat = halo_material(color=tuple(cfg.get("color", (0.6, 0.96, 1.0))),
+                        strength=cfg.get("strength", 3.0))
+    roots = []
+    for s in cfg["systems"]:
+        n = Vector(s["normal"]).normalized()
+        root = SC.empty(f"{name}_{s['id']}", location=tuple(s["center"]),
+                        rotation=n.to_track_quat("Z", "Y").to_euler(), collection=collection,
+                        display="CIRCLE", size=50.0)
+        for i, r in enumerate(s["rings"]):
+            SC.gn_object(f"{name}_{s['id']}_{i}", get_asset("KIV.HaloRing"), {
+                "Radius": r["radius"], "Thickness": r.get("thickness", s.get("thickness", 4.0)),
+                "Gap": r.get("gap", 0.0), "Seed": r.get("seed", i),
+                "Dotted": bool(r.get("dotted", False)), "Dot Count": r.get("dots", 180),
+                "Markers": r.get("markers", 0), "Marker Length": r.get("marker_length", 14.0),
+                "Material": mat}, collection=collection, parent=root)
+        roots.append(root)
+    return roots

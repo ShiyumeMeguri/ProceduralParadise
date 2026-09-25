@@ -20,8 +20,9 @@
   },
   "curtain_wall": {
     "module": 1.5,
-    "mullion_width": 0.1,
-    "mullion_depth": 0.2,
+    "mullion_width": 0.05,
+    "mullion_depth": 0.06,
+    "exterior_cap": 0.03,
     "sill_height": 0.1,
     "rail_height": 0.56,
     "rail_thickness": 0.045,
@@ -48,15 +49,15 @@
     "mullion": [0.62, 0.7, 0.8],
     "desk_top": [0.9, 0.93, 0.96],
     "desk_edge": [0.3, 0.35, 0.4],
-    "chair_white": [0.8, 0.85, 0.92],
-    "chair_blue": [0.0, 0.45, 1.0],
+    "chair_white": [0.46, 0.6, 0.74],
+    "chair_blue": [0.0, 0.5, 1.0],
     "cushion_blue": [0.0, 0.22, 0.8],
     "millennium_blue": [0.05, 0.42, 0.95],
     "holo_cyan": [0.2, 0.85, 1.0],
-    "marble_base": [0.3, 0.37, 0.47],
-    "marble_vein": [0.22, 0.29, 0.4],
-    "grout": [0.1, 0.13, 0.18],
+    "marble_base": [0.14, 0.26, 0.45],
+    "marble_vein": [0.12, 0.23, 0.4],
+    "grout": [0.05, 0.07, 0.11],
     "facade_spandrel": [0.55, 0.64, 0.74],
-    "glass_tint": [0.86, 0.95, 1.0]
+    "glass_tint": [0.94, 0.98, 1.0]
   }
 }

@@ -135,7 +135,7 @@ def city_blocks():
 @asset("KIV.Tower", "Kivotos")
 def tower():
     """Hero high-rise: rectangular (Shape 0) or cylindrical (Shape 1) shaft
-    with vertical fins, a set-back crown and a roof mast.  Origin at the base
+    with a set-back crown and an optional roof mast.  Origin at the base
     centre."""
     g = GN("KIV.Tower", tower.__doc__)
     shape = g.inp("Shape", "INT", default=0, min=0, max=1)
@@ -145,6 +145,7 @@ def tower():
     crown = g.inp("Crown Height", default=10.0, subtype="DISTANCE")
     inset = g.inp("Crown Inset", default=3.0, subtype="DISTANCE")
     fins = g.inp("Fin Spacing", default=0.0, subtype="DISTANCE", desc="0 = no fins")
+    mast_h = g.inp("Mast Height", default=0.0, subtype="DISTANCE", desc="0 = no roof mast")
     m = g.inp("Material", "MATERIAL")
     m2 = g.inp("Crown Material", "MATERIAL")
     is_cyl = g.compare(shape, 0.5, "GREATER_THAN")
@@ -157,7 +158,9 @@ def tower():
     crown_box = g.box(cw * -0.5, cd * -0.5, h, cw * 0.5, cd * 0.5, h + crown)
     crown_cyl = g.transform(cyl, t=g.vec(0.0, 0.0, h + crown * 0.5), s=g.vec(cw * 0.5, cw * 0.5, crown))
     cr = g.switch(is_cyl, crown_box, crown_cyl)
-    mast = g.transform(g.cylinder(0.6, 1.0, 8), t=g.vec(0.0, 0.0, h + crown + 6.0), s=(1.0, 1.0, 12.0))
+    mast = g.transform(g.cylinder(0.6, 1.0, 8), t=g.vec(0.0, 0.0, h + crown + mast_h * 0.5),
+                       s=g.vec(1.0, 1.0, g.max(mast_h, 0.001)))
+    mast = g.switch(g.compare(mast_h, 0.01, "GREATER_THAN"), None, mast)
     g.result(g.join(g.mat(shaft, m), g.mat(g.join(cr, mast), m2)))
     return g
 
