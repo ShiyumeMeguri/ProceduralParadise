@@ -1,0 +1,96 @@
+{
+  "id": "BG_Milleniumclub",
+  "reference": "../Reference/BG_Milleniumclub.webp",
+  "notes": "Camera from the photogrammetric solve of the reference (2-point perspective: zero pitch/roll, principal point shifted). Location/yaw are in the ROOM frame.",
+  "camera": {
+    "resolution": [1280, 900],
+    "focal_px": 1137.1,
+    "principal_px": [733.9, 492.56],
+    "location": [8.04, 6.06, 1.2],
+    "yaw_deg": 21.412,
+    "pitch_deg": 0.0,
+    "roll_deg": 0.0
+  },
+  "sky": {
+    "zenith": [0.03, 0.3, 0.95],
+    "mid": [0.12, 0.62, 1.0],
+    "horizon": [0.35, 0.88, 1.0],
+    "ground": [0.45, 0.62, 0.78],
+    "strength": 0.5,
+    "cloud": {
+      "scale": 10.0,
+      "coverage": 0.74,
+      "softness": 0.06,
+      "color": [1.0, 1.0, 1.0],
+      "shadow": [0.62, 0.8, 0.97],
+      "strength": 1.3,
+      "seed": [3.1, 7.7, 0.0],
+      "clusters": [
+        {
+          "az": 306.0,
+          "el": 14.5,
+          "radius": 5.0,
+          "density": 0.22
+        },
+        {
+          "az": 309.0,
+          "el": 6.0,
+          "radius": 3.5,
+          "density": 0.18
+        },
+        {
+          "az": 331.0,
+          "el": 3.2,
+          "radius": 7.0,
+          "density": 0.28
+        },
+        {
+          "az": 322.0,
+          "el": 7.5,
+          "radius": 3.0,
+          "density": 0.14
+        }
+      ]
+    },
+    "camera_boost": 2.9,
+    "glossy_boost": 1.0
+  },
+  "sun": {
+    "azimuth": 280.0,
+    "elevation": 29.0,
+    "strength": 9.0,
+    "angle": 1.5
+  },
+  "render": {
+    "samples": 160,
+    "scale": 1.0,
+    "view": "Standard",
+    "look": null,
+    "exposure": -1.0
+  },
+  "look": {
+    "glow": {
+      "threshold": 1.0,
+      "size": 6,
+      "strength": 0.18,
+      "quality": "Medium"
+    },
+    "grade": {
+      "matrix": [[0.8097, -0.1282, 0.1983], [-0.0161, 0.7363, 0.2191], [-0.0511, -0.1374, 1.1672]],
+      "offset": [0.0088, 0.0188, 0.0204],
+      "curves": {
+        "R": [[0.0, 0.0745], [0.125, 0.1307], [0.25, 0.299], [0.375, 0.3991], [0.5, 0.4838], [0.625, 0.5765], [0.75, 0.7408], [0.875, 0.8541], [1.0, 0.9104]],
+        "G": [[0.0, 0.3306], [0.125, 0.3868], [0.25, 0.4431], [0.375, 0.4993], [0.5, 0.5556], [0.625, 0.6212], [0.75, 0.7148], [0.875, 0.8731], [1.0, 0.9294]],
+        "B": [[0.0, 0.3815], [0.125, 0.4377], [0.25, 0.494], [0.375, 0.5502], [0.5, 0.6065], [0.625, 0.6775], [0.75, 0.7603], [0.875, 0.8357], [1.0, 0.9804]]
+      }
+    }
+  },
+  "materials": {
+    "glass_camera_boost": 1.6
+  },
+  "exterior": {
+    "haze": [0.62, 0.8, 0.92],
+    "haze_dist": 3200.0,
+    "glow": 0.1
+  }
+}

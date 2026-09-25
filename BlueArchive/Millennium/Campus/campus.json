@@ -1,0 +1,129 @@
+{
+  "id": "MillenniumCampus",
+  "notes": ["Campus frame: +X east, +Y north, Z up, metres. MIL-A (main academic tower) base centre = origin.", "Towers use the academy facade system (Kit curtain wall per storey), so any room placed on a storey sees the real facade.", "Hero buildings were positioned so the view from the club room reproduces BG_Milleniumclub; they are ordinary world geometry."],
+  "towers": [
+    {
+      "id": "MIL-A",
+      "name": "Academic Tower A",
+      "center": [0.0, 0.0],
+      "rotation": 0.0,
+      "size": [48.0, 48.0],
+      "storeys": 36,
+      "crown": 14.0,
+      "style": "grid",
+      "core_inset": 15.0
+    },
+    {
+      "id": "MIL-B",
+      "name": "Research Tower B",
+      "center": [-704.5, 589.4],
+      "rotation": 0.0,
+      "size": [34.0, 34.0],
+      "storeys": 31,
+      "crown": 10.2,
+      "style": "stripe",
+      "core_inset": 9.0
+    },
+    {
+      "id": "MIL-C",
+      "name": "Research Tower C",
+      "center": [-667.5, 603.9],
+      "rotation": 0.0,
+      "size": [28.0, 26.0],
+      "storeys": 32,
+      "crown": 8.3,
+      "style": "stripe",
+      "core_inset": 9.0
+    },
+    {
+      "id": "MIL-D",
+      "name": "Seminar Hall D",
+      "center": [110.0, -40.0],
+      "rotation": 0.0,
+      "size": [42.0, 30.0],
+      "storeys": 22,
+      "crown": 6.0,
+      "style": "grid",
+      "core_inset": 9.0
+    },
+    {
+      "id": "MIL-E",
+      "name": "Engineering Block E",
+      "center": [-40.0, 150.0],
+      "rotation": 0.0,
+      "size": [54.0, 36.0],
+      "storeys": 16,
+      "crown": 4.0,
+      "style": "grid",
+      "core_inset": 9.0
+    }
+  ],
+  "hero_buildings": [
+    {
+      "id": "cyl_glass",
+      "type": "tower",
+      "shape": 1,
+      "center": [-784.2, 773.0],
+      "size": [41.0, 41.0],
+      "height": 157.8,
+      "crown": 6.0,
+      "material": "glass_teal"
+    },
+    {
+      "id": "white_tower",
+      "type": "tower",
+      "shape": 0,
+      "center": [-685.4, 919.1],
+      "size": [30.0, 26.0],
+      "height": 181.4,
+      "crown": 8.0,
+      "material": "white_grid"
+    },
+    {
+      "id": "glass_block_L",
+      "type": "tower",
+      "shape": 0,
+      "center": [-850.3, 639.6],
+      "size": [62.0, 52.0],
+      "height": 106.1,
+      "crown": 3.0,
+      "material": "glass_blue"
+    },
+    {
+      "id": "arena",
+      "type": "arena",
+      "center": [-1010.9, 791.4],
+      "radius": 72.5,
+      "height": 41.4
+    }
+  ],
+  "city": {
+    "extent": 3200.0,
+    "block": 58.0,
+    "clear_radius": 320.0,
+    "height_min": 14.0,
+    "height_max": 150.0,
+    "cluster_scale": 0.0011,
+    "seed": 7,
+    "near_height_scale": 0.45,
+    "far_height_scale": 1.35
+  },
+  "halo": {
+    "center": [-2266.0, 1984.0, 606.0],
+    "inner_radius": 260.0,
+    "outer_radius": 1500.0,
+    "rings": 13,
+    "band_width": 3.2,
+    "tilt_deg": 6.0,
+    "seed": 4,
+    "dots": 140,
+    "dot_size": 3.0,
+    "color": [0.6, 0.96, 1.0],
+    "strength": 3.2
+  },
+  "sun": {
+    "azimuth": 245.0,
+    "elevation": 38.0,
+    "strength": 4.2
+  }
+}

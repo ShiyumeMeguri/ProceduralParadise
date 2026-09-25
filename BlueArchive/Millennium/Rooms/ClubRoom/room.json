@@ -1,0 +1,315 @@
+{
+  "id": "ClubRoom",
+  "name": "Millennium Club Room (BG_Milleniumclub)",
+  "notes": ["Room frame: origin = inner glass line x front wall, finished floor. +X into the room (east), +Y along the facade (north), Z up.", "Everything snaps to the Millennium modules (0.3 planning / 1.2 tile / 1.5 facade / 6.0 bay).", "Placement in the campus: tower MIL-A, storey 24, west facade, facade bays starting at tower-local y = -6.0."],
+  "placement": {
+    "tower": "MIL-A",
+    "storey": 24,
+    "facade": "west",
+    "facade_offset": -6.0
+  },
+  "size": [10.5, 24.0],
+  "ceiling": {
+    "datum": 3.96,
+    "main": 4.2,
+    "coffer": 4.4,
+    "void_top": 5.05,
+    "soffit": {
+      "window": 1.11,
+      "right": 1.5,
+      "front": 1.5,
+      "back": 1.73
+    },
+    "window_step": {
+      "height": 0.06,
+      "depth": 0.17
+    },
+    "coffer_rect": [2.45, 5.81, 7.5, 18.19],
+    "trim_width": 0.06
+  },
+  "curtain_wall": {
+    "first_mullion": 0.0,
+    "module": 1.5
+  },
+  "walls": [
+    {
+      "id": "back",
+      "from": [0.0, 24.0],
+      "to": [10.5, 24.0],
+      "face": "-Y",
+      "openings": [
+        {
+          "type": "glass_door",
+          "x0": 9.1,
+          "width": 1.2,
+          "height": 2.7
+        }
+      ]
+    },
+    {
+      "id": "front",
+      "from": [0.0, 0.0],
+      "to": [10.5, 0.0],
+      "face": "+Y",
+      "openings": []
+    },
+    {
+      "id": "right",
+      "from": [10.5, 0.0],
+      "to": [10.5, 24.0],
+      "face": "-X",
+      "openings": [
+        {
+          "type": "glass_door",
+          "x0": 1.8,
+          "width": 1.8,
+          "height": 2.7
+        }
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "id": "corner_nw",
+      "center": [0.21, 23.79],
+      "size": [0.42, 0.42]
+    },
+    {
+      "id": "pilaster_door",
+      "center": [8.95, 23.9],
+      "size": [0.24, 0.2]
+    }
+  ],
+  "lights": {
+    "z": 3.36,
+    "length": 5.71,
+    "width": 0.25,
+    "housing": 0.1,
+    "center_x": 5.375,
+    "rows_y": [6.6, 8.7, 10.8, 12.91, 15.24, 17.95],
+    "watts": 15.0,
+    "uplight_watts": 35.0
+  },
+  "sign": {
+    "center_x": 4.69,
+    "bottom_z": 0.62,
+    "height": 2.836,
+    "top_width": 7.57,
+    "bottom_width": 6.54,
+    "artwork_x": -0.05,
+    "emblem_height": 1.155,
+    "emblem_z": 1.673,
+    "text_height": 0.234,
+    "text_z": 0.763
+  },
+  "shelves": [
+    {
+      "id": "shelf_left_a",
+      "center": [1.62, 20.2],
+      "rotation": 0,
+      "top_rail": true,
+      "rail_length": 2.6,
+      "tower_width": 0.52,
+      "height": 2.18,
+      "wing1": 0.69,
+      "wing2": 0.5,
+      "wing1_z": 1.3,
+      "wing2_z": 1.72
+    },
+    {
+      "id": "shelf_left_b",
+      "center": [3.05, 20.2],
+      "rotation": 0,
+      "top_rail": false,
+      "tower_width": 0.52,
+      "height": 2.18,
+      "wing1": 0.6,
+      "wing2": 0.45,
+      "wing1_z": 1.3,
+      "wing2_z": 1.72
+    },
+    {
+      "id": "shelf_right",
+      "center": [6.85, 20.12],
+      "rotation": 0,
+      "top_rail": false,
+      "tower_width": 0.7,
+      "height": 2.36,
+      "wing1": 0.86,
+      "wing2": 0.54,
+      "wing1_z": 1.4,
+      "wing2_z": 1.86
+    }
+  ],
+  "desks": {
+    "unit": {
+      "width": 0.72,
+      "depth": 1.2,
+      "height": 0.845
+    },
+    "clusters": [
+      {
+        "id": "L1",
+        "origin": [2.4, 10.5],
+        "units": 3,
+        "seats": [
+          {
+            "chair": "white"
+          },
+          {
+            "chair": "blue",
+            "cushions": 1
+          },
+          {
+            "chair": "white"
+          }
+        ],
+        "props": [
+          {
+            "type": "laptop",
+            "unit": 2,
+            "offset": [0.02, 0.25]
+          }
+        ],
+        "unit_width": 0.88
+      },
+      {
+        "id": "R1",
+        "origin": [6.07, 10.5],
+        "units": 3,
+        "seats": [
+          {
+            "chair": "white"
+          },
+          {
+            "chair": "blue"
+          },
+          {
+            "chair": "white",
+            "cushions": 2
+          }
+        ],
+        "props": [
+          {
+            "type": "laptop",
+            "unit": 0,
+            "offset": [0.05, 0.3]
+          }
+        ],
+        "unit_width": 0.72
+      },
+      {
+        "id": "L2",
+        "origin": [2.4, 13.66],
+        "units": 3,
+        "seats": [
+          {
+            "chair": "blue"
+          },
+          {
+            "chair": "white"
+          },
+          {
+            "chair": "blue"
+          }
+        ],
+        "props": [
+          {
+            "type": "laptop",
+            "unit": 1,
+            "offset": [0.0, 0.3]
+          }
+        ],
+        "unit_width": 0.88
+      },
+      {
+        "id": "R2",
+        "origin": [6.07, 13.66],
+        "units": 3,
+        "seats": [
+          {
+            "chair": "white"
+          },
+          {
+            "chair": "blue"
+          },
+          {
+            "chair": "white"
+          }
+        ],
+        "props": [
+          {
+            "type": "pencup",
+            "unit": 1,
+            "offset": [0.15, 0.15]
+          }
+        ],
+        "unit_width": 0.72
+      },
+      {
+        "id": "L3",
+        "origin": [2.4, 16.82],
+        "units": 3,
+        "seats": [
+          {
+            "chair": "white"
+          },
+          {
+            "chair": "white"
+          },
+          {
+            "chair": "blue"
+          }
+        ],
+        "props": [
+          {
+            "type": "laptop",
+            "unit": 0,
+            "offset": [0.0, 0.3]
+          }
+        ],
+        "unit_width": 0.88
+      },
+      {
+        "id": "R3",
+        "origin": [6.07, 16.82],
+        "units": 3,
+        "seats": [
+          {
+            "chair": "blue"
+          },
+          {
+            "chair": "white"
+          },
+          {
+            "chair": "white"
+          }
+        ],
+        "props": [
+          {
+            "type": "pencup",
+            "unit": 1,
+            "offset": [0.1, 0.2]
+          },
+          {
+            "type": "laptop",
+            "unit": 2,
+            "offset": [0.0, 0.3]
+          }
+        ],
+        "unit_width": 0.72
+      }
+    ],
+    "chair_tuck": 0.33
+  },
+  "wall_washers": [
+    {
+      "id": "back",
+      "location": [5.25, 23.62, 3.93],
+      "length": 10.2,
+      "watts": 260.0,
+      "rotation_deg": [-28.0, 0.0, 0.0],
+      "spread_deg": 110
+    }
+  ]
+}
