@@ -1,0 +1,78 @@
+name: Release
+
+# Builds every scene's .blend from the tagged source with Blender's Python
+# module (the same build.py a user runs locally) and publishes them as the
+# assets of a GitHub release.
+#   * Actions -> Release -> Run workflow (tag, e.g. v1.0), or
+#   * push a tag v*.
+# Release notes come from .github/release-notes/<tag>.md when that file exists.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag
+        required: true
+        default: v1.0
+      title:
+        description: Release title (default "ProceduralParadise <version>")
+        required: false
+        default: ""
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      TITLE: ${{ inputs.title }}
+      BPY_VERSION: "5.2.2"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: System libraries used by the bpy module
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libgl1 libglx0 libegl1 libice6 libsm6 libx11-6 libxext6 libxfixes3 libxi6 \
+            libxrender1 libxkbcommon0 libxcb1
+
+      - name: Blender as a Python module
+        run: pip install "bpy==${BPY_VERSION}"
+
+      - name: Build the scenes
+        run: |
+          python BlueArchive/build.py Millennium/Rooms/ClubRoom
+          python BlueArchive/build.py Shanhaijing/Rooms/TeaHouse
+          mkdir -p dist
+          cp Build/Millennium/ClubRoom/ClubRoom.blend dist/Millennium_ClubRoom.blend
+          cp Build/Shanhaijing/TeaHouse/TeaHouse.blend dist/Shanhaijing_TeaHouse.blend
+          ls -l dist
+
+      - name: Check the files open on their own
+        run: python .github/scripts/check_blend.py dist/*.blend
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=".github/release-notes/${TAG}.md"
+          if [ ! -f "$notes" ]; then
+            printf 'Scenes built from %s with Blender %s (bpy module).\n' "$GITHUB_SHA" "$BPY_VERSION" > /tmp/notes.md
+            notes=/tmp/notes.md
+          fi
+          title="${TITLE:-ProceduralParadise ${TAG#v}}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.blend --clobber
+            gh release edit "$TAG" --title "$title" --notes-file "$notes"
+          else
+            gh release create "$TAG" dist/*.blend --title "$title" --notes-file "$notes" --target "$GITHUB_SHA"
+          fi

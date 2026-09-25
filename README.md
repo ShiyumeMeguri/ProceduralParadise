@@ -16,6 +16,13 @@
 
   ![TeaHouse render vs reference](BlueArchive/Shanhaijing/Rooms/TeaHouse/Renders/BG_ShanTeaHouse_Night_compare.png)
 
+## 下载
+
+不想自己构建的话，[Releases](https://github.com/ShiyumeMeguri/ProceduralParadise/releases) 里有构建好的两个场景的
+`.blend`（用 Blender 5.2 LTS 或更新版本打开）。每个版本都由 `.github/workflows/release.yml` 从对应的源码自动构建：
+在 Actions 里运行 **Release**（填版本标签，如 `v1.0`），或推送一个 `v*` 标签；
+发行说明取自 `.github/release-notes/<标签>.md`。
+
 ## 快速开始（本地 Blender）
 
 需要 Blender 4.4 以上（视频合成用到 4.4 起的序列编辑器接口），最近一次在 **Blender 5.3** 上验证。
