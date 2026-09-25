@@ -247,13 +247,14 @@ def _motif_mask(t, P3, rows=26.0, cols=9.0, keep=0.45, size=0.23):
 
 @_reg("SHJ.LacquerBlackGold")
 def lacquer_black_gold():
-    """Blue-black lacquer with sparse gold calligraphic motifs (the
-    structural columns)."""
+    """Blue-black lacquer with sparse calligraphic motifs (the structural
+    columns); the motif colour is the palette's ``column_motif`` -- pale
+    silver in the tea house (the name stays for the gilded variants)."""
     def build(t: Tree):
         m = _motif_mask(t, _obj(t), rows=P("motif_rows", 7.0), cols=P("motif_cols", 5.0))
-        col = S.mix_rgb(t, m, C("lacquer_blue_black"), C("gold"))
-        return S.bsdf(t, Base_Color=col, Metallic=m * 0.85, Roughness=t.mix(m, 0.3, 0.35),
-                      Specular_IOR_Level=0.5, Coat_Weight=t.mix(m, 0.45, 0.0),
+        col = S.mix_rgb(t, m, C("lacquer_blue_black"), C("column_motif"))
+        return S.bsdf(t, Base_Color=col, Metallic=m * P("column_motif_metal", 0.0), Roughness=t.mix(m, 0.35, 0.35),
+                      Specular_IOR_Level=0.5, Coat_Weight=t.mix(m, 0.2, 0.0),
                       Coat_Roughness=0.12)["BSDF"]
     return S.material("SHJ.LacquerBlackGold", build)
 
@@ -485,7 +486,7 @@ def night_backdrop():
     glow (emissive, like the world) with soft vertical falloff."""
     def build(t: Tree):
         z = t.sep(_obj(t))[2]
-        k = t.map_range(z, 0.0, P("backdrop_height", 4.0), 0.0, 1.0)
+        k = t.map_range(z, P("backdrop_z0", 0.0), P("backdrop_height", 4.0), 0.0, 1.0)
         col = S.mix_rgb(t, k, P("night_low", (0.08, 0.14, 0.32, 1.0)),
                         P("night_high", (0.02, 0.04, 0.12, 1.0)))
         return t.n("ShaderNodeEmission", Color=col, Strength=P("backdrop_strength", 1.0))["Emission"]
@@ -498,9 +499,9 @@ def night_backdrop_bay():
     bay (same night gradient, its own strength)."""
     def build(t: Tree):
         z = t.sep(_obj(t))[2]
-        k = t.map_range(z, 0.0, P("backdrop_height", 4.0), 0.0, 1.0)
-        col = S.mix_rgb(t, k, P("night_low", (0.08, 0.14, 0.32, 1.0)),
-                        P("night_high", (0.02, 0.04, 0.12, 1.0)))
+        k = t.map_range(z, 0.0, P("bay_backdrop_height", 4.0), 0.0, 1.0)
+        col = S.mix_rgb(t, k, P("bay_low", (0.08, 0.14, 0.32, 1.0)),
+                        P("bay_high", (0.02, 0.04, 0.12, 1.0)))
         return t.n("ShaderNodeEmission", Color=col, Strength=P("bay_backdrop_strength", 1.5))["Emission"]
     return S.material("SHJ.NightBackdropBay", build)
 
@@ -654,6 +655,13 @@ def celadon():
     return S.principled("SHJ.Celadon", C("celadon"), roughness=0.15, specular=0.55, coat=0.5)
 
 
+@_reg("SHJ.Bamboo")
+def bamboo_stalk():
+    """Glossy pale yellow-green bamboo stalks."""
+    return S.principled("SHJ.Bamboo", P("bamboo", (0.42, 0.52, 0.16, 1.0)), roughness=0.3, specular=0.5,
+                        coat=0.3)
+
+
 @_reg("SHJ.CaddyLime")
 def caddy_lime():
     """Glossy yellow-green glaze (tea caddies in the cabinet)."""
@@ -705,8 +713,8 @@ def lantern_paper():
         ang = t.math("ARCTAN2", py, px)
         rib = t.map_range(t.abs(t.math("FRACT", ang * (P("lantern_ribs", 14.0) / 6.2832)) - 0.5),
                           0.44, 0.49, 0.0, 1.0)
-        col = S.mix_rgb(t, rib, C("lantern_red"), (0.45, 0.02, 0.02, 1.0))
-        glow = t.mix(rib, P("lantern_emission", 6.0), P("lantern_emission", 6.0) * 0.5)
+        col = S.mix_rgb(t, rib, C("lantern_red"), (0.7, 0.04, 0.03, 1.0))
+        glow = t.mix(rib, P("lantern_emission", 6.0), P("lantern_emission", 6.0) * 0.8)
         return S.bsdf(t, Base_Color=col, Roughness=0.6, Specular_IOR_Level=0.3,
                       Emission_Color=C("lantern_red"), Emission_Strength=glow)["BSDF"]
     return S.material("SHJ.LanternPaper", build)
@@ -716,8 +724,9 @@ def lantern_paper():
 def lantern_gold():
     """Gold caps and characters of the lanterns (slightly self-lit by the
     lantern)."""
-    return S.principled("SHJ.LanternGold", C("gold"), roughness=0.35, metallic=0.85, specular=0.6,
-                        emission=C("gold"), emission_strength=P("lantern_gold_emission", 0.6))
+    return S.principled("SHJ.LanternGold", P("lantern_gold", (0.95, 0.72, 0.22, 1.0)), roughness=0.4, metallic=0.3,
+                        specular=0.6, emission=P("lantern_gold", (0.95, 0.72, 0.22, 1.0)),
+                        emission_strength=P("lantern_gold_emission", 0.6))
 
 
 @_reg("SHJ.Tassel")

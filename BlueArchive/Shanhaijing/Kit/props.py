@@ -301,6 +301,50 @@ def grass():
     return g
 
 
+@asset("SHJ.Prop.Bamboo", "Props")
+def bamboo():
+    """Lucky-bamboo arrangement (富贵竹): straight jointed stalks fanning out
+    of a vase mouth, node rings along each stalk and a small leaf tuft at
+    every tip.  Origin at the vase mouth."""
+    g = GN("SHJ.Prop.Bamboo", bamboo.__doc__)
+    n = g.inp("Stalks", "INT", default=16, min=1)
+    Hh = g.inp("Height", default=0.9, subtype="DISTANCE", desc="mean stalk length")
+    lean = g.inp("Spread", default=0.3, desc="largest lean of a stalk (radians)")
+    r = g.inp("Stalk Radius", default=0.009, subtype="DISTANCE")
+    pitch = g.inp("Node Pitch", default=0.11, subtype="DISTANCE")
+    seed = g.inp("Seed", "INT", default=0)
+    m = g.inp("Material", "MATERIAL")
+    m_leaf = g.inp("Leaf Material", "MATERIAL")
+    # one stalk in 'unit' space (radius 1, length 1); instances scale it by (r, r, length)
+    stalk = g.move(g.cylinder(1.0, 1.0, 8), z=0.5)
+    rings = []
+    for k in range(1, 12):
+        rings.append(g.move(g.cylinder(1.3, 0.012 / Hh, 8), z=pitch * k / Hh))
+    rings = g.join(*rings)
+    rz = g.sep(g.position())[2]
+    rings = g.delete(rings, g.compare(rz, 0.96, "GREATER_THAN"), "FACE")
+    leaves = []
+    for k in range(3):
+        leaf = g.transform(_leaf(g, 0.6, 1.0), r=(0.0, -1.0, k * TAU / 3.0 + 0.4))
+        leaves.append(leaf)
+    tuft = g.transform(g.join(*leaves), t=(0.0, 0.0, 1.0),
+                       s=g.vec(0.075 / r, 0.075 / r, 0.075 / Hh))
+    unit = g.join(g.mat(g.join(stalk, rings), m), g.mat(tuft, m_leaf))
+    # stalk feet in a small clump, each leaning out in its own direction
+    base = g.mesh_line(n, (0, 0, 0), (0, 0, 0))
+    bx = g.random(-1.0, 1.0, seed + 3) * 0.025
+    by = g.random(-1.0, 1.0, seed + 4) * 0.025
+    base = g.set_pos(base, offset=g.vec(bx, by, 0.0))
+    # directions spread evenly (golden angle) with a little jitter; leans fill the cone evenly
+    ang = g.index() * 2.39996 + g.random(-0.3, 0.3, seed)
+    tilt = g.math("SQRT", g.random(0.02, 1.0, seed + 1)) * lean
+    length = g.random(0.62, 1.08, seed + 2) * Hh
+    inst = g.iop(g.mesh_to_points(base), unit, rot=g.vec(tilt * g.cos(ang), tilt * g.sin(ang), 0.0),
+                 scale=g.vec(r, r, length))
+    g.result(g.smooth_by_angle(g.realize(inst), 0.7))
+    return g
+
+
 # ------------------------------------------------------------------- lions
 @asset("SHJ.Prop.Lion", "Props")
 def lion():
@@ -358,7 +402,7 @@ FU_STROKES = [
 ]
 
 
-def fu_glyph(g, width=0.075):
+def fu_glyph(g, width=0.15):
     """The character 福 as flat stroke ribbons in XY, centred, 1 unit tall."""
     strokes = [g.polyline([(x - 0.5, y - 0.5, 0.0) for x, y in st]) for st in FU_STROKES]
     return flat_sweep(g, g.join(*strokes), width, 0.02)
@@ -385,8 +429,8 @@ def lantern():
     body = g.transform(body, t=g.vec(0.0, 0.0, zc), s=g.vec(r, r, bh * 0.5))
     top = g.join(g.move(g.cylinder(D * 0.13, cap_h, 24), z=cap_h * -0.5),
                  g.move(g.cylinder(D * 0.03, D * 0.04, 8), z=D * 0.02))
-    # slim drum under the body with a darker waist ring
-    dr, dh = D * 0.2, D * 0.31
+    # short gold drum under the body with a ring at top and bottom
+    dr, dh = D * 0.21, D * 0.17
     z_top = zc - bh * 0.5 + D * 0.03
     drum = g.move(g.cylinder(dr, dh, 32), z=z_top - dh * 0.5)
     rings = g.join(g.move(g.cylinder(dr * 1.06, D * 0.018, 32), z=z_top - dh * 0.08),
@@ -394,7 +438,7 @@ def lantern():
     # 福 wrapped onto the body, front (-Y) and back
     med = g.transform(fu_glyph(g), r=STAND)
     gz = zc + bh * 0.12
-    med = g.transform(med, t=g.vec(0.0, 0.0, gz), s=g.vec(D * 0.26, 0.5, D * 0.26))
+    med = g.transform(med, t=g.vec(0.0, 0.0, gz), s=g.vec(D * 0.3, 0.5, D * 0.3))
     mx, my, mz = g.sep(g.position())
     k = 1.0 - (mx / r) * (mx / r) - ((mz - zc) / (bh * 0.5)) * ((mz - zc) / (bh * 0.5))
     ys = r * g.math("SQRT", g.max(k, 0.0))

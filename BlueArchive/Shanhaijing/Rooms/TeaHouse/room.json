@@ -317,9 +317,9 @@
     {
       "asset": "SHJ.Arch.Slab",
       "name": "CourtyardWall",
-      "loc": [-4.0, 24.6, 0.0],
+      "loc": [0.3, 23.2, 0.0],
       "inputs": {
-        "Size X": 25.0,
+        "Size X": 20.7,
         "Size Y": 0.3,
         "Thickness": 6.0
       },
@@ -410,7 +410,7 @@
       "inputs": {
         "Radius": 0.93,
         "Pattern": 1,
-        "Bar Width": 0.05,
+        "Bar Width": 0.04,
         "Ring Width": 0.09
       },
       "mat": {
@@ -422,9 +422,9 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [1.43, 22.72, 0.0],
+      "loc": [1.461, 22.72, 0.0],
       "inputs": {
-        "Height": 2.04,
+        "Height": 2.081,
         "Globe Radius": 0.2
       },
       "mat": {
@@ -436,9 +436,9 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [2.33, 22.72, 0.0],
+      "loc": [2.298, 22.72, 0.0],
       "inputs": {
-        "Height": 2.04,
+        "Height": 2.081,
         "Globe Radius": 0.2
       },
       "mat": {
@@ -501,7 +501,7 @@
       "inputs": {
         "Radius": 0.9,
         "Pattern": 1,
-        "Bar Width": 0.05,
+        "Bar Width": 0.04,
         "Ring Width": 0.09
       },
       "mat": {
@@ -513,24 +513,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [10.66, 22.72, 0.0],
+      "loc": [11.02, 22.72, 0.0],
       "inputs": {
-        "Height": 2.04,
-        "Globe Radius": 0.2
-      },
-      "mat": {
-        "Post Material": "SHJ.LacquerBlack",
-        "Globe Material": "SHJ.Globe"
-      },
-      "col": "Exterior"
-    },
-    {
-      "asset": "SHJ.Prop.GardenLamp",
-      "name": "CourtyardLamp",
-      "loc": [11.56, 22.72, 0.0],
-      "inputs": {
-        "Height": 2.04,
-        "Globe Radius": 0.2
+        "Height": 2.225,
+        "Globe Radius": 0.22
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -592,7 +578,7 @@
       "inputs": {
         "Radius": 0.93,
         "Pattern": 1,
-        "Bar Width": 0.05,
+        "Bar Width": 0.04,
         "Ring Width": 0.09
       },
       "mat": {
@@ -604,10 +590,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [15.83, 22.72, 0.0],
+      "loc": [16.094, 22.72, 0.0],
       "inputs": {
-        "Height": 2.18,
-        "Globe Radius": 0.2
+        "Height": 2.454,
+        "Globe Radius": 0.1
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -618,10 +604,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [16.73, 22.72, 0.0],
+      "loc": [16.559, 22.72, 0.0],
       "inputs": {
-        "Height": 2.18,
-        "Globe Radius": 0.2
+        "Height": 2.407,
+        "Globe Radius": 0.1
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -664,11 +650,11 @@
       "rot": 90.0,
       "inputs": {
         "Length": 11.75,
-        "Width": 0.14,
+        "Width": 0.22,
         "Height": 0.15
       },
       "mat": {
-        "Material": "SHJ.TimberDark"
+        "Material": "SHJ.LacquerBrown"
       }
     },
     {
@@ -688,12 +674,13 @@
     {
       "asset": "SHJ.Arch.WaveBand",
       "name": "WaveBandUpper",
-      "loc": [9.539, 14.95, 3.62],
+      "loc": [9.539, 14.95, 3.34],
       "rot": -90.0,
       "inputs": {
-        "Length": 11.75,
+        "Length": 6.45,
         "Wavelength": 0.17,
-        "Amplitude": 0.05
+        "Amplitude": 0.045,
+        "Fillet Gap": 0.05
       },
       "mat": {
         "Material": "SHJ.Gold"
@@ -702,13 +689,13 @@
     {
       "asset": "SHJ.Arch.WaveBand",
       "name": "WaveBandLower",
-      "loc": [9.539, 14.95, 2.95],
+      "loc": [9.539, 14.95, 3.1],
       "rot": -90.0,
       "inputs": {
-        "Length": 11.75,
+        "Length": 6.45,
         "Wavelength": 0.6,
         "Amplitude": 0.0,
-        "Fillet Gap": 0.2
+        "Fillet Gap": 0.0
       },
       "mat": {
         "Material": "SHJ.Gold"
@@ -1732,19 +1719,21 @@
       }
     },
     {
-      "asset": "SHJ.Prop.Grass",
-      "name": "FloorVaseGrass",
+      "asset": "SHJ.Prop.Bamboo",
+      "name": "FloorVaseBamboo",
       "loc": [9.2, 14.85, 1.42],
       "col": "Props",
       "inputs": {
-        "Blades": 34,
-        "Height": 1.7,
-        "Spread": 0.4,
-        "Blade Width": 0.03,
+        "Stalks": 22,
+        "Height": 1.5,
+        "Spread": 0.24,
+        "Stalk Radius": 0.011,
+        "Node Pitch": 0.12,
         "Seed": 5
       },
       "mat": {
-        "Material": "SHJ.Grass"
+        "Material": "SHJ.Bamboo",
+        "Leaf Material": "SHJ.Leaf"
       }
     },
     {
@@ -3766,19 +3755,21 @@
       }
     },
     {
-      "asset": "SHJ.Prop.Grass",
-      "name": "CounterGrass",
+      "asset": "SHJ.Prop.Bamboo",
+      "name": "CounterBamboo",
       "loc": [0.38, 13.31, 1.55],
       "col": "Props",
       "inputs": {
-        "Blades": 60,
-        "Height": 1.15,
-        "Spread": 0.55,
-        "Blade Width": 0.035,
+        "Stalks": 16,
+        "Height": 0.85,
+        "Spread": 0.17,
+        "Stalk Radius": 0.008,
+        "Node Pitch": 0.1,
         "Seed": 11
       },
       "mat": {
-        "Material": "SHJ.Grass"
+        "Material": "SHJ.Bamboo",
+        "Leaf Material": "SHJ.Leaf"
       }
     }
   ],
@@ -4024,7 +4015,10 @@
               "Food Material": "SHJ.Snack"
             }
           }
-        ]
+        ],
+        "mat": {
+          "Edge Material": "SHJ.Rosewood"
+        }
       },
       {
         "id": "T2",
@@ -4084,7 +4078,11 @@
               "Food Material": "SHJ.Snack"
             }
           }
-        ]
+        ],
+        "inputs": {
+          "Style": 1,
+          "Top Thickness": 0.022
+        }
       },
       {
         "id": "T3",
@@ -4143,7 +4141,11 @@
               "Food Material": "SHJ.Snack"
             }
           }
-        ]
+        ],
+        "inputs": {
+          "Style": 1,
+          "Top Thickness": 0.022
+        }
       },
       {
         "id": "T4",
@@ -4203,7 +4205,10 @@
               "Food Material": "SHJ.Snack"
             }
           }
-        ]
+        ],
+        "mat": {
+          "Edge Material": "SHJ.Rosewood"
+        }
       },
       {
         "id": "T9",
@@ -4261,7 +4266,10 @@
               "Food Material": "SHJ.Snack"
             }
           }
-        ]
+        ],
+        "mat": {
+          "Edge Material": "SHJ.Rosewood"
+        }
       },
       {
         "id": "T5",
@@ -4322,7 +4330,11 @@
               "Food Material": "SHJ.Snack"
             }
           }
-        ]
+        ],
+        "inputs": {
+          "Style": 1,
+          "Top Thickness": 0.022
+        }
       },
       {
         "id": "T6",
@@ -4333,7 +4345,9 @@
         "y": 8.5,
         "inputs": {
           "Width": 1.65,
-          "Depth": 1.0
+          "Depth": 1.0,
+          "Style": 1,
+          "Top Thickness": 0.022
         },
         "chairs": [
           {
@@ -4359,7 +4373,9 @@
         "x": 5.58,
         "y": 15.6,
         "inputs": {
-          "Height": 0.72
+          "Height": 0.72,
+          "Style": 1,
+          "Top Thickness": 0.022
         },
         "chairs": [
           {
@@ -4429,7 +4445,11 @@
               "Food Material": "SHJ.Snack"
             }
           }
-        ]
+        ],
+        "inputs": {
+          "Style": 1,
+          "Top Thickness": 0.022
+        }
       }
     ]
   },
@@ -4454,7 +4474,8 @@
           "Diameter": 0.58,
           "Drop": 1.0,
           "Pitch": 0.755
-        }
+        },
+        "light_power": 4.5657
       },
       {
         "id": "LanternsLeftSmall",
@@ -4465,7 +4486,8 @@
           "Diameter": 0.36,
           "Drop": 2.0,
           "Pitch": 0.4
-        }
+        },
+        "light_power": 4.5657
       },
       {
         "id": "LanternsMiddle",
@@ -4476,7 +4498,8 @@
           "Diameter": 0.35,
           "Drop": 1.85,
           "Pitch": 0.4
-        }
+        },
+        "light_power": 2.7802
       },
       {
         "id": "LanternsRight",
@@ -4487,7 +4510,8 @@
           "Diameter": 0.41,
           "Drop": 2.49,
           "Pitch": 0.5
-        }
+        },
+        "light_power": 1.1175
       }
     ]
   },
@@ -4495,7 +4519,7 @@
     "sets": [
       {
         "radius": 0.06,
-        "power": 42.4,
+        "power": 41.76,
         "angle": 80.0,
         "blend": 0.7,
         "color": [1.0, 0.88, 0.72],
@@ -4503,7 +4527,7 @@
       },
       {
         "radius": 0.06,
-        "power": 491.67,
+        "power": 430.29,
         "angle": 80.0,
         "blend": 0.7,
         "color": [1.0, 0.88, 0.72],
@@ -4511,7 +4535,7 @@
       },
       {
         "radius": 0.07,
-        "power": 44.7,
+        "power": 34.2,
         "angle": 90.0,
         "blend": 0.8,
         "color": [1.0, 0.92, 0.82],
@@ -4520,7 +4544,7 @@
       },
       {
         "radius": 0.07,
-        "power": 171.9,
+        "power": 165.6,
         "angle": 90.0,
         "blend": 0.8,
         "color": [1.0, 0.92, 0.82],
@@ -4529,7 +4553,7 @@
       },
       {
         "radius": 0.07,
-        "power": 463.8,
+        "power": 480.9,
         "angle": 90.0,
         "blend": 0.8,
         "color": [1.0, 0.92, 0.82],
@@ -4538,7 +4562,7 @@
       },
       {
         "radius": 0.07,
-        "power": 21.9,
+        "power": 12.9,
         "angle": 90.0,
         "blend": 0.8,
         "color": [1.0, 0.92, 0.82],
@@ -4553,7 +4577,7 @@
       "name": "PanelWash",
       "loc": [2.3, 20.2, 5.45],
       "rot": [30.61, 0, 0],
-      "power": 26.24,
+      "power": 18.56,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -4565,7 +4589,7 @@
       "name": "PanelWash",
       "loc": [11.11, 20.2, 5.2],
       "rot": [32.47, 0, 0],
-      "power": 29.68,
+      "power": 22.96,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -4577,7 +4601,7 @@
       "name": "PanelWash",
       "loc": [16.28, 20.2, 5.2],
       "rot": [33.27, 0, 0],
-      "power": 199.08,
+      "power": 217.8,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -4589,7 +4613,7 @@
       "name": "PanelWash",
       "loc": [4.8, 20.2, 5.45],
       "rot": [32.87, 0, 0],
-      "power": 127.42,
+      "power": 81.42,
       "color": [1.0, 0.85, 0.62],
       "angle": 62,
       "blend": 0.6,
@@ -4601,7 +4625,7 @@
       "name": "PanelWash",
       "loc": [7.9, 20.2, 5.45],
       "rot": [32.87, 0, 0],
-      "power": 127.42,
+      "power": 81.42,
       "color": [1.0, 0.85, 0.62],
       "angle": 62,
       "blend": 0.6,
@@ -4633,7 +4657,7 @@
       "name": "FrontPanel",
       "loc": [2.5, 1.6, 5.88],
       "rot": [0, 0, 0],
-      "power": 128.4,
+      "power": 183.6,
       "color": [1.0, 0.93, 0.84],
       "size": [3.2, 1.6]
     },
@@ -4642,7 +4666,7 @@
       "name": "FrontPanel",
       "loc": [7.0, 1.6, 5.88],
       "rot": [0, 0, 0],
-      "power": 128.4,
+      "power": 183.6,
       "color": [1.0, 0.93, 0.84],
       "size": [3.2, 1.6]
     },
@@ -4651,7 +4675,7 @@
       "name": "FrontPanel",
       "loc": [13.0, 1.6, 5.88],
       "rot": [0, 0, 0],
-      "power": 128.4,
+      "power": 183.6,
       "color": [1.0, 0.93, 0.84],
       "size": [3.2, 1.6]
     },
@@ -4660,7 +4684,7 @@
       "name": "ArchitraveUplight",
       "loc": [9.72, 9.0, 3.93],
       "rot": [180, 0, 0],
-      "power": 1.32,
+      "power": 1.1,
       "color": [1.0, 0.86, 0.66],
       "size": [0.08, 11.5],
       "hidden": true
@@ -4670,7 +4694,7 @@
       "name": "BeamUplight",
       "loc": [0.55, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 9.92,
+      "power": 14.56,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4680,7 +4704,7 @@
       "name": "BeamUplight",
       "loc": [1.85, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 9.92,
+      "power": 14.56,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4690,7 +4714,7 @@
       "name": "BeamUplight",
       "loc": [5.4, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 4.32,
+      "power": 4.48,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4700,7 +4724,7 @@
       "name": "BeamUplight",
       "loc": [9.65, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 4.32,
+      "power": 4.48,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4710,7 +4734,7 @@
       "name": "BeamUplight",
       "loc": [13.9, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 6.24,
+      "power": 7.36,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4720,7 +4744,7 @@
       "name": "BeamUplight",
       "loc": [17.45, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 6.24,
+      "power": 7.36,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4790,7 +4814,7 @@
       "name": "BounceUp",
       "loc": [1.6, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.56,
+      "power": 22.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4800,7 +4824,7 @@
       "name": "FillDown",
       "loc": [1.6, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 81.24,
+      "power": 84.12,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4810,7 +4834,7 @@
       "name": "BounceUp",
       "loc": [1.6, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.56,
+      "power": 22.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4820,7 +4844,7 @@
       "name": "FillDown",
       "loc": [1.6, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 81.24,
+      "power": 84.12,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4890,7 +4914,7 @@
       "name": "BounceUp",
       "loc": [4.8, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.56,
+      "power": 22.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4900,7 +4924,7 @@
       "name": "FillDown",
       "loc": [4.8, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 81.24,
+      "power": 84.12,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4910,7 +4934,7 @@
       "name": "BounceUp",
       "loc": [4.8, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.56,
+      "power": 22.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4920,7 +4944,7 @@
       "name": "FillDown",
       "loc": [4.8, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 81.24,
+      "power": 84.12,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4990,7 +5014,7 @@
       "name": "BounceUp",
       "loc": [8.0, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.56,
+      "power": 22.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5000,7 +5024,7 @@
       "name": "FillDown",
       "loc": [8.0, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 81.24,
+      "power": 84.12,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5010,7 +5034,7 @@
       "name": "BounceUp",
       "loc": [8.0, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.56,
+      "power": 22.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5020,7 +5044,7 @@
       "name": "FillDown",
       "loc": [8.0, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 81.24,
+      "power": 84.12,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5030,7 +5054,7 @@
       "name": "BounceUp",
       "loc": [11.6, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5040,7 +5064,7 @@
       "name": "FillDown",
       "loc": [11.6, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5050,7 +5074,7 @@
       "name": "BounceUp",
       "loc": [11.6, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5060,7 +5084,7 @@
       "name": "FillDown",
       "loc": [11.6, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5070,7 +5094,7 @@
       "name": "BounceUp",
       "loc": [11.6, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5080,7 +5104,7 @@
       "name": "FillDown",
       "loc": [11.6, 11.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5090,7 +5114,7 @@
       "name": "BounceUp",
       "loc": [11.6, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5100,7 +5124,7 @@
       "name": "FillDown",
       "loc": [11.6, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5110,7 +5134,7 @@
       "name": "BounceUp",
       "loc": [11.6, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5120,7 +5144,7 @@
       "name": "FillDown",
       "loc": [11.6, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5130,7 +5154,7 @@
       "name": "BounceUp",
       "loc": [15.0, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5140,7 +5164,7 @@
       "name": "FillDown",
       "loc": [15.0, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5150,7 +5174,7 @@
       "name": "BounceUp",
       "loc": [15.0, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5160,7 +5184,7 @@
       "name": "FillDown",
       "loc": [15.0, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5170,7 +5194,7 @@
       "name": "BounceUp",
       "loc": [15.0, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5180,7 +5204,7 @@
       "name": "FillDown",
       "loc": [15.0, 11.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5190,7 +5214,7 @@
       "name": "BounceUp",
       "loc": [15.0, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5200,7 +5224,7 @@
       "name": "FillDown",
       "loc": [15.0, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5210,7 +5234,7 @@
       "name": "BounceUp",
       "loc": [15.0, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5220,7 +5244,7 @@
       "name": "FillDown",
       "loc": [15.0, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5230,7 +5254,7 @@
       "name": "BounceUp",
       "loc": [18.0, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5240,7 +5264,7 @@
       "name": "FillDown",
       "loc": [18.0, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5250,7 +5274,7 @@
       "name": "BounceUp",
       "loc": [18.0, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5260,7 +5284,7 @@
       "name": "FillDown",
       "loc": [18.0, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5270,7 +5294,7 @@
       "name": "BounceUp",
       "loc": [18.0, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5280,7 +5304,7 @@
       "name": "FillDown",
       "loc": [18.0, 11.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5290,7 +5314,7 @@
       "name": "BounceUp",
       "loc": [18.0, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5300,7 +5324,7 @@
       "name": "FillDown",
       "loc": [18.0, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5310,7 +5334,7 @@
       "name": "BounceUp",
       "loc": [18.0, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 5.4,
+      "power": 8.16,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5320,7 +5344,7 @@
       "name": "FillDown",
       "loc": [18.0, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 3.24,
+      "power": 2.28,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5330,7 +5354,7 @@
       "name": "LeftWindowFill",
       "loc": [0.05, 4.8, 2.2],
       "rot": [0, -90, 0],
-      "power": 7.65,
+      "power": 6.9,
       "color": [0.6, 0.72, 1.0],
       "size": [3.0, 3.0],
       "hidden": true
@@ -5340,7 +5364,7 @@
       "name": "LogoWash",
       "loc": [9.9, 11.2, 3.4],
       "rot": [65, 0, -74],
-      "power": 47.4,
+      "power": 51.75,
       "color": [1.0, 0.92, 0.8],
       "size": [3.0, 0.2],
       "hidden": true
@@ -5351,7 +5375,8 @@
       "loc": [1.88, 23.6, 1.7],
       "power": 2.76,
       "color": [1.0, 0.62, 0.3],
-      "radius": 0.15
+      "radius": 0.15,
+      "hidden": true
     },
     {
       "type": "POINT",
@@ -5359,7 +5384,8 @@
       "loc": [11.1, 23.6, 1.6],
       "power": 2.76,
       "color": [1.0, 0.62, 0.3],
-      "radius": 0.15
+      "radius": 0.15,
+      "hidden": true
     },
     {
       "type": "POINT",
@@ -5367,7 +5393,8 @@
       "loc": [16.28, 23.6, 1.8],
       "power": 2.07,
       "color": [1.0, 0.62, 0.3],
-      "radius": 0.15
+      "radius": 0.15,
+      "hidden": true
     },
     {
       "type": "POINT",
@@ -5375,7 +5402,8 @@
       "loc": [-1.0, 23.8, 2.0],
       "power": 3.45,
       "color": [1.0, 0.62, 0.3],
-      "radius": 0.15
+      "radius": 0.15,
+      "hidden": true
     }
   ]
 }

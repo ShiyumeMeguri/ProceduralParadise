@@ -117,12 +117,40 @@ def _set(node, name, value):
     # silently ignore parameters that do not exist in this version
 
 
+def vignette_gain(r2, v):
+    """Lens vignetting factor for squared radius ``r2`` (distance from the
+    frame centre, half the image width = 1): 1 - strength * r2 ** power,
+    never below 0.  ``r2`` may be a number, a numpy array or a node socket."""
+    k = float(v.get("strength", 0.2))
+    p = float(v.get("power", 2.0))
+    if hasattr(r2, "shape") or isinstance(r2, (int, float)):
+        import numpy as np
+        return np.maximum(1.0 - k * np.power(r2, p), 0.0)
+    return None
+
+
+def vignette_nodes(t, img, v):
+    """Multiply the (scene-linear) image by :func:`vignette_gain`, the radius
+    taken from the Image Coordinates node ('Uniform': zero-centred, the
+    larger image dimension spans -1..1)."""
+    k = float(v.get("strength", 0.2))
+    p = float(v.get("power", 2.0))
+    ic = t.n("CompositorNodeImageCoordinates")
+    t.link(img, ic.n.inputs[0])
+    x, y, _ = t.sep(ic["Uniform"])
+    r2 = x * x + y * y
+    gain = t.math("MAXIMUM", 1.0 - t.math("POWER", r2, p) * k, 0.0)
+    sep = t.n("CompositorNodeSeparateColor", img)
+    return t.n("CompositorNodeCombineColor", sep[0] * gain, sep[1] * gain, sep[2] * gain, 1.0).o
+
+
 def compositor(look: dict | None = None, lines_layer: str | None = None):
     """Build the compositor graph from a ``look`` dict::
 
         {"bloom": {"threshold": 1.0, "size": 7, "strength": 0.6},
          "glow":  {"threshold": 0.8, "size": 9, "strength": 0.25},
          "exposure": 0.0,
+         "vignette": {"strength": 0.2, "power": 2.0},
          "lift": [r,g,b], "gamma": [r,g,b], "gain": [r,g,b],
          "hue_sat": {"hue": 0.5, "saturation": 1.0, "value": 1.0},
          "curves": {"C": [[x,y],...], "R": [...], "G": [...], "B": [...]}}
@@ -171,6 +199,9 @@ def compositor(look: dict | None = None, lines_layer: str | None = None):
         ex = t.n("CompositorNodeExposure", img, look["exposure"])
         ex.n.name = ex.n.label = "Exposure"          # animation looks it up by name
         img = ex.o
+
+    if look.get("vignette"):
+        img = vignette_nodes(t, img, look["vignette"])
 
     for key, gtype in (("glow", "FOG_GLOW"), ("bloom", "BLOOM"), ("streaks", "STREAKS")):
         if key in look:

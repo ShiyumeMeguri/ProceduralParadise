@@ -41,16 +41,22 @@ REF = os.path.join(ROOM, "Reference", "BG_ShanTeaHouse_Night.webp")
 # emissive look parameters (shot "materials") that belong to a family
 EMISSIVE = {"lanterns": ["lantern_emission", "lantern_gold_emission"], "backdrop": ["backdrop_strength"],
             "backdrop_bay": ["bay_backdrop_strength"],
-            "globes": ["globe_emission"], "counter": ["gift_glow"], "logo": ["cloud_glow"],
+            "globes": ["globe_emission"], "cards": ["gift_glow"], "logo": ["cloud_glow"],
             "timber_dl": ["downlight_emission"]}
 EMISSIVE_DEFAULTS = {"lantern_emission": 1.0, "lantern_gold_emission": 0.3, "backdrop_strength": 0.5,
                      "bay_backdrop_strength": 1.5,
                      "globe_emission": 12.0, "gift_glow": 0.4, "cloud_glow": 0.35, "downlight_emission": 40.0}
-NAMED = {"WallWasher": "washers", "LanternLight": "lanterns", "CounterLight": "counter",
+NAMED = {"WallWasher": "washers", "CounterLight": "counter",
          "LogoWash": "logo", "ArchitraveUplight": "arch_up", "GardenLamp": "garden",
          "CourtyardLamp": "globes", "CourtyardWall": "backdrop", "BayBackdrop": "backdrop_bay",
          "FrontPanel": "front_fill",
-         "LeftWindowFill": "left_window", "GiftBox": "counter", "MenuTablet": "counter", "LogoWall": "logo"}
+         "LeftWindowFill": "left_window", "GiftBox": "cards", "MenuTablet": "cards", "LogoWall": "logo"}
+
+
+def lantern_string_family(x, y):
+    """Glow family of a lantern string by position: left strings, the small
+    string by the colonnade at the back, the string in front of the architrave."""
+    return "lglow_L" if x < 3.0 else ("lglow_M" if y > 14.0 else "lglow_R")
 
 
 def family(base, x, y, z):
@@ -68,6 +74,8 @@ def family(base, x, y, z):
         return "bounce_R" if x > 9.65 else ("bounce_F" if y < 9 else ("bounce_M" if y < 13 else "bounce_B"))
     if base == "FillDown":
         return "fill_R" if x > 9.65 else ("fill_F" if y < 9 else ("fill_M" if y < 13 else "fill_B"))
+    if base == "LanternLight":
+        return lantern_string_family(x, y)
     if base.startswith("Lanterns"):
         return "lanterns"
     return NAMED.get(base)
@@ -165,20 +173,28 @@ def _srgb(c):
     return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(np.maximum(c, 1e-8), 1.0 / 2.4) - 0.055)
 
 
-def fit(imgs, ref, size=(320, 225), blur=1.5, fixed=("world",), prior=0.002, iters=300):
+def fit(imgs, ref, size=(320, 225), blur=1.5, fixed=("world",), prior=0.002, iters=300, vignette=None):
     """Display-space fit.  ``imgs``: {family: linear HxWx3}, ``ref``: sRGB
-    image of the same size.  Returns {family: weight}."""
+    image of the same size, ``vignette``: the shot's look.vignette (applied to
+    the light sum, as the compositor does).  Returns {family: weight}."""
     import cv2
     from scipy.optimize import minimize
+    from Core.render import vignette_gain
 
     def prep(a):
         a = cv2.resize(a.astype(np.float32), size, interpolation=cv2.INTER_AREA)
         return cv2.GaussianBlur(a, (0, 0), blur)
 
+    gain = np.ones((size[1], size[0], 1), np.float32)
+    if vignette:
+        yy, xx = np.mgrid[0:size[1], 0:size[0]].astype(np.float32)
+        half = size[0] / 2.0
+        r2 = ((xx + 0.5 - half) / half) ** 2 + ((yy + 0.5 - size[1] / 2.0) / half) ** 2
+        gain = vignette_gain(r2, vignette)[..., None].astype(np.float32)
     names = sorted(imgs)
     free = [n for n in names if n not in fixed]
-    A = np.stack([prep(imgs[n]) for n in free], 0)
-    base = sum(prep(imgs[n]) for n in fixed if n in imgs)
+    A = np.stack([prep(imgs[n]) * gain for n in free], 0)
+    base = sum(prep(imgs[n]) * gain for n in fixed if n in imgs)
     R = prep(ref)
 
     def f(lx):
@@ -216,8 +232,11 @@ def apply(weights):
         g = family("DownlightSpot", x, y, z - 0.02)
         if g in weights:
             d["power"] = round(d["power"] * weights[g], 3)
-    if "lanterns" in weights and "light_power" in R.get("lanterns", {}):
-        R["lanterns"]["light_power"] = round(R["lanterns"]["light_power"] * weights["lanterns"], 4)
+    lan = R.get("lanterns", {})
+    for st in lan.get("strings", []):
+        g = lantern_string_family(st["x"], st["y"])
+        if g in weights:
+            st["light_power"] = round(st.get("light_power", lan.get("light_power", 12.0)) * weights[g], 4)
     dump(R, path)
     with open(SHOT, encoding="utf-8") as fh:
         shot = json.load(fh)
@@ -235,7 +254,9 @@ def main(argv):
     scale = float(argv[argv.index("--scale") + 1]) if "--scale" in argv else 0.5
     imgs = render_groups(samples, scale)
     h, w = next(iter(imgs.values())).shape[:2]
-    weights = fit(imgs, C.load_image(REF, size=(w, h)))
+    with open(SHOT, encoding="utf-8") as fh:
+        vignette = json.load(fh).get("look", {}).get("vignette")
+    weights = fit(imgs, C.load_image(REF, size=(w, h)), vignette=vignette)
     print(json.dumps({k: round(v, 3) for k, v in sorted(weights.items())}, indent=1))
     np.savez_compressed(os.path.join(tempfile.gettempdir(), "shj_lightgroups.npz"), **imgs)
     if "--apply" in argv:

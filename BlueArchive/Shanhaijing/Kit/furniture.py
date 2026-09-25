@@ -40,9 +40,10 @@ def _studs(g, x, y, z0, z1, pitch, r, normal):
 # --------------------------------------------------------------- tea table
 @asset("SHJ.Furn.TeaTable", "Furniture")
 def tea_table():
-    """Square hardwood tea table: pale lacquered top with a double inlay
-    line, dark rim, slim apron, round stretchers just below the top and
-    square legs with rows of copper studs."""
+    """Square hardwood tea table: lacquered top with a double inlay line,
+    slim apron and square legs with rows of copper studs.  Style 0 has round
+    (brass) stretchers just below the apron; style 1 a lattice apron: a
+    lower rail with short vertical struts (矮老) between it and the apron."""
     g = GN("SHJ.Furn.TeaTable", tea_table.__doc__)
     W = g.inp("Width", default=FURN["table_size"], subtype="DISTANCE")
     D = g.inp("Depth", default=FURN["table_size"], subtype="DISTANCE")
@@ -57,6 +58,10 @@ def tea_table():
     i2 = g.inp("Inlay Gap", default=0.022, subtype="DISTANCE", panel="Details")
     iw = g.inp("Inlay Width", default=0.006, subtype="DISTANCE", panel="Details")
     pitch = g.inp("Stud Pitch", default=FURN["stud_pitch"], subtype="DISTANCE", panel="Details")
+    style = g.inp("Style", "INT", default=0, min=0, max=1, panel="Details",
+                  desc="0 round stretchers, 1 lattice apron (struts over a lower rail)")
+    sh = g.inp("Strut Height", default=0.055, subtype="DISTANCE", panel="Details")
+    sp = g.inp("Strut Pitch", default=0.15, subtype="DISTANCE", panel="Details")
     m_top = g.inp("Top Material", "MATERIAL", panel="Materials")
     m_wood = g.inp("Frame Material", "MATERIAL", panel="Materials")
     m_inlay = g.inp("Inlay Material", "MATERIAL", panel="Materials")
@@ -94,7 +99,29 @@ def tea_table():
                 g.rod(g.vec(lx * -1.0, ly, zs), g.vec(lx, ly, zs), sr, 10),
                 g.rod(g.vec(lx * -1.0, ly * -1.0, zs), g.vec(lx * -1.0, ly, zs), sr, 10),
                 g.rod(g.vec(lx, ly * -1.0, zs), g.vec(lx, ly, zs), sr, 10))
-    frame = g.join(g.mat(g.join(legs, apron), m_wood), g.mat(st, m_rod))
+    # lattice apron: lower rail + evenly spaced short struts on every side
+    rh, sw_ = 0.022, 0.016
+    zr1 = z0 - sh                      # rail top
+
+    def lattice_side(half_len, out):
+        """rail + struts along X spanning +-half_len (leg centres), outer face
+        at y = -out, body towards +y"""
+        inner = half_len * 2.0 - s
+        n = g.max(g.math("FLOOR", inner / sp), 1.0)
+        step = inner / n
+        rail = g.box(half_len * -1.0, out * -1.0, zr1 - rh, half_len, out * -1.0 + at, zr1)
+        line = g.mesh_line(n - 1.0, g.vec(inner * -0.5 + step, 0.0, 0.0), g.vec(step, 0.0, 0.0))
+        strut = g.box(sw_ * -0.5, out * -1.0 + 0.002, zr1, sw_ * 0.5, out * -1.0 + at - 0.002, z0)
+        return g.join(rail, g.realize(g.iop(g.mesh_to_points(line), strut)))
+
+    oy = ly + s * 0.5 - 0.004
+    ox = lx + s * 0.5 - 0.004
+    fb = lattice_side(lx, oy)
+    lr = lattice_side(ly, ox)
+    lattice = g.join(fb, g.transform(fb, r=(0.0, 0.0, math.pi)),
+                     g.transform(lr, r=(0.0, 0.0, math.pi * 0.5)), g.transform(lr, r=(0.0, 0.0, math.pi * -0.5)))
+    under = g.index_switch(style, [g.mat(st, m_rod), g.mat(lattice, m_wood)], "GEOMETRY")
+    frame = g.join(g.mat(g.join(legs, apron), m_wood), under)
     # studs on both outward faces of every leg
     rows = []
     for sx, sy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
@@ -164,9 +191,8 @@ def chair():
                   g.rod(g.vec(fx * -1.0, fy, 0.15), g.vec(fx, fy, 0.15), sr, 8))
     wood = g.mat(g.join(legs, *posts, frame, crest, splat, back_rail, stre), m_wood)
     # cushion with gold piping
-    cush = g.cube(g.vec(sw - 0.02, sd - 0.02, ct), 4, 4, 2)
-    cush = g.subdiv(cush, 2)
-    cush = g.transform(cush, t=g.vec(0.0, 0.0, sh + ct * 0.5))
+    cush = solid(g, g.fill(g.fillet(g.rect(sw - 0.02, sd - 0.02), 0.025, 4)), ct)
+    cush = g.move(cush, z=sh)
     pipe = flat_sweep(g, g.fillet(g.rect(sw - 0.09, sd - 0.09), 0.02, 3), 0.005, 0.003)
     pipe = g.move(pipe, z=sh + ct + 0.0012)
     # studs: front faces of the front legs, front faces of the back posts
@@ -182,7 +208,7 @@ def chair():
         r = g.set_pos(r, offset=g.vec(fx * sx * -0.04 * (pz - sh) / (bh - sh), rake * (pz - sh) / (bh - sh), 0.0))
         post_rows.append(r)
     studs = g.mat(g.join(stud_f, *post_rows), m_stud)
-    g.result(g.join(g.smooth_by_angle(wood, 0.5), g.smooth(g.mat(cush, m_cush), True),
+    g.result(g.join(g.smooth_by_angle(wood, 0.5), g.smooth_by_angle(g.mat(cush, m_cush), 0.9),
                     g.mat(pipe, m_gold), g.smooth(studs, True)))
     return g
 

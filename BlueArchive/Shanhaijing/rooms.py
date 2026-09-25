@@ -203,13 +203,16 @@ class RoomBuilder:
                           {"Paper Material": "SHJ.LanternPaper", "Gold Material": "SHJ.LanternGold",
                            "Cord Material": "SHJ.Tassel"},
                           (s["x"], s["y"], s["z"]), s.get("rot"), "Lanterns")
-            # a warm point light inside every lantern
+            # the silk is lit from inside: it must not block its own lamps (it still glows for the camera)
+            if hasattr(ob, "visible_shadow"):
+                ob.visible_shadow = False
+            # a warm point light inside every lantern (per-string "light_power" overrides the default)
             n = int(ins.get("Count", 3))
             D = ins.get("Diameter", 0.6)
+            power = s.get("light_power", L.get("light_power", 12.0))
             for i in range(n):
-                z = s["z"] - ins.get("Drop", 0.6) - ins.get("Pitch", 0.7) * i - D * 0.16 - D * 0.41
-                self.point_light(f"LanternLight", (s["x"], s["y"], z),
-                                 L.get("light_power", 12.0) * (D / 0.6) ** 2,
+                z = s["z"] - ins.get("Drop", 0.6) - ins.get("Pitch", 0.7) * i - D * 0.525
+                self.point_light(f"LanternLight", (s["x"], s["y"], z), power * (D / 0.6) ** 2,
                                  L.get("light_color", (1.0, 0.35, 0.18)), D * 0.35)
 
     def downlights(self):
@@ -251,7 +254,7 @@ class RoomBuilder:
 
     @staticmethod
     def _conceal(ob):
-        for attr in ("visible_camera", "visible_glossy"):
+        for attr in ("visible_camera", "visible_glossy", "visible_transmission"):
             if hasattr(ob, attr):
                 setattr(ob, attr, False)
 

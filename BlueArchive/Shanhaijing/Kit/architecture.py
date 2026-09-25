@@ -267,11 +267,11 @@ def haitang_points(cx, cy, q, rc, n=5):
     return pts
 
 
-def four_octagon_segments(c=0.46, a=0.29, e=0.045, q=0.1, rc=0.045):
+def four_octagon_segments(c=0.46, a=0.29, e=0.04, q=0.1, rc=0.045, dia=0.18):
     """Line work of the tea house round windows on the unit circle: a
     doubled central cross, four upright octagons (flats on the axes) each with
-    a cross running out to the central bars and to the rim and a begonia
-    flower at its centre, and splayed 'Y' arms where the cross meets the rim.
+    a cross running out to the central bars and to the rim and a lozenge at
+    its centre, and splayed 'Y' arms where the cross meets the rim.
     Returns {group: [polyline, ...]}; the groups get slightly different bar
     depths so that crossing bars never share a face plane."""
     G = {"central_v": [], "central_h": [], "cross_v": [], "cross_h": [], "arms": [], "octagons": [],
@@ -288,7 +288,8 @@ def four_octagon_segments(c=0.46, a=0.29, e=0.045, q=0.1, rc=0.045):
             G["octagons"].append(V + [V[0]])
             G["cross_h"].append([(sx * e, cy), (sx * 1.2, cy)])
             G["cross_v"].append([(cx, sy * e), (cx, sy * 1.2)])
-            G["flowers"].append(haitang_points(cx, cy, q, rc))
+            # the flower: a lozenge (square on its corner) centred on the octagon's cross
+            G["flowers"].append([(cx + dia, cy), (cx, cy + dia), (cx - dia, cy), (cx, cy - dia), (cx + dia, cy)])
     for k in range(4):
         ca, sa = math.cos(k * math.pi / 2.0), math.sin(k * math.pi / 2.0)
         for s in (-1.0, 1.0):
@@ -300,8 +301,8 @@ def four_octagon_segments(c=0.46, a=0.29, e=0.045, q=0.1, rc=0.045):
 
 @asset("SHJ.Arch.FourOctagonLattice", "Architecture")
 def four_octagon_lattice():
-    """Round-window lattice of the Shan tea house (八方海棠): four upright
-    octagons, each with a begonia flower on a cross that runs out to the
+    """Round-window lattice of the Shan tea house (八方锦): four upright
+    octagons, each with a lozenge on a cross that runs out to the
     doubled central cross and to the rim, and splayed 'Y' arms at the four
     ends of the central cross.  Built on the unit circle and scaled to Radius
     (bar width is absolute).  XZ plane, centred, face towards -Y."""
