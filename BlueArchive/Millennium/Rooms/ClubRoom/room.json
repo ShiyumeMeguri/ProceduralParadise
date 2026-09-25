@@ -154,11 +154,13 @@
         "units": 3,
         "seats": [
           {
-            "chair": "white"
+            "chair": "white",
+            "dx": -0.22
           },
           {
             "chair": "blue",
-            "cushions": 1
+            "cushions": 1,
+            "dx": -0.15
           },
           {
             "chair": "white"
@@ -168,7 +170,7 @@
           {
             "type": "laptop",
             "unit": 2,
-            "offset": [0.02, 0.25]
+            "offset": [-0.12, 0.25]
           }
         ],
         "unit_width": 0.88
@@ -182,18 +184,20 @@
             "chair": "white"
           },
           {
-            "chair": "blue"
+            "chair": "blue",
+            "dx": 0.09
           },
           {
             "chair": "white",
-            "cushions": 2
+            "cushions": 2,
+            "dx": 0.09
           }
         ],
         "props": [
           {
             "type": "laptop",
             "unit": 0,
-            "offset": [0.05, 0.3]
+            "offset": [-0.1, 0.3]
           }
         ],
         "unit_width": 0.72

@@ -68,7 +68,7 @@ def marble():
         grout = t.map_range(edge, 0.004, 0.0075, 1.0, 0.0)
         rnd = t.n("ShaderNodeTexWhiteNoise", cell, props={"noise_dimensions": "3D"})["Color"]
         # per-tile pattern offset + slight rotation of the vein direction
-        Pm = P * 0.55 + rnd * 37.0
+        Pm = P * PARAMS.get("marble_scale", 0.55) + rnd * 37.0
         dist = S.noise(t, Pm, scale=1.6, detail=6.0, rough=0.62)["Fac"]
         wave = t.n("ShaderNodeTexWave", Pm, Scale=0.9, Distortion=9.5, Detail=6.0,
                    Detail_Scale=1.4, Detail_Roughness=0.62,
@@ -85,9 +85,9 @@ def marble():
             + t.n("ShaderNodeRGBToBW", cloud).o * 0.5
         base = S.mix_rgb(t, t.clamp01(v), C("marble_base"), C("marble_vein"))
         col = S.mix_rgb(t, grout, base, C("grout"))
-        rough = t.mix(grout, 0.045, 0.55)
+        rough = t.mix(grout, PARAMS.get("marble_roughness", 0.045), 0.55)
         b = S.bsdf(t, Base_Color=col, Roughness=rough, Specular_IOR_Level=0.28,
-                   Coat_Weight=0.1, Coat_Roughness=0.03)
+                   Coat_Weight=PARAMS.get("marble_coat", 0.1), Coat_Roughness=0.03)
         return b["BSDF"]
     return S.material("MIL.Marble", build)
 
@@ -179,7 +179,7 @@ def chair_white():
 
 @_reg("MIL.ChairBlue")
 def chair_blue():
-    return S.principled("MIL.ChairBlue", C("chair_blue"), roughness=0.55, specular=0.15)
+    return S.principled("MIL.ChairBlue", C("chair_blue"), roughness=0.55, specular=0.08)
 
 
 @_reg("MIL.CushionBlue")

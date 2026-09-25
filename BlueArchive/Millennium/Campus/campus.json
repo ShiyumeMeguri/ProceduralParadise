@@ -19,8 +19,8 @@
       "center": [-704.5, 589.4],
       "rotation": 0.0,
       "size": [26.0, 26.0],
-      "storeys": 31,
-      "crown": 3.0,
+      "storeys": 32,
+      "crown": 4.8,
       "style": "stripe",
       "core_inset": 9.0
     },
@@ -30,8 +30,8 @@
       "center": [-667.5, 603.9],
       "rotation": 0.0,
       "size": [24.0, 23.0],
-      "storeys": 32,
-      "crown": 3.0,
+      "storeys": 33,
+      "crown": 2.9,
       "style": "stripe",
       "core_inset": 9.0
     },
