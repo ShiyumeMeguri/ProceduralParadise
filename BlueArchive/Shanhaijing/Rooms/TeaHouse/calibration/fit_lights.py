@@ -1,17 +1,22 @@
 """
-Light balancing as a linear inverse problem.
+Light balancing as an inverse problem.
 
 Light transport is linear in the light intensities, so the room is rendered
-once with every fixture family in its own Cycles *light group*; the
-per-group images I_g are then combined as  sum_g w_g * I_g  and the
-non-negative weights w_g that best reproduce the painting (in linear light,
-blurred to be tolerant of small misalignments) are solved with NNLS.
+once with every fixture family in its own Cycles *light group*; any balance
+of the families is then  sum_g w_g * I_g.  The non-negative weights w_g are
+solved so that this sum, after the Standard view transform (sRGB encoding,
+clipping at white), reproduces the painting: a robust (Charbonnier) error on
+downsampled, slightly blurred display values, optimised over log-weights
+with L-BFGS, a weak prior keeping every weight near 1.
 
-    python BlueArchive/Shanhaijing/Rooms/TeaHouse/calibration/fit_lights.py [--samples 24] [--scale 0.5] [--apply]
+    python BlueArchive/Shanhaijing/Rooms/TeaHouse/calibration/fit_lights.py [--samples 64] [--scale 0.5] [--apply]
 
-Prints the weights; ``--apply`` multiplies the corresponding light powers in
-room.json (and the emissive look parameters in the shot) by them.
-Development tool: needs numpy + scipy (the scene build itself does not).
+Prints the weights; ``--apply`` multiplies them into room.json (light and
+downlight powers, the lantern lights) and into the emissive look parameters
+of the shot (lanterns, downlight discs, courtyard globes, backdrop...), so a
+fit is one command.  Render ungraded (the grade is refitted afterwards with
+fit_grade.py).  Development tool: needs numpy + scipy + OpenCV (the scene
+build itself does not).
 """
 from __future__ import annotations
 
@@ -30,35 +35,51 @@ for p in (ROOT, os.path.join(ROOT, "BlueArchive")):
 import numpy as np  # noqa: E402
 
 PREFIX = "TeaHouse."
+SHOT = os.path.join(ROOM, "shots", "BG_ShanTeaHouse_Night.json")
+REF = os.path.join(ROOM, "Reference", "BG_ShanTeaHouse_Night.webp")
+
+# emissive look parameters (shot "materials") that belong to a family
+EMISSIVE = {"lanterns": ["lantern_emission", "lantern_gold_emission"], "backdrop": ["backdrop_strength"],
+            "backdrop_bay": ["bay_backdrop_strength"],
+            "globes": ["globe_emission"], "counter": ["gift_glow"], "logo": ["cloud_glow"],
+            "timber_dl": ["downlight_emission"]}
+EMISSIVE_DEFAULTS = {"lantern_emission": 1.0, "lantern_gold_emission": 0.3, "backdrop_strength": 0.5,
+                     "bay_backdrop_strength": 1.5,
+                     "globe_emission": 12.0, "gift_glow": 0.4, "cloud_glow": 0.35, "downlight_emission": 40.0}
+NAMED = {"WallWasher": "washers", "LanternLight": "lanterns", "CounterLight": "counter",
+         "LogoWash": "logo", "ArchitraveUplight": "arch_up", "GardenLamp": "garden",
+         "CourtyardLamp": "globes", "CourtyardWall": "backdrop", "BayBackdrop": "backdrop_bay",
+         "FrontPanel": "front_fill",
+         "LeftWindowFill": "left_window", "GiftBox": "counter", "MenuTablet": "counter", "LogoWall": "logo"}
+
+
+def family(base, x, y, z):
+    """Fixture family of a light / emissive object named ``base`` at (x, y, z)
+    in the room frame (None = not a light source)."""
+    if base in ("DownlightSpot", "Downlight"):             # the spot and its glowing disc
+        if z > 5.8:                                        # concealed plaster-ceiling spots
+            return "plaster_dl_R" if x > 9.65 else ("plaster_dl_F" if y < 5 else ("plaster_dl_M" if y < 8 else "plaster_dl_B"))
+        return "timber_dl" if x < 9.65 else "right_dl"
+    if base == "PanelWash":
+        return "panel_L" if x < 3.5 else ("shelf" if x < 9.0 else ("panel_M" if x < 14.0 else "panel_R"))
+    if base == "BeamUplight":
+        return "beam_up_L" if x < 3.0 else ("beam_up_M" if x < 10.0 else "beam_up_R")
+    if base == "BounceUp":
+        return "bounce_R" if x > 9.65 else ("bounce_F" if y < 9 else ("bounce_M" if y < 13 else "bounce_B"))
+    if base == "FillDown":
+        return "fill_R" if x > 9.65 else ("fill_F" if y < 9 else ("fill_M" if y < 13 else "fill_B"))
+    if base.startswith("Lanterns"):
+        return "lanterns"
+    return NAMED.get(base)
 
 
 def group_of(ob):
-    """Fixture family of a light / emissive object (None = not a source)."""
+    """Family of a scene object (the room root sits at the world origin)."""
     n = ob.name
     if not n.startswith(PREFIX):
         return None
-    base = n[len(PREFIX):].split(".")[0]
-    z = ob.matrix_world.translation.z
-    x = ob.matrix_world.translation.x
-    if base in ("DownlightSpot", "Downlight"):          # the spot and its glowing disc
-        return "plaster_dl" if z > 5.8 else ("timber_dl" if x < 9.65 else "right_dl")
-    if base == "PanelWash":
-        return "panel_L" if x < 3.5 else ("shelf" if x < 9.0 else ("panel_M" if x < 14.0 else "panel_R"))
-    table = {"WallWasher": "washers", "LanternLight": "lanterns", "CounterLight": "counter",
-             "LogoWash": "logo", "ArchitraveUplight": "arch_up",
-             "GardenLamp": "garden", "CourtyardLamp": "globes", "CourtyardWall": "backdrop",
-             "FrontPanel": "front_fill", "GiftBox": "counter", "MenuTablet": "counter", "LogoWall": "logo"}
-    if base.startswith("Lanterns"):
-        return "lanterns"
-    if base == "BeamUplight":
-        return "beam_up_L" if x < 3.0 else ("beam_up_M" if x < 10.0 else "beam_up_R")
-    if base == "FillDown":
-        y = ob.matrix_world.translation.y
-        return "fill_R" if x > 9.65 else ("fill_F" if y < 9 else ("fill_M" if y < 13 else "fill_B"))
-    if base == "BounceUp":
-        y = ob.matrix_world.translation.y
-        return "bounce_R" if x > 9.65 else ("bounce_F" if y < 9 else ("bounce_M" if y < 13 else "bounce_B"))
-    return table.get(base)
+    t = ob.matrix_world.translation
+    return family(n[len(PREFIX):].split(".")[0], t.x, t.y, t.z)
 
 
 def _load_exr(path):
@@ -71,7 +92,7 @@ def _load_exr(path):
     return px.reshape(h, w, 4)[::-1, :, :3]
 
 
-def render_groups(samples=24, scale=0.5):
+def render_groups(samples=64, scale=0.5):
     import bpy
     import build as B
     args = B.parse(["x", "Shanhaijing/Rooms/TeaHouse", "--no-save", "--no-look", "--animation", "none",
@@ -120,7 +141,7 @@ def render_groups(samples=24, scale=0.5):
         if sock is None:
             sock = next(s for s in rl.outputs if g in s.name)
         if items is not None:
-            it = items.new("RGBA", g)
+            items.new("RGBA", g)
             dst = fo.inputs[g]
         else:
             fo.file_slots.new(g)
@@ -140,49 +161,87 @@ def render_groups(samples=24, scale=0.5):
     return imgs
 
 
-def fit(imgs, ref_path, blur=3, fixed=("world",), prior=0.02, rel=0.08):
-    """NNLS for the group weights.  ``fixed`` groups keep weight 1; a ridge
-    prior pulls weights towards 1 (``prior`` relative to the data term) and
-    residuals are weighted by 1 / (reference + ``rel``), i.e. roughly a
-    relative (log-like) error so dark and bright areas count alike."""
+def _srgb(c):
+    return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(np.maximum(c, 1e-8), 1.0 / 2.4) - 0.055)
+
+
+def fit(imgs, ref, size=(320, 225), blur=1.5, fixed=("world",), prior=0.002, iters=300):
+    """Display-space fit.  ``imgs``: {family: linear HxWx3}, ``ref``: sRGB
+    image of the same size.  Returns {family: weight}."""
     import cv2
-    from scipy.optimize import nnls
-    from Core import compare as C
-    names = sorted(imgs)
-    h, w = imgs[names[0]].shape[:2]
-    ref = C.load_image(ref_path, size=(w, h))
-    ref_lin = np.where(ref <= 0.04045, ref / 12.92, ((ref + 0.055) / 1.055) ** 2.4)
+    from scipy.optimize import minimize
 
     def prep(a):
-        return cv2.GaussianBlur(a.astype(np.float32), (0, 0), blur).reshape(-1)
+        a = cv2.resize(a.astype(np.float32), size, interpolation=cv2.INTER_AREA)
+        return cv2.GaussianBlur(a, (0, 0), blur)
 
-    b = prep(ref_lin)
-    for n in fixed:
-        if n in imgs:
-            b = b - prep(imgs[n])
+    names = sorted(imgs)
     free = [n for n in names if n not in fixed]
-    A = np.stack([prep(imgs[n]) for n in free], 1)
-    wgt = 1.0 / (prep(ref_lin) + rel)
-    A = A * wgt[:, None]
-    b = b * wgt
-    lam = np.sqrt(prior * float((A ** 2).sum()) / len(free))
-    A2 = np.vstack([A, lam * np.eye(len(free))])
-    b2 = np.concatenate([b, lam * np.ones(len(free))])
-    x, _ = nnls(A2, b2, maxiter=5000)
-    out = dict(zip(free, x))
+    A = np.stack([prep(imgs[n]) for n in free], 0)
+    base = sum(prep(imgs[n]) for n in fixed if n in imgs)
+    R = prep(ref)
+
+    def f(lx):
+        w = np.exp(lx)
+        C = np.maximum(base + np.tensordot(w, A, 1), 0.0)
+        S = np.minimum(_srgb(C), 1.0)
+        r = S - R
+        e = np.sqrt(r * r + 1e-4)                             # Charbonnier
+        dS = np.where(C <= 0.0031308, 12.92, 1.055 / 2.4 * np.power(np.maximum(C, 1e-8), 1.0 / 2.4 - 1.0))
+        dS = np.where(S >= 1.0, 0.0, dS)
+        gi = (r / e) * dS / r.size
+        grad = np.array([(gi * A[i]).sum() for i in range(len(free))]) * w + 2.0 * prior * lx / len(free)
+        return e.mean() + prior * np.mean(lx ** 2), grad
+
+    res = minimize(f, np.zeros(len(free)), jac=True, method="L-BFGS-B", bounds=[(-9.0, 4.0)] * len(free),
+                   options={"maxiter": iters})
+    out = dict(zip(free, (float(v) for v in np.exp(res.x))))
     for n in fixed:
         out[n] = 1.0
     return out
 
 
+def apply(weights):
+    """Multiply the weights into room.json and the shot's emissive parameters."""
+    from Core.jsonio import dump
+    path = os.path.join(ROOM, "room.json")
+    with open(path, encoding="utf-8") as fh:
+        R = json.load(fh)
+    for l in R.get("lights", []):
+        g = family(l["name"], *l["loc"])
+        if g in weights:
+            l["power"] = round(l["power"] * weights[g], 3)
+    for d in R.get("downlights", {}).get("sets", []):
+        x, y, z = d["at"][0]
+        g = family("DownlightSpot", x, y, z - 0.02)
+        if g in weights:
+            d["power"] = round(d["power"] * weights[g], 3)
+    if "lanterns" in weights and "light_power" in R.get("lanterns", {}):
+        R["lanterns"]["light_power"] = round(R["lanterns"]["light_power"] * weights["lanterns"], 4)
+    dump(R, path)
+    with open(SHOT, encoding="utf-8") as fh:
+        shot = json.load(fh)
+    mats = shot.setdefault("materials", {})
+    for g, keys in EMISSIVE.items():
+        if g in weights:
+            for k in keys:
+                mats[k] = round(mats.get(k, EMISSIVE_DEFAULTS[k]) * weights[g], 4)
+    dump(shot, SHOT)
+
+
 def main(argv):
-    samples = int(argv[argv.index("--samples") + 1]) if "--samples" in argv else 24
+    from Core import compare as C
+    samples = int(argv[argv.index("--samples") + 1]) if "--samples" in argv else 64
     scale = float(argv[argv.index("--scale") + 1]) if "--scale" in argv else 0.5
     imgs = render_groups(samples, scale)
-    w = fit(imgs, os.path.join(ROOM, "Reference", "BG_ShanTeaHouse_Night.webp"))
-    print(json.dumps({k: round(float(v), 3) for k, v in w.items()}, indent=1))
+    h, w = next(iter(imgs.values())).shape[:2]
+    weights = fit(imgs, C.load_image(REF, size=(w, h)))
+    print(json.dumps({k: round(v, 3) for k, v in sorted(weights.items())}, indent=1))
     np.savez_compressed(os.path.join(tempfile.gettempdir(), "shj_lightgroups.npz"), **imgs)
-    return w
+    if "--apply" in argv:
+        apply(weights)
+        print("weights applied to room.json and", os.path.basename(SHOT))
+    return weights
 
 
 if __name__ == "__main__":

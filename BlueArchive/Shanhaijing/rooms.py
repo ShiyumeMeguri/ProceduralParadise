@@ -136,6 +136,13 @@ class RoomBuilder:
                               "Disc Radius": tp.get("disc", TIMBER["hanging_disc_radius"])},
                              {"Material": mat_x, "Disc Material": tp.get("disc_material", "SHJ.TimberDark")},
                              (x, y, tz), None, "Structure")
+            # free-standing hanging posts between the grid lines: [x, y, bottom(, disc)]
+            for e in tp.get("extra", []):
+                self.obj("HangPost", "SHJ.Arch.HangingPost",
+                         {"Length": tz - e[2], "Size": tp.get("size", 0.2),
+                          "Disc Radius": e[3] if len(e) > 3 else 0.0},
+                         {"Material": mat_x, "Disc Material": tp.get("disc_material", "SHJ.TimberDark")},
+                         (e[0], e[1], tz), None, "Structure")
 
     # ------------------------------------------------------------ columns
     def columns(self):

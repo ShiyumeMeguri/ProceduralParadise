@@ -263,8 +263,8 @@ def lacquer_slate():
     """Slate-blue lacquer with sparse gold motifs (the hall's front columns)."""
     def build(t: Tree):
         m = _motif_mask(t, _obj(t), rows=P("motif_rows", 7.0), cols=P("motif_cols", 5.0))
-        col = S.mix_rgb(t, m, P("slate", (0.1, 0.14, 0.19, 1.0)), C("gold"))
-        return S.bsdf(t, Base_Color=col, Metallic=m * 0.85, Roughness=t.mix(m, 0.35, 0.35),
+        col = S.mix_rgb(t, m, P("slate", (0.1, 0.14, 0.19, 1.0)), P("slate_motif", (0.7, 0.72, 0.74, 1.0)))
+        return S.bsdf(t, Base_Color=col, Metallic=m * P("slate_motif_metal", 0.0), Roughness=t.mix(m, 0.35, 0.35),
                       Specular_IOR_Level=0.5, Coat_Weight=t.mix(m, 0.4, 0.0),
                       Coat_Roughness=0.15)["BSDF"]
     return S.material("SHJ.LacquerSlate", build)
@@ -407,12 +407,18 @@ def fret_band():
             return t.clamp01(t.map_range(d, r0 - 0.02, r0, 0.0, 1.0) * t.map_range(d, r1, r1 + 0.02, 1.0, 0.0))
         # outer ring broken on one side + inner ring = a stylised key fret
         gap = t.map_range(t.abs(v - 0.62), 0.06, 0.08, 0.0, 1.0)
-        outer = ring(0.38, 0.43) * t.max(gap, t.map_range(u, 0.52, 0.54, 1.0, 0.0))
-        gold = t.clamp01(outer + ring(0.15, 0.2))
-        col = S.mix_rgb(t, gold, C("lacquer_black"), C("gold"))
-        return S.bsdf(t, Base_Color=col, Roughness=t.mix(gold, 0.25, 0.3), Metallic=t.mix(gold, 0.0, 0.85),
-                      Specular_IOR_Level=0.5, Coat_Weight=0.4)["BSDF"]
+        outer = ring(0.39, 0.415) * t.max(gap, t.map_range(u, 0.52, 0.54, 1.0, 0.0))
+        gold = t.clamp01(outer + ring(0.16, 0.185)) * P("fret_gold", 0.8)
+        col = S.mix_rgb(t, gold, P("ebony", (0.025, 0.02, 0.016, 1.0)), C("gold"))
+        return S.bsdf(t, Base_Color=col, Roughness=t.mix(gold, 0.55, 0.3), Metallic=t.mix(gold, 0.0, 0.85),
+                      Specular_IOR_Level=0.35)["BSDF"]
     return S.material("SHJ.FretBand", build)
+
+
+@_reg("SHJ.EbonyMatte")
+def ebony_matte():
+    """Satin black-stained frame wood (display cabinet)."""
+    return S.principled("SHJ.EbonyMatte", P("ebony", (0.025, 0.02, 0.016, 1.0)), roughness=0.55, specular=0.35)
 
 
 @_reg("SHJ.DoorWood")
@@ -484,6 +490,19 @@ def night_backdrop():
                         P("night_high", (0.02, 0.04, 0.12, 1.0)))
         return t.n("ShaderNodeEmission", Color=col, Strength=P("backdrop_strength", 1.0))["Emission"]
     return S.material("SHJ.NightBackdrop", build)
+
+
+@_reg("SHJ.NightBackdropBay")
+def night_backdrop_bay():
+    """The brighter garden seen through the big lattice window of the left
+    bay (same night gradient, its own strength)."""
+    def build(t: Tree):
+        z = t.sep(_obj(t))[2]
+        k = t.map_range(z, 0.0, P("backdrop_height", 4.0), 0.0, 1.0)
+        col = S.mix_rgb(t, k, P("night_low", (0.08, 0.14, 0.32, 1.0)),
+                        P("night_high", (0.02, 0.04, 0.12, 1.0)))
+        return t.n("ShaderNodeEmission", Color=col, Strength=P("bay_backdrop_strength", 1.5))["Emission"]
+    return S.material("SHJ.NightBackdropBay", build)
 
 
 @_reg("SHJ.Downlight")
@@ -633,6 +652,12 @@ def porcelain_lilac():
 @_reg("SHJ.Celadon")
 def celadon():
     return S.principled("SHJ.Celadon", C("celadon"), roughness=0.15, specular=0.55, coat=0.5)
+
+
+@_reg("SHJ.CaddyLime")
+def caddy_lime():
+    """Glossy yellow-green glaze (tea caddies in the cabinet)."""
+    return S.principled("SHJ.CaddyLime", (0.62, 0.72, 0.2), roughness=0.15, specular=0.55, coat=0.5)
 
 
 @_reg("SHJ.PinkGlass")

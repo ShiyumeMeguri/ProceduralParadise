@@ -1,0 +1,158 @@
+{
+  "render": "BG_ShanTeaHouse_Night.png",
+  "mae": 0.0969,
+  "ssim": 0.3991,
+  "edge_recall_2px": 0.5762,
+  "regions_mean_abs_diff": 0.0463,
+  "luminance_pct": {
+    "render": [0.121, 0.182, 0.327, 0.429, 0.597],
+    "reference": [0.091, 0.182, 0.32, 0.457, 0.599]
+  },
+  "regions": {
+    "plaster_left": {
+      "render": [0.449, 0.398, 0.305],
+      "reference": [0.437, 0.381, 0.306],
+      "abs_diff": 0.01
+    },
+    "plaster_centre": {
+      "render": [0.424, 0.371, 0.278],
+      "reference": [0.334, 0.282, 0.221],
+      "abs_diff": 0.079
+    },
+    "plaster_right": {
+      "render": [0.377, 0.322, 0.264],
+      "reference": [0.349, 0.327, 0.281],
+      "abs_diff": 0.017
+    },
+    "timber_ceiling": {
+      "render": [0.251, 0.199, 0.132],
+      "reference": [0.209, 0.182, 0.139],
+      "abs_diff": 0.022
+    },
+    "timber_ceiling_R": {
+      "render": [0.437, 0.357, 0.266],
+      "reference": [0.495, 0.429, 0.326],
+      "abs_diff": 0.063
+    },
+    "big_beam": {
+      "render": [0.277, 0.202, 0.136],
+      "reference": [0.218, 0.133, 0.102],
+      "abs_diff": 0.054
+    },
+    "back_panel_L": {
+      "render": [0.698, 0.584, 0.355],
+      "reference": [0.826, 0.605, 0.355],
+      "abs_diff": 0.05
+    },
+    "back_panel_M": {
+      "render": [0.454, 0.386, 0.219],
+      "reference": [0.564, 0.525, 0.35],
+      "abs_diff": 0.127
+    },
+    "back_planks": {
+      "render": [0.225, 0.163, 0.085],
+      "reference": [0.218, 0.137, 0.081],
+      "abs_diff": 0.012
+    },
+    "plaque": {
+      "render": [0.236, 0.197, 0.13],
+      "reference": [0.157, 0.146, 0.121],
+      "abs_diff": 0.046
+    },
+    "shelf": {
+      "render": [0.256, 0.209, 0.136],
+      "reference": [0.241, 0.182, 0.108],
+      "abs_diff": 0.023
+    },
+    "moon_door": {
+      "render": [0.406, 0.315, 0.225],
+      "reference": [0.404, 0.3, 0.197],
+      "abs_diff": 0.015
+    },
+    "floor_near": {
+      "render": [0.561, 0.485, 0.351],
+      "reference": [0.619, 0.492, 0.314],
+      "abs_diff": 0.034
+    },
+    "floor_mid": {
+      "render": [0.648, 0.573, 0.425],
+      "reference": [0.709, 0.622, 0.447],
+      "abs_diff": 0.044
+    },
+    "floor_right": {
+      "render": [0.575, 0.499, 0.36],
+      "reference": [0.559, 0.482, 0.369],
+      "abs_diff": 0.014
+    },
+    "floor_far": {
+      "render": [0.647, 0.529, 0.318],
+      "reference": [0.53, 0.429, 0.301],
+      "abs_diff": 0.078
+    },
+    "table_top": {
+      "render": [0.768, 0.65, 0.356],
+      "reference": [0.763, 0.603, 0.373],
+      "abs_diff": 0.023
+    },
+    "cushion": {
+      "render": [0.333, 0.19, 0.135],
+      "reference": [0.406, 0.184, 0.17],
+      "abs_diff": 0.038
+    },
+    "chair_back": {
+      "render": [0.532, 0.449, 0.301],
+      "reference": [0.387, 0.307, 0.218],
+      "abs_diff": 0.123
+    },
+    "table_leg": {
+      "render": [0.214, 0.173, 0.113],
+      "reference": [0.226, 0.179, 0.166],
+      "abs_diff": 0.023
+    },
+    "column_red": {
+      "render": [0.247, 0.138, 0.075],
+      "reference": [0.183, 0.082, 0.056],
+      "abs_diff": 0.047
+    },
+    "column_left": {
+      "render": [0.222, 0.233, 0.218],
+      "reference": [0.15, 0.183, 0.205],
+      "abs_diff": 0.045
+    },
+    "lantern": {
+      "render": [0.857, 0.273, 0.196],
+      "reference": [0.854, 0.24, 0.218],
+      "abs_diff": 0.019
+    },
+    "logo_paper": {
+      "render": [0.649, 0.607, 0.448],
+      "reference": [0.711, 0.668, 0.55],
+      "abs_diff": 0.075
+    },
+    "cloud_panel": {
+      "render": [0.457, 0.422, 0.367],
+      "reference": [0.434, 0.391, 0.311],
+      "abs_diff": 0.037
+    },
+    "counter": {
+      "render": [0.323, 0.263, 0.182],
+      "reference": [0.381, 0.364, 0.29],
+      "abs_diff": 0.089
+    },
+    "lattice": {
+      "render": [0.109, 0.188, 0.188],
+      "reference": [0.087, 0.121, 0.151],
+      "abs_diff": 0.042
+    },
+    "architrave": {
+      "render": [0.289, 0.215, 0.137],
+      "reference": [0.289, 0.234, 0.164],
+      "abs_diff": 0.015
+    },
+    "lion": {
+      "render": [0.52, 0.494, 0.416],
+      "reference": [0.645, 0.578, 0.444],
+      "abs_diff": 0.079
+    }
+  }
+}

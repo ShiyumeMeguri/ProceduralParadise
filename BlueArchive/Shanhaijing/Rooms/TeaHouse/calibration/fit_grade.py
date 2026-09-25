@@ -27,7 +27,7 @@ SHOT = os.path.join(ROOM, "shots", "BG_ShanTeaHouse_Night.json")
 REF = os.path.join(ROOM, "Reference", "BG_ShanTeaHouse_Night.webp")
 
 
-def patch_means(img, grid=(16, 12)):
+def patch_means(img, grid=(24, 18)):
     """Region means: the semantic regions of verify.py plus a coarse grid
     (so the fit sees the whole frame, not only hand-picked areas)."""
     sys.path.insert(0, ROOM)
@@ -48,7 +48,9 @@ def main(argv):
     if "--hist" in argv:
         g = G.fit_grade_hist(ren, ref, n_knots=17, smooth=0.6, min_slope=0.35, max_slope=3.0)
     else:
-        g = G.fit_grade_patches(patch_means(ren), patch_means(ref), n_knots=17, reg=0.05)
+        # a 24 x 18 grid plus the semantic regions, fairly strong smoothing: the best balance
+        # between per-pixel error and the colour of the named regions
+        g = G.fit_grade_patches(patch_means(ren), patch_means(ref), n_knots=17, reg=2.0)
     g["highlight_rolloff"] = True        # lamps and lanterns roll off to white, not pink
     g["notes"] = ("Display-referred grade (3x3 colour matrix + per-channel monotone curves) fitted "
                   "on region means of the ungraded render vs the painting (calibration/fit_grade.py).")

@@ -4,10 +4,17 @@
 所有几何体都由 GN 资产生成，所有布局、尺寸、配色、镜头都写在 JSON 数据里；场景可以在命令行
 一键重建、渲染，也可以存成 `.blend` 在 Blender 里自由换机位。
 
-当前内容：**Blue Archive / 千年科学学园（Millennium）社团活动室**（`BG_Milleniumclub`），
-包括窗外的千年校区塔楼、基沃托斯城市与天空光环。
+当前内容（左：渲染，右：原画）：
 
-![render vs reference](BlueArchive/Millennium/Rooms/ClubRoom/Renders/BG_Milleniumclub_compare.png)
+* **千年科学学园（Millennium）社团活动室**（`BG_Milleniumclub`），包括窗外的千年校区塔楼、基沃托斯城市与天空光环；
+
+  ![ClubRoom render vs reference](BlueArchive/Millennium/Rooms/ClubRoom/Renders/BG_Milleniumclub_compare.png)
+
+* **山海经高级中学（Shanhaijing）茶楼**（`BG_ShanTeaHouse_Night`，夜景）：木构梁架与吊柱、红柱廊、博古架与月洞门、
+  八方海棠圆窗、斜置校徽墙与石狮、茶桌灯挂椅、红灯笼。详见
+  [`BlueArchive/Shanhaijing/Rooms/TeaHouse/README.md`](BlueArchive/Shanhaijing/Rooms/TeaHouse/README.md)。
+
+  ![TeaHouse render vs reference](BlueArchive/Shanhaijing/Rooms/TeaHouse/Renders/BG_ShanTeaHouse_Night_compare.png)
 
 ## 快速开始（本地 Blender）
 
@@ -50,6 +57,19 @@ blender -b -P BlueArchive/build.py -- --render still.png
 blender -b -P BlueArchive/build.py -- --view reverse --render reverse.png
 ```
 
+**其他房间**：在参数最前面写房间目录（相对 `BlueArchive/`）。在 Blender 界面里运行时，把 `build.py` 顶部的
+`DEFAULT_ROOM` 改成这个目录即可。例如山海经茶楼：
+
+```bash
+# 构建并保存 Build/Shanhaijing/TeaHouse/TeaHouse.blend（含配布视频机位 CAM_Showcase）
+blender -b -P BlueArchive/build.py -- Shanhaijing/Rooms/TeaHouse
+
+# 配布视频 / 原画机位 / 自由机位
+blender -b -P BlueArchive/build.py -- Shanhaijing/Rooms/TeaHouse --render-animation
+blender -b -P BlueArchive/build.py -- Shanhaijing/Rooms/TeaHouse --render still.png
+blender -b -P BlueArchive/build.py -- Shanhaijing/Rooms/TeaHouse --view shelf --render shelf.png
+```
+
 也可以用 PyPI 的 `bpy` 模块代替 Blender：`python BlueArchive/build.py [同样的参数]`。
 全部参数见 `BlueArchive/build.py` 顶部说明。无显示器的 Linux 上渲染描边（Freestyle）需要 EGL：
 安装 Mesa EGL 并设置 `EGL_PLATFORM=surfaceless`。
@@ -72,7 +92,13 @@ BlueArchive/
     Kit/                  模块化 GN 资产库（建筑、家具、灯具、标识、材质）
     Campus/               校区总图 + 塔楼生成器（房间嵌在真实塔楼的真实立面里）
     rooms.py              由 room.json 装配房间
-    Rooms/ClubRoom/       本次还原的社团活动室（room.json、镜头、配布视频动画、参考图、渲染结果）
+    Rooms/ClubRoom/       社团活动室（room.json、镜头、配布视频动画、参考图、渲染结果）
+  Shanhaijing/            山海经高级中学
+    Academy.json          学院设计系统（层高、木构尺寸、家具模数、地砖、色板）
+    Kit/                  GN 资产库：木构建筑（梁、吊柱、立柱、圆窗花格、额枋雀替、校徽墙）、
+                          家具（茶桌、灯挂椅、博古架、茶叶柜）、陈设（灯笼、铜壶、瓷器、石狮、植物）、材质
+    rooms.py              由 room.json 装配房间（结构网格、柱、桌椅组、灯笼串、筒灯、灯光）
+    Rooms/TeaHouse/       茶楼（room.json、镜头、配布视频动画、参考图、渲染结果、calibration/ 标定工具）
 Build/                    构建输出（.blend、视频），git 忽略
 ```
 
