@@ -168,7 +168,7 @@ class RoomBuilder:
             for ch in t.get("chairs", []):
                 side = ch.get("side", "W")
                 dist = ch.get("dist", ctype.get("dist", 0.62))
-                ang = {"W": -90.0, "E": 90.0, "S": 0.0, "N": 180.0}[side]
+                ang = {"W": 90.0, "E": -90.0, "S": 180.0, "N": 0.0}[side]   # chairs face -Y
                 dx, dy = {"W": (-dist, 0.0), "E": (dist, 0.0), "S": (0.0, -dist), "N": (0.0, dist)}[side]
                 dx += ch.get("dx", 0.0)
                 dy += ch.get("dy", 0.0)
@@ -211,13 +211,17 @@ class RoomBuilder:
             return
         sets = Dl["sets"] if "sets" in Dl else [Dl]
         for d in sets:
+            hidden = d.get("hidden", False)       # concealed: light only, no visible fixture
             for x, y, z in d["at"]:
-                self.obj("Downlight", "SHJ.Arch.Downlight", {"Radius": d.get("radius", 0.06)},
-                         {"Emitter Material": "SHJ.Downlight", "Trim Material": "SHJ.DownlightTrim"},
-                         (x, y, z), None, "Lights")
-                self.spot_light("DownlightSpot", (x, y, z - 0.02), d.get("power", 60.0),
-                                d.get("color", (1.0, 0.82, 0.6)), d.get("angle", 70.0),
-                                d.get("blend", 0.6), d.get("radius", 0.06))
+                if not hidden:
+                    self.obj("Downlight", "SHJ.Arch.Downlight", {"Radius": d.get("radius", 0.06)},
+                             {"Emitter Material": "SHJ.Downlight", "Trim Material": "SHJ.DownlightTrim"},
+                             (x, y, z), None, "Lights")
+                ob = self.spot_light("DownlightSpot", (x, y, z - 0.02), d.get("power", 60.0),
+                                     d.get("color", (1.0, 0.82, 0.6)), d.get("angle", 70.0),
+                                     d.get("blend", 0.6), d.get("radius", 0.06))
+                if hidden:
+                    self._conceal(ob)
 
     def lights(self):
         """Explicit lights.  ``"hidden": true`` marks a concealed fixture
@@ -236,9 +240,13 @@ class RoomBuilder:
                                      l.get("angle", 60.0), l.get("blend", 0.5), l.get("radius", 0.05),
                                      l.get("rot"))
             if l.get("hidden"):
-                for attr in ("visible_camera", "visible_glossy"):
-                    if hasattr(ob, attr):
-                        setattr(ob, attr, False)
+                self._conceal(ob)
+
+    @staticmethod
+    def _conceal(ob):
+        for attr in ("visible_camera", "visible_glossy"):
+            if hasattr(ob, attr):
+                setattr(ob, attr, False)
 
     def _light(self, name, data, loc, rot=None):
         ob = bpy.data.objects.new(f"{self.id}.{self._name(name)}", data)

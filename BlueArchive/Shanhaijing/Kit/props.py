@@ -282,11 +282,15 @@ def grass():
     gx, gy, _ = g.sep(g.position())
     t = gy + 0.5
     blade_m = g.set_pos(strip, pos=g.vec(t * t * 0.6, gx * (1.0 - t * 0.92), t * (2.0 - t)))
-    base = g.mesh_line(n, (0, 0, 0), (0, 0, 0))
+    # blades rise from a small clump, leaning outwards by a random amount
     ang = g.random(0.0, 6.2832, seed)
-    tilt = g.random(0.2, 1.0, seed + 1)
-    hs = g.random(0.6, 1.05, seed + 2)
-    blades = g.iop(g.mesh_to_points(base), blade_m, rot=g.vec(0.0, 0.0, ang),
+    tilt = g.random(0.25, 1.0, seed + 1)
+    hs = g.random(0.55, 1.05, seed + 2)
+    line = g.mesh_line(n, (0, 0, 0), (0, 0, 0))
+    lx = g.random(-1.0, 1.0, seed + 3) * spread * 0.1
+    ly = g.random(-1.0, 1.0, seed + 4) * spread * 0.1
+    line = g.set_pos(line, offset=g.vec(lx, ly, 0.0))
+    blades = g.iop(g.mesh_to_points(line), blade_m, rot=g.vec(0.0, 0.0, ang),
                    scale=g.vec(spread * tilt, bw, Hh * hs))
     g.result(g.smooth(g.mat(g.realize(blades), m), True))
     return g
@@ -336,51 +340,68 @@ def lion():
 
 
 # ---------------------------------------------------------------- lanterns
+# strokes of the character 福 in a unit square (x right, y up)
+FU_STROKES = [
+    [(0.15, 0.95), (0.22, 0.85)],                                  # 礻 dot
+    [(0.03, 0.73), (0.33, 0.73), (0.05, 0.4)],                      # 礻 bar + sweep
+    [(0.19, 0.58), (0.19, 0.02)],                                  # 礻 stem
+    [(0.23, 0.5), (0.35, 0.38)],                                   # 礻 dot
+    [(0.47, 0.93), (0.97, 0.93)],                                  # 畐 top bar
+    [(0.56, 0.83), (0.88, 0.83), (0.88, 0.65), (0.56, 0.65), (0.56, 0.83)],   # 口
+    [(0.5, 0.55), (0.94, 0.55), (0.94, 0.03), (0.5, 0.03), (0.5, 0.55)],     # 田 frame
+    [(0.72, 0.55), (0.72, 0.03)], [(0.5, 0.29), (0.94, 0.29)],               # 田 cross
+]
+
+
+def fu_glyph(g, width=0.075):
+    """The character 福 as flat stroke ribbons in XY, centred, 1 unit tall."""
+    strokes = [g.polyline([(x - 0.5, y - 0.5, 0.0) for x, y in st]) for st in FU_STROKES]
+    return flat_sweep(g, g.join(*strokes), width, 0.02)
+
+
 @asset("SHJ.Prop.Lantern", "Props")
 def lantern():
-    """Round red silk lantern: ribbed glowing body, gold top and bottom caps
-    with rings, a gold 'fu' medallion front and back, and a tassel.  Origin
-    at the top of the cap (hanging point), body below."""
+    """Round red silk lantern (as painted in the tea house): an almost
+    spherical ribbed glowing body, a small gold top cap, a slim gold drum
+    hanging under the body and a gold 福 on the front and back.  Origin at
+    the top of the cap (hanging point), body below."""
     g = GN("SHJ.Prop.Lantern", lantern.__doc__)
     D = g.inp("Diameter", default=0.6, subtype="DISTANCE")
-    Hr = g.inp("Height Ratio", default=0.82)
+    Hr = g.inp("Height Ratio", default=0.88)
     tassel = g.inp("Tassel", "BOOL", default=True)
     m_paper = g.inp("Paper Material", "MATERIAL")
     m_gold = g.inp("Gold Material", "MATERIAL")
     m_tassel = g.inp("Tassel Material", "MATERIAL")
     r = D * 0.5
     bh = D * Hr
-    cap_h = D * 0.16
-    cap_r = D * 0.26
+    cap_h = D * 0.035
+    zc = cap_h * -1.0 - bh * 0.5 + D * 0.01              # body centre
     body = ellipsoid(g, 1.0, 1.0, 1.0, 32, 20)
-    body = g.transform(body, t=g.vec(0.0, 0.0, cap_h * -1.0 - bh * 0.5 + 0.02),
-                       s=g.vec(r, r, bh * 0.5))
-    top = g.cylinder(cap_r, cap_h, 32)
-    top = g.move(top, z=cap_h * -0.5)
-    bot = g.move(g.cylinder(cap_r, cap_h, 32), z=cap_h * -1.5 - bh + 0.04)
-    rings = g.join(g.move(g.cylinder(cap_r + 0.01, 0.012, 32), z=cap_h * -0.12),
-                   g.move(g.cylinder(cap_r + 0.01, 0.012, 32), z=cap_h * -0.88),
-                   g.move(g.cylinder(cap_r + 0.01, 0.012, 32), z=cap_h * -1.12 - bh + 0.04),
-                   g.move(g.cylinder(cap_r + 0.01, 0.012, 32), z=cap_h * -1.88 - bh + 0.04))
-    # 'fu' medallion: a rotated square frame with a cross-hatched centre
-    med = g.join(flat_sweep(g, g.transform(g.rect(1.0, 1.0), r=(0.0, 0.0, math.pi / 4.0)), 0.07, 0.02),
-                 flat_sweep(g, g.rect(0.36, 0.36), 0.06, 0.02),
-                 g.box(-0.2, -0.03, -0.01, 0.2, 0.03, 0.01), g.box(-0.03, -0.2, -0.01, 0.03, 0.2, 0.01))
-    med = g.transform(med, r=STAND)
-    zc = cap_h * -1.0 - bh * 0.5 + 0.02
-    med = g.transform(med, t=g.vec(0.0, 0.0, zc), s=g.vec(D * 0.22, 0.5, D * 0.22))
-    # wrap onto the ellipsoidal body: y from the surface equation
+    body = g.transform(body, t=g.vec(0.0, 0.0, zc), s=g.vec(r, r, bh * 0.5))
+    top = g.join(g.move(g.cylinder(D * 0.13, cap_h, 24), z=cap_h * -0.5),
+                 g.move(g.cylinder(D * 0.03, D * 0.04, 8), z=D * 0.02))
+    # slim drum under the body with a darker waist ring
+    dr, dh = D * 0.2, D * 0.31
+    z_top = zc - bh * 0.5 + D * 0.03
+    drum = g.move(g.cylinder(dr, dh, 32), z=z_top - dh * 0.5)
+    rings = g.join(g.move(g.cylinder(dr * 1.06, D * 0.018, 32), z=z_top - dh * 0.08),
+                   g.move(g.cylinder(dr * 1.06, D * 0.018, 32), z=z_top - dh * 0.92))
+    # 福 wrapped onto the body, front (-Y) and back
+    med = g.transform(fu_glyph(g), r=STAND)
+    gz = zc + bh * 0.12
+    med = g.transform(med, t=g.vec(0.0, 0.0, gz), s=g.vec(D * 0.26, 0.5, D * 0.26))
     mx, my, mz = g.sep(g.position())
     k = 1.0 - (mx / r) * (mx / r) - ((mz - zc) / (bh * 0.5)) * ((mz - zc) / (bh * 0.5))
     ys = r * g.math("SQRT", g.max(k, 0.0))
-    front = g.set_pos(med, pos=g.vec(mx, ys * -1.0 - 0.004 + my, mz))
+    front = g.set_pos(med, pos=g.vec(mx, ys * -1.0 - 0.003 + my, mz))
     back = g.transform(front, s=(1.0, -1.0, 1.0))
     medals = g.join(front, g.n("GeometryNodeFlipFaces", back).o)
-    tas = g.join(g.rod(g.vec(0.0, 0.0, cap_h * -2.0 - bh + 0.04), g.vec(0.0, 0.0, cap_h * -2.0 - bh - D * 0.12),
-                       0.006, 6),
-                 g.move(g.cylinder(D * 0.035, D * 0.45, 12), z=cap_h * -2.0 - bh - D * 0.35))
+    z_bot = z_top - dh
+    tas = g.join(g.rod(g.vec(0.0, 0.0, z_bot), g.vec(0.0, 0.0, z_bot - D * 0.1), 0.006, 6),
+                 g.move(g.cylinder(D * 0.035, D * 0.45, 12), z=z_bot - D * 0.32))
     tas = g.switch(tassel, None, tas)
-    geo = g.join(g.smooth(g.mat(body, m_paper), True), g.mat(g.join(top, bot, rings, medals), m_gold),
+    geo = g.join(g.smooth(g.mat(body, m_paper), True),
+                 g.mat(g.join(g.smooth(g.join(top, drum), True), rings, medals), m_gold),
                  g.mat(tas, m_tassel))
     g.result(geo)
     return g
@@ -402,10 +423,26 @@ def lantern_string():
                   Gold_Material=m_gold, Tassel_Material=m_cord).o
     pts = g.mesh_line(cnt, g.vec(0.0, 0.0, drop * -1.0), g.vec(0.0, 0.0, pitch * -1.0))
     lans = g.realize(g.iop(g.mesh_to_points(pts), lan))
-    bottom = drop + pitch * (cnt - 1.0) + D * 0.9
+    bottom = drop + pitch * (cnt - 1.0) + D * 1.25
     cord = g.rod((0.0, 0.0, 0.0), g.vec(0.0, 0.0, bottom * -1.0), 0.005, 6)
-    tas = g.move(g.cylinder(D * 0.035, D * 0.45, 12), z=bottom * -1.0 - D * 0.2)
+    tas = g.move(g.cylinder(D * 0.035, D * 0.4, 12), z=bottom * -1.0 - D * 0.18)
     g.result(g.join(lans, g.mat(g.join(cord, tas), m_cord)))
+    return g
+
+
+@asset("SHJ.Prop.GardenLamp", "Props")
+def garden_lamp():
+    """Courtyard post lamp: slim dark post with a glowing globe on top
+    (seen softly through the frosted round windows)."""
+    g = GN("SHJ.Prop.GardenLamp", garden_lamp.__doc__)
+    Hh = g.inp("Height", default=1.6, subtype="DISTANCE")
+    r = g.inp("Globe Radius", default=0.16, subtype="DISTANCE")
+    m_post = g.inp("Post Material", "MATERIAL")
+    m_globe = g.inp("Globe Material", "MATERIAL")
+    post = g.rod((0.0, 0.0, 0.0), g.vec(0.0, 0.0, Hh - r), 0.03, 10)
+    ball = g.n("GeometryNodeMeshUVSphere", Segments=24, Rings=12, Radius=r)["Mesh"]
+    ball = g.move(ball, z=Hh)
+    g.result(g.join(g.mat(post, m_post), g.smooth(g.mat(ball, m_globe), True)))
     return g
 
 

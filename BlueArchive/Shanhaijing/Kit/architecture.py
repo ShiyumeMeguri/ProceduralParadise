@@ -253,24 +253,103 @@ def octagon_lattice():
     return g
 
 
+def haitang_points(cx, cy, q, rc, n=5):
+    """Square of half-size q with concave (inward) quarter-arc corners of
+    radius rc -- the small 'begonia' flower of the lattice -- as a closed
+    list of (x, y) points."""
+    pts = []
+    for kx, ky, a0 in ((1, 1, 270.0), (-1, 1, 0.0), (-1, -1, 90.0), (1, -1, 180.0)):
+        ox, oy = cx + kx * q, cy + ky * q
+        for i in range(n + 1):
+            a = math.radians(a0 - 90.0 * i / n)
+            pts.append((ox + rc * math.cos(a), oy + rc * math.sin(a)))
+    pts.append(pts[0])
+    return pts
+
+
+def four_octagon_segments(c=0.46, a=0.29, e=0.045, q=0.1, rc=0.045):
+    """Line work of the tea house round windows on the unit circle: a
+    doubled central cross, four upright octagons (flats on the axes) each with
+    a cross running out to the central bars and to the rim and a begonia
+    flower at its centre, and splayed 'Y' arms where the cross meets the rim.
+    Returns {group: [polyline, ...]}; the groups get slightly different bar
+    depths so that crossing bars never share a face plane."""
+    G = {"central_v": [], "central_h": [], "cross_v": [], "cross_h": [], "arms": [], "octagons": [],
+         "flowers": []}
+    for s in (-1.0, 1.0):
+        G["central_v"].append([(s * e, -1.2), (s * e, 1.2)])
+        G["central_h"].append([(-1.2, s * e), (1.2, s * e)])
+    h = a * math.tan(math.pi / 8.0)
+    for sx in (-1.0, 1.0):
+        for sy in (-1.0, 1.0):
+            cx, cy = sx * c, sy * c
+            V = [(cx + a, cy - h), (cx + a, cy + h), (cx + h, cy + a), (cx - h, cy + a),
+                 (cx - a, cy + h), (cx - a, cy - h), (cx - h, cy - a), (cx + h, cy - a)]
+            G["octagons"].append(V + [V[0]])
+            G["cross_h"].append([(sx * e, cy), (sx * 1.2, cy)])
+            G["cross_v"].append([(cx, sy * e), (cx, sy * 1.2)])
+            G["flowers"].append(haitang_points(cx, cy, q, rc))
+    for k in range(4):
+        ca, sa = math.cos(k * math.pi / 2.0), math.sin(k * math.pi / 2.0)
+        for s in (-1.0, 1.0):
+            p0, p1 = (s * 0.28, 0.92), (s * e, 0.74)
+            G["arms"].append([(p0[0] * ca - p0[1] * sa, p0[0] * sa + p0[1] * ca),
+                              (p1[0] * ca - p1[1] * sa, p1[0] * sa + p1[1] * ca)])
+    return G
+
+
+@asset("SHJ.Arch.FourOctagonLattice", "Architecture")
+def four_octagon_lattice():
+    """Round-window lattice of the Shan tea house (八方海棠): four upright
+    octagons, each with a begonia flower on a cross that runs out to the
+    doubled central cross and to the rim, and splayed 'Y' arms at the four
+    ends of the central cross.  Built on the unit circle and scaled to Radius
+    (bar width is absolute).  XZ plane, centred, face towards -Y."""
+    g = GN("SHJ.Arch.FourOctagonLattice", four_octagon_lattice.__doc__)
+    R = g.inp("Radius", default=0.9, subtype="DISTANCE")
+    bw = g.inp("Bar Width", default=0.045, subtype="DISTANCE")
+    bd = g.inp("Bar Depth", default=0.04, subtype="DISTANCE")
+    m = g.inp("Material", "MATERIAL")
+    depth = {"central_v": 1.1, "central_h": 1.06, "cross_v": 1.02, "cross_h": 1.0, "arms": 0.97,
+             "octagons": 1.04, "flowers": 1.13}
+    parts = []
+    for name, lines in four_octagon_segments().items():
+        cur = g.join(*[g.polyline([(x, y, 0.0) for x, y in p]) for p in lines])
+        if name != "flowers":
+            cur = g.resample(cur, 48)
+        cur = g.transform(cur, s=g.vec(R, R, 1.0))
+        parts.append(flat_sweep(g, cur, bw, bd * depth[name]))
+    bars = g.join(*parts)
+    far = g.compare(g.vmath("LENGTH", g.position()), R, "GREATER_THAN")
+    bars = g.delete(bars, far, "FACE")
+    bars = g.transform(bars, r=STAND)
+    g.result(g.smooth_by_angle(g.mat(bars, m), 0.5))
+    return g
+
+
 @asset("SHJ.Arch.RoundWindow", "Architecture")
 def round_window():
-    """Round lattice window: moulded timber ring, octagon lattice and a glass
-    pane, centred on the origin in the XZ plane (face towards -Y)."""
+    """Round lattice window: moulded timber ring, lattice (Pattern 0 octagon
+    tiling, 1 the tea house's four-octagon motif) and a glass pane, centred
+    on the origin in the XZ plane (face towards -Y)."""
     g = GN("SHJ.Arch.RoundWindow", round_window.__doc__)
     R = g.inp("Radius", default=0.92, subtype="DISTANCE")
     rw = g.inp("Ring Width", default=0.07, subtype="DISTANCE")
     rd = g.inp("Ring Depth", default=0.12, subtype="DISTANCE")
+    pat = g.inp("Pattern", "INT", default=1, min=0, max=1)
     a = g.inp("Lattice Edge", default=0.17, subtype="DISTANCE")
-    bw = g.inp("Bar Width", default=0.028, subtype="DISTANCE")
+    bw = g.inp("Bar Width", default=0.045, subtype="DISTANCE")
     gy = g.inp("Glass Offset", default=0.05, subtype="DISTANCE")
     m_ring = g.inp("Ring Material", "MATERIAL", panel="Materials")
     m_lat = g.inp("Lattice Material", "MATERIAL", panel="Materials")
     m_glass = g.inp("Glass Material", "MATERIAL", panel="Materials")
     ring = flat_sweep(g, g.circle(R - rw * 0.5, 128), rw, rd)
     ring = g.transform(ring, r=STAND)
-    lat = g.group(get_asset("SHJ.Arch.OctagonLattice"), Radius=R - rw * 0.6, Edge=a,
-                  Bar_Width=bw, Material=m_lat).o
+    lat0 = g.group(get_asset("SHJ.Arch.OctagonLattice"), Radius=R - rw * 0.6, Edge=a,
+                   Bar_Width=bw, Material=m_lat).o
+    lat1 = g.group(get_asset("SHJ.Arch.FourOctagonLattice"), Radius=R - rw * 0.6,
+                   Bar_Width=bw, Material=m_lat).o
+    lat = g.index_switch(pat, [lat0, lat1], "GEOMETRY")
     glass = g.fill(g.circle(R - rw * 0.5, 96))
     glass = g.transform(glass, t=g.vec(0.0, gy, 0.0), r=STAND)
     g.result(g.join(g.smooth_by_angle(g.mat(ring, m_ring), 0.6), lat, g.mat(glass, m_glass)))
@@ -316,10 +395,9 @@ def downlight():
     r = g.inp("Radius", default=0.06, subtype="DISTANCE")
     m_e = g.inp("Emitter Material", "MATERIAL")
     m_t = g.inp("Trim Material", "MATERIAL")
-    ring = g.cylinder(r + 0.018, 0.012, 32)
-    ring = g.move(ring, z=-0.006)
-    hole = g.cylinder(r, 0.02, 32)
-    em = g.move(g.cylinder(r * 0.92, 0.004, 32), z=-0.008)
+    # satin trim ring (an annulus 12 mm deep) around a slightly recessed glowing disc
+    ring = g.move(flat_sweep(g, g.circle(r + 0.009, 32), 0.018, 0.012), z=-0.006)
+    em = g.move(g.fill(g.circle(r, 32)), z=-0.004)
     g.result(g.join(g.mat(ring, m_t), g.mat(em, m_e)))
     return g
 

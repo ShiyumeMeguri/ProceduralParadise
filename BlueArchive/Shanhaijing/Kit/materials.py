@@ -139,7 +139,7 @@ def floor_wood():
         rough = P("floor_roughness", 0.32) + ry * 0.08
         b = S.bsdf(t, Base_Color=col, Roughness=t.mix(joint, rough, 0.7),
                    Specular_IOR_Level=P("floor_specular", 0.45),
-                   Coat_Weight=P("floor_coat", 0.12), Coat_Roughness=0.12)
+                   Coat_Weight=P("floor_coat", 0.12), Coat_Roughness=P("floor_coat_roughness", 0.1))
         return b["BSDF"]
     return S.material("SHJ.FloorWood", build)
 
@@ -201,8 +201,9 @@ def timber_planks():
         joint = t.map_range(d, 0.002, 0.006, 1.0, 0.0)
         rnd = t.n("ShaderNodeTexWhiteNoise", board, props={"noise_dimensions": "1D"})["Value"]
         g = _grain(t, t.vec(py + pz, px * 3.0 + rnd * 11.0, 0.0), (0.7, 1.0, 1.0), 0.3)
-        base = S.mix_rgb(t, rnd, C("timber_plank"),
-                         tuple(c * 1.35 for c in C("timber_plank")[:3]) + (1.0,))
+        k = P("plank_contrast", 0.45)
+        base = S.mix_rgb(t, rnd, tuple(c * (1.0 - k) for c in C("timber_plank")[:3]) + (1.0,),
+                         tuple(c * (1.0 + k * 1.4) for c in C("timber_plank")[:3]) + (1.0,))
         col = S.mix_rgb(t, g, base, tuple(c * 0.6 for c in C("timber_plank")[:3]) + (1.0,))
         col = S.mix_rgb(t, joint, col, (0.01, 0.007, 0.005, 1.0))
         return S.bsdf(t, Base_Color=col, Roughness=0.6, Specular_IOR_Level=0.35)["BSDF"]
@@ -243,6 +244,32 @@ def lacquer_black_gold():
                       Specular_IOR_Level=0.5, Coat_Weight=t.mix(m, 0.45, 0.0),
                       Coat_Roughness=0.12)["BSDF"]
     return S.material("SHJ.LacquerBlackGold", build)
+
+
+@_reg("SHJ.LacquerSlate")
+def lacquer_slate():
+    """Slate-blue lacquer with sparse gold motifs (the hall's front columns)."""
+    def build(t: Tree):
+        m = _motif_mask(t, _obj(t), rows=P("motif_rows", 7.0), cols=P("motif_cols", 5.0))
+        col = S.mix_rgb(t, m, P("slate", (0.1, 0.14, 0.19, 1.0)), C("gold"))
+        return S.bsdf(t, Base_Color=col, Metallic=m * 0.85, Roughness=t.mix(m, 0.35, 0.35),
+                      Specular_IOR_Level=0.5, Coat_Weight=t.mix(m, 0.4, 0.0),
+                      Coat_Roughness=0.15)["BSDF"]
+    return S.material("SHJ.LacquerSlate", build)
+
+
+@_reg("SHJ.LacquerBrown")
+def lacquer_brown():
+    """Dark brown lacquer (colonnade architrave)."""
+    return S.principled("SHJ.LacquerBrown", P("lacquer_brown", (0.13, 0.085, 0.055)), roughness=0.3,
+                        specular=0.5, coat=0.5, coat_roughness=0.12)
+
+
+@_reg("SHJ.TimberLight")
+def timber_light():
+    """Lighter board ceiling (right hall, lit by its downlights)."""
+    return wood("SHJ.TimberLight", P("timber_light", (0.34, 0.2, 0.1, 1.0)),
+                (0.22, 0.12, 0.06, 1.0), rough=0.5, scale=(12.0, 0.6, 1.0), strength=0.3)
 
 
 @_reg("SHJ.LacquerRed")
@@ -302,9 +329,11 @@ def cloud_panel():
         P3 = _obj(t)
         px, py, pz = t.sep(P3)
         uv = t.vec(px * P("cloud_cols", 8.0), pz * P("cloud_rows", 7.0), 0.0)
+        # squash the cells horizontally: glyphs read as short vertical strokes
+        uv = t.vmath("MULTIPLY", uv, (1.0, P("cloud_stretch", 0.6), 1.0))
         dist, rnd = _cells(t, uv, 1.0)
         r = t.sep(rnd)
-        blob = t.map_range(dist, 0.16, 0.3, 1.0, 0.0)
+        blob = t.map_range(dist, P("cloud_size", 0.24), P("cloud_size", 0.24) + 0.1, 1.0, 0.0)
         n = S.noise(t, t.vec(t.sep(uv)[0] * 4.0, t.sep(uv)[1] * 4.0, 0.0), scale=2.0,
                     detail=2.0)["Fac"]
         swirl = t.map_range(n, 0.44, 0.56, 0.0, 1.0)
@@ -342,10 +371,40 @@ def jade_panel():
     return S.material("SHJ.JadePanel", build)
 
 
+@_reg("SHJ.FretBand")
+def fret_band():
+    """Black lacquer band with a gold key-fret (回纹) meander, laid out along
+    the band in object X/Y and Z (the display cabinet's plinth, shelf edge
+    and top rail)."""
+    def build(t: Tree):
+        P3 = _obj(t)
+        px, py, pz = t.sep(P3)
+        k = P("fret_scale", 14.0)
+        u = t.math("FRACT", (px + py) * k)
+        v = t.math("FRACT", pz * k)
+        d = t.max(t.abs(u - 0.5), t.abs(v - 0.5))            # square rings
+
+        def ring(r0, r1):
+            return t.clamp01(t.map_range(d, r0 - 0.02, r0, 0.0, 1.0) * t.map_range(d, r1, r1 + 0.02, 1.0, 0.0))
+        # outer ring broken on one side + inner ring = a stylised key fret
+        gap = t.map_range(t.abs(v - 0.62), 0.06, 0.08, 0.0, 1.0)
+        outer = ring(0.38, 0.43) * t.max(gap, t.map_range(u, 0.52, 0.54, 1.0, 0.0))
+        gold = t.clamp01(outer + ring(0.15, 0.2))
+        col = S.mix_rgb(t, gold, C("lacquer_black"), C("gold"))
+        return S.bsdf(t, Base_Color=col, Roughness=t.mix(gold, 0.25, 0.3), Metallic=t.mix(gold, 0.0, 0.85),
+                      Specular_IOR_Level=0.5, Coat_Weight=0.4)["BSDF"]
+    return S.material("SHJ.FretBand", build)
+
+
 @_reg("SHJ.DoorWood")
 def door_wood():
-    return wood("SHJ.DoorWood", (0.5, 0.26, 0.12, 1.0), (0.3, 0.14, 0.06, 1.0), rough=0.5,
+    return wood("SHJ.DoorWood", P("door_wood", (0.26, 0.14, 0.07, 1.0)), (0.13, 0.065, 0.03, 1.0), rough=0.5,
                 scale=(0.4, 25.0, 1.0))
+
+
+@_reg("SHJ.GateRim")
+def gate_rim():
+    return S.principled("SHJ.GateRim", P("gate_rim", (0.06, 0.08, 0.07)), roughness=0.35, specular=0.5, coat=0.4)
 
 
 @_reg("SHJ.LatticeWood")
@@ -367,9 +426,27 @@ def glass_night():
                        roughness=0.02, ior=1.5, reflect=0.6)
 
 
+@_reg("SHJ.GlassFrosted")
+def glass_frosted():
+    """Lightly frosted window glass: blurred transmission (IOR 1, rough) with
+    a thin glossy reflection -- lamps behind it read as soft glows."""
+    def build(t: Tree):
+        fres = t.n("ShaderNodeFresnel", IOR=1.5)["Fac"]
+        tr = t.n("ShaderNodeBsdfGlass", Color=P("frost_tint", (0.8, 0.85, 1.0, 1.0)),
+                 Roughness=P("frost_roughness", 0.35), IOR=1.0)["BSDF"]
+        gl = t.n("ShaderNodeBsdfGlossy", Color=(1, 1, 1, 1), Roughness=0.05)["BSDF"]
+        return t.n("ShaderNodeMixShader", fres * 0.6, tr, gl)["Shader"]
+    return S.material("SHJ.GlassFrosted", build)
+
+
+@_reg("SHJ.Globe")
+def globe():
+    return S.emission_mat("SHJ.Globe", (1.0, 0.62, 0.3), P("globe_emission", 12.0))
+
+
 @_reg("SHJ.GlassCase")
 def glass_case():
-    return S.glass_mat("SHJ.GlassCase", (0.96, 0.98, 0.97), roughness=0.0, ior=1.5, reflect=0.8)
+    return S.glass_mat("SHJ.GlassCase", (0.97, 0.99, 0.98), roughness=0.0, ior=1.5, reflect=P("case_reflect", 0.35))
 
 
 @_reg("SHJ.NightBackdrop")
@@ -400,22 +477,39 @@ def downlight_trim():
 def rosewood():
     """Dark reddish-brown hardwood (tables, chairs)."""
     return wood("SHJ.Rosewood", C("rosewood"),
-                tuple(c * 0.55 for c in C("rosewood")[:3]) + (1.0,), rough=0.38,
-                coat=0.25, coat_rough=0.18, scale=(1.0, 18.0, 18.0), strength=0.3)
+                tuple(c * 0.5 for c in C("rosewood")[:3]) + (1.0,), rough=0.32,
+                coat=P("rosewood_coat", 0.6), coat_rough=0.12, scale=(1.0, 18.0, 18.0), strength=0.3,
+                spec=0.5)
 
 
 @_reg("SHJ.TableTop")
 def table_top():
     """Light golden lacquered tabletop panel (with a faint grain)."""
     return wood("SHJ.TableTop", C("table_inlay"),
-                tuple(c * 0.78 for c in C("table_inlay")[:3]) + (1.0,), rough=0.28,
-                coat=P("table_coat", 0.35), coat_rough=0.1, scale=(0.6, 9.0, 9.0), strength=0.25)
+                tuple(c * 0.78 for c in C("table_inlay")[:3]) + (1.0,), rough=0.22,
+                coat=P("table_coat", 0.9), coat_rough=P("table_coat_roughness", 0.06),
+                scale=(0.6, 9.0, 9.0), strength=0.25, spec=0.5)
+
+
+@_reg("SHJ.TableTopDark")
+def table_top_dark():
+    """Dark olive-black stone top under a glossy coat (the tables in the middle
+    of the hall): faint cloudy mottling, crisp reflections of the lamps."""
+    def build(t: Tree):
+        P3 = _obj(t)
+        n = S.noise(t, P3, scale=6.0, detail=5.0, rough=0.6)["Fac"]
+        base = P("table_dark", (0.035, 0.033, 0.026))
+        col = S.mix_rgb(t, t.map_range(n, 0.35, 0.7, 0.0, 1.0), tuple(c * 0.7 for c in base[:3]) + (1.0,),
+                        tuple(c * 1.5 for c in base[:3]) + (1.0,))
+        return S.bsdf(t, Base_Color=col, Roughness=0.35, Specular_IOR_Level=0.5,
+                      Coat_Weight=P("table_dark_coat", 1.0), Coat_Roughness=P("table_dark_coat_roughness", 0.05))["BSDF"]
+    return S.material("SHJ.TableTopDark", build)
 
 
 @_reg("SHJ.Inlay")
 def inlay():
-    """Pale inlay lines (tabletop border)."""
-    return S.principled("SHJ.Inlay", (0.85, 0.72, 0.5), roughness=0.3, metallic=0.3, specular=0.5)
+    """Pale gold inlay lines (tabletop border)."""
+    return S.principled("SHJ.Inlay", P("inlay", (0.95, 0.82, 0.55)), roughness=0.25, metallic=0.5, specular=0.6)
 
 
 @_reg("SHJ.CushionRed")
@@ -571,6 +665,11 @@ def teabox_red():
 @_reg("SHJ.TeaBoxGreen")
 def teabox_green():
     return S.principled("SHJ.TeaBoxGreen", (0.35, 0.42, 0.2), roughness=0.45, specular=0.5)
+
+
+@_reg("SHJ.TeaBoxSage")
+def teabox_sage():
+    return S.principled("SHJ.TeaBoxSage", (0.5, 0.55, 0.38), roughness=0.5, specular=0.4)
 
 
 @_reg("SHJ.TeaBoxCream")

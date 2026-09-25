@@ -115,8 +115,21 @@ def grade_nodes(t, img, g):
 
     Linear -> sRGB, matrix + offset, per-channel curves, sRGB -> linear, so
     the Standard view transform afterwards yields exactly the fitted mapping.
-    Values above 1 (lights, sun glints) pass through the matrix unclamped."""
+    Values above 1 (lights, sun glints) pass through the matrix unclamped,
+    unless the grade sets ``"highlight_rolloff": true``: the fit only saw
+    [0, 1] images, so over-range values are then first rolled off towards
+    white -- c / m + (1 - 1 / m) with m the largest channel -- which keeps
+    their hue and never lets one channel's curve extrapolate on its own
+    (bright saturated lamps would otherwise turn pink)."""
     gamma = t.resolve("CompositorNodeGamma", "ShaderNodeGamma")
+    rolloff = bool(g.get("highlight_rolloff", False))
+    if rolloff:
+        sep0 = t.n("CompositorNodeSeparateColor", img)
+        r0, g0, b0 = sep0[0], sep0[1], sep0[2]
+        m = t.math("MAXIMUM", t.math("MAXIMUM", t.math("MAXIMUM", r0, g0), b0), 1.0)
+        k = t.math("DIVIDE", 1.0, m)
+        lift = 1.0 - k
+        img = t.n("CompositorNodeCombineColor", r0 * k + lift, g0 * k + lift, b0 * k + lift, 1.0).o
     enc = t.n(gamma, img, 1.0 / 2.2).o
     sep = t.n("CompositorNodeSeparateColor", enc)
     r, gg, b = sep[0], sep[1], sep[2]
@@ -139,6 +152,8 @@ def grade_nodes(t, img, g):
         curve.points[-1].location = pts[-1]
         for x, y in pts[1:-1]:
             curve.points.new(x, y)
+    if rolloff and hasattr(mapping, "extend"):
+        mapping.extend = "HORIZONTAL"
     mapping.update()
     dec = t.n(gamma, cv.o, 2.2).o
     return dec

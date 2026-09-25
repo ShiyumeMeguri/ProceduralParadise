@@ -61,10 +61,13 @@ def tea_table():
     m_wood = g.inp("Frame Material", "MATERIAL", panel="Materials")
     m_inlay = g.inp("Inlay Material", "MATERIAL", panel="Materials")
     m_stud = g.inp("Stud Material", "MATERIAL", panel="Materials")
+    m_rod = g.inp("Stretcher Material", "MATERIAL", panel="Materials")
+    m_edge = g.inp("Edge Material", "MATERIAL", panel="Materials", desc="side faces of the top slab")
     hw, hd = W * 0.5, D * 0.5
     top = g.box(hw * -1.0, hd * -1.0, H - T, hw, hd, H)
     nz = g.sep(g.normal())[2]
     top = g.mat(top, m_wood)
+    top = g.mat(top, m_edge, sel=g.compare(g.abs(nz), 0.5, "LESS_THAN"))
     top = g.mat(top, m_top, sel=g.compare(nz, 0.5, "GREATER_THAN"))
     # inlay: two concentric rectangular lines on the top surface
     r1 = g.rect(W - i1 * 2.0, D - i1 * 2.0)
@@ -91,7 +94,7 @@ def tea_table():
                 g.rod(g.vec(lx * -1.0, ly, zs), g.vec(lx, ly, zs), sr, 10),
                 g.rod(g.vec(lx * -1.0, ly * -1.0, zs), g.vec(lx * -1.0, ly, zs), sr, 10),
                 g.rod(g.vec(lx, ly * -1.0, zs), g.vec(lx, ly, zs), sr, 10))
-    frame = g.mat(g.join(legs, apron, st), m_wood)
+    frame = g.join(g.mat(g.join(legs, apron), m_wood), g.mat(st, m_rod))
     # studs on both outward faces of every leg
     rows = []
     for sx, sy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
@@ -291,33 +294,50 @@ def bogu_shelf():
 # ---------------------------------------------------------- display counter
 @asset("SHJ.Furn.DisplayCounter", "Furniture")
 def display_counter():
-    """Glass display counter: dark frame with gold-fret bands, glass top and
-    sides, two inner shelves.  Front on y = 0, runs along X centred."""
+    """Glass display cabinet (tea shop counter): black lacquer frame whose
+    plinth, shelf edge and top rail carry gold key-fret bands, clear glass
+    front, ends and top, slim mullions, a low bottom shelf and a middle
+    shelf.  Front on y = 0, runs along X centred."""
     g = GN("SHJ.Furn.DisplayCounter", display_counter.__doc__)
     L = g.inp("Length", default=3.0, subtype="DISTANCE")
     D = g.inp("Depth", default=0.55, subtype="DISTANCE")
     H = g.inp("Height", default=1.0, subtype="DISTANCE")
-    f = g.inp("Frame Size", default=0.04, subtype="DISTANCE")
+    f = g.inp("Frame Size", default=0.035, subtype="DISTANCE")
+    ph = g.inp("Plinth Height", default=0.1, subtype="DISTANCE", panel="Details")
+    sz = g.inp("Shelf Height", default=0.47, subtype="DISTANCE", panel="Details", desc="bottom of the middle band")
+    bh = g.inp("Band Height", default=0.13, subtype="DISTANCE", panel="Details")
+    th = g.inp("Top Rail", default=0.09, subtype="DISTANCE", panel="Details")
+    pitch = g.inp("Mullion Pitch", default=1.2, subtype="DISTANCE", panel="Details")
     m_frame = g.inp("Frame Material", "MATERIAL", panel="Materials")
     m_glass = g.inp("Glass Material", "MATERIAL", panel="Materials")
     m_band = g.inp("Band Material", "MATERIAL", panel="Materials")
     m_shelf = g.inp("Shelf Material", "MATERIAL", panel="Materials")
     hl = L * 0.5
-    post = g.box(0.0, 0.0, 0.0, f, f, H)
+    # carcass: plinth block, middle shelf block, top rail, back board, end posts
+    plinth = g.box(hl * -1.0, 0.0, 0.0, hl, D, ph)
+    mid = g.box(hl * -1.0, 0.0, sz, hl, D, sz + bh)
+    top = g.box(hl * -1.0, 0.0, H - th, hl, D, H - 0.012)
+    back = g.box(hl * -1.0, D - 0.02, ph, hl, D, H - th)
+    post = g.box(0.0, 0.0, 0.0, f, f, H - 0.012)
     posts = g.join(g.move(post, hl * -1.0, 0.0, 0.0), g.move(post, hl - f, 0.0, 0.0),
                    g.move(post, hl * -1.0, D - f, 0.0), g.move(post, hl - f, D - f, 0.0))
-    rails = g.join(g.box(hl * -1.0, 0.0, H - f, hl, D, H),
-                   g.box(hl * -1.0, 0.0, 0.0, hl, D, 0.08))
-    band_lo = g.box(hl * -1.0, -0.004, 0.08, hl, 0.0, 0.2)
-    band_mid = g.box(hl * -1.0, -0.004, H * 0.55, hl, 0.0, H * 0.55 + 0.07)
-    shelves = g.join(g.box(hl * -1.0 + f, f, 0.2, hl - f, D - f, 0.22),
-                     g.box(hl * -1.0 + f, f, H * 0.55, hl - f, D - f, H * 0.55 + 0.02))
-    glass = g.join(g.box(hl * -1.0 + f, 0.004, 0.2, hl - f, 0.012, H - f),
-                   g.box(hl * -1.0 + f, f, H - 0.004, hl - f, D - f, H + 0.004),
-                   g.box(hl * -1.0 + 0.004, f, 0.2, hl * -1.0 + 0.012, D - f, H - f),
-                   g.box(hl - 0.012, f, 0.2, hl - 0.004, D - f, H - f))
-    back = g.box(hl * -1.0, D - 0.02, 0.08, hl, D, H - f)
-    geo = g.join(g.mat(g.join(posts, rails, back), m_frame), g.mat(g.join(band_lo, band_mid), m_band),
+    # front mullions every ~pitch
+    nm = g.max(g.math("FLOOR", L / pitch), 1.0)
+    mpts = g.mesh_line(nm - 1.0, g.vec(hl * -1.0 + L / nm - f * 0.5, 0.0, 0.0), g.vec(L / nm, 0.0, 0.0))
+    mull = g.realize(g.iop(g.mesh_to_points(mpts), g.box(0.0, 0.0, 0.0, f, f * 0.8, H - 0.012)))
+    # key-fret bands: thin plates proud of the front and end faces
+    def bands(z0, z1):
+        return g.join(g.box(hl * -1.0, -0.004, z0, hl, 0.0, z1),
+                      g.box(hl * -1.0 - 0.004, 0.0, z0, hl * -1.0, D, z1),
+                      g.box(hl, 0.0, z0, hl + 0.004, D, z1))
+    band = g.join(bands(0.012, ph - 0.012), bands(sz + 0.012, sz + bh - 0.012), bands(H - th + 0.012, H - 0.024))
+    shelves = g.box(hl * -1.0 + f, f, ph, hl - f, D - 0.02, ph + 0.012)
+    glass = g.join(g.box(hl * -1.0 + f, 0.006, ph, hl - f, 0.012, sz),
+                   g.box(hl * -1.0 + f, 0.006, sz + bh, hl - f, 0.012, H - th),
+                   g.box(hl * -1.0 + 0.006, f, ph, hl * -1.0 + 0.012, D - f, H - th),
+                   g.box(hl - 0.012, f, ph, hl - 0.006, D - f, H - th),
+                   g.box(hl * -1.0, 0.0, H - 0.012, hl, D, H))
+    geo = g.join(g.mat(g.join(plinth, mid, top, back, posts, mull), m_frame), g.mat(band, m_band),
                  g.mat(shelves, m_shelf), g.mat(glass, m_glass))
     g.result(geo)
     return g

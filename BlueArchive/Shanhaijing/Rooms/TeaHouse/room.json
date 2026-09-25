@@ -96,12 +96,39 @@
       "name": "BoardCeiling",
       "loc": [-2.0, 14.95, 5.6],
       "inputs": {
-        "Size X": 21.3,
+        "Size X": 11.65,
         "Size Y": 7.35,
         "Thickness": 0.1
       },
       "mat": {
         "Material": "SHJ.TimberPlanks"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Slab",
+      "name": "RightHallCeiling",
+      "loc": [9.78, 14.95, 5.3],
+      "inputs": {
+        "Size X": 9.52,
+        "Size Y": 7.35,
+        "Thickness": 0.4
+      },
+      "mat": {
+        "Material": "SHJ.TimberLight"
+      }
+    },
+    {
+      "asset": "SHJ.Arch.Wall",
+      "name": "RightHallFascia",
+      "loc": [9.78, 14.95, 5.3],
+      "inputs": {
+        "Length": 9.52,
+        "Height": 0.6,
+        "Thickness": 0.08
+      },
+      "mat": {
+        "Material": "SHJ.TimberPlanks",
+        "Reveal Material": "SHJ.TimberPlanks"
       }
     },
     {
@@ -287,6 +314,20 @@
       }
     },
     {
+      "asset": "SHJ.Arch.Slab",
+      "name": "CourtyardWall",
+      "loc": [-4.0, 24.6, 0.0],
+      "inputs": {
+        "Size X": 25.0,
+        "Size Y": 0.3,
+        "Thickness": 6.0
+      },
+      "mat": {
+        "Material": "SHJ.NightBackdrop"
+      },
+      "col": "Exterior"
+    },
+    {
       "asset": "SHJ.Arch.Wall",
       "name": "WindowPanel",
       "loc": [0.55, 22.26, 0.12],
@@ -339,13 +380,43 @@
       "loc": [1.88, 22.4, 2.36],
       "inputs": {
         "Radius": 0.93,
-        "Lattice Edge": 0.172
+        "Pattern": 1,
+        "Bar Width": 0.05,
+        "Ring Width": 0.09
       },
       "mat": {
         "Ring Material": "SHJ.TimberDark",
         "Lattice Material": "SHJ.LatticeWood",
-        "Glass Material": "SHJ.GlassNight"
+        "Glass Material": "SHJ.GlassFrosted"
       }
+    },
+    {
+      "asset": "SHJ.Prop.GardenLamp",
+      "name": "CourtyardLamp",
+      "loc": [1.43, 23.3, 0.0],
+      "inputs": {
+        "Height": 2.06,
+        "Globe Radius": 0.16
+      },
+      "mat": {
+        "Post Material": "SHJ.LacquerBlack",
+        "Globe Material": "SHJ.Globe"
+      },
+      "col": "Exterior"
+    },
+    {
+      "asset": "SHJ.Prop.GardenLamp",
+      "name": "CourtyardLamp",
+      "loc": [2.33, 23.3, 0.0],
+      "inputs": {
+        "Height": 2.06,
+        "Globe Radius": 0.16
+      },
+      "mat": {
+        "Post Material": "SHJ.LacquerBlack",
+        "Globe Material": "SHJ.Globe"
+      },
+      "col": "Exterior"
     },
     {
       "asset": "SHJ.Arch.Wall",
@@ -400,13 +471,43 @@
       "loc": [11.11, 22.4, 2.36],
       "inputs": {
         "Radius": 0.9,
-        "Lattice Edge": 0.167
+        "Pattern": 1,
+        "Bar Width": 0.05,
+        "Ring Width": 0.09
       },
       "mat": {
         "Ring Material": "SHJ.TimberDark",
         "Lattice Material": "SHJ.LatticeWood",
-        "Glass Material": "SHJ.GlassNight"
+        "Glass Material": "SHJ.GlassFrosted"
       }
+    },
+    {
+      "asset": "SHJ.Prop.GardenLamp",
+      "name": "CourtyardLamp",
+      "loc": [10.66, 23.3, 0.0],
+      "inputs": {
+        "Height": 2.06,
+        "Globe Radius": 0.16
+      },
+      "mat": {
+        "Post Material": "SHJ.LacquerBlack",
+        "Globe Material": "SHJ.Globe"
+      },
+      "col": "Exterior"
+    },
+    {
+      "asset": "SHJ.Prop.GardenLamp",
+      "name": "CourtyardLamp",
+      "loc": [11.56, 23.3, 0.0],
+      "inputs": {
+        "Height": 2.06,
+        "Globe Radius": 0.16
+      },
+      "mat": {
+        "Post Material": "SHJ.LacquerBlack",
+        "Globe Material": "SHJ.Globe"
+      },
+      "col": "Exterior"
     },
     {
       "asset": "SHJ.Arch.Wall",
@@ -461,13 +562,43 @@
       "loc": [16.28, 22.4, 2.5],
       "inputs": {
         "Radius": 0.93,
-        "Lattice Edge": 0.172
+        "Pattern": 1,
+        "Bar Width": 0.05,
+        "Ring Width": 0.09
       },
       "mat": {
         "Ring Material": "SHJ.TimberDark",
         "Lattice Material": "SHJ.LatticeWood",
-        "Glass Material": "SHJ.GlassNight"
+        "Glass Material": "SHJ.GlassFrosted"
       }
+    },
+    {
+      "asset": "SHJ.Prop.GardenLamp",
+      "name": "CourtyardLamp",
+      "loc": [15.83, 23.3, 0.0],
+      "inputs": {
+        "Height": 2.2,
+        "Globe Radius": 0.16
+      },
+      "mat": {
+        "Post Material": "SHJ.LacquerBlack",
+        "Globe Material": "SHJ.Globe"
+      },
+      "col": "Exterior"
+    },
+    {
+      "asset": "SHJ.Prop.GardenLamp",
+      "name": "CourtyardLamp",
+      "loc": [16.73, 23.3, 0.0],
+      "inputs": {
+        "Height": 2.2,
+        "Globe Radius": 0.16
+      },
+      "mat": {
+        "Post Material": "SHJ.LacquerBlack",
+        "Globe Material": "SHJ.Globe"
+      },
+      "col": "Exterior"
     },
     {
       "asset": "SHJ.Arch.Plaque",
@@ -494,7 +625,7 @@
         "Height": 0.45
       },
       "mat": {
-        "Material": "SHJ.LacquerBlack"
+        "Material": "SHJ.LacquerBrown"
       }
     },
     {
@@ -522,14 +653,14 @@
         "Height": 0.45
       },
       "mat": {
-        "Material": "SHJ.LacquerBlack"
+        "Material": "SHJ.LacquerBrown"
       }
     },
     {
       "asset": "SHJ.Arch.WaveBand",
       "name": "WaveBandUpper",
-      "loc": [9.539, 3.2, 3.62],
-      "rot": 90.0,
+      "loc": [9.539, 14.95, 3.62],
+      "rot": -90.0,
       "inputs": {
         "Length": 11.75,
         "Wavelength": 0.17,
@@ -542,8 +673,8 @@
     {
       "asset": "SHJ.Arch.WaveBand",
       "name": "WaveBandLower",
-      "loc": [9.539, 3.2, 2.95],
-      "rot": 90.0,
+      "loc": [9.539, 14.95, 2.95],
+      "rot": -90.0,
       "inputs": {
         "Length": 11.75,
         "Wavelength": 0.6,
@@ -557,8 +688,8 @@
     {
       "asset": "SHJ.Arch.Medallions",
       "name": "ArchitraveMedallions",
-      "loc": [9.538, 7.2, 2.92],
-      "rot": 90.0,
+      "loc": [9.538, 8.2, 2.92],
+      "rot": -90.0,
       "inputs": {
         "Count": 3,
         "Size": 0.3,
@@ -702,24 +833,29 @@
         "Back Material": "SHJ.TimberPlanks",
         "Plinth Material": "SHJ.JadePanel",
         "Door Material": "SHJ.DoorWood",
-        "Gate Rim Material": "SHJ.JadePanel"
+        "Gate Rim Material": "SHJ.GateRim"
       },
       "col": "Furniture"
     },
     {
       "asset": "SHJ.Furn.DisplayCounter",
       "name": "Counter",
-      "loc": [0.53, 13.85, 0.0],
+      "loc": [0.68, 13.25, 0.0],
       "rot": 90.0,
       "inputs": {
-        "Length": 6.9,
-        "Depth": 0.53,
-        "Height": 1.0
+        "Length": 7.2,
+        "Depth": 0.6,
+        "Height": 1.0,
+        "Plinth Height": 0.1,
+        "Shelf Height": 0.47,
+        "Band Height": 0.13,
+        "Top Rail": 0.09,
+        "Mullion Pitch": 1.2
       },
       "mat": {
         "Frame Material": "SHJ.LacquerBlack",
         "Glass Material": "SHJ.GlassCase",
-        "Band Material": "SHJ.JadePanel",
+        "Band Material": "SHJ.FretBand",
         "Shelf Material": "SHJ.TimberDark"
       },
       "col": "Furniture"
@@ -1174,9 +1310,9 @@
       "loc": [3.652, 22.0, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.4641,
-        "Width": 0.3,
-        "Height": 0.16
+        "Length": 0.5187,
+        "Width": 0.34,
+        "Height": 0.2
       },
       "mat": {
         "Material": "SHJ.PorcelainBW",
@@ -1184,15 +1320,31 @@
       }
     },
     {
+      "asset": "SHJ.Prop.Bush",
+      "name": "ShelfIvyMound",
+      "loc": [3.652, 22.0, 3.94],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.22,
+        "Height": 0.08,
+        "Density": 320.0,
+        "Seed": 0
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [3.652, 22.0, 3.97],
+      "loc": [3.652, 21.97, 4.0],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Runners": 9,
-        "Spread": 0.34,
-        "Drop": 0.55,
+        "Runners": 14,
+        "Spread": 0.36,
+        "Drop": 0.45,
+        "Leaf Size": 0.085,
         "Seed": 0
       },
       "mat": {
@@ -1205,9 +1357,9 @@
       "loc": [4.467, 22.0, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.51595,
-        "Width": 0.3,
-        "Height": 0.16
+        "Length": 0.57665,
+        "Width": 0.34,
+        "Height": 0.2
       },
       "mat": {
         "Material": "SHJ.PorcelainBW",
@@ -1215,15 +1367,31 @@
       }
     },
     {
+      "asset": "SHJ.Prop.Bush",
+      "name": "ShelfIvyMound",
+      "loc": [4.467, 22.0, 3.94],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.22,
+        "Height": 0.08,
+        "Density": 320.0,
+        "Seed": 5
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [4.467, 22.0, 3.97],
+      "loc": [4.467, 21.97, 4.0],
       "col": "Props",
       "rot": 37.0,
       "inputs": {
-        "Runners": 9,
-        "Spread": 0.34,
-        "Drop": 0.65,
+        "Runners": 14,
+        "Spread": 0.36,
+        "Drop": 0.5700000000000001,
+        "Leaf Size": 0.085,
         "Seed": 7
       },
       "mat": {
@@ -1236,9 +1404,9 @@
       "loc": [5.746, 22.0, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.49044999999999994,
-        "Width": 0.3,
-        "Height": 0.16
+        "Length": 0.5481499999999999,
+        "Width": 0.34,
+        "Height": 0.2
       },
       "mat": {
         "Material": "SHJ.PorcelainBW",
@@ -1246,15 +1414,31 @@
       }
     },
     {
+      "asset": "SHJ.Prop.Bush",
+      "name": "ShelfIvyMound",
+      "loc": [5.746, 22.0, 3.94],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.22,
+        "Height": 0.08,
+        "Density": 320.0,
+        "Seed": 10
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [5.746, 22.0, 3.97],
+      "loc": [5.746, 21.97, 4.0],
       "col": "Props",
       "rot": 74.0,
       "inputs": {
-        "Runners": 9,
-        "Spread": 0.34,
-        "Drop": 0.75,
+        "Runners": 14,
+        "Spread": 0.36,
+        "Drop": 0.69,
+        "Leaf Size": 0.085,
         "Seed": 14
       },
       "mat": {
@@ -1267,9 +1451,9 @@
       "loc": [7.007, 22.0, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.53635,
-        "Width": 0.3,
-        "Height": 0.16
+        "Length": 0.5994499999999999,
+        "Width": 0.34,
+        "Height": 0.2
       },
       "mat": {
         "Material": "SHJ.PorcelainBW",
@@ -1277,15 +1461,31 @@
       }
     },
     {
+      "asset": "SHJ.Prop.Bush",
+      "name": "ShelfIvyMound",
+      "loc": [7.007, 22.0, 3.94],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.22,
+        "Height": 0.08,
+        "Density": 320.0,
+        "Seed": 15
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [7.007, 22.0, 3.97],
+      "loc": [7.007, 21.97, 4.0],
       "col": "Props",
       "rot": 111.0,
       "inputs": {
-        "Runners": 9,
-        "Spread": 0.34,
-        "Drop": 0.55,
+        "Runners": 14,
+        "Spread": 0.36,
+        "Drop": 0.45,
+        "Leaf Size": 0.085,
         "Seed": 21
       },
       "mat": {
@@ -1298,9 +1498,9 @@
       "loc": [8.137, 22.0, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.6018,
-        "Width": 0.3,
-        "Height": 0.16
+        "Length": 0.6726,
+        "Width": 0.34,
+        "Height": 0.2
       },
       "mat": {
         "Material": "SHJ.PorcelainBW",
@@ -1308,15 +1508,31 @@
       }
     },
     {
+      "asset": "SHJ.Prop.Bush",
+      "name": "ShelfIvyMound",
+      "loc": [8.137, 22.0, 3.94],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.22,
+        "Height": 0.08,
+        "Density": 320.0,
+        "Seed": 20
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [8.137, 22.0, 3.97],
+      "loc": [8.137, 21.97, 4.0],
       "col": "Props",
       "rot": 148.0,
       "inputs": {
-        "Runners": 9,
-        "Spread": 0.34,
-        "Drop": 0.65,
+        "Runners": 14,
+        "Spread": 0.36,
+        "Drop": 0.5700000000000001,
+        "Leaf Size": 0.085,
         "Seed": 28
       },
       "mat": {
@@ -1329,9 +1545,9 @@
       "loc": [9.038, 22.0, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.5202,
-        "Width": 0.3,
-        "Height": 0.16
+        "Length": 0.5813999999999999,
+        "Width": 0.34,
+        "Height": 0.2
       },
       "mat": {
         "Material": "SHJ.PorcelainBW",
@@ -1339,15 +1555,31 @@
       }
     },
     {
+      "asset": "SHJ.Prop.Bush",
+      "name": "ShelfIvyMound",
+      "loc": [9.038, 22.0, 3.94],
+      "col": "Props",
+      "inputs": {
+        "Radius": 0.22,
+        "Height": 0.08,
+        "Density": 320.0,
+        "Seed": 25
+      },
+      "mat": {
+        "Material": "SHJ.Leaf"
+      }
+    },
+    {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [9.038, 22.0, 3.97],
+      "loc": [9.038, 21.97, 4.0],
       "col": "Props",
       "rot": 185.0,
       "inputs": {
-        "Runners": 9,
-        "Spread": 0.34,
-        "Drop": 0.75,
+        "Runners": 14,
+        "Spread": 0.36,
+        "Drop": 0.69,
+        "Leaf Size": 0.085,
         "Seed": 35
       },
       "mat": {
@@ -1471,13 +1703,608 @@
       }
     },
     {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 10.7, 0.57],
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 9.77, 0.112],
       "col": "Props",
-      "rot": -21.116152821005237,
+      "rot": 0.0,
       "inputs": {
-        "Scale": 1.25
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 9.975, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 10.18, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 10.385, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 10.59, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 10.795, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 11.0, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 11.205, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 11.41, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 11.615, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 11.82, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 12.025, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 12.23, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 12.435, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 12.64, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 12.845, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 13.05, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 13.255, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 13.46, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 13.665, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 13.87, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 14.075, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 14.28, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 14.485, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 14.69, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 14.895, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 15.1, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 15.305, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 15.51, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 15.715, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 15.92, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 16.125, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 16.33, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 16.535, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterTeaBox",
+      "loc": [0.4, 16.74, 0.112],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.22,
+        "Size Y": 0.2,
+        "Size Z": 0.34,
+        "Lid": 0.42
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxRed",
+        "Lid Material": "SHJ.TeaBoxSage"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 9.78, 0.6],
+      "col": "Props",
+      "rot": -15.83711461575393,
+      "inputs": {
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.PorcelainWhite"
@@ -1485,12 +2312,38 @@
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 11.08, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 10.08, 0.6],
       "col": "Props",
-      "rot": 17.697352407013312,
+      "rot": -23.810037946157053,
       "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 10.38, 0.6],
+      "col": "Props",
+      "rot": -6.236505443359139,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 10.68, 0.6],
+      "col": "Props",
+      "rot": -20.701663751855385,
+      "inputs": {
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.Celadon"
@@ -1498,77 +2351,12 @@
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 11.46, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 10.98, 0.6],
       "col": "Props",
-      "rot": -27.60221833580718,
+      "rot": -26.009094259224604,
       "inputs": {
-        "Scale": 1.25
-      },
-      "mat": {
-        "Material": "SHJ.PorcelainWhite"
-      }
-    },
-    {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 11.84, 0.57],
-      "col": "Props",
-      "rot": -38.414625882154105,
-      "inputs": {
-        "Scale": 1.25
-      },
-      "mat": {
-        "Material": "SHJ.Brass"
-      }
-    },
-    {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 12.22, 0.57],
-      "col": "Props",
-      "rot": 33.43640344701751,
-      "inputs": {
-        "Scale": 1.25
-      },
-      "mat": {
-        "Material": "SHJ.PorcelainWhite"
-      }
-    },
-    {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 12.6, 0.57],
-      "col": "Props",
-      "rot": -22.24574594477459,
-      "inputs": {
-        "Scale": 1.25
-      },
-      "mat": {
-        "Material": "SHJ.Brass"
-      }
-    },
-    {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 12.98, 0.57],
-      "col": "Props",
-      "rot": -11.1804072399839,
-      "inputs": {
-        "Scale": 1.25
-      },
-      "mat": {
-        "Material": "SHJ.PorcelainWhite"
-      }
-    },
-    {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 13.36, 0.57],
-      "col": "Props",
-      "rot": 26.149734321941907,
-      "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.Celadon"
@@ -1576,12 +2364,25 @@
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 13.74, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 11.28, 0.6],
       "col": "Props",
-      "rot": -22.84796539368668,
+      "rot": -5.904539130895511,
       "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.PinkGlass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 11.58, 0.6],
+      "col": "Props",
+      "rot": 25.077302585263133,
+      "inputs": {
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.PorcelainWhite"
@@ -1589,25 +2390,25 @@
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 14.12, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 11.88, 0.6],
       "col": "Props",
-      "rot": 26.313603902273556,
+      "rot": 18.02714108974851,
       "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
       },
       "mat": {
-        "Material": "SHJ.Celadon"
+        "Material": "SHJ.TeaBoxCream"
       }
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 14.5, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 12.18, 0.6],
       "col": "Props",
-      "rot": 24.035827083437297,
+      "rot": 15.90975615032631,
       "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.PorcelainWhite"
@@ -1615,12 +2416,12 @@
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 14.88, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 12.48, 0.6],
       "col": "Props",
-      "rot": -26.814539247840674,
+      "rot": -16.68430945858094,
       "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.Celadon"
@@ -1628,25 +2429,12 @@
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 15.26, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 12.78, 0.6],
       "col": "Props",
-      "rot": 10.158048193050405,
+      "rot": 2.2008004904888097,
       "inputs": {
-        "Scale": 1.25
-      },
-      "mat": {
-        "Material": "SHJ.Brass"
-      }
-    },
-    {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 15.64, 0.57],
-      "col": "Props",
-      "rot": 36.8738370267441,
-      "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.Celadon"
@@ -1654,478 +2442,1220 @@
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 16.02, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 13.08, 0.6],
       "col": "Props",
-      "rot": -33.062539789206255,
+      "rot": -13.399041393512988,
       "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
       },
       "mat": {
-        "Material": "SHJ.Brass"
+        "Material": "SHJ.PinkGlass"
       }
     },
     {
       "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 16.4, 0.57],
+      "name": "CounterCaddy",
+      "loc": [0.32, 13.38, 0.6],
       "col": "Props",
-      "rot": -13.007801966845129,
+      "rot": -19.640128242877864,
       "inputs": {
-        "Scale": 1.25
-      },
-      "mat": {
-        "Material": "SHJ.Celadon"
-      }
-    },
-    {
-      "asset": "SHJ.Prop.Teapot",
-      "name": "CounterTeapot",
-      "loc": [0.27, 16.78, 0.57],
-      "col": "Props",
-      "rot": 0.4763020568332266,
-      "inputs": {
-        "Scale": 1.25
+        "Scale": 1.4
       },
       "mat": {
         "Material": "SHJ.PorcelainWhite"
       }
     },
     {
-      "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 10.62, 0.22],
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 13.68, 0.6],
       "col": "Props",
-      "rot": 0.0,
+      "rot": -23.629002454108193,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Scale": 1.4
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 13.98, 0.6],
+      "col": "Props",
+      "rot": -17.13597404526501,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 14.28, 0.6],
+      "col": "Props",
+      "rot": 25.648537885683623,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 14.58, 0.6],
+      "col": "Props",
+      "rot": 19.735202926705163,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 14.88, 0.6],
+      "col": "Props",
+      "rot": 18.399140802139407,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.PinkGlass"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 15.18, 0.6],
+      "col": "Props",
+      "rot": 18.02687031257797,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 15.48, 0.6],
+      "col": "Props",
+      "rot": -18.3938629188456,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.TeaBoxCream"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 15.78, 0.6],
+      "col": "Props",
+      "rot": -11.409002562027865,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 16.08, 0.6],
+      "col": "Props",
+      "rot": 7.618536144787804,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 16.38, 0.6],
+      "col": "Props",
+      "rot": 13.91368253272308,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.Celadon"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Teapot",
+      "name": "CounterCaddy",
+      "loc": [0.32, 16.68, 0.6],
+      "col": "Props",
+      "rot": 21.27890147948083,
+      "inputs": {
+        "Scale": 1.4
+      },
+      "mat": {
+        "Material": "SHJ.PinkGlass"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 10.88, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 9.75, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 11.14, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 9.865, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 11.4, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 9.98, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 11.66, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.095, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 11.92, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.21, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 12.18, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.325, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 12.44, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.44, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 12.7, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.555, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 12.96, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.67, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 13.22, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.785, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 13.48, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 10.9, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 13.74, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.015, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 14.0, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.13, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 14.26, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.245, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 14.52, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.36, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 14.78, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.475, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 15.04, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.59, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 15.3, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.705, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 15.56, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.82, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 15.82, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 11.935, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 16.08, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 12.05, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 16.34, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 12.165, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxGreen",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 16.6, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 12.28, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
-      "name": "CounterTeaBox",
-      "loc": [0.27, 16.86, 0.22],
+      "name": "CounterPack",
+      "loc": [0.55, 12.395, 0.6],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Size X": 0.22,
-        "Size Y": 0.2,
-        "Size Z": 0.26,
-        "Lid": 0.3
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
       },
       "mat": {
-        "Material": "SHJ.TeaBoxRed",
-        "Lid Material": "SHJ.TeaBoxCream"
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 12.51, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 12.625, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 12.74, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 12.855, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 12.97, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.085, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.2, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.315, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.43, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.545, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.66, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.775, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 13.89, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.005, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.12, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.235, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.35, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.465, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.58, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.695, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.81, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 14.925, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.04, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.155, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.27, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.385, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.5, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.615, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.73, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.845, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 15.96, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 16.075, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 16.19, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 16.305, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 16.42, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 16.535, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
+      }
+    },
+    {
+      "asset": "SHJ.Prop.Box",
+      "name": "CounterPack",
+      "loc": [0.55, 16.65, 0.6],
+      "col": "Props",
+      "rot": 0.0,
+      "inputs": {
+        "Size X": 0.09,
+        "Size Y": 0.1,
+        "Size Z": 0.12,
+        "Lid": 0.35
+      },
+      "mat": {
+        "Material": "SHJ.PorcelainWhite",
+        "Lid Material": "SHJ.LogoPaper"
       }
     },
     {
       "asset": "SHJ.Prop.Box",
       "name": "GiftBox",
-      "loc": [0.3, 11.0, 1.004],
+      "loc": [0.36, 11.45, 1.0],
       "col": "Props",
-      "rot": -9.073560019929747,
+      "rot": 6.08081202177919,
       "inputs": {
-        "Size X": 0.28,
+        "Size X": 0.26,
         "Size Y": 0.2,
-        "Size Z": 0.09,
+        "Size Z": 0.1,
         "Lid": 0.35
       },
       "mat": {
@@ -2136,13 +3666,13 @@
     {
       "asset": "SHJ.Prop.Box",
       "name": "GiftBox",
-      "loc": [0.3, 11.25, 1.004],
+      "loc": [0.36, 11.72, 1.0],
       "col": "Props",
-      "rot": 2.5270149107980693,
+      "rot": -6.612507957841251,
       "inputs": {
-        "Size X": 0.28,
+        "Size X": 0.26,
         "Size Y": 0.2,
-        "Size Z": 0.09,
+        "Size Z": 0.1,
         "Lid": 0.35
       },
       "mat": {
@@ -2153,13 +3683,13 @@
     {
       "asset": "SHJ.Prop.Box",
       "name": "GiftBox",
-      "loc": [0.3, 11.5, 1.004],
+      "loc": [0.36, 11.99, 1.0],
       "col": "Props",
-      "rot": -4.391335767675626,
+      "rot": 1.6936301395180777,
       "inputs": {
-        "Size X": 0.28,
+        "Size X": 0.26,
         "Size Y": 0.2,
-        "Size Z": 0.09,
+        "Size Z": 0.1,
         "Lid": 0.35
       },
       "mat": {
@@ -2170,13 +3700,13 @@
     {
       "asset": "SHJ.Prop.Box",
       "name": "GiftBox",
-      "loc": [0.3, 11.75, 1.004],
+      "loc": [0.36, 12.26, 1.0],
       "col": "Props",
-      "rot": 0.6924358975884441,
+      "rot": 2.7472233042635725,
       "inputs": {
-        "Size X": 0.28,
+        "Size X": 0.26,
         "Size Y": 0.2,
-        "Size Z": 0.09,
+        "Size Z": 0.1,
         "Lid": 0.35
       },
       "mat": {
@@ -2187,13 +3717,13 @@
     {
       "asset": "SHJ.Prop.Box",
       "name": "GiftBox",
-      "loc": [0.3, 12.05, 1.004],
+      "loc": [0.36, 12.53, 1.0],
       "col": "Props",
-      "rot": -0.5751982777001388,
+      "rot": 0.09526041136664531,
       "inputs": {
-        "Size X": 0.28,
+        "Size X": 0.26,
         "Size Y": 0.2,
-        "Size Z": 0.09,
+        "Size Z": 0.1,
         "Lid": 0.35
       },
       "mat": {
@@ -2204,7 +3734,7 @@
     {
       "asset": "SHJ.Prop.Tablet",
       "name": "MenuTablet",
-      "loc": [0.3, 14.85, 1.004],
+      "loc": [0.45, 15.8, 1.0],
       "col": "Props",
       "rot": 90.0,
       "inputs": {
@@ -2219,12 +3749,12 @@
     {
       "asset": "SHJ.Prop.Vase",
       "name": "CounterVase",
-      "loc": [0.27, 14.27, 1.004],
+      "loc": [0.38, 13.31, 1.0],
       "col": "Props",
       "inputs": {
         "Shape": 1,
-        "Height": 0.7,
-        "Width": 0.36
+        "Height": 0.6,
+        "Width": 0.26
       },
       "mat": {
         "Material": "SHJ.PorcelainBW"
@@ -2233,13 +3763,13 @@
     {
       "asset": "SHJ.Prop.Grass",
       "name": "CounterGrass",
-      "loc": [0.27, 14.27, 1.6],
+      "loc": [0.38, 13.31, 1.55],
       "col": "Props",
       "inputs": {
-        "Blades": 24,
-        "Height": 1.2,
-        "Spread": 0.3,
-        "Blade Width": 0.025,
+        "Blades": 60,
+        "Height": 1.15,
+        "Spread": 0.55,
+        "Blade Width": 0.035,
         "Seed": 11
       },
       "mat": {
@@ -2283,6 +3813,23 @@
         "Dado Material": "SHJ.LacquerBlack"
       }
     },
+    "slate": {
+      "inputs": {
+        "Radius": 0.15,
+        "Base Height": 0.12,
+        "Base Radius": 0.21,
+        "Sleeve Top": 0.0,
+        "Capital Height": 0.3,
+        "Ring Width": 0.035
+      },
+      "mat": {
+        "Shaft Material": "SHJ.LacquerSlate",
+        "Sleeve Material": "SHJ.LacquerRed",
+        "Base Material": "SHJ.Stone",
+        "Gold Material": "SHJ.Gold",
+        "Dado Material": "SHJ.LacquerBlack"
+      }
+    },
     "black": {
       "inputs": {
         "Radius": 0.21,
@@ -2308,7 +3855,7 @@
       "x": 9.65,
       "y": 7.585,
       "inputs": {
-        "Height": 5.27
+        "Height": 3.9
       }
     },
     {
@@ -2317,7 +3864,7 @@
       "x": 9.65,
       "y": 11.97,
       "inputs": {
-        "Height": 5.27
+        "Height": 3.9
       }
     },
     {
@@ -2326,7 +3873,7 @@
       "x": 9.65,
       "y": 3.2,
       "inputs": {
-        "Height": 5.27
+        "Height": 3.9
       }
     },
     {
@@ -2339,18 +3886,18 @@
       }
     },
     {
-      "name": "ColBlackGold",
-      "type": "blackgold",
-      "x": 0.6,
+      "name": "ColSlate",
+      "type": "slate",
+      "x": 0.55,
       "y": 9.5,
       "inputs": {
         "Height": 5.27
       }
     },
     {
-      "name": "ColBlackGold",
-      "type": "blackgold",
-      "x": 0.6,
+      "name": "ColSlate",
+      "type": "slate",
+      "x": 0.55,
       "y": 3.2,
       "inputs": {
         "Height": 5.27
@@ -2397,7 +3944,9 @@
           "Top Material": "SHJ.TableTop",
           "Frame Material": "SHJ.Rosewood",
           "Inlay Material": "SHJ.Inlay",
-          "Stud Material": "SHJ.Stud"
+          "Stud Material": "SHJ.Stud",
+          "Stretcher Material": "SHJ.Brass",
+          "Edge Material": "SHJ.Inlay"
         }
       }
     },
@@ -2474,6 +4023,9 @@
       },
       {
         "id": "T2",
+        "mat": {
+          "Top Material": "SHJ.TableTopDark"
+        },
         "x": 4.865,
         "y": 6.46,
         "chairs": [
@@ -2486,7 +4038,7 @@
           {
             "id": "T2.ChairE",
             "side": "E",
-            "dist": 0.555,
+            "dist": 0.58,
             "dy": -0.06
           }
         ],
@@ -2531,13 +4083,17 @@
       },
       {
         "id": "T3",
+        "mat": {
+          "Top Material": "SHJ.TableTopDark"
+        },
         "x": 7.32,
         "y": 6.47,
         "chairs": [
           {
             "id": "T3.ChairW",
             "side": "W",
-            "dist": 0.6
+            "dist": 0.48,
+            "dy": -0.13
           },
           {
             "id": "T3.ChairE",
@@ -2597,12 +4153,12 @@
           {
             "id": "T4.ChairW",
             "side": "W",
-            "dist": 0.72
+            "dist": 0.425
           },
           {
             "id": "T4.ChairE",
             "side": "E",
-            "dist": 0.72
+            "dist": 0.446
           }
         ],
         "props": [
@@ -2646,18 +4202,21 @@
       },
       {
         "id": "T9",
-        "x": 2.0,
-        "y": 12.4,
+        "x": 2.3,
+        "y": 13.75,
+        "inputs": {
+          "Height": 0.66
+        },
         "chairs": [
           {
             "id": "T9.ChairW",
             "side": "W",
-            "dist": 0.62
+            "dist": 0.342
           },
           {
             "id": "T9.ChairE",
             "side": "E",
-            "dist": 0.62
+            "dist": 0.484
           }
         ],
         "props": [
@@ -2701,21 +4260,24 @@
       },
       {
         "id": "T5",
-        "x": 4.42,
-        "y": 9.11,
+        "mat": {
+          "Top Material": "SHJ.TableTopDark"
+        },
+        "x": 4.9,
+        "y": 9.48,
         "chairs": [
           {
             "id": "T5.ChairW",
             "side": "W",
-            "dist": 0.55,
-            "dy": -0.6
+            "dist": 0.49,
+            "dy": 0.07
           },
           {
-            "id": "T5.ChairE",
-            "side": "E",
-            "dist": 0.28,
-            "dy": -0.6,
-            "rot": 180
+            "id": "T5.ChairNE",
+            "side": "N",
+            "rot": 90.0,
+            "dist": 0.74,
+            "dx": 0.77
           }
         ],
         "props": [
@@ -2759,6 +4321,9 @@
       },
       {
         "id": "T6",
+        "mat": {
+          "Top Material": "SHJ.TableTopDark"
+        },
         "x": 6.1,
         "y": 8.5,
         "inputs": {
@@ -2769,21 +4334,23 @@
           {
             "id": "T6.ChairW",
             "side": "W",
-            "dist": 0.9,
-            "dy": 0.3
+            "dist": 1.05
           },
           {
-            "id": "T6.ChairE",
-            "side": "E",
-            "dist": 0.3,
-            "dy": 0.62,
-            "rot": 180
+            "id": "T6.ChairN",
+            "side": "N",
+            "rot": 90.0,
+            "dist": 0.75,
+            "dx": 0.3
           }
         ],
         "props": []
       },
       {
         "id": "T7",
+        "mat": {
+          "Top Material": "SHJ.TableTopDark"
+        },
         "x": 5.58,
         "y": 15.6,
         "inputs": {
@@ -2793,7 +4360,7 @@
           {
             "id": "T7.ChairW",
             "side": "W",
-            "dist": 0.62,
+            "dist": 0.425,
             "mat": {
               "Cushion Material": "SHJ.CushionRed"
             }
@@ -2803,6 +4370,9 @@
       },
       {
         "id": "T8",
+        "mat": {
+          "Top Material": "SHJ.TableTopDark"
+        },
         "x": 7.9,
         "y": 13.4,
         "chairs": [
@@ -2859,7 +4429,7 @@
     ]
   },
   "lanterns": {
-    "light_power": 8.0,
+    "light_power": 2.819,
     "light_color": [1.0, 0.45, 0.25],
     "defaults": {
       "inputs": {
@@ -2920,18 +4490,26 @@
     "sets": [
       {
         "radius": 0.06,
-        "power": 110.0,
-        "angle": 75.0,
+        "power": 54.2,
+        "angle": 80.0,
         "blend": 0.7,
         "color": [1.0, 0.88, 0.72],
-        "at": [[0.8, 16.3, 5.6], [3.8, 16.3, 5.6], [8.1, 16.3, 5.6], [12.5, 16.3, 5.6], [16.8, 16.3, 5.6], [0.8, 19.8, 5.6], [3.8, 19.8, 5.6], [8.1, 19.8, 5.6], [12.5, 19.8, 5.6], [16.8, 19.8, 5.6]]
+        "at": [[0.9, 15.08, 5.262], [3.7, 15.08, 5.262], [7.63, 15.08, 5.262], [0.9, 18.58, 5.262], [3.7, 18.58, 5.262], [7.63, 18.58, 5.262], [0.9, 22.17, 5.262], [3.7, 22.17, 5.262], [7.63, 22.17, 5.262]]
+      },
+      {
+        "radius": 0.06,
+        "power": 173.4,
+        "angle": 80.0,
+        "blend": 0.7,
+        "color": [1.0, 0.88, 0.72],
+        "at": [[11.7, 15.6, 5.3], [11.8, 18.8, 5.3], [11.5, 22.0, 5.2], [15.3, 15.73, 5.3], [15.3, 19.0, 5.3], [18.3, 17.4, 5.3]]
       },
       {
         "radius": 0.07,
-        "power": 240.0,
+        "power": 252.9,
         "angle": 90.0,
         "blend": 0.8,
-        "color": [1.0, 0.9, 0.78],
+        "color": [1.0, 0.92, 0.82],
         "at": [
           [1.3, 3.5, 5.9],
           [3.6, 3.5, 5.9],
@@ -2951,50 +4529,18 @@
           [11.5, 6.5, 5.9],
           [14.5, 6.5, 5.9],
           [17.5, 6.5, 5.9]
-        ]
+        ],
+        "hidden": true
       }
     ]
   },
   "lights": [
     {
       "type": "SPOT",
-      "name": "WallWasher",
-      "loc": [3.7, 21.95, 5.16],
-      "rot": [8, 0, 0],
-      "power": 160.0,
-      "color": [1.0, 0.8, 0.55],
-      "angle": 130,
-      "blend": 1.0,
-      "radius": 0.04
-    },
-    {
-      "type": "SPOT",
-      "name": "WallWasher",
-      "loc": [7.5, 21.95, 5.16],
-      "rot": [8, 0, 0],
-      "power": 160.0,
-      "color": [1.0, 0.8, 0.55],
-      "angle": 130,
-      "blend": 1.0,
-      "radius": 0.04
-    },
-    {
-      "type": "SPOT",
-      "name": "WallWasher",
-      "loc": [11.37, 21.95, 5.16],
-      "rot": [8, 0, 0],
-      "power": 160.0,
-      "color": [1.0, 0.8, 0.55],
-      "angle": 130,
-      "blend": 1.0,
-      "radius": 0.04
-    },
-    {
-      "type": "SPOT",
       "name": "PanelWash",
       "loc": [2.3, 20.2, 5.45],
       "rot": [30.61, 0, 0],
-      "power": 520.0,
+      "power": 126.7,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -3004,9 +4550,9 @@
     {
       "type": "SPOT",
       "name": "PanelWash",
-      "loc": [11.11, 20.2, 5.45],
-      "rot": [30.61, 0, 0],
-      "power": 420.0,
+      "loc": [11.11, 20.2, 5.2],
+      "rot": [32.47, 0, 0],
+      "power": 138.3,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -3016,9 +4562,9 @@
     {
       "type": "SPOT",
       "name": "PanelWash",
-      "loc": [16.28, 20.2, 5.45],
-      "rot": [31.33, 0, 0],
-      "power": 300.0,
+      "loc": [16.28, 20.2, 5.2],
+      "rot": [33.27, 0, 0],
+      "power": 193.7,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -3030,7 +4576,7 @@
       "name": "PanelWash",
       "loc": [4.8, 20.2, 5.45],
       "rot": [32.87, 0, 0],
-      "power": 420.0,
+      "power": 192.7,
       "color": [1.0, 0.85, 0.62],
       "angle": 62,
       "blend": 0.6,
@@ -3042,7 +4588,7 @@
       "name": "PanelWash",
       "loc": [7.9, 20.2, 5.45],
       "rot": [32.87, 0, 0],
-      "power": 420.0,
+      "power": 192.7,
       "color": [1.0, 0.85, 0.62],
       "angle": 62,
       "blend": 0.6,
@@ -3052,11 +4598,718 @@
     {
       "type": "AREA",
       "name": "CounterLight",
-      "loc": [0.27, 13.85, 0.96],
+      "loc": [0.36, 13.25, 0.95],
       "rot": [0, 0, 90],
-      "power": 60.0,
-      "color": [1.0, 0.9, 0.75],
-      "size": [6.6, 0.3],
+      "power": 30.6,
+      "color": [1.0, 0.92, 0.8],
+      "size": [7.0, 0.25],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "CounterLight",
+      "loc": [0.36, 13.25, 0.52],
+      "rot": [0, 0, 90],
+      "power": 30.6,
+      "color": [1.0, 0.92, 0.8],
+      "size": [7.0, 0.25],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FrontPanel",
+      "loc": [2.5, 1.6, 5.88],
+      "rot": [0, 0, 0],
+      "power": 36.0,
+      "color": [1.0, 0.93, 0.84],
+      "size": [3.2, 1.6]
+    },
+    {
+      "type": "AREA",
+      "name": "FrontPanel",
+      "loc": [7.0, 1.6, 5.88],
+      "rot": [0, 0, 0],
+      "power": 36.0,
+      "color": [1.0, 0.93, 0.84],
+      "size": [3.2, 1.6]
+    },
+    {
+      "type": "AREA",
+      "name": "FrontPanel",
+      "loc": [13.0, 1.6, 5.88],
+      "rot": [0, 0, 0],
+      "power": 36.0,
+      "color": [1.0, 0.93, 0.84],
+      "size": [3.2, 1.6]
+    },
+    {
+      "type": "AREA",
+      "name": "ArchitraveUplight",
+      "loc": [9.72, 9.0, 3.93],
+      "rot": [180, 0, 0],
+      "power": 4.0,
+      "color": [1.0, 0.86, 0.66],
+      "size": [0.08, 11.5],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BeamUplight",
+      "loc": [0.55, 7.47, 5.61],
+      "rot": [180, 0, 0],
+      "power": 11.4,
+      "color": [1.0, 0.9, 0.78],
+      "size": [0.08, 14.6],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BeamUplight",
+      "loc": [1.85, 7.47, 5.61],
+      "rot": [180, 0, 0],
+      "power": 11.4,
+      "color": [1.0, 0.9, 0.78],
+      "size": [0.08, 14.6],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BeamUplight",
+      "loc": [5.4, 7.47, 5.61],
+      "rot": [180, 0, 0],
+      "power": 4.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [0.08, 14.6],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BeamUplight",
+      "loc": [9.65, 7.47, 5.61],
+      "rot": [180, 0, 0],
+      "power": 4.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [0.08, 14.6],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BeamUplight",
+      "loc": [13.9, 7.47, 5.61],
+      "rot": [180, 0, 0],
+      "power": 7.5,
+      "color": [1.0, 0.9, 0.78],
+      "size": [0.08, 14.6],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BeamUplight",
+      "loc": [17.45, 7.47, 5.61],
+      "rot": [180, 0, 0],
+      "power": 7.5,
+      "color": [1.0, 0.9, 0.78],
+      "size": [0.08, 14.6],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [1.6, 3.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 2.2,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [1.6, 3.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 4.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [1.6, 7.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 2.2,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [1.6, 7.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 4.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [1.6, 11.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 0.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [1.6, 11.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 10.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [1.6, 15.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 22.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [1.6, 15.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 82.0,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [1.6, 19.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 22.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [1.6, 19.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 82.0,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [4.8, 3.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 2.2,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [4.8, 3.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 4.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [4.8, 7.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 2.2,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [4.8, 7.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 4.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [4.8, 11.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 0.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [4.8, 11.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 10.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [4.8, 15.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 22.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [4.8, 15.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 82.0,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [4.8, 19.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 22.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [4.8, 19.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 82.0,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [8.0, 3.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 2.2,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [8.0, 3.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 4.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [8.0, 7.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 2.2,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [8.0, 7.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 4.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [8.0, 11.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 0.8,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [8.0, 11.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 10.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [8.0, 15.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 22.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [8.0, 15.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 82.0,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [8.0, 19.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 22.6,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [8.0, 19.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 82.0,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [11.6, 3.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [11.6, 3.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [11.6, 7.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [11.6, 7.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [11.6, 11.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [11.6, 11.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [11.6, 15.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [11.6, 15.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [11.6, 19.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [11.6, 19.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [15.0, 3.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [15.0, 3.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [15.0, 7.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [15.0, 7.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [15.0, 11.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [15.0, 11.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [15.0, 15.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [15.0, 15.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [15.0, 19.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [15.0, 19.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [18.0, 3.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [18.0, 3.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [18.0, 7.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [18.0, 7.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [18.0, 11.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [18.0, 11.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [18.0, 15.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [18.0, 15.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "BounceUp",
+      "loc": [18.0, 19.0, 3.2],
+      "rot": [180, 0, 0],
+      "power": 4.7,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
+      "hidden": true
+    },
+    {
+      "type": "AREA",
+      "name": "FillDown",
+      "loc": [18.0, 19.0, 4.7],
+      "rot": [0, 0, 0],
+      "power": 13.3,
+      "color": [1.0, 0.9, 0.78],
+      "size": [3.0, 3.8],
       "hidden": true
     },
     {
@@ -3064,7 +5317,7 @@
       "name": "LogoWash",
       "loc": [9.9, 11.2, 3.4],
       "rot": [65, 0, -74],
-      "power": 110.0,
+      "power": 53.7,
       "color": [1.0, 0.92, 0.8],
       "size": [3.0, 0.2],
       "hidden": true
@@ -3073,7 +5326,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [1.88, 23.6, 1.7],
-      "power": 40.0,
+      "power": 2.4,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     },
@@ -3081,7 +5334,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [11.1, 23.6, 1.6],
-      "power": 40.0,
+      "power": 2.4,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     },
@@ -3089,7 +5342,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [16.28, 23.6, 1.8],
-      "power": 30.0,
+      "power": 1.8,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     },
@@ -3097,7 +5350,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [-1.0, 23.8, 2.0],
-      "power": 50.0,
+      "power": 2.9,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     }
