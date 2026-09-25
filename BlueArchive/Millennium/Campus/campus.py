@@ -167,9 +167,9 @@ def build_campus(campus=None, collection=None, city=True, halo=True, towers=True
     if city:
         ccol = SC.collection("Kivotos_City", parent=col)
         mats = {
-            "glass_teal": KC.facade_material("KIV.Facade.GlassTeal", glass=(0.3, 0.72, 0.8), frame=(0.75, 0.88, 0.92), vertical=True, glow=ex["glow"], **hz),
-            "white_grid": KC.facade_material("KIV.Facade.WhiteGrid", glass=(0.55, 0.75, 0.92), frame=(0.95, 0.97, 1.0), glow=ex["glow"], **hz),
-            "glass_blue": KC.facade_material("KIV.Facade.GlassBlue", glass=(0.35, 0.6, 0.9), frame=(0.8, 0.88, 0.95), glass_ratio=0.85, glow=ex["glow"], **hz),
+            "glass_teal": KC.facade_material("KIV.Facade.GlassTeal", glass=(0.3, 0.72, 0.8), frame=(0.75, 0.88, 0.92), vertical=True, glow=ex["glow"] * 0.3, **hz),
+            "white_grid": KC.facade_material("KIV.Facade.WhiteGrid", glass=(0.55, 0.75, 0.92), frame=(0.95, 0.97, 1.0), glow=ex["glow"] * 0.3, **hz),
+            "glass_blue": KC.facade_material("KIV.Facade.GlassBlue", glass=(0.35, 0.6, 0.9), frame=(0.8, 0.88, 0.95), glass_ratio=0.85, glow=ex["glow"] * 0.3, **hz),
             "glass_grey": KC.facade_material("KIV.Facade.GlassGrey", glass=(0.22, 0.4, 0.48), frame=(0.62, 0.74, 0.8), floor_h=3.6, glass_ratio=0.96, band_ratio=0.78, glow=ex["glow"] * 0.5, **hz),
         }
         c = campus["city"]

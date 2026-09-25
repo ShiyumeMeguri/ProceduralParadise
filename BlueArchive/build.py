@@ -117,7 +117,9 @@ def build(args):
     # ---- render settings
     r = shot.get("render", {})
     RND.setup_cycles(samples=args.samples or r.get("samples", 128))
-    exposure = r.get("exposure", 0.0)
+    view = shot["views"][args.view] if args.view else None
+    # a view may carry its own camera exposure (e.g. exterior views)
+    exposure = (view or {}).get("exposure", r.get("exposure", 0.0))
     if not args.no_look and shot.get("look"):
         # exposure goes into the compositor *before* the grade, so the grade
         # sees exactly the values it was fitted on
@@ -133,12 +135,10 @@ def build(args):
         RND.color_management(r.get("view", "AgX"), r.get("look"), exposure)
     if args.scale or r.get("scale"):
         sc.render.resolution_percentage = int(round(100 * (args.scale or r.get("scale", 1.0))))
-    if args.view:
-        vcam = bpy.data.objects[f"VIEW_{args.view}"]
-        sc.camera = vcam
-        v = shot["views"][args.view]
-        if "resolution" in v:
-            sc.render.resolution_x, sc.render.resolution_y = v["resolution"]
+    if view is not None:
+        sc.camera = bpy.data.objects[f"VIEW_{args.view}"]
+        if "resolution" in view:
+            sc.render.resolution_x, sc.render.resolution_y = view["resolution"]
     return dict(scene=sc, room=rb, camera=cam, room_matrix=M_room, shot=shot)
 
 

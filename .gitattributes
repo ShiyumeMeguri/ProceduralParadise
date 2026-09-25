@@ -1,2 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# binary assets (renders, references, scenes)
+*.png binary
+*.jpg binary
+*.webp binary
+*.blend binary

@@ -50,6 +50,9 @@ def curtain_wall():
 
     # glass (one continuous pane per bay row; joints hidden by mullions)
     glass = g.box(-gt * 0.5, 0.0, sill_h, gt * 0.5, L, H)
+    # mark the exterior face so the glass shader can give it a reflective coating
+    nx = g.sep(g.normal())[0]
+    glass = g.store(glass, "glass_out", g.compare(nx, -0.5, "LESS_THAN"), domain="FACE")
     glass = g.mat(glass, m_glass)
 
     # mullions: instanced boxes along +Y

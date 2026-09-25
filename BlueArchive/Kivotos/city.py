@@ -24,8 +24,10 @@ from Core.gn import GN, asset
 # ----------------------------------------------------------------- materials
 def facade_material(name, glass=(0.45, 0.72, 0.95), frame=(0.88, 0.92, 0.96),
                     floor_h=4.0, bay_w=3.2, glass_ratio=0.72, band_ratio=0.62,
-                    haze=(0.75, 0.9, 1.0), haze_dist=2600.0, glow=0.35, vertical=False):
-    """Window-grid facade.  ``vertical`` -> strip windows (vertical fins)."""
+                    haze=(0.75, 0.9, 1.0), haze_dist=2600.0, glow=0.35, vertical=False,
+                    roof=(0.56, 0.61, 0.66)):
+    """Window-grid facade.  ``vertical`` -> strip windows (vertical fins);
+    upward faces get the ``roof`` colour (plant decks, not facade)."""
     def build(t: Tree):
         P = t.n("ShaderNodeTexCoord")["Object"]
         N = t.n("ShaderNodeNewGeometry")["True Normal"]
@@ -40,8 +42,8 @@ def facade_material(name, glass=(0.45, 0.72, 0.95), frame=(0.88, 0.92, 0.96),
             wu = t.map_range(t.abs(fu - 0.5), glass_ratio * 0.5, glass_ratio * 0.5 + 0.02, 1.0, 0.0)
             wv = t.map_range(t.abs(fv - 0.5), band_ratio * 0.5, band_ratio * 0.5 + 0.02, 1.0, 0.0)
             win = wu * wv
-        roof = t.map_range(t.abs(nz), 0.6, 0.8, 0.0, 1.0)
-        win = win * (1.0 - roof)
+        is_roof = t.map_range(t.abs(nz), 0.6, 0.8, 0.0, 1.0)
+        win = win * (1.0 - is_roof)
         # per-building tint variation
         bid = t.n("ShaderNodeAttribute", props={"attribute_name": "bld_rand",
                                                 "attribute_type": "GEOMETRY"})["Fac"]
@@ -49,6 +51,7 @@ def facade_material(name, glass=(0.45, 0.72, 0.95), frame=(0.88, 0.92, 0.96),
                                (1.0, (0.85, 0.93, 1.0, 1))])["Color"]
         fr = S.mix_rgb(t, 1.0, (*frame, 1), tint, blend="MULTIPLY")
         base = S.mix_rgb(t, win, fr, (*glass, 1))
+        base = S.mix_rgb(t, is_roof, base, (*roof, 1))
         rough = t.mix(win, 0.45, 0.22)
         b = S.bsdf(t, Base_Color=base, Roughness=rough, Specular_IOR_Level=0.6,
                    Metallic=t.mix(win, 0.0, 0.3), Emission_Color=base,

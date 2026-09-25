@@ -145,7 +145,8 @@ def mullion():
 @_reg("MIL.Glass")
 def glass():
     return S.glass_mat("MIL.Glass", C("glass_tint"), roughness=0.0, ior=1.5, reflect=0.45,
-                       camera_boost=PARAMS.get("glass_camera_boost", 1.0))
+                       camera_boost=PARAMS.get("glass_camera_boost", 1.0),
+                       coating={"reflect": 0.3, "tint": C("glass_coating")[:3]})
 
 
 @_reg("MIL.FacadeSpandrel")
@@ -162,8 +163,8 @@ def metal_frame():
 # --------------------------------------------------------------- furniture
 @_reg("MIL.DeskTop")
 def desk_top():
-    return S.principled("MIL.DeskTop", C("desk_top"), roughness=0.22, specular=0.5,
-                        coat=0.25, coat_roughness=0.08)
+    return S.principled("MIL.DeskTop", C("desk_top"), roughness=PARAMS.get("desk_roughness", 0.22),
+                        specular=0.5, coat=PARAMS.get("desk_coat", 0.25), coat_roughness=0.08)
 
 
 @_reg("MIL.DeskEdge")
@@ -179,7 +180,10 @@ def chair_white():
 
 @_reg("MIL.ChairBlue")
 def chair_blue():
-    return S.principled("MIL.ChairBlue", C("chair_blue"), roughness=0.55, specular=0.08)
+    """Translucent blue polypropylene: a little of the light passing through
+    the thin shell is modelled as a faint glow of the base colour."""
+    return S.principled("MIL.ChairBlue", C("chair_blue"), roughness=0.55, specular=0.08,
+                        emission=C("chair_blue"), emission_strength=PARAMS.get("chair_glow", 0.0))
 
 
 @_reg("MIL.CushionBlue")
@@ -229,7 +233,7 @@ def led():
 
 @_reg("MIL.HoloEdge")
 def holo_edge():
-    return S.emission_mat("MIL.HoloEdge", C("holo_cyan"), 9.0)
+    return S.emission_mat("MIL.HoloEdge", C("holo_cyan"), PARAMS.get("holo_edge_strength", 9.0))
 
 
 @_reg("MIL.HoloPanel")

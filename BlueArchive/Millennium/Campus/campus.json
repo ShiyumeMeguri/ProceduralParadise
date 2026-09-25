@@ -148,8 +148,8 @@
         "thickness": 2.9,
         "rings": [
           {
-            "radius": 581.3,
-            "markers": 3
+            "radius": 152.7,
+            "markers": 1
           },
           {
             "radius": 308.8,
@@ -157,8 +157,8 @@
             "dots": 220
           },
           {
-            "radius": 152.7,
-            "markers": 1
+            "radius": 581.3,
+            "markers": 3
           }
         ]
       },

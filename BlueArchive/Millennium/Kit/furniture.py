@@ -278,6 +278,8 @@ def wing_shelf():
     l2 = g.inp("Wing 2 Length", default=0.7, subtype="DISTANCE", panel="Wings")
     wd = g.inp("Wing Depth", default=0.34, subtype="DISTANCE", panel="Wings")
     wt = g.inp("Wing Tilt", default=0.35, subtype="ANGLE", panel="Wings")
+    tt = g.inp("Tray Thickness", default=0.03, subtype="DISTANCE", panel="Wings")
+    nbooks = g.inp("Books per Shelf", "INT", default=8, min=0, panel="Tower")
     rail = g.inp("Top Rail", "BOOL", default=False, panel="Tower")
     rail_len = g.inp("Top Rail Length", default=2.2, subtype="DISTANCE", panel="Tower")
     m_b = g.inp("Board Material", "MATERIAL", panel="Materials")
@@ -301,7 +303,7 @@ def wing_shelf():
     # books inside the tower (two rows)
     books = []
     for i, (f, seed) in enumerate(((0.3, 3), (0.56, 9), (0.02, 4))):
-        br = g.group(get_asset("MIL.Furn.BookRow"), Count=8, Seed=seed,
+        br = g.group(get_asset("MIL.Furn.BookRow"), Count=nbooks, Seed=seed,
                      Material_A=m_k, Material_B=m_k2, Material_C=m_k3).o
         br = g.move(br, g.math("ADD", g.math("MULTIPLY", hw, -1.0), bt + 0.03), 0.0, th * f + 0.025)
         books.append(br)
@@ -314,9 +316,9 @@ def wing_shelf():
         outline = g.polyline([(0.0, -d * 0.5, 0), (L, -d * 0.5, 0), (L - d * 0.55, d * 0.5, 0),
                               (0.0, d * 0.5, 0)], cyclic=True)
         outline = g.fillet(outline, 0.02, 3)
-        slab = g.slab(outline, 0.03)
+        slab = g.slab(outline, tt)
         rim = g.sweep(outline, g.rect(0.025, 0.05), True)
-        rim = g.move(rim, z=0.035)
+        rim = g.move(rim, z=g.math("ADD", tt, 0.005))
         tr = g.join(slab, rim)
         # tilt towards the viewer (-Y): rotate about X so the back edge rises
         tr = g.transform(tr, r=g.vec(wt, 0.0, 0.0))

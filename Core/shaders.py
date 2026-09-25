@@ -79,13 +79,18 @@ def emission_mat(name, color=(1, 1, 1), strength=5.0):
 
 
 def glass_mat(name, color=(0.9, 0.95, 1.0), roughness=0.0, ior=1.45, thin=True, reflect=1.0,
-              camera_boost=1.0):
+              camera_boost=1.0, coating=None):
     """Architectural glass. ``thin`` uses a fresnel mix of transparent +
     glossy, which renders clean window panes without refraction offsets.
 
     ``camera_boost`` > 1 brightens what *cameras* see through the pane (an
     exposure pull for the exterior, like a photographer's window blend)
-    while light and shadow rays pass unchanged."""
+    while light and shadow rays pass unchanged.
+
+    ``coating`` = {"reflect": 0.3, "tint": (r, g, b)} gives faces carrying the
+    ``glass_out`` attribute (the exterior side of a facade) the look of
+    coated curtain-wall glass for camera rays: a minimum reflectance and a
+    tinted view into the building.  Light transport is unchanged."""
     def build(t):
         if not thin:
             return t.n("ShaderNodeBsdfGlass", Color=color, Roughness=roughness, IOR=ior)["BSDF"]
@@ -100,11 +105,26 @@ def glass_mat(name, color=(0.9, 0.95, 1.0), roughness=0.0, ior=1.45, thin=True, 
             cam = t.n("ShaderNodeLightPath")["Is Camera Ray"]
             k = 1.0 + (camera_boost - 1.0) * cam
             tcol = t.vmath("SCALE", tuple(color[:3]), scale=k)
+        fac = fres * reflect if reflect != 1.0 else fres
+        if coating:
+            lp = t.n("ShaderNodeLightPath")
+            outside = t.n("ShaderNodeAttribute", props={"attribute_name": "glass_out",
+                                                        "attribute_type": "GEOMETRY"})["Fac"]
+            k = outside * lp["Is Camera Ray"] * (1.0 - back)
+            fac = t.mix(k, fac, t.max(fres, coating.get("reflect", 0.3)))
+            tint = coating.get("tint", (0.6, 0.7, 0.8))
+            tcol = mix_color(t, k, tcol, tuple(tint[:3]))
         transp = t.n("ShaderNodeBsdfTransparent", Color=tcol)["BSDF"]
         gloss = t.n("ShaderNodeBsdfGlossy", Color=(1, 1, 1), Roughness=roughness)["BSDF"]
-        fac = fres * reflect if reflect != 1.0 else fres
         return t.n("ShaderNodeMixShader", fac, transp, gloss)["Shader"]
     return material(name, build)
+
+
+def mix_color(t, fac, a, b):
+    """Linear mix of two colours (sockets or tuples) by ``fac``."""
+    a = tuple(a) + (1.0,) if isinstance(a, tuple) and len(a) == 3 else a
+    b = tuple(b) + (1.0,) if isinstance(b, tuple) and len(b) == 3 else b
+    return mix_rgb(t, fac, a, b)
 
 
 def new_world(name="World"):
