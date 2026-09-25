@@ -4,3 +4,4 @@ __pycache__/
 *.blend2
 /tmp/
 .DS_Store
+/Build/

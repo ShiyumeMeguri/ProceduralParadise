@@ -21,9 +21,38 @@ __all__ = ["reset_scene", "collection", "gn_object", "set_gn_inputs", "empty",
 
 
 def reset_scene(keep_worlds=False):
-    """Start from an empty file (factory settings, no default objects)."""
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    sc = bpy.context.scene
+    """Start from an empty scene with default settings.
+
+    Safe inside a running Blender UI (a script run from the Text Editor):
+    reloading factory settings would tear down the very UI that runs the
+    script, so instead a fresh scene replaces all existing scenes and every
+    data-block kind a build creates is removed.  Texts, screens and
+    workspaces are left alone."""
+    old = list(bpy.data.scenes)
+    sc = bpy.data.scenes.new("Scene")
+    wm = bpy.context.window_manager
+    for win in (wm.windows if wm else ()):
+        win.scene = sc
+    # Freestyle line sets hold a collection pointer that ID removal does not
+    # release cleanly (user-count error): drop them explicitly first
+    for s in old:
+        for vl in s.view_layers:
+            fs = vl.freestyle_settings
+            for ls in list(fs.linesets):
+                ls.select_by_collection = False
+                ls.collection = None
+                fs.linesets.remove(ls)
+    # then the data, then the old scenes
+    kinds = ["objects", "meshes", "curves", "cameras", "lights", "materials", "node_groups",
+             "collections", "images", "textures", "linestyles", "actions"]
+    if not keep_worlds:
+        kinds.append("worlds")
+    doomed = [idb for k in kinds for idb in getattr(bpy.data, k, ())
+              if not (k == "images" and idb.type in {"RENDER_RESULT", "COMPOSITING"})]
+    if doomed:
+        bpy.data.batch_remove(doomed)
+    for s in old:
+        bpy.data.scenes.remove(s)
     sc.unit_settings.system = "METRIC"
     sc.unit_settings.scale_length = 1.0
     return sc

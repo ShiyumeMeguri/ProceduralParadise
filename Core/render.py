@@ -82,17 +82,26 @@ def _set(node, name, value):
         else:
             sock.default_value = value
         return
+    # Blender 4.x: node properties instead of input sockets.  Aliases first:
+    # every node has a read-only ``type`` (its identifier), and the 4.x glare
+    # has no strength -- its ``mix`` runs from -1 (original) to +1 (glare only).
     prop = name.lower().replace(" ", "_")
     alias = {"type": "glare_type", "strength": "mix"}
-    for p in (prop, alias.get(prop, prop)):
-        if hasattr(n, p):
-            try:
-                setattr(n, p, value)
-                return
-            except TypeError:
-                if isinstance(value, str):
-                    setattr(n, p, value.upper())
+    if prop == "strength" and hasattr(n, "mix") and not isinstance(value, str):
+        value = max(-1.0, min(1.0, 2.0 * float(value) - 1.0))
+    for p in dict.fromkeys((alias.get(prop, prop), prop)):
+        if not hasattr(n, p):
+            continue
+        try:
+            setattr(n, p, value)
+            return
+        except (TypeError, AttributeError):
+            if isinstance(value, str):
+                try:
+                    setattr(n, p, value.upper().replace(" ", "_").replace("/", "_"))
                     return
+                except (TypeError, AttributeError):
+                    pass
     # silently ignore parameters that do not exist in this version
 
 
@@ -130,8 +139,10 @@ def compositor(look: dict | None = None):
     rl = t.n("CompositorNodeRLayers")
     img = rl["Image"]
 
-    if "exposure" in look and look["exposure"]:
-        img = t.n("CompositorNodeExposure", img, look["exposure"]).o
+    if "exposure" in look:
+        ex = t.n("CompositorNodeExposure", img, look["exposure"])
+        ex.n.name = ex.n.label = "Exposure"          # animation looks it up by name
+        img = ex.o
 
     for key, gtype in (("glow", "FOG_GLOW"), ("bloom", "BLOOM"), ("streaks", "STREAKS")):
         if key in look:
@@ -228,7 +239,7 @@ def lines(cfg: dict | None):
     except TypeError:
         pass
     sc.render.line_thickness = 1.0
-    vl = bpy.context.view_layer
+    vl = sc.view_layers[0]
     fs = vl.freestyle_settings
     fs.mode = "EDITOR"
     fs.crease_angle = __import__("math").radians(cfg.get("crease_deg", 140.0))
@@ -255,10 +266,76 @@ def lines(cfg: dict | None):
     return ls
 
 
+def _output_kind(kind):
+    """Image settings for 'IMAGE' or 'VIDEO' output (Blender 5.x splits the
+    file formats by ``media_type``; 4.x has one flat list)."""
+    im = bpy.context.scene.render.image_settings
+    if hasattr(im, "media_type"):
+        im.media_type = "VIDEO" if kind == "VIDEO" else "IMAGE"
+    return im
+
+
+def video_output(path, fps=30):
+    """Render the frame range to an H.264 MP4 at ``path`` (a PNG sequence
+    when this Blender build has no FFmpeg).  Returns the output path."""
+    sc = bpy.context.scene
+    sc.render.fps = int(round(fps))
+    sc.render.fps_base = 1.0
+    sc.render.filepath = path
+    if bpy.app.ffmpeg.supported:
+        im = _output_kind("VIDEO")
+        im.file_format = "FFMPEG"
+        ff = sc.render.ffmpeg
+        ff.format = "MPEG4"
+        ff.codec = "H264"
+        for attr, val in (("constant_rate_factor", "HIGH"), ("ffmpeg_preset", "GOOD"),
+                          ("audio_codec", "NONE"), ("gopsize", int(round(fps)))):
+            try:
+                setattr(ff, attr, val)
+            except (AttributeError, TypeError):
+                pass
+    else:
+        im = _output_kind("IMAGE")
+        im.file_format = "PNG"
+    return path
+
+
+def use_gpu_if_available():
+    """Render Cycles on the GPU when this machine has one.  Only touches the
+    Cycles preferences when no compute backend is configured yet; returns
+    the backend in use or None (CPU)."""
+    try:
+        prefs = bpy.context.preferences.addons["cycles"].preferences
+    except (KeyError, AttributeError):
+        return None
+    sc = bpy.context.scene
+    if getattr(prefs, "compute_device_type", "NONE") == "NONE":
+        for backend in ("OPTIX", "CUDA", "HIP", "METAL", "ONEAPI"):
+            try:
+                prefs.compute_device_type = backend
+            except TypeError:
+                continue
+            try:
+                prefs.get_devices()
+            except Exception:
+                pass
+            devs = [d for d in prefs.devices if d.type == backend]
+            if devs:
+                for d in devs:
+                    d.use = True
+                break
+            prefs.compute_device_type = "NONE"
+    backend = getattr(prefs, "compute_device_type", "NONE")
+    if backend != "NONE":
+        sc.cycles.device = "GPU"
+        return backend
+    return None
+
+
 def render_still(path, use_compositor=True):
     sc = bpy.context.scene
     sc.render.filepath = path
-    sc.render.image_settings.file_format = "PNG"
+    _output_kind("IMAGE").file_format = "PNG"
     sc.render.image_settings.color_depth = "8"
     try:
         sc.render.use_compositing = use_compositor

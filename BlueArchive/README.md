@@ -35,10 +35,11 @@ BlueArchive/
   Rooms/<Room>/
     room.json         房间数据（房间坐标系：原点 = 玻璃内表面线 × 前墙，+X 向室内，+Y 沿立面）
     shots/<Shot>.json 镜头：相机解算、天空、太阳、外观、自由机位 views
+    animations/<Anim>.json 相机动画（配布视频）：关键帧、帧率、分辨率
     Reference/        参考原画（只用于标定与对比）
     Renders/          渲染结果
 ```
 
 新增房间：在 `Rooms/` 下建文件夹写 `room.json`（`placement` 指定所在塔楼、楼层、立面与偏移），
-不需要改任何代码。新增学院：复制 `Millennium/` 的包结构，写自己的 `Academy.json` 与 Kit。
+不需要改任何代码；`room.json` 的 `defaults` 指定默认镜头与动画。新增学院：复制 `Millennium/` 的包结构，写自己的 `Academy.json` 与 Kit。
 `build.py` 通过房间路径的第一段（学院名）自动加载对应的包。

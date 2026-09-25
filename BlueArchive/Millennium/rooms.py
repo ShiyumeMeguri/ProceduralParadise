@@ -197,12 +197,14 @@ class RoomBuilder:
         z = Ld["z"]
         cof = self.R["ceiling"]["coffer"]
         for i, y in enumerate(Ld["rows_y"]):
-            self.obj(f"Pendant_{i}", "MIL.Fix.LinearPendant",
-                     {"Length": Ld["length"], "Width": Ld["width"], "Housing Height": Ld["housing"],
-                      "Cable Length": cof - z - Ld["housing"],
-                      "Housing Material": M.get("MIL.Mullion"), "Diffuser Material": M.get("MIL.LED"),
-                      "Cable Material": M.get("MIL.MetalFrame")},
-                     loc=(Ld["center_x"], y + Ld["width"] * 0.5, z), col="Lighting")
+            fx = self.obj(f"Pendant_{i}", "MIL.Fix.LinearPendant",
+                          {"Length": Ld["length"], "Width": Ld["width"], "Housing Height": Ld["housing"],
+                           "Cable Length": cof - z - Ld["housing"],
+                           "Housing Material": M.get("MIL.Mullion"), "Diffuser Material": M.get("MIL.LED"),
+                           "Cable Material": M.get("MIL.MetalFrame")},
+                          loc=(Ld["center_x"], y + Ld["width"] * 0.5, z), col="Lighting")
+            # painted BGs never show the lamps mirrored in glass / floor
+            fx.visible_glossy = Ld.get("reflections", True)
             # area light doing the actual illumination (clean sampling)
             ld = bpy.data.lights.new(f"{self.id}.PendantLight_{i}", "AREA")
             ld.shape = "RECTANGLE"

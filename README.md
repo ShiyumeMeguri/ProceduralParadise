@@ -9,26 +9,43 @@
 
 ![render vs reference](BlueArchive/Millennium/Rooms/ClubRoom/Renders/BG_Milleniumclub_compare.png)
 
-## 快速开始
+## 快速开始（本地 Blender）
 
-需要 Blender 4.2+（或 PyPI 的 `bpy` 模块，已在 Blender 5.2 LTS / `bpy` 5.2 上验证）。
+需要 Blender 4.2 以上，已在 **Blender 4.5 LTS** 与 **5.2 LTS** 上验证。不需要安装任何额外的 Python 包。
+
+**在 Blender 界面里：**
+
+1. 打开 Blender → 切到 **Scripting** 工作区；
+2. 文本编辑器 **Text → Open**，选择仓库里的 `BlueArchive/build.py`（要打开文件本身，不要复制粘贴代码）；
+3. 点 **Run Script**（▶）。约十几秒后整个场景就构建好了：社团活动室、窗外校区、光环、原画机位
+   `CAM_BG_Milleniumclub` 和配布视频机位 `CAM_Showcase`。场景会自动另存为
+
+   `Build/Millennium/ClubRoom/ClubRoom.blend`（`Build/` 在 `.gitignore` 里，不会进仓库）；
+4. **Ctrl+F12** 渲染配布视频（1920×1080，30 fps，28 秒），输出到 `Build/Millennium/ClubRoom/video/`。
+   单帧预览按 F12；想渲染原画机位，把 `CAM_BG_Milleniumclub` 设为活动相机、分辨率改为 1280×900。
+
+若本机有显卡且 Cycles 还没配置计算设备，脚本会自动启用 GPU（OptiX / CUDA / HIP / Metal / oneAPI）。
+
+**命令行：**
 
 ```bash
-# Blender 可执行文件
-blender -b -P BlueArchive/build.py -- Millennium/Rooms/ClubRoom --shot BG_Milleniumclub \
-    --render out.png --samples 128 --save ClubRoom.blend
+# 默认：构建并保存 Build/Millennium/ClubRoom/ClubRoom.blend
+blender -b -P BlueArchive/build.py
 
-# 或者 bpy 模块
-python BlueArchive/build.py Millennium/Rooms/ClubRoom --shot BG_Milleniumclub --render out.png
+# 构建并直接渲染配布视频（默认输出 Build/Millennium/ClubRoom/video/Showcase_0001-0840.mp4）
+blender -b -P BlueArchive/build.py -- --render-animation
 
-# 自由机位（在镜头文件 "views" 里定义）
-python BlueArchive/build.py Millennium/Rooms/ClubRoom --shot BG_Milleniumclub --view reverse --render reverse.png
+# 快速试看：1/4 分辨率、12 采样、不画描边
+blender -b -P BlueArchive/build.py -- --render-animation --scale 0.25 --samples 12 --no-lines
 
-# 快速预览：半分辨率、少采样、不建城市/光环
-python BlueArchive/build.py Millennium/Rooms/ClubRoom --shot BG_Milleniumclub --scale 0.5 --samples 32 --no-city --no-halo --render preview.png
+# 渲染原画机位 / 自由机位的单帧
+blender -b -P BlueArchive/build.py -- --render still.png
+blender -b -P BlueArchive/build.py -- --view reverse --render reverse.png
 ```
 
-描边（Freestyle）在无显示器的 Linux 上需要 EGL：安装 Mesa EGL 并设置 `EGL_PLATFORM=surfaceless`。
+也可以用 PyPI 的 `bpy` 模块代替 Blender：`python BlueArchive/build.py [同样的参数]`。
+全部参数见 `BlueArchive/build.py` 顶部说明。无显示器的 Linux 上渲染描边（Freestyle）需要 EGL：
+安装 Mesa EGL 并设置 `EGL_PLATFORM=surfaceless`。
 
 ## 目录结构
 
@@ -37,7 +54,8 @@ Core/                     与游戏无关的通用框架
   nodes.py                节点树 DSL（运算符重载、版本兼容的节点解析）
   gn.py                   几何节点构建器 + 资产注册表（@asset）
   scene.py camera.py      场景/集合/GN 对象；摄影测量相机（焦距、主点偏移、两点透视）
-  shaders.py render.py    程序化材质；Cycles、合成器外观（曝光、辉光、调色、Freestyle 描边）
+  shaders.py render.py    程序化材质；Cycles、合成器外观（曝光、辉光、调色、Freestyle 描边）、视频输出
+  anim.py                 相机动画：关键帧 + 平滑样条手柄，可在 Graph Editor 里继续调
   grade.py compare.py     调色拟合（直方图/色卡/回归）；与参考图的叠线、区域色差、SSIM 对比
 BlueArchive/
   build.py                命令行入口：学院 → 校区 → 房间 → 镜头
@@ -47,7 +65,8 @@ BlueArchive/
     Kit/                  模块化 GN 资产库（建筑、家具、灯具、标识、材质）
     Campus/               校区总图 + 塔楼生成器（房间嵌在真实塔楼的真实立面里）
     rooms.py              由 room.json 装配房间
-    Rooms/ClubRoom/       本次还原的社团活动室（room.json、镜头、参考图、渲染结果）
+    Rooms/ClubRoom/       本次还原的社团活动室（room.json、镜头、配布视频动画、参考图、渲染结果）
+Build/                    构建输出（.blend、视频），git 忽略
 ```
 
 ## 设计原则

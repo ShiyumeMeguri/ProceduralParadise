@@ -113,7 +113,7 @@ def edge_map(out_png=None, id_thresh=0.02, normal_thresh=0.18, hide=()):
     Returns a boolean (H, W) array.  Objects whose names are in ``hide`` are
     excluded (e.g. glass or the exterior)."""
     sc = bpy.context.scene
-    vl = bpy.context.view_layer
+    vl = sc.view_layers[0]
     saved = dict(engine=sc.render.engine, samples=sc.cycles.samples, denoise=sc.cycles.use_denoising,
                  bounces=sc.cycles.max_bounces, override=vl.material_override,
                  filepath=sc.render.filepath, view=sc.view_settings.view_transform,

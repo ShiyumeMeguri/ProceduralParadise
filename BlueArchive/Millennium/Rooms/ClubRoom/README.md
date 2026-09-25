@@ -2,12 +2,15 @@
 
 参考原画：`Reference/BG_Milleniumclub.webp`（1280 × 900）。
 渲染结果：`Renders/BG_Milleniumclub.png`（原画机位），`Renders/BG_Milleniumclub_compare.png`（左渲染 / 右原画），
-`Renders/view_*.png`（自由机位验证），`Renders/ClubRoom.blend`（完整场景，全部为几何节点，可直接换机位；
-用 Blender 5.2 保存，其他版本请用下面的命令从数据重新生成）。
+`Renders/view_*.png`（自由机位验证），`Renders/metrics.json`（数值对比）。
+
+完整场景不进仓库，由脚本生成：在 Blender 里打开并运行 `BlueArchive/build.py`（或 `blender -b -P BlueArchive/build.py`），
+得到 `Build/Millennium/ClubRoom/ClubRoom.blend`（git 忽略目录），见仓库根目录 README。
 
 ```bash
-python BlueArchive/build.py Millennium/Rooms/ClubRoom --shot BG_Milleniumclub --render out.png --samples 128
-python BlueArchive/build.py Millennium/Rooms/ClubRoom --shot BG_Milleniumclub --view reverse --render reverse.png
+blender -b -P BlueArchive/build.py -- --render out.png                  # 原画机位
+blender -b -P BlueArchive/build.py -- --view reverse --render reverse.png
+blender -b -P BlueArchive/build.py -- --render-animation                # 配布视频
 ```
 
 ## 1. 相机解算（摄影测量，不是目测）
@@ -83,3 +86,24 @@ Cycles，Standard 视图变换；合成器：曝光 → 按原画拟合的全局
 | `window` | 贴近玻璃沿立面看向西北：城市、双塔、光环 |
 | `desks` | 桌组之间的视平线 |
 | `aerial` | 室外：从西南方看 MIL-A 塔，活动室在西立面 24 层 |
+
+## 7. 配布视频（`animations/Showcase.json`）
+
+`CAM_Showcase`：1920×1080、30 fps、840 帧（28 秒），构建后就是场景的活动相机，Ctrl+F12 直接出片。
+
+| 帧 | 镜头 |
+|----|------|
+| 1–50 | 与原画完全相同的机位（同焦距、同主点偏移）停留 |
+| 50–300 | 推进到桌组之间的过道，对准校徽标牌 |
+| 300–540 | 转向窗户，贴近玻璃看窗外：城市、双塔、天空光环（这一段曝光降 0.45 档，像真实相机一样照顾窗外高光） |
+| 540–660 | 沿窗边后退，回头看整个房间 |
+| 660–840 | 升到前右角的高机位全景，缓停 |
+
+关键帧只写了 9 个（房间坐标系里的相机位置、注视点、焦距、可选主点偏移与曝光），
+`Core/anim.py` 用 Hermite 样条计算平滑的贝塞尔手柄：运动连续、在 `ease` 关键帧处缓入缓出，
+而且全部是普通关键帧，可以在 Blender 的 Graph Editor / Dope Sheet 里继续调整。
+机位路线沿桌组间过道（x 5.04–6.07 m）、窗边通道（x < 2.4 m）走，并保持在吊灯下方（z < 3.36 m），不穿模。
+想改镜头：编辑 JSON 后重新运行脚本即可；也可以复制成新的 `animations/<名字>.json`，用 `--animation <名字>` 构建。
+
+渲染时间参考：CPU 上 1920×1080、64 采样每帧数分钟；有 GPU 时快得多。先用
+`--render-animation --scale 0.25 --samples 12 --no-lines` 快速试看路线。

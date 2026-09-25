@@ -1,0 +1,75 @@
+{
+  "id": "Showcase",
+  "title": "Millennium Club Room - showcase (配布 video)",
+  "notes": ["Camera keys in the ROOM frame (origin = inner glass line x front wall, +X into the room, +Y towards the sign wall).", "'camera': 'shot' copies the BG_Milleniumclub solve, so the video opens on the painting's framing.", "Between keys the motion is a Hermite spline written as Bezier keys with explicit handles (Core/anim.py) - editable in the Graph Editor.", "Path clearances: aisles between the desk clusters (x 5.04-6.07), window aisle (x < 2.4), below the pendant fixtures (z < 3.36).", "Optional per-key 'exposure' (stops, compositor, before the grade) - the window segment is exposed for the bright exterior like a real camera would be."],
+  "fps": 30,
+  "resolution": [1920, 1080],
+  "samples": 64,
+  "keys": [
+    {
+      "frame": 1,
+      "camera": "shot",
+      "ease": true,
+      "note": "the painting's framing"
+    },
+    {
+      "frame": 50,
+      "camera": "shot",
+      "ease": true
+    },
+    {
+      "frame": 170,
+      "location": [5.95, 8.9, 1.35],
+      "target": [4.9, 24.0, 1.9],
+      "lens": 30.0,
+      "shift": [0.0, 0.0],
+      "note": "push in towards the aisle"
+    },
+    {
+      "frame": 300,
+      "location": [5.55, 14.6, 1.55],
+      "target": [4.7, 24.0, 1.8],
+      "lens": 28.0,
+      "note": "down the aisle, on the emblem"
+    },
+    {
+      "frame": 420,
+      "location": [5.45, 18.3, 1.62],
+      "target": [-30.0, 30.0, 12.0],
+      "lens": 24.0,
+      "note": "turn to the windows",
+      "exposure": -1.15
+    },
+    {
+      "frame": 540,
+      "location": [1.55, 16.8, 1.65],
+      "target": [-20.0, 36.0, 8.0],
+      "lens": 22.0,
+      "note": "at the glass: city, twin towers, halo",
+      "exposure": -1.45
+    },
+    {
+      "frame": 660,
+      "location": [1.4, 9.4, 2.1],
+      "target": [6.0, 22.0, 1.3],
+      "lens": 20.0,
+      "note": "back along the windows, look into the room",
+      "exposure": -1.0
+    },
+    {
+      "frame": 790,
+      "location": [9.35, 3.3, 3.0],
+      "target": [3.3, 17.0, 1.1],
+      "lens": 18.0,
+      "ease": true,
+      "note": "high establishing view"
+    },
+    {
+      "frame": 840,
+      "location": [9.3, 3.1, 3.05],
+      "target": [3.3, 17.0, 1.1],
+      "lens": 18.0,
+      "ease": true
+    }
+  ]
+}
