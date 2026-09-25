@@ -87,8 +87,8 @@
         "Thickness": 0.08
       },
       "mat": {
-        "Material": "SHJ.TimberPlanks",
-        "Reveal Material": "SHJ.TimberPlanks"
+        "Material": "SHJ.CeilingBoards",
+        "Reveal Material": "SHJ.CeilingBoards"
       }
     },
     {
@@ -101,7 +101,7 @@
         "Thickness": 0.1
       },
       "mat": {
-        "Material": "SHJ.TimberPlanks"
+        "Material": "SHJ.CeilingBoards"
       }
     },
     {
@@ -393,10 +393,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [1.43, 23.3, 0.0],
+      "loc": [1.43, 22.72, 0.0],
       "inputs": {
-        "Height": 2.06,
-        "Globe Radius": 0.16
+        "Height": 2.04,
+        "Globe Radius": 0.2
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -407,10 +407,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [2.33, 23.3, 0.0],
+      "loc": [2.33, 22.72, 0.0],
       "inputs": {
-        "Height": 2.06,
-        "Globe Radius": 0.16
+        "Height": 2.04,
+        "Globe Radius": 0.2
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -484,10 +484,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [10.66, 23.3, 0.0],
+      "loc": [10.66, 22.72, 0.0],
       "inputs": {
-        "Height": 2.06,
-        "Globe Radius": 0.16
+        "Height": 2.04,
+        "Globe Radius": 0.2
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -498,10 +498,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [11.56, 23.3, 0.0],
+      "loc": [11.56, 22.72, 0.0],
       "inputs": {
-        "Height": 2.06,
-        "Globe Radius": 0.16
+        "Height": 2.04,
+        "Globe Radius": 0.2
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -575,10 +575,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [15.83, 23.3, 0.0],
+      "loc": [15.83, 22.72, 0.0],
       "inputs": {
-        "Height": 2.2,
-        "Globe Radius": 0.16
+        "Height": 2.18,
+        "Globe Radius": 0.2
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -589,10 +589,10 @@
     {
       "asset": "SHJ.Prop.GardenLamp",
       "name": "CourtyardLamp",
-      "loc": [16.73, 23.3, 0.0],
+      "loc": [16.73, 22.72, 0.0],
       "inputs": {
-        "Height": 2.2,
-        "Globe Radius": 0.16
+        "Height": 2.18,
+        "Globe Radius": 0.2
       },
       "mat": {
         "Post Material": "SHJ.LacquerBlack",
@@ -1307,27 +1307,29 @@
     {
       "asset": "SHJ.Prop.Planter",
       "name": "ShelfPlanter",
-      "loc": [3.652, 22.0, 3.82],
+      "loc": [3.652, 21.93, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.5187,
-        "Width": 0.34,
-        "Height": 0.2
+        "Length": 0.519,
+        "Width": 0.3,
+        "Height": 0.16
       },
       "mat": {
-        "Material": "SHJ.PorcelainBW",
+        "Material": "SHJ.PorcelainGreen",
         "Soil Material": "SHJ.Soil"
       }
     },
     {
       "asset": "SHJ.Prop.Bush",
       "name": "ShelfIvyMound",
-      "loc": [3.652, 22.0, 3.94],
+      "loc": [3.652, 21.93, 3.97],
       "col": "Props",
       "inputs": {
-        "Radius": 0.22,
-        "Height": 0.08,
-        "Density": 320.0,
+        "Radius": 0.16,
+        "Stretch": 1.62,
+        "Flatten": 0.5,
+        "Height": 0.0,
+        "Density": 1400.0,
         "Seed": 0
       },
       "mat": {
@@ -1337,14 +1339,14 @@
     {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [3.652, 21.97, 4.0],
+      "loc": [3.652, 21.86, 3.97],
       "col": "Props",
       "rot": 0.0,
       "inputs": {
-        "Runners": 14,
-        "Spread": 0.36,
-        "Drop": 0.45,
-        "Leaf Size": 0.085,
+        "Runners": 18,
+        "Spread": 0.3,
+        "Drop": 0.4,
+        "Leaf Size": 0.075,
         "Seed": 0
       },
       "mat": {
@@ -1354,27 +1356,29 @@
     {
       "asset": "SHJ.Prop.Planter",
       "name": "ShelfPlanter",
-      "loc": [4.467, 22.0, 3.82],
+      "loc": [4.467, 21.93, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.57665,
-        "Width": 0.34,
-        "Height": 0.2
+        "Length": 0.577,
+        "Width": 0.3,
+        "Height": 0.16
       },
       "mat": {
-        "Material": "SHJ.PorcelainBW",
+        "Material": "SHJ.PorcelainGreen",
         "Soil Material": "SHJ.Soil"
       }
     },
     {
       "asset": "SHJ.Prop.Bush",
       "name": "ShelfIvyMound",
-      "loc": [4.467, 22.0, 3.94],
+      "loc": [4.467, 21.93, 3.97],
       "col": "Props",
       "inputs": {
-        "Radius": 0.22,
-        "Height": 0.08,
-        "Density": 320.0,
+        "Radius": 0.16,
+        "Stretch": 1.8,
+        "Flatten": 0.5,
+        "Height": 0.0,
+        "Density": 1400.0,
         "Seed": 5
       },
       "mat": {
@@ -1384,14 +1388,14 @@
     {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [4.467, 21.97, 4.0],
+      "loc": [4.467, 21.86, 3.97],
       "col": "Props",
       "rot": 37.0,
       "inputs": {
-        "Runners": 14,
-        "Spread": 0.36,
-        "Drop": 0.5700000000000001,
-        "Leaf Size": 0.085,
+        "Runners": 18,
+        "Spread": 0.3,
+        "Drop": 0.52,
+        "Leaf Size": 0.075,
         "Seed": 7
       },
       "mat": {
@@ -1401,27 +1405,29 @@
     {
       "asset": "SHJ.Prop.Planter",
       "name": "ShelfPlanter",
-      "loc": [5.746, 22.0, 3.82],
+      "loc": [5.746, 21.93, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.5481499999999999,
-        "Width": 0.34,
-        "Height": 0.2
+        "Length": 0.548,
+        "Width": 0.3,
+        "Height": 0.16
       },
       "mat": {
-        "Material": "SHJ.PorcelainBW",
+        "Material": "SHJ.PorcelainGreen",
         "Soil Material": "SHJ.Soil"
       }
     },
     {
       "asset": "SHJ.Prop.Bush",
       "name": "ShelfIvyMound",
-      "loc": [5.746, 22.0, 3.94],
+      "loc": [5.746, 21.93, 3.97],
       "col": "Props",
       "inputs": {
-        "Radius": 0.22,
-        "Height": 0.08,
-        "Density": 320.0,
+        "Radius": 0.16,
+        "Stretch": 1.71,
+        "Flatten": 0.5,
+        "Height": 0.0,
+        "Density": 1400.0,
         "Seed": 10
       },
       "mat": {
@@ -1431,14 +1437,14 @@
     {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [5.746, 21.97, 4.0],
+      "loc": [5.746, 21.86, 3.97],
       "col": "Props",
       "rot": 74.0,
       "inputs": {
-        "Runners": 14,
-        "Spread": 0.36,
-        "Drop": 0.69,
-        "Leaf Size": 0.085,
+        "Runners": 18,
+        "Spread": 0.3,
+        "Drop": 0.64,
+        "Leaf Size": 0.075,
         "Seed": 14
       },
       "mat": {
@@ -1448,27 +1454,29 @@
     {
       "asset": "SHJ.Prop.Planter",
       "name": "ShelfPlanter",
-      "loc": [7.007, 22.0, 3.82],
+      "loc": [7.007, 21.93, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.5994499999999999,
-        "Width": 0.34,
-        "Height": 0.2
+        "Length": 0.599,
+        "Width": 0.3,
+        "Height": 0.16
       },
       "mat": {
-        "Material": "SHJ.PorcelainBW",
+        "Material": "SHJ.PorcelainGreen",
         "Soil Material": "SHJ.Soil"
       }
     },
     {
       "asset": "SHJ.Prop.Bush",
       "name": "ShelfIvyMound",
-      "loc": [7.007, 22.0, 3.94],
+      "loc": [7.007, 21.93, 3.97],
       "col": "Props",
       "inputs": {
-        "Radius": 0.22,
-        "Height": 0.08,
-        "Density": 320.0,
+        "Radius": 0.16,
+        "Stretch": 1.87,
+        "Flatten": 0.5,
+        "Height": 0.0,
+        "Density": 1400.0,
         "Seed": 15
       },
       "mat": {
@@ -1478,14 +1486,14 @@
     {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [7.007, 21.97, 4.0],
+      "loc": [7.007, 21.86, 3.97],
       "col": "Props",
       "rot": 111.0,
       "inputs": {
-        "Runners": 14,
-        "Spread": 0.36,
-        "Drop": 0.45,
-        "Leaf Size": 0.085,
+        "Runners": 18,
+        "Spread": 0.3,
+        "Drop": 0.4,
+        "Leaf Size": 0.075,
         "Seed": 21
       },
       "mat": {
@@ -1495,27 +1503,29 @@
     {
       "asset": "SHJ.Prop.Planter",
       "name": "ShelfPlanter",
-      "loc": [8.137, 22.0, 3.82],
+      "loc": [8.137, 21.93, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.6726,
-        "Width": 0.34,
-        "Height": 0.2
+        "Length": 0.673,
+        "Width": 0.3,
+        "Height": 0.16
       },
       "mat": {
-        "Material": "SHJ.PorcelainBW",
+        "Material": "SHJ.PorcelainGreen",
         "Soil Material": "SHJ.Soil"
       }
     },
     {
       "asset": "SHJ.Prop.Bush",
       "name": "ShelfIvyMound",
-      "loc": [8.137, 22.0, 3.94],
+      "loc": [8.137, 21.93, 3.97],
       "col": "Props",
       "inputs": {
-        "Radius": 0.22,
-        "Height": 0.08,
-        "Density": 320.0,
+        "Radius": 0.16,
+        "Stretch": 2.1,
+        "Flatten": 0.5,
+        "Height": 0.0,
+        "Density": 1400.0,
         "Seed": 20
       },
       "mat": {
@@ -1525,14 +1535,14 @@
     {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [8.137, 21.97, 4.0],
+      "loc": [8.137, 21.86, 3.97],
       "col": "Props",
       "rot": 148.0,
       "inputs": {
-        "Runners": 14,
-        "Spread": 0.36,
-        "Drop": 0.5700000000000001,
-        "Leaf Size": 0.085,
+        "Runners": 18,
+        "Spread": 0.3,
+        "Drop": 0.52,
+        "Leaf Size": 0.075,
         "Seed": 28
       },
       "mat": {
@@ -1542,27 +1552,29 @@
     {
       "asset": "SHJ.Prop.Planter",
       "name": "ShelfPlanter",
-      "loc": [9.038, 22.0, 3.82],
+      "loc": [9.038, 21.93, 3.82],
       "col": "Props",
       "inputs": {
-        "Length": 0.5813999999999999,
-        "Width": 0.34,
-        "Height": 0.2
+        "Length": 0.581,
+        "Width": 0.3,
+        "Height": 0.16
       },
       "mat": {
-        "Material": "SHJ.PorcelainBW",
+        "Material": "SHJ.PorcelainGreen",
         "Soil Material": "SHJ.Soil"
       }
     },
     {
       "asset": "SHJ.Prop.Bush",
       "name": "ShelfIvyMound",
-      "loc": [9.038, 22.0, 3.94],
+      "loc": [9.038, 21.93, 3.97],
       "col": "Props",
       "inputs": {
-        "Radius": 0.22,
-        "Height": 0.08,
-        "Density": 320.0,
+        "Radius": 0.16,
+        "Stretch": 1.82,
+        "Flatten": 0.5,
+        "Height": 0.0,
+        "Density": 1400.0,
         "Seed": 25
       },
       "mat": {
@@ -1572,14 +1584,14 @@
     {
       "asset": "SHJ.Prop.Ivy",
       "name": "ShelfIvy",
-      "loc": [9.038, 21.97, 4.0],
+      "loc": [9.038, 21.86, 3.97],
       "col": "Props",
       "rot": 185.0,
       "inputs": {
-        "Runners": 14,
-        "Spread": 0.36,
-        "Drop": 0.69,
-        "Leaf Size": 0.085,
+        "Runners": 18,
+        "Spread": 0.3,
+        "Drop": 0.64,
+        "Leaf Size": 0.075,
         "Seed": 35
       },
       "mat": {
@@ -1607,9 +1619,9 @@
       "loc": [2.95, 21.55, 0.8],
       "col": "Props",
       "inputs": {
-        "Shape": 1,
-        "Height": 0.52,
-        "Width": 0.44
+        "Shape": 5,
+        "Height": 0.62,
+        "Width": 0.4
       },
       "mat": {
         "Material": "SHJ.PorcelainBW"
@@ -1618,11 +1630,13 @@
     {
       "asset": "SHJ.Prop.Bush",
       "name": "Shrub",
-      "loc": [2.95, 21.55, 1.22],
+      "loc": [2.95, 21.55, 1.3],
       "col": "Props",
       "inputs": {
         "Radius": 0.3,
         "Height": 0.3,
+        "Flatten": 1.15,
+        "Density": 420.0,
         "Seed": 29
       },
       "mat": {
@@ -1650,9 +1664,9 @@
       "loc": [9.45, 21.55, 0.62],
       "col": "Props",
       "inputs": {
-        "Shape": 1,
-        "Height": 0.52,
-        "Width": 0.44
+        "Shape": 5,
+        "Height": 0.62,
+        "Width": 0.4
       },
       "mat": {
         "Material": "SHJ.PorcelainBW"
@@ -1661,11 +1675,13 @@
     {
       "asset": "SHJ.Prop.Bush",
       "name": "Shrub",
-      "loc": [9.45, 21.55, 1.04],
+      "loc": [9.45, 21.55, 1.12],
       "col": "Props",
       "inputs": {
         "Radius": 0.3,
         "Height": 0.3,
+        "Flatten": 1.15,
+        "Density": 420.0,
         "Seed": 94
       },
       "mat": {
@@ -4429,7 +4445,7 @@
     ]
   },
   "lanterns": {
-    "light_power": 2.819,
+    "light_power": 2.563,
     "light_color": [1.0, 0.45, 0.25],
     "defaults": {
       "inputs": {
@@ -4446,7 +4462,7 @@
         "y": 11.56,
         "z": 5.9,
         "inputs": {
-          "Diameter": 0.6,
+          "Diameter": 0.58,
           "Drop": 1.0,
           "Pitch": 0.755
         }
@@ -4475,13 +4491,13 @@
       },
       {
         "id": "LanternsRight",
-        "x": 12.18,
-        "y": 10.33,
+        "x": 9.3,
+        "y": 8.2,
         "z": 5.9,
         "inputs": {
-          "Diameter": 0.6,
-          "Drop": 1.43,
-          "Pitch": 0.71
+          "Diameter": 0.41,
+          "Drop": 2.49,
+          "Pitch": 0.5
         }
       }
     ]
@@ -4490,7 +4506,7 @@
     "sets": [
       {
         "radius": 0.06,
-        "power": 54.2,
+        "power": 44.2,
         "angle": 80.0,
         "blend": 0.7,
         "color": [1.0, 0.88, 0.72],
@@ -4498,7 +4514,7 @@
       },
       {
         "radius": 0.06,
-        "power": 173.4,
+        "power": 415.0,
         "angle": 80.0,
         "blend": 0.7,
         "color": [1.0, 0.88, 0.72],
@@ -4506,7 +4522,7 @@
       },
       {
         "radius": 0.07,
-        "power": 252.9,
+        "power": 217.2,
         "angle": 90.0,
         "blend": 0.8,
         "color": [1.0, 0.92, 0.82],
@@ -4540,7 +4556,7 @@
       "name": "PanelWash",
       "loc": [2.3, 20.2, 5.45],
       "rot": [30.61, 0, 0],
-      "power": 126.7,
+      "power": 35.2,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -4552,7 +4568,7 @@
       "name": "PanelWash",
       "loc": [11.11, 20.2, 5.2],
       "rot": [32.47, 0, 0],
-      "power": 138.3,
+      "power": 46.5,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -4564,7 +4580,7 @@
       "name": "PanelWash",
       "loc": [16.28, 20.2, 5.2],
       "rot": [33.27, 0, 0],
-      "power": 193.7,
+      "power": 196.6,
       "color": [1.0, 0.85, 0.62],
       "angle": 60,
       "blend": 0.6,
@@ -4576,7 +4592,7 @@
       "name": "PanelWash",
       "loc": [4.8, 20.2, 5.45],
       "rot": [32.87, 0, 0],
-      "power": 192.7,
+      "power": 93.8,
       "color": [1.0, 0.85, 0.62],
       "angle": 62,
       "blend": 0.6,
@@ -4588,7 +4604,7 @@
       "name": "PanelWash",
       "loc": [7.9, 20.2, 5.45],
       "rot": [32.87, 0, 0],
-      "power": 192.7,
+      "power": 93.8,
       "color": [1.0, 0.85, 0.62],
       "angle": 62,
       "blend": 0.6,
@@ -4600,7 +4616,7 @@
       "name": "CounterLight",
       "loc": [0.36, 13.25, 0.95],
       "rot": [0, 0, 90],
-      "power": 30.6,
+      "power": 32.2,
       "color": [1.0, 0.92, 0.8],
       "size": [7.0, 0.25],
       "hidden": true
@@ -4610,7 +4626,7 @@
       "name": "CounterLight",
       "loc": [0.36, 13.25, 0.52],
       "rot": [0, 0, 90],
-      "power": 30.6,
+      "power": 32.2,
       "color": [1.0, 0.92, 0.8],
       "size": [7.0, 0.25],
       "hidden": true
@@ -4620,7 +4636,7 @@
       "name": "FrontPanel",
       "loc": [2.5, 1.6, 5.88],
       "rot": [0, 0, 0],
-      "power": 36.0,
+      "power": 46.2,
       "color": [1.0, 0.93, 0.84],
       "size": [3.2, 1.6]
     },
@@ -4629,7 +4645,7 @@
       "name": "FrontPanel",
       "loc": [7.0, 1.6, 5.88],
       "rot": [0, 0, 0],
-      "power": 36.0,
+      "power": 46.2,
       "color": [1.0, 0.93, 0.84],
       "size": [3.2, 1.6]
     },
@@ -4638,7 +4654,7 @@
       "name": "FrontPanel",
       "loc": [13.0, 1.6, 5.88],
       "rot": [0, 0, 0],
-      "power": 36.0,
+      "power": 46.2,
       "color": [1.0, 0.93, 0.84],
       "size": [3.2, 1.6]
     },
@@ -4647,7 +4663,7 @@
       "name": "ArchitraveUplight",
       "loc": [9.72, 9.0, 3.93],
       "rot": [180, 0, 0],
-      "power": 4.0,
+      "power": 2.0,
       "color": [1.0, 0.86, 0.66],
       "size": [0.08, 11.5],
       "hidden": true
@@ -4657,7 +4673,7 @@
       "name": "BeamUplight",
       "loc": [0.55, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 11.4,
+      "power": 10.7,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4667,7 +4683,7 @@
       "name": "BeamUplight",
       "loc": [1.85, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 11.4,
+      "power": 10.7,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4677,7 +4693,7 @@
       "name": "BeamUplight",
       "loc": [5.4, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 4.3,
+      "power": 4.5,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4687,7 +4703,7 @@
       "name": "BeamUplight",
       "loc": [9.65, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 4.3,
+      "power": 4.5,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4697,7 +4713,7 @@
       "name": "BeamUplight",
       "loc": [13.9, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 7.5,
+      "power": 6.4,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4707,7 +4723,7 @@
       "name": "BeamUplight",
       "loc": [17.45, 7.47, 5.61],
       "rot": [180, 0, 0],
-      "power": 7.5,
+      "power": 6.4,
       "color": [1.0, 0.9, 0.78],
       "size": [0.08, 14.6],
       "hidden": true
@@ -4717,7 +4733,7 @@
       "name": "BounceUp",
       "loc": [1.6, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 2.2,
+      "power": 0.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4727,7 +4743,7 @@
       "name": "FillDown",
       "loc": [1.6, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 4.8,
+      "power": 1.1,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4737,7 +4753,7 @@
       "name": "BounceUp",
       "loc": [1.6, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 2.2,
+      "power": 0.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4747,7 +4763,7 @@
       "name": "FillDown",
       "loc": [1.6, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 4.8,
+      "power": 1.1,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4757,7 +4773,7 @@
       "name": "BounceUp",
       "loc": [1.6, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 0.8,
+      "power": 0.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4777,7 +4793,7 @@
       "name": "BounceUp",
       "loc": [1.6, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.6,
+      "power": 22.4,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4787,7 +4803,7 @@
       "name": "FillDown",
       "loc": [1.6, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 82.0,
+      "power": 89.3,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4797,7 +4813,7 @@
       "name": "BounceUp",
       "loc": [1.6, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.6,
+      "power": 22.4,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4807,7 +4823,7 @@
       "name": "FillDown",
       "loc": [1.6, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 82.0,
+      "power": 89.3,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4817,7 +4833,7 @@
       "name": "BounceUp",
       "loc": [4.8, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 2.2,
+      "power": 0.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4827,7 +4843,7 @@
       "name": "FillDown",
       "loc": [4.8, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 4.8,
+      "power": 1.1,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4837,7 +4853,7 @@
       "name": "BounceUp",
       "loc": [4.8, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 2.2,
+      "power": 0.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4847,7 +4863,7 @@
       "name": "FillDown",
       "loc": [4.8, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 4.8,
+      "power": 1.1,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4857,7 +4873,7 @@
       "name": "BounceUp",
       "loc": [4.8, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 0.8,
+      "power": 0.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4877,7 +4893,7 @@
       "name": "BounceUp",
       "loc": [4.8, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.6,
+      "power": 22.4,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4887,7 +4903,7 @@
       "name": "FillDown",
       "loc": [4.8, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 82.0,
+      "power": 89.3,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4897,7 +4913,7 @@
       "name": "BounceUp",
       "loc": [4.8, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.6,
+      "power": 22.4,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4907,7 +4923,7 @@
       "name": "FillDown",
       "loc": [4.8, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 82.0,
+      "power": 89.3,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4917,7 +4933,7 @@
       "name": "BounceUp",
       "loc": [8.0, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 2.2,
+      "power": 0.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4927,7 +4943,7 @@
       "name": "FillDown",
       "loc": [8.0, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 4.8,
+      "power": 1.1,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4937,7 +4953,7 @@
       "name": "BounceUp",
       "loc": [8.0, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 2.2,
+      "power": 0.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4947,7 +4963,7 @@
       "name": "FillDown",
       "loc": [8.0, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 4.8,
+      "power": 1.1,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4957,7 +4973,7 @@
       "name": "BounceUp",
       "loc": [8.0, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 0.8,
+      "power": 0.2,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4977,7 +4993,7 @@
       "name": "BounceUp",
       "loc": [8.0, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.6,
+      "power": 22.4,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4987,7 +5003,7 @@
       "name": "FillDown",
       "loc": [8.0, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 82.0,
+      "power": 89.3,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -4997,7 +5013,7 @@
       "name": "BounceUp",
       "loc": [8.0, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 22.6,
+      "power": 22.4,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5007,7 +5023,7 @@
       "name": "FillDown",
       "loc": [8.0, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 82.0,
+      "power": 89.3,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5017,7 +5033,7 @@
       "name": "BounceUp",
       "loc": [11.6, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5027,7 +5043,7 @@
       "name": "FillDown",
       "loc": [11.6, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5037,7 +5053,7 @@
       "name": "BounceUp",
       "loc": [11.6, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5047,7 +5063,7 @@
       "name": "FillDown",
       "loc": [11.6, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5057,7 +5073,7 @@
       "name": "BounceUp",
       "loc": [11.6, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5067,7 +5083,7 @@
       "name": "FillDown",
       "loc": [11.6, 11.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5077,7 +5093,7 @@
       "name": "BounceUp",
       "loc": [11.6, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5087,7 +5103,7 @@
       "name": "FillDown",
       "loc": [11.6, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5097,7 +5113,7 @@
       "name": "BounceUp",
       "loc": [11.6, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5107,7 +5123,7 @@
       "name": "FillDown",
       "loc": [11.6, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5117,7 +5133,7 @@
       "name": "BounceUp",
       "loc": [15.0, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5127,7 +5143,7 @@
       "name": "FillDown",
       "loc": [15.0, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5137,7 +5153,7 @@
       "name": "BounceUp",
       "loc": [15.0, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5147,7 +5163,7 @@
       "name": "FillDown",
       "loc": [15.0, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5157,7 +5173,7 @@
       "name": "BounceUp",
       "loc": [15.0, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5167,7 +5183,7 @@
       "name": "FillDown",
       "loc": [15.0, 11.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5177,7 +5193,7 @@
       "name": "BounceUp",
       "loc": [15.0, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5187,7 +5203,7 @@
       "name": "FillDown",
       "loc": [15.0, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5197,7 +5213,7 @@
       "name": "BounceUp",
       "loc": [15.0, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5207,7 +5223,7 @@
       "name": "FillDown",
       "loc": [15.0, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5217,7 +5233,7 @@
       "name": "BounceUp",
       "loc": [18.0, 3.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5227,7 +5243,7 @@
       "name": "FillDown",
       "loc": [18.0, 3.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5237,7 +5253,7 @@
       "name": "BounceUp",
       "loc": [18.0, 7.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5247,7 +5263,7 @@
       "name": "FillDown",
       "loc": [18.0, 7.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5257,7 +5273,7 @@
       "name": "BounceUp",
       "loc": [18.0, 11.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5267,7 +5283,7 @@
       "name": "FillDown",
       "loc": [18.0, 11.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5277,7 +5293,7 @@
       "name": "BounceUp",
       "loc": [18.0, 15.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5287,7 +5303,7 @@
       "name": "FillDown",
       "loc": [18.0, 15.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5297,7 +5313,7 @@
       "name": "BounceUp",
       "loc": [18.0, 19.0, 3.2],
       "rot": [180, 0, 0],
-      "power": 4.7,
+      "power": 4.9,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5307,7 +5323,7 @@
       "name": "FillDown",
       "loc": [18.0, 19.0, 4.7],
       "rot": [0, 0, 0],
-      "power": 13.3,
+      "power": 5.5,
       "color": [1.0, 0.9, 0.78],
       "size": [3.0, 3.8],
       "hidden": true
@@ -5317,7 +5333,7 @@
       "name": "LogoWash",
       "loc": [9.9, 11.2, 3.4],
       "rot": [65, 0, -74],
-      "power": 53.7,
+      "power": 46.8,
       "color": [1.0, 0.92, 0.8],
       "size": [3.0, 0.2],
       "hidden": true
@@ -5326,7 +5342,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [1.88, 23.6, 1.7],
-      "power": 2.4,
+      "power": 2.8,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     },
@@ -5334,7 +5350,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [11.1, 23.6, 1.6],
-      "power": 2.4,
+      "power": 2.8,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     },
@@ -5342,7 +5358,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [16.28, 23.6, 1.8],
-      "power": 1.8,
+      "power": 2.1,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     },
@@ -5350,7 +5366,7 @@
       "type": "POINT",
       "name": "GardenLamp",
       "loc": [-1.0, 23.8, 2.0],
-      "power": 2.9,
+      "power": 3.5,
       "color": [1.0, 0.62, 0.3],
       "radius": 0.15
     }

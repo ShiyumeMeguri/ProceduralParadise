@@ -117,6 +117,9 @@ VASE_PROFILES = {
     # 3 squat jar with lid knob
     3: [(0.0, 0.0), (0.36, 0.0), (0.44, 0.12), (0.5, 0.4), (0.46, 0.66), (0.3, 0.78), (0.28, 0.84),
         (0.34, 0.86), (0.2, 0.96), (0.06, 1.0), (0.0, 1.0)],
+    # 5 straight planter pot (筒), slightly flared, thick rim
+    5: [(0.0, 0.0), (0.4, 0.0), (0.43, 0.04), (0.46, 0.5), (0.5, 0.94), (0.52, 1.0), (0.46, 1.0),
+        (0.45, 0.94)],
     # 4 bottle vase (玉壶春)
     4: [(0.0, 0.0), (0.3, 0.0), (0.34, 0.05), (0.46, 0.3), (0.42, 0.5), (0.2, 0.7), (0.14, 0.86),
         (0.2, 1.0), (0.16, 1.0), (0.1, 0.86)],
@@ -126,15 +129,15 @@ VASE_PROFILES = {
 @asset("SHJ.Prop.Vase", "Props")
 def vase():
     """Porcelain vase lathed from one of several classic profiles
-    (Shape 0 meiping, 1 baluster jar, 2 floor vase, 3 lidded jar, 4 bottle)
-    scaled to Height x Width."""
+    (Shape 0 meiping, 1 baluster jar, 2 floor vase, 3 lidded jar, 4 bottle,
+    5 straight planter pot) scaled to Height x Width."""
     g = GN("SHJ.Prop.Vase", vase.__doc__)
-    shape = g.inp("Shape", "INT", default=0, min=0, max=4)
+    shape = g.inp("Shape", "INT", default=0, min=0, max=len(VASE_PROFILES) - 1)
     Hh = g.inp("Height", default=0.4, subtype="DISTANCE")
     Wd = g.inp("Width", default=0.25, subtype="DISTANCE")
     m = g.inp("Material", "MATERIAL")
     shapes = []
-    for k in range(5):
+    for k in range(len(VASE_PROFILES)):
         shapes.append(lathe(g, VASE_PROFILES[k], 40, 1.0))
     v = g.index_switch(shape, shapes, "GEOMETRY")
     # profiles are unit height with radius ~0.5 -> scale
@@ -250,11 +253,13 @@ def bush():
     g = GN("SHJ.Prop.Bush", bush.__doc__)
     r = g.inp("Radius", default=0.2, subtype="DISTANCE")
     Hh = g.inp("Height", default=0.35, subtype="DISTANCE", desc="centre height of the foliage")
+    stretch = g.inp("Stretch", default=1.0, desc="length / width of the foliage (along X)")
+    flat = g.inp("Flatten", default=0.9, desc="height / width of the foliage")
     dens = g.inp("Density", default=260.0)
     seed = g.inp("Seed", "INT", default=0)
     m = g.inp("Material", "MATERIAL")
     ball = g.n("GeometryNodeMeshIcoSphere", Radius=1.0, Subdivisions=2)["Mesh"]
-    ball = g.transform(ball, t=g.vec(0.0, 0.0, Hh), s=g.vec(r, r, r * 0.9))
+    ball = g.transform(ball, t=g.vec(0.0, 0.0, Hh), s=g.vec(r * stretch, r, r * flat))
     pts = g.n("GeometryNodeDistributePointsOnFaces", ball, Density=dens, Seed=seed,
               props={"distribute_method": "RANDOM"})
     rot = g.random(-3.1416, 3.1416, seed + 1, dtype="FLOAT_VECTOR")
@@ -367,7 +372,7 @@ def lantern():
     the top of the cap (hanging point), body below."""
     g = GN("SHJ.Prop.Lantern", lantern.__doc__)
     D = g.inp("Diameter", default=0.6, subtype="DISTANCE")
-    Hr = g.inp("Height Ratio", default=0.88)
+    Hr = g.inp("Height Ratio", default=1.0)
     tassel = g.inp("Tassel", "BOOL", default=True)
     m_paper = g.inp("Paper Material", "MATERIAL")
     m_gold = g.inp("Gold Material", "MATERIAL")
@@ -416,11 +421,12 @@ def lantern_string():
     D = g.inp("Diameter", default=0.6, subtype="DISTANCE")
     drop = g.inp("Drop", default=0.6, subtype="DISTANCE")
     pitch = g.inp("Pitch", default=0.7, subtype="DISTANCE")
+    hr = g.inp("Height Ratio", default=1.0)
     m_paper = g.inp("Paper Material", "MATERIAL")
     m_gold = g.inp("Gold Material", "MATERIAL")
     m_cord = g.inp("Cord Material", "MATERIAL")
-    lan = g.group(get_asset("SHJ.Prop.Lantern"), Diameter=D, Tassel=False, Paper_Material=m_paper,
-                  Gold_Material=m_gold, Tassel_Material=m_cord).o
+    lan = g.group(get_asset("SHJ.Prop.Lantern"), Diameter=D, Height_Ratio=hr, Tassel=False,
+                  Paper_Material=m_paper, Gold_Material=m_gold, Tassel_Material=m_cord).o
     pts = g.mesh_line(cnt, g.vec(0.0, 0.0, drop * -1.0), g.vec(0.0, 0.0, pitch * -1.0))
     lans = g.realize(g.iop(g.mesh_to_points(pts), lan))
     bottom = drop + pitch * (cnt - 1.0) + D * 1.25

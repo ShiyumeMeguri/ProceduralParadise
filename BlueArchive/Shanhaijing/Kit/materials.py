@@ -185,11 +185,11 @@ def timber_red():
                 coat=0.15, coat_rough=0.2)
 
 
-@_reg("SHJ.TimberPlanks")
-def timber_planks():
-    """Board cladding: boards run along object Y/Z, joints every
-    ``plank_width`` along object X (walls, ceiling boards, fascia)."""
-    w = TIMBER["plank_width"]
+def _planks(name, key, width=None, contrast=None):
+    """Board cladding: boards run along object Y/Z, joints every ``width``
+    (default: the academy's plank width) along object X; every board its own
+    tone."""
+    w = width or TIMBER["plank_width"]
 
     def build(t: Tree):
         P3 = _obj(t)
@@ -201,13 +201,25 @@ def timber_planks():
         joint = t.map_range(d, 0.002, 0.006, 1.0, 0.0)
         rnd = t.n("ShaderNodeTexWhiteNoise", board, props={"noise_dimensions": "1D"})["Value"]
         g = _grain(t, t.vec(py + pz, px * 3.0 + rnd * 11.0, 0.0), (0.7, 1.0, 1.0), 0.3)
-        k = P("plank_contrast", 0.45)
-        base = S.mix_rgb(t, rnd, tuple(c * (1.0 - k) for c in C("timber_plank")[:3]) + (1.0,),
-                         tuple(c * (1.0 + k * 1.4) for c in C("timber_plank")[:3]) + (1.0,))
-        col = S.mix_rgb(t, g, base, tuple(c * 0.6 for c in C("timber_plank")[:3]) + (1.0,))
+        k = contrast if contrast is not None else P("plank_contrast", 0.45)
+        base = S.mix_rgb(t, rnd, tuple(c * (1.0 - k) for c in C(key)[:3]) + (1.0,),
+                         tuple(c * (1.0 + k * 1.4) for c in C(key)[:3]) + (1.0,))
+        col = S.mix_rgb(t, g, base, tuple(c * 0.6 for c in C(key)[:3]) + (1.0,))
         col = S.mix_rgb(t, joint, col, (0.01, 0.007, 0.005, 1.0))
         return S.bsdf(t, Base_Color=col, Roughness=0.6, Specular_IOR_Level=0.35)["BSDF"]
-    return S.material("SHJ.TimberPlanks", build)
+    return S.material(name, build)
+
+
+@_reg("SHJ.TimberPlanks")
+def timber_planks():
+    """Vertical board cladding of the walls."""
+    return _planks("SHJ.TimberPlanks", "timber_plank")
+
+
+@_reg("SHJ.CeilingBoards")
+def ceiling_boards():
+    """The darker board ceiling above the timber beam grid."""
+    return _planks("SHJ.CeilingBoards", "ceiling_board")
 
 
 @_reg("SHJ.LacquerBlack")
@@ -313,31 +325,38 @@ def plaque():
         cells_u = px * 9.0
         dist, rnd = _cells(t, t.vec(cells_u, pz * 30.0, 0.0), 1.0)
         chars = t.map_range(dist, 0.25, 0.35, 1.0, 0.0) * t.map_range(t.sep(rnd)[0], 0.15, 0.2, 0.0, 1.0)
-        m = t.clamp01(rows * chars)
-        col = S.mix_rgb(t, m, C("lacquer_black"), C("gold"))
-        return S.bsdf(t, Base_Color=col, Metallic=m * 0.8, Roughness=0.35,
+        m = t.clamp01(rows * chars) * P("plaque_text", 0.45)
+        col = S.mix_rgb(t, m, C("lacquer_black"), P("plaque_ink", (0.55, 0.5, 0.4, 1.0)))
+        return S.bsdf(t, Base_Color=col, Metallic=m * 0.4, Roughness=0.4,
                       Specular_IOR_Level=0.5, Coat_Weight=0.3)["BSDF"]
     return S.material("SHJ.Plaque", build)
 
 
 @_reg("SHJ.CloudPanel")
 def cloud_panel():
-    """Warm lacquered panel with light-blue cloud glyphs in loose vertical
-    columns (the panels flanking the Shanhaijing logo).  Object X runs
-    along the panel, Z up."""
+    """Warm lacquered panel written with light-blue cursive glyphs in tight
+    vertical columns (the panels flanking the Shanhaijing logo).  Each glyph
+    is a few brush strokes: contour bands of a per-glyph noise field inside an
+    elliptical glyph box, with a random share of the boxes left empty.
+    Object X runs along the panel, Z up."""
     def build(t: Tree):
         P3 = _obj(t)
         px, py, pz = t.sep(P3)
-        uv = t.vec(px * P("cloud_cols", 8.0), pz * P("cloud_rows", 7.0), 0.0)
-        # squash the cells horizontally: glyphs read as short vertical strokes
-        uv = t.vmath("MULTIPLY", uv, (1.0, P("cloud_stretch", 0.6), 1.0))
-        dist, rnd = _cells(t, uv, 1.0)
-        r = t.sep(rnd)
-        blob = t.map_range(dist, P("cloud_size", 0.24), P("cloud_size", 0.24) + 0.1, 1.0, 0.0)
-        n = S.noise(t, t.vec(t.sep(uv)[0] * 4.0, t.sep(uv)[1] * 4.0, 0.0), scale=2.0,
-                    detail=2.0)["Fac"]
-        swirl = t.map_range(n, 0.44, 0.56, 0.0, 1.0)
-        m = t.clamp01(blob * swirl * t.map_range(r[0], 0.1, 0.2, 0.0, 1.0))
+        u = px / P("glyph_pitch", 0.16)
+        v = pz / P("glyph_rows", 0.12)
+        cell = t.vec(t.math("FLOOR", u), t.math("FLOOR", v), 0.0)
+        rnd = t.n("ShaderNodeTexWhiteNoise", cell, props={"noise_dimensions": "3D"})["Color"]
+        rx, ry, rz = t.sep(rnd)
+        fu = t.math("FRACT", u) - 0.5 + (rx - 0.5) * 0.12
+        fv = t.math("FRACT", v) - 0.5
+        n = S.noise(t, t.vec(fu * 2.2 + rx * 37.0, fv * 2.2 + ry * 37.0, rz * 11.0), scale=1.4,
+                    detail=1.0, rough=0.4)["Fac"]
+        stroke = t.map_range(t.abs(n - 0.5), 0.025, 0.055, 1.0, 0.0)
+        blob = t.map_range(n, 0.6, 0.64, 0.0, 1.0) * 0.9
+        e = (fu / 0.36) * (fu / 0.36) + (fv / 0.44) * (fv / 0.44)
+        box = t.map_range(e, 0.6, 1.0, 1.0, 0.0)
+        keep = t.map_range(rz, 0.12, 0.14, 0.0, 1.0)
+        m = t.clamp01(t.clamp01(stroke + blob) * box * keep)
         col = S.mix_rgb(t, m, C("cloud_panel"), C("cloud_blue"))
         return S.bsdf(t, Base_Color=col, Roughness=0.45, Specular_IOR_Level=0.45,
                       Emission_Color=C("cloud_blue"), Emission_Strength=m * P("cloud_glow", 0.35))["BSDF"]
@@ -398,8 +417,8 @@ def fret_band():
 
 @_reg("SHJ.DoorWood")
 def door_wood():
-    return wood("SHJ.DoorWood", P("door_wood", (0.26, 0.14, 0.07, 1.0)), (0.13, 0.065, 0.03, 1.0), rough=0.5,
-                scale=(0.4, 25.0, 1.0))
+    """Narrow vertical boards of the moon-gate door."""
+    return _planks("SHJ.DoorWood", "door_wood", width=0.065, contrast=0.25)
 
 
 @_reg("SHJ.GateRim")
@@ -428,20 +447,25 @@ def glass_night():
 
 @_reg("SHJ.GlassFrosted")
 def glass_frosted():
-    """Lightly frosted window glass: blurred transmission (IOR 1, rough) with
-    a thin glossy reflection -- lamps behind it read as soft glows."""
+    """Frosted (acid-etched) window glass: light from behind scatters
+    diffusely through the pane (translucent), so the night courtyard reads as
+    a dusky blue and the garden lamps behind it as large soft warm glows;
+    a thin glossy film on top."""
     def build(t: Tree):
         fres = t.n("ShaderNodeFresnel", IOR=1.5)["Fac"]
-        tr = t.n("ShaderNodeBsdfGlass", Color=P("frost_tint", (0.8, 0.85, 1.0, 1.0)),
-                 Roughness=P("frost_roughness", 0.35), IOR=1.0)["BSDF"]
-        gl = t.n("ShaderNodeBsdfGlossy", Color=(1, 1, 1, 1), Roughness=0.05)["BSDF"]
-        return t.n("ShaderNodeMixShader", fres * 0.6, tr, gl)["Shader"]
+        tint = P("frost_tint", (0.92, 0.94, 1.0, 1.0))
+        tr = t.n("ShaderNodeBsdfTranslucent", Color=tint)["BSDF"]
+        # part of the light goes straight through, blurred: the lamps stay soft blobs
+        blur = t.n("ShaderNodeBsdfGlass", Color=tint, Roughness=P("frost_roughness", 0.3), IOR=1.0)["BSDF"]
+        body = t.n("ShaderNodeMixShader", P("frost_clear", 0.55), tr, blur)["Shader"]
+        gl = t.n("ShaderNodeBsdfGlossy", Color=(1, 1, 1, 1), Roughness=0.12)["BSDF"]
+        return t.n("ShaderNodeMixShader", fres * 0.5, body, gl)["Shader"]
     return S.material("SHJ.GlassFrosted", build)
 
 
 @_reg("SHJ.Globe")
 def globe():
-    return S.emission_mat("SHJ.Globe", (1.0, 0.62, 0.3), P("globe_emission", 12.0))
+    return S.emission_mat("SHJ.Globe", P("globe_color", (1.0, 0.58, 0.2)), P("globe_emission", 12.0))
 
 
 @_reg("SHJ.GlassCase")
@@ -529,11 +553,24 @@ def stud():
 
 @_reg("SHJ.Brass")
 def brass():
-    return S.principled("SHJ.Brass", C("brass"), roughness=0.22, metallic=1.0, specular=0.6)
+    """Hammered brass (kettles, trays, stretchers): small overlapping dimples
+    (Voronoi bump) and a satin finish, so it glows golden instead of
+    mirroring the dark room."""
+    def build(t: Tree):
+        P3 = _obj(t)
+        v = t.n("ShaderNodeTexVoronoi", P3, Scale=P("hammer_scale", 90.0),
+                props={"voronoi_dimensions": "3D", "feature": "F1"})["Distance"]
+        bump = t.n("ShaderNodeBump", Strength=P("hammer_strength", 0.35), Distance=0.002, Height=v)["Normal"]
+        n = S.noise(t, P3, scale=25.0, detail=3.0)["Fac"]
+        col = S.mix_rgb(t, t.map_range(n, 0.35, 0.7, 0.0, 1.0), C("brass"),
+                        tuple(c * 0.75 for c in C("brass")[:3]) + (1.0,))
+        return S.bsdf(t, Base_Color=col, Metallic=1.0, Roughness=P("brass_roughness", 0.38),
+                      Specular_IOR_Level=0.6, Normal=bump)["BSDF"]
+    return S.material("SHJ.Brass", build)
 
 
 # -------------------------------------------------------------------- props
-def _porcelain(name, density=1.0, seed=0.0, blue_share=0.5):
+def _porcelain(name, density=1.0, seed=0.0, blue_share=0.5, pigment="porcelain_blue", glaze="porcelain_white"):
     """Blue-and-white porcelain: glossy white glaze with cobalt decoration
     -- horizontal bands near rim/foot plus scrolling floral blobs between.
     Decoration lives in object space (Z up, angle around the axis)."""
@@ -549,7 +586,7 @@ def _porcelain(name, density=1.0, seed=0.0, blue_share=0.5):
                                            "wave_profile": "SIN"})["Fac"]
         band = t.map_range(bands, 0.9, 0.95, 0.0, 1.0)
         m = t.clamp01(flor + band)
-        col = S.mix_rgb(t, m, C("porcelain_white"), C("porcelain_blue"))
+        col = S.mix_rgb(t, m, C(glaze), C(pigment))
         return S.bsdf(t, Base_Color=col, Roughness=0.12, Specular_IOR_Level=0.55,
                       Coat_Weight=0.6, Coat_Roughness=0.05, Subsurface_Weight=0.05)["BSDF"]
     return S.material(name, build)
@@ -557,12 +594,18 @@ def _porcelain(name, density=1.0, seed=0.0, blue_share=0.5):
 
 @_reg("SHJ.PorcelainBW")
 def porcelain_bw():
-    return _porcelain("SHJ.PorcelainBW", 1.0, 0.0, 0.5)
+    return _porcelain("SHJ.PorcelainBW", 1.0, 0.0, 0.3)
 
 
 @_reg("SHJ.PorcelainBW2")
 def porcelain_bw2():
-    return _porcelain("SHJ.PorcelainBW2", 1.6, 3.7, 0.8)
+    return _porcelain("SHJ.PorcelainBW2", 1.6, 3.7, 0.5)
+
+
+@_reg("SHJ.PorcelainGreen")
+def porcelain_green():
+    """Pale celadon glaze with dark green decoration (the shelf-top planters)."""
+    return _porcelain("SHJ.PorcelainGreen", 1.3, 1.9, 0.25, pigment="planter_green", glaze="celadon")
 
 
 @_reg("SHJ.PorcelainWhite")
@@ -690,7 +733,7 @@ def panda_white():
 
 @_reg("SHJ.PandaBlack")
 def panda_black():
-    return S.principled("SHJ.PandaBlack", (0.03, 0.06, 0.18), roughness=0.2, specular=0.5, coat=0.5)
+    return S.principled("SHJ.PandaBlack", P("panda_blue", (0.1, 0.16, 0.3)), roughness=0.2, specular=0.5, coat=0.5)
 
 
 @_reg("SHJ.Snack")

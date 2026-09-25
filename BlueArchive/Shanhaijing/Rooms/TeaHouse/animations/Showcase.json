@@ -1,0 +1,78 @@
+{
+  "id": "Showcase",
+  "title": "Shan tea house (山海经茶楼) - showcase (配布 video)",
+  "notes": ["Camera keys in the ROOM frame (origin = inner corner of the left wall and the front wall, +X across the hall, +Y deep into the hall, Z up).", "'camera': 'shot' copies the BG_ShanTeaHouse_Night solve, so the video opens on the painting's framing.", "Between keys the motion is a Hermite spline written as Bezier keys with explicit handles (Core/anim.py) - editable in the Graph Editor.", "Path clearances: the aisle between the left and middle tables (X 3.0 - 4.1), the open floor in front of the bogu shelf (Y 17 - 21), above the table tops (z > 2.0 when crossing a table) and away from the hanging lantern strings.", "Checked for collisions with calibration/path_check.py."],
+  "fps": 30,
+  "resolution": [1920, 1080],
+  "samples": 64,
+  "keys": [
+    {
+      "frame": 1,
+      "camera": "shot",
+      "ease": true,
+      "note": "the painting's framing"
+    },
+    {
+      "frame": 50,
+      "camera": "shot",
+      "ease": true
+    },
+    {
+      "frame": 110,
+      "location": [3.35, 4.4, 1.2],
+      "target": [3.6, 22.3, 1.7],
+      "lens": 26.0,
+      "note": "slide right into the aisle"
+    },
+    {
+      "frame": 190,
+      "location": [3.6, 8.8, 1.4],
+      "target": [3.4, 22.3, 1.9],
+      "lens": 26.0,
+      "note": "down the aisle"
+    },
+    {
+      "frame": 300,
+      "location": [3.65, 17.2, 1.55],
+      "target": [6.35, 22.3, 2.2],
+      "lens": 24.0,
+      "note": "the bogu shelf and the moon gate"
+    },
+    {
+      "frame": 420,
+      "location": [3.5, 18.6, 1.65],
+      "target": [0.4, 12.0, 1.1],
+      "lens": 24.0,
+      "note": "turn to the tea cabinet and the lanterns"
+    },
+    {
+      "frame": 540,
+      "location": [3.7, 12.6, 1.6],
+      "target": [12.0, 12.4, 2.0],
+      "lens": 24.0,
+      "note": "turn to the colonnade"
+    },
+    {
+      "frame": 660,
+      "location": [6.6, 11.3, 1.5],
+      "target": [12.0, 11.9, 1.9],
+      "lens": 26.0,
+      "note": "the emblem between the guardian lions"
+    },
+    {
+      "frame": 790,
+      "location": [7.2, 4.2, 2.6],
+      "target": [5.5, 20.0, 1.2],
+      "lens": 18.0,
+      "ease": true,
+      "note": "high establishing view down the hall"
+    },
+    {
+      "frame": 840,
+      "location": [7.15, 4.0, 2.62],
+      "target": [5.5, 20.0, 1.2],
+      "lens": 18.0,
+      "ease": true
+    }
+  ]
+}
