@@ -110,8 +110,7 @@ def fingerprint(args, root, script_path):
 def shot_cameras(shot, matrix):
     """The shot camera ``CAM_<id>`` (from the shot's photogrammetric solve,
     if any) and one free camera ``VIEW_<name>`` per entry of ``views``, all
-    placed in the frame ``matrix``.  A view may set ``roll`` (degrees).
-    Returns the shot camera or None."""
+    placed in the frame ``matrix``.  Returns the shot camera or None."""
     from . import camera as CAM
     camera = None
     if shot.get("camera"):
@@ -119,9 +118,7 @@ def shot_cameras(shot, matrix):
     for name, view in (shot.get("views") or {}).items():
         location = matrix @ Vector(view["location"])
         target = matrix @ Vector(view["target"])
-        free = CAM.look_camera(f"VIEW_{name}", location, target, lens=view.get("lens", 24.0))
-        if view.get("roll"):
-            free.rotation_euler.rotate_axis("Z", math.radians(view["roll"]))
+        CAM.look_camera(f"VIEW_{name}", location, target, lens=view.get("lens", 24.0))
     return camera
 
 

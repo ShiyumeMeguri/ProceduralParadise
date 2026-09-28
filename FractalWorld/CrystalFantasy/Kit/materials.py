@@ -103,6 +103,32 @@ def glass_pane():
                        reflect=param("pane_reflect", 1.0))
 
 
+def roof(name, glow):
+    """Starlit roof glass: frosted panes that glow softly (``glow`` tint),
+    lighting the naves from above and giving every reflection a bright
+    sky.  Seen directly the glow is held back to ``roof_camera`` of its
+    strength (a photographer's graduated filter), so the ironwork of the
+    vaults stays legible."""
+    def build(tree: Tree):
+        frosted = S.bsdf(tree, Base_Color=color("glass"), Roughness=param("roof_roughness", 0.3), IOR=1.5,
+                         Transmission_Weight=1.0, Thin_Wall=True)["BSDF"]
+        body = shadow_clear(tree, frosted, color("glass"))
+        camera = tree.n("ShaderNodeLightPath")["Is Camera Ray"]
+        strength = param("roof_glow", 1.5) * (1.0 + (param("roof_camera", 0.45) - 1.0) * camera)
+        return add(tree, body, emission(tree, glow, strength))
+    return S.material(name, build)
+
+
+@register("CF.GlassRoof")
+def glass_roof():
+    return roof("CF.GlassRoof", color("ice"))
+
+
+@register("CF.GlassRoofViolet")
+def glass_roof_violet():
+    return roof("CF.GlassRoofViolet", color("lilac"))
+
+
 @register("CF.Crystal")
 def crystal():
     """Clear crystal: dispersion splits highlights into spectral sparkles,
@@ -149,16 +175,26 @@ def crystal_light_violet():
 def water():
     """Water in the vessels: refractive surface, blue absorption with depth
     and a soft cyan glow from within."""
-    return dielectric("CF.Water", color("glass"), 1.333, absorption=color("cyan"),
-                      density=param("water_absorption", 2.5), glow=color("cyan"),
-                      glow_strength=param("water_glow", 0.8))
+    return dielectric("CF.Water", color("glass"), 1.333, absorption=color("azure"),
+                      density=param("water_absorption", 4.0), glow=color("cyan"),
+                      glow_strength=param("water_glow", 2.0))
+
+
+@register("CF.WaterDeep")
+def water_deep():
+    """Water of the shallow bowls: saturated azure even a few centimetres
+    deep, glowing cyan."""
+    return dielectric("CF.WaterDeep", color("glass"), 1.333, absorption=color("azure"),
+                      density=param("water_deep_absorption", 22.0), glow=color("cyan"),
+                      glow_strength=param("water_deep_glow", 3.0))
 
 
 @register("CF.OrbGlass")
 def orb_glass():
     """Deep cobalt glass of the galaxy orbs."""
     return dielectric("CF.OrbGlass", color("ice"), 1.47, film=param("orb_film", 420.0),
-                      absorption=color("azure"), density=param("orb_absorption", 7.0))
+                      absorption=color("cobalt"), density=param("orb_absorption", 5.0),
+                      glow=color("azure"), glow_strength=param("orb_glow", 0.4))
 
 
 @register("CF.OrbMarble")
@@ -169,10 +205,10 @@ def orb_marble():
         position = tree.n("ShaderNodeTexCoord")["Object"]
         warp = S.noise(tree, position, scale=2.2, detail=8.0, rough=0.62, distortion=1.4)["Fac"]
         bands = S.noise(tree, position + tree.vec(warp, warp, warp), scale=3.4, detail=10.0, rough=0.58)["Fac"]
-        tint = S.ramp(tree, bands, [(0.28, color("cobalt")), (0.45, color("azure")), (0.55, color("leaf_teal")),
-                                    (0.64, color("cyan")), (0.72, color("ice"))])["Color"]
+        tint = S.ramp(tree, bands, [(0.3, color("navy")), (0.42, color("cobalt")), (0.5, color("azure")),
+                                    (0.56, color("leaf_teal")), (0.62, color("cyan")), (0.7, color("ice"))])["Color"]
         return S.bsdf(tree, Base_Color=tint, Roughness=0.35, Coat_Weight=1.0, Coat_Roughness=0.02,
-                      Emission_Color=tint, Emission_Strength=param("marble_glow", 0.15))["BSDF"]
+                      Emission_Color=tint, Emission_Strength=param("marble_glow", 0.03))["BSDF"]
     return S.material("CF.OrbMarble", build)
 
 
@@ -181,7 +217,7 @@ def star():
     """Stars of the galaxies inside the orbs (colour per point)."""
     def build(tree: Tree):
         tint = attribute(tree, "star_color", "Color")
-        return emission(tree, tint, param("star_strength", 12.0))
+        return emission(tree, tint, param("star_strength", 6.0))
     return S.material("CF.Star", build)
 
 
@@ -226,7 +262,7 @@ def leaf():
         base = attribute(tree, "leaf_color", "Color")
         rib = tree.map_range(across, 0.0, 0.07, 1.0, 0.0, interp="SMOOTHSTEP")
         light = S.mix_rgb(tree, 0.55, base, color("ice"))
-        tint = S.mix_rgb(tree, rib * 0.6, base, light)
+        tint = S.mix_rgb(tree, rib * 0.3, base, light)
         tint = S.mix_rgb(tree, tree.map_range(along, 0.6, 1.0, 0.0, 0.35), tint, light)
         surface = S.bsdf(tree, Base_Color=tint, Roughness=0.3, Coat_Weight=0.4, Coat_Roughness=0.1)["BSDF"]
         translucent = tree.n("ShaderNodeBsdfTranslucent", Color=tint)["BSDF"]
@@ -261,7 +297,8 @@ def thread():
 
 @register("CF.Stone")
 def stone():
-    """Pale blue-white marble tiles (1.2 m, thin joints) with faint veins."""
+    """Polished midnight marble in 1.2 m tiles: tone varying tile by tile,
+    fine azure veins, pale hairline joints, a wet-looking coat."""
     size = param("tile_size", 1.2)
 
     def build(tree: Tree):
@@ -274,12 +311,12 @@ def stone():
         cell = tree.vec(tree.math("FLOOR", x / size), tree.math("FLOOR", y / size), 0.0)
         tone = tree.n("ShaderNodeTexWhiteNoise", cell, props={"noise_dimensions": "3D"})["Value"]
         vein = S.noise(tree, position * 0.8, scale=1.6, detail=9.0, rough=0.6, distortion=2.2)["Fac"]
-        vein = tree.map_range(tree.abs(vein - 0.5), 0.0, 0.03, 1.0, 0.0)
-        base = S.mix_rgb(tree, tone * 0.5, color("stone"), color("ice"))
-        base = S.mix_rgb(tree, vein * 0.25, base, color("azure"))
-        base = S.mix_rgb(tree, joint, base, color("navy"))
-        return S.bsdf(tree, Base_Color=base, Roughness=tree.mix(joint, param("stone_roughness", 0.12), 0.6),
-                      Coat_Weight=param("stone_coat", 0.35), Coat_Roughness=0.05)["BSDF"]
+        vein = tree.map_range(tree.abs(vein - 0.5), 0.0, 0.025, 1.0, 0.0)
+        base = S.mix_rgb(tree, tone * 0.7, color("stone"), scaled(color("stone"), 2.2))
+        base = S.mix_rgb(tree, vein * param("stone_vein", 0.3), base, color("vein"))
+        base = S.mix_rgb(tree, joint, base, scaled(color("vein"), 0.45))
+        return S.bsdf(tree, Base_Color=base, Roughness=tree.mix(joint, param("stone_roughness", 0.07), 0.5),
+                      Coat_Weight=param("stone_coat", 0.8), Coat_Roughness=0.03)["BSDF"]
     return S.material("CF.Stone", build)
 
 
@@ -289,11 +326,11 @@ def soil():
     def build(tree: Tree):
         position = tree.n("ShaderNodeTexCoord")["Object"]
         clumps = S.noise(tree, position, scale=9.0, detail=6.0, rough=0.7)["Fac"]
-        tint = S.mix_rgb(tree, clumps, color("navy"), color("leaf_teal"))
+        tint = S.mix_rgb(tree, clumps, color("navy"), scaled(color("stem"), 0.35))
         flecks = tree.n("ShaderNodeTexVoronoi", position, Scale=60.0, props={"feature": "F1"})["Distance"]
         spark = tree.map_range(flecks, 0.0, 0.06, 1.0, 0.0)
-        return S.bsdf(tree, Base_Color=tint, Roughness=0.85, Emission_Color=color("cyan"),
-                      Emission_Strength=spark * param("soil_sparkle", 0.6))["BSDF"]
+        return S.bsdf(tree, Base_Color=tint, Roughness=0.95, Specular_IOR_Level=0.15, Emission_Color=color("cyan"),
+                      Emission_Strength=spark * param("soil_sparkle", 0.08))["BSDF"]
     return S.material("CF.Soil", build)
 
 
@@ -333,13 +370,31 @@ def light_core():
     return S.material("CF.LightCore", build)
 
 
+@register("CF.LightMist")
+def light_mist():
+    """Glowing mist of the light pillar: emission falling off as a Gaussian
+    of the distance from the pillar's axis (object space), scattering a
+    little of the light it makes."""
+    def build(tree: Tree):
+        x, y, _ = tree.sep(tree.n("ShaderNodeTexCoord")["Object"])
+        spread = param("mist_radius", 0.45)
+        falloff = tree.math("EXPONENT", (x * x + y * y) * (-1.0 / (spread * spread)))
+        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("ice"), Density=0.2,
+                        Emission_Color=color("ice"), Emission_Strength=falloff * param("mist_strength", 6.0))["Volume"]
+        return {"Surface": None, "Volume": volume}
+    return S.material("CF.LightMist", build)
+
+
 @register("CF.Mote")
 def mote():
-    """Floating light motes; ``glow`` (0..1) twinkles per mote."""
+    """Floating light motes: clear surfaces that emit, so a mote between
+    two twinkles is invisible rather than a dark speck; ``glow`` (0..1)
+    twinkles per mote."""
     def build(tree: Tree):
         twinkle = attribute(tree, "glow")
         tint = S.mix_rgb(tree, attribute(tree, "hue"), color("cyan"), color("ice"))
-        return emission(tree, tint, twinkle * param("mote_strength", 18.0))
+        clear = tree.n("ShaderNodeBsdfTransparent", Color=(1.0, 1.0, 1.0, 1.0))["BSDF"]
+        return add(tree, clear, emission(tree, tint, twinkle * param("mote_strength", 18.0)))
     return S.material("CF.Mote", build)
 
 
@@ -379,8 +434,8 @@ def haze():
     """Luminous air: a thin forward-scattering medium that turns every light
     into a glow and every vista into depth."""
     def build(tree: Tree):
-        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("ice"), Density=param("haze_density", 0.02),
-                        Anisotropy=param("haze_anisotropy", 0.45))["Volume"]
+        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("haze"), Density=param("haze_density", 0.007),
+                        Anisotropy=param("haze_anisotropy", 0.65))["Volume"]
         return {"Surface": None, "Volume": volume}
     return S.material("CF.Haze", build)
 
@@ -405,7 +460,8 @@ def crystal_far():
     def build(tree: Tree):
         facing = tree.n("ShaderNodeLayerWeight", Blend=0.4)["Facing"]
         glow = S.mix_rgb(tree, facing, color("cyan"), color("cobalt"))
-        surface = S.bsdf(tree, Base_Color=color("navy"), Roughness=0.08, Specular_IOR_Level=0.8,
-                         Emission_Color=glow, Emission_Strength=param("spire_glow", 1.5))["BSDF"]
+        rim = tree.math("POWER", tree.n("ShaderNodeLayerWeight", Blend=0.3)["Fresnel"], 2.0)
+        surface = S.bsdf(tree, Base_Color=color("cobalt"), Roughness=0.05, Specular_IOR_Level=0.8,
+                         Emission_Color=glow, Emission_Strength=(rim * 0.8 + 0.2) * param("spire_glow", 3.0))["BSDF"]
         return surface
     return S.material("CF.CrystalFar", build)

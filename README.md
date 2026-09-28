@@ -16,6 +16,13 @@
 
   ![TeaHouse render vs reference](BlueArchive/Shanhaijing/Rooms/TeaHouse/Renders/BG_ShanTeaHouse_Night_compare.png)
 
+* **分形世界 · 水晶幻想（FractalWorld / CrystalFantasy）水晶温室**：漂浮在星海中的玻璃温室——光之柱与倒影池、
+  玻璃展柜塔、垂挂浅碗、银河宝珠花园、等比多层玻璃架；花、晶簇、植物、星系全部由分形数学（3D 斐波那契、迭代函数系统、
+  L 系统、对数螺旋）生成，蝴蝶、光尘、落花、水波随时间运动。详见 [`FractalWorld/README.md`](FractalWorld/README.md)
+  （在 Blender 5.3 上验证）。
+
+  ![Crystal conservatory](FractalWorld/CrystalFantasy/Scenes/Conservatory/Renders/ReflectingPool.png)
+
 ## 下载
 
 不想自己构建的话，[Releases](https://github.com/ShiyumeMeguri/ProceduralParadise/releases) 里有构建好的两个场景的
@@ -85,6 +92,7 @@ blender -b -P BlueArchive/build.py -- Shanhaijing/Rooms/TeaHouse --view shelf --
 
 ```
 Core/                     与游戏无关的通用框架
+  driver.py               各世界 build.py 共用的构建驱动（命令行、镜头、渲染设置、配布视频、保存与渲染流程）
   nodes.py                节点树 DSL（运算符重载、版本兼容的节点解析）
   gn.py                   几何节点构建器 + 资产注册表（@asset）
   scene.py camera.py      场景/集合/GN 对象；摄影测量相机（焦距、主点偏移、两点透视）
@@ -106,6 +114,10 @@ BlueArchive/
                           家具（茶桌、灯挂椅、博古架、茶叶柜）、陈设（灯笼、铜壶、瓷器、石狮、植物）、材质
     rooms.py              由 room.json 装配房间（结构网格、柱、桌椅组、灯笼串、筒灯、灯光）
     Rooms/TeaHouse/       茶楼（room.json、镜头、配布视频动画、参考图、渲染结果、calibration/ 标定工具）
+FractalWorld/
+  build.py                命令行入口：境界 → 场景 → 镜头
+  Fractals/               各境界共享的分形数学（黄金角点阵、自相似实例化、星空）
+  CrystalFantasy/         水晶幻想：Realm.json 设计系统、Kit/ GN 资产库、scenes.py 场景解释器、Scenes/Conservatory/
 Build/                    构建输出（.blend、视频），git 忽略
 ```
 

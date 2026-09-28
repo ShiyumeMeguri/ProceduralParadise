@@ -1,19 +1,19 @@
 {
   "id": "OrbGarden",
-  "notes": "Looking down into the blue planting bed of galaxy orbs, crystals and butterflies, the camera tilted.",
+  "notes": "Down into the island bed of the orb garden: galaxy orbs on their stalks, blue foliage and crystal shards around the glowing Wardian case, the camera tilted.",
   "camera": {
     "resolution": [1496, 1160],
-    "focal_px": 914.2,
-    "location": [-1.0, -12.2, 2.3],
-    "yaw_deg": 145.0,
-    "pitch_deg": -23.0,
-    "roll_deg": -12.0
+    "focal_px": 997.3,
+    "location": [1.45, -14.55, 2.05],
+    "yaw_deg": 150.6,
+    "pitch_deg": -14.2,
+    "roll_deg": -13.0
   },
   "render": {
     "samples": 256,
-    "view": "AgX",
-    "look": "AgX - Punchy",
-    "exposure": 0.0,
+    "view": "Standard",
+    "look": null,
+    "exposure": 0.5,
     "cycles": {
       "max_bounces": 16,
       "clamp_indirect": 6.0
@@ -21,14 +21,22 @@
   },
   "look": {
     "glow": {
-      "threshold": 0.9,
+      "threshold": 1.0,
       "size": 9,
-      "strength": 0.35,
+      "strength": 0.45,
       "quality": "High"
     },
     "vignette": {
-      "strength": 0.25,
-      "power": 2.0
+      "strength": 0.5,
+      "power": 1.5
+    },
+    "lift": [1.0, 1.0, 1.02],
+    "gamma": [1.0, 1.0, 1.02],
+    "gain": [1.0, 1.0, 1.0],
+    "hue_sat": {
+      "hue": 0.5,
+      "saturation": 1.2,
+      "value": 1.0
     }
   }
 }

@@ -47,14 +47,6 @@ def clip(graph, bars, region):
     return node["Mesh"]
 
 
-def bar(graph, start, end, width, depth, normal):
-    """Straight bar from ``start`` to ``end``, ``width`` along ``normal``."""
-    line = graph.n("GeometryNodeSetCurveNormal", graph.curve_line(start, end))
-    set_mode(line, "FREE")
-    graph.assign(graph._in_socket(line.n, "Normal"), normal)
-    return graph.sweep(line.o, graph.rect(width, depth), True)
-
-
 @asset("CF.Arch.Gable", "Architecture")
 def gable():
     """Glazed wall on an iron grid: outline ``Width`` x ``Spring`` with an
@@ -119,6 +111,7 @@ def nave():
     rib_depth = graph.inp("Rib Depth", default=0.24, subtype="DISTANCE")
     frame_material = graph.inp("Frame Material", "MATERIAL", default=M.get("CF.Iron"))
     glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("CF.GlassPane"))
+    roof_material = graph.inp("Roof Material", "MATERIAL", default=M.get("CF.GlassRoof"))
     stone_material = graph.inp("Stone Material", "MATERIAL", default=M.get("CF.Stone"))
 
     half = width * 0.5
@@ -164,7 +157,7 @@ def nave():
 
     iron = graph.join(uprights, rails, eaves, ribs, purlin_set)
     graph.result(graph.join(graph.mat(graph.join(floor, plinths), stone_material),
-                            graph.mat(graph.join(panes, graph.smooth(vault)), glass_material),
+                            graph.mat(panes, glass_material), graph.mat(graph.smooth(vault), roof_material),
                             graph.mat(iron, frame_material)))
     return graph
 
@@ -197,6 +190,7 @@ def rotunda():
     walk = graph.inp("Walkway", default=0.7, subtype="DISTANCE", desc="Width of the dry ring along the drum")
     frame_material = graph.inp("Frame Material", "MATERIAL", default=M.get("CF.Iron"))
     glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("CF.GlassPane"))
+    roof_material = graph.inp("Roof Material", "MATERIAL", default=M.get("CF.GlassRoof"))
     stone_material = graph.inp("Stone Material", "MATERIAL", default=M.get("CF.Stone"))
     water_material = graph.inp("Water Material", "MATERIAL", default=M.get("CF.PoolWater"))
 
@@ -295,7 +289,7 @@ def rotunda():
 
     iron = graph.join(columns, ring_beam, ribs, bands, lantern_posts, graph.smooth(cap), spire)
     graph.result(graph.join(drum, portals,
-                            graph.mat(graph.join(graph.smooth(dome), lantern_glass), glass_material),
+                            graph.mat(graph.smooth(dome), roof_material), graph.mat(lantern_glass, glass_material),
                             graph.mat(iron, frame_material),
                             graph.mat(graph.join(basin, curb), stone_material),
                             graph.mat(water, water_material)))
@@ -343,8 +337,9 @@ def planter():
 
 @asset("CF.Arch.LightPillar", "Architecture")
 def light_pillar():
-    """Pillar of light: a tall glass tube around a luminous core on a stone
-    drum, silver bands around it, motes of light rising inside."""
+    """Pillar of light: a tall glass tube filled with glowing mist around a
+    bright filament, on a stone drum, silver bands around it, motes of light
+    rising inside."""
     graph = GN("CF.Arch.LightPillar", light_pillar.__doc__)
     height = graph.inp("Height", default=18.0, subtype="DISTANCE")
     radius = graph.inp("Radius", default=1.1, subtype="DISTANCE")
@@ -355,6 +350,7 @@ def light_pillar():
     seed = graph.inp("Seed", "INT", default=0)
     glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("CF.Glass"))
     core_material = graph.inp("Core Material", "MATERIAL", default=M.get("CF.LightCore"))
+    mist_material = graph.inp("Mist Material", "MATERIAL", default=M.get("CF.LightMist"))
     stone_material = graph.inp("Stone Material", "MATERIAL", default=M.get("CF.Stone"))
     metal_material = graph.inp("Metal Material", "MATERIAL", default=M.get("CF.Silver"))
     mote_material = graph.inp("Mote Material", "MATERIAL", default=M.get("CF.Mote"))
@@ -362,7 +358,8 @@ def light_pillar():
     wall = 0.035
     section = [(radius - wall, 0.0), (radius, 0.0), (radius, height), (radius - wall, height), (radius - wall, 0.0)]
     tube = graph.smooth_by_angle(graph.lathe(section, 64), 0.7)
-    beam = graph.move(graph.cylinder(core, height, 32), z=height * 0.5)
+    beam = graph.move(graph.cylinder(core * 0.3, height, 16), z=height * 0.5)
+    mist = graph.move(graph.cylinder(radius - wall - 0.01, height - 0.02, 48), z=height * 0.5)
     base = graph.join(graph.move(graph.cylinder(radius + 0.45, 0.55, 64), z=0.0),
                       graph.move(graph.cylinder(radius + 0.3, 0.12, 64), z=0.33))
     hoop = graph.n("GeometryNodeCurvePrimitiveCircle", Resolution=64, Radius=radius + 0.015).o
@@ -379,13 +376,14 @@ def light_pillar():
     sway = seconds * 0.4 + graph.random(0.0, TAU, seed + 2)
     position = graph.vec(reach * graph.cos(turn + graph.sin(sway) * 0.15),
                          reach * graph.sin(turn + graph.sin(sway) * 0.15), climb)
-    size = 0.01 + graph.math("POWER", graph.random(0.0, 1.0, seed + 3), 3.0) * 0.03
+    size = 0.008 + graph.math("POWER", graph.random(0.0, 1.0, seed + 3), 3.0) * 0.02
     cloud = graph.points(motes, position, size)
     twinkle = 0.55 + graph.sin(seconds * graph.random(1.5, 4.0, seed + 4) + graph.random(0.0, TAU, seed + 5)) * 0.45
     cloud = graph.store(cloud, "glow", twinkle)
     cloud = graph.store(cloud, "hue", graph.random(0.0, 1.0, seed + 6))
 
     graph.result(graph.join(graph.mat(tube, glass_material), graph.mat(beam, core_material),
+                            graph.mat(mist, mist_material),
                             graph.mat(base, stone_material), graph.mat(graph.smooth(hoops), metal_material),
                             graph.mat(cloud, mote_material)))
     return graph

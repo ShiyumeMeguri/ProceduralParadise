@@ -21,8 +21,8 @@ An item places one asset (``asset``, ``inputs``, ``loc``, ``rot``,
 
 ``inputs`` are the asset's group inputs (degrees for angles, palette names
 for colours, library names for materials).  ``vary`` gives per-copy inputs:
-``"index"`` (0, 1, 2 ...), ``[low, high]`` (uniform) or ``{"pick": [...]}``;
-``turn`` (degrees about Z) and ``size`` (uniform scale) vary the placement
+``"index"`` (0, 1, 2 ...), ``[low, high]`` (uniform), ``{"pick": [...]}``
+(random choice) or ``{"cycle": [...]}`` (by copy index); ``turn`` (degrees about Z) and ``size`` (uniform scale) vary the placement
 the same way, seeded by the item's name.  ``sway`` [degrees, seconds] hangs
 a copy on a slow swing about its origin; ``visible`` sets ray visibility.
 

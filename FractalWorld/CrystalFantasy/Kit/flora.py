@@ -193,7 +193,7 @@ def plant():
     def spawn(geometry):
         return graph.iop(forks, geometry, rot=fork_rotation, scale=fork_size)
 
-    graph.result(REC.pick_level(graph, REC.levels(graph, twig, spawn, 2), generations))
+    graph.result(graph.realize(REC.pick_level(graph, REC.levels(graph, twig, spawn, 2), generations)))
     return graph
 
 

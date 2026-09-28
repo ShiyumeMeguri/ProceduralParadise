@@ -122,11 +122,11 @@ def etagere():
     dishes = graph.iop(tiers, plate, scale=base_radius * shrink)
 
     treasures = [
-        graph.move(group(graph, "CF.Vessel.Orb", {"Radius": 0.085, "Seed": seed}).o, z=0.085),
-        graph.move(group(graph, "CF.Vessel.Orb", {"Radius": 0.075, "Style": 1, "Seed": seed + 1}).o, z=0.075),
-        graph.move(group(graph, "CF.Crystal.Brilliant", {"Diameter": 0.11}).o, z=0.047),
-        group(graph, "CF.Crystal.Druse", {"Count": 7, "Length": 0.2, "Levels": 1, "Children": 5, "Seed": seed}).o,
-        group(graph, "CF.Crystal.Quartz", {"Length": 0.2, "Radius": 0.028, "Seed": seed + 2,
+        graph.move(group(graph, "CF.Vessel.Orb", {"Radius": 0.13, "Seed": seed}).o, z=0.13),
+        graph.move(group(graph, "CF.Vessel.Orb", {"Radius": 0.11, "Style": 1, "Seed": seed + 1}).o, z=0.11),
+        graph.move(group(graph, "CF.Crystal.Brilliant", {"Diameter": 0.16}).o, z=0.069),
+        group(graph, "CF.Crystal.Druse", {"Count": 7, "Length": 0.3, "Levels": 1, "Children": 5, "Seed": seed}).o,
+        group(graph, "CF.Crystal.Quartz", {"Length": 0.3, "Radius": 0.04, "Seed": seed + 2,
                                            "Material": M.get("CF.CrystalBlue")}).o,
     ]
     choices = graph.n("GeometryNodeGeometryToInstance", Geometry=treasures).o
@@ -165,9 +165,9 @@ def wardian_case():
     top = stand + height
     ridge = graph.n("GeometryNodeMeshCube", Size=graph.vec(width, depth, roof), Vertices_X=2, Vertices_Y=3,
                     Vertices_Z=2)["Mesh"]
-    rx, ry, rz = graph.sep(graph.position())
-    peak = graph.compare(rz, 0.0, "GREATER_THAN")
-    roof_shape = graph.set_pos(ridge, pos=graph.vec(rx, ry * graph.switch(peak, 1.0, 0.0, "FLOAT"), rz))
+    x, y, z = graph.sep(graph.position())
+    peak = graph.compare(z, 0.0, "GREATER_THAN")
+    roof_shape = graph.set_pos(ridge, pos=graph.vec(x, y * graph.switch(peak, 1.0, 0.0, "FLOAT"), z))
     roof_shape = graph.merge(roof_shape, 0.0005)
     cover = graph.move(roof_shape, z=top + roof * 0.5)
     base = graph.box(width * -0.5 - 0.04, depth * -0.5 - 0.04, stand - 0.08, width * 0.5 + 0.04, depth * 0.5 + 0.04, stand)

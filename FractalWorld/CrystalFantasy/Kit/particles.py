@@ -17,10 +17,9 @@ from __future__ import annotations
 
 import math
 
-from Core.gn import GN, asset, get_asset
+from Core.gn import GN, asset
 from Fractals import phyllotaxis as PHY
 from .. import REALM
-from ..values import apply
 from . import materials as M
 from .flora import blade, flower_node
 
@@ -118,11 +117,11 @@ def motes():
     seconds = graph.scene_time()
     x, y, z = graph.sep(region)
     start = graph.random(0.0, 1.0, seed, dtype="FLOAT_VECTOR")
-    sx, sy, sz = graph.sep(start)
-    height = graph.math("FRACT", sz + seconds * rise / z) * z
+    start_x, start_y, start_z = graph.sep(start)
+    height = graph.math("FRACT", start_z + seconds * rise / z) * z
     sway = noise_path(graph, start * 7.0, seconds * 0.05)
-    dx, dy, _ = graph.sep(sway)
-    position = graph.vec((sx - 0.5) * x + dx * drift, (sy - 0.5) * y + dy * drift, height)
+    sway_x, sway_y, _ = graph.sep(sway)
+    position = graph.vec((start_x - 0.5) * x + sway_x * drift, (start_y - 0.5) * y + sway_y * drift, height)
     radius = size * (0.4 + graph.math("POWER", graph.random(0.0, 1.0, seed + 1), 2.0) * 1.6)
     cloud = graph.points(count, position, radius)
     shimmer = 0.5 + graph.sin(seconds * graph.random(0.8, 3.0, seed + 2) + graph.random(0.0, TAU, seed + 3)) * 0.5
@@ -148,25 +147,25 @@ def petals():
     seed = graph.inp("Seed", "INT", default=0)
     material = graph.inp("Material", "MATERIAL", default=M.get("CF.Petal"))
 
-    leaf = blade(graph, 1.0, 0.8, 0.6, 0.2, 0.6, "petal", (5, 8))
-    leaf = graph.store(leaf, "petal_t", 1.0)
-    leaf = graph.store(leaf, "petal_inner", inner, "FLOAT_COLOR")
-    leaf = graph.store(leaf, "petal_outer", outer, "FLOAT_COLOR")
-    leaf = graph.mat(leaf, material)
+    petal = blade(graph, 1.0, 0.8, 0.6, 0.2, 0.6, "petal", (5, 8))
+    petal = graph.store(petal, "petal_t", 1.0)
+    petal = graph.store(petal, "petal_inner", inner, "FLOAT_COLOR")
+    petal = graph.store(petal, "petal_outer", outer, "FLOAT_COLOR")
+    petal = graph.mat(petal, material)
 
     seconds = graph.scene_time()
     x, y, z = graph.sep(region)
     start = graph.random(0.0, 1.0, seed, dtype="FLOAT_VECTOR")
-    sx, sy, sz = graph.sep(start)
-    life = graph.math("FRACT", sz + seconds / fall)
-    swirl = seconds * graph.random(0.4, 0.9, seed + 1) + sz * TAU
+    start_x, start_y, start_z = graph.sep(start)
+    life = graph.math("FRACT", start_z + seconds / fall)
+    swirl = seconds * graph.random(0.4, 0.9, seed + 1) + start_z * TAU
     loop = graph.random(0.15, 0.45, seed + 2)
-    position = graph.vec((sx - 0.5) * x + graph.cos(swirl) * loop, (sy - 0.5) * y + graph.sin(swirl) * loop,
+    position = graph.vec((start_x - 0.5) * x + graph.cos(swirl) * loop, (start_y - 0.5) * y + graph.sin(swirl) * loop,
                          (1.0 - life) * z)
     tumble = graph.vec(seconds * graph.random(0.6, 1.8, seed + 3), seconds * graph.random(0.4, 1.4, seed + 4),
                        swirl)
     visible = graph.map_range(life, 0.0, 0.04, 0.0, 1.0) * graph.map_range(life, 0.9, 0.99, 1.0, 0.0)
-    flutter = graph.iop(graph.points(count, position), leaf, rot=tumble,
+    flutter = graph.iop(graph.points(count, position), petal, rot=tumble,
                         scale=visible * size * graph.random(0.7, 1.3, seed + 5))
     graph.result(flutter)
     return graph
@@ -175,25 +174,26 @@ def petals():
 @asset("CF.FX.Floaters", "Particles")
 def floaters():
     """Flowers floating on a pool: a flower preset scattered on the
-    golden-angle disc of ``Radius``, each circling slowly round its spot and
-    turning on the water."""
+    golden-angle annulus from ``Inner Radius`` to ``Radius`` (equal area per
+    flower), each circling slowly round its spot and turning on the water."""
     graph = GN("CF.FX.Floaters", floaters.__doc__)
     count = graph.inp("Count", "INT", default=24, min=0, max=2000)
     radius = graph.inp("Radius", default=6.0, subtype="DISTANCE")
+    inner = graph.inp("Inner Radius", default=0.0, subtype="DISTANCE")
     kind = graph.inp("Flower", "INT", default=2, min=1, max=5)
     scale = graph.inp("Scale", default=1.3)
     drift = graph.inp("Drift", default=0.25, subtype="DISTANCE")
-    inner = graph.inp("Inner Color", "COLOR", default=M.color("pink"))
-    outer = graph.inp("Outer Color", "COLOR", default=M.color("blush"))
+    inner_color = graph.inp("Inner Color", "COLOR", default=M.color("pink"))
+    outer_color = graph.inp("Outer Color", "COLOR", default=M.color("blush"))
     seed = graph.inp("Seed", "INT", default=0)
 
     seconds = graph.scene_time()
     t, azimuth = PHY.spiral(graph, count)
-    reach = graph.math("SQRT", t) * radius
+    reach = graph.math("SQRT", inner * inner + t * (radius * radius - inner * inner))
     orbit = seconds * graph.random(0.02, 0.06, seed) + graph.random(0.0, TAU, seed + 1)
     position = graph.vec(reach * graph.cos(azimuth) + graph.cos(orbit) * drift,
                          reach * graph.sin(azimuth) + graph.sin(orbit) * drift, 0.0)
-    blooms = [flower_node(graph, name, {"Inner Color": inner, "Outer Color": outer, "Seed": seed}).o
+    blooms = [flower_node(graph, name, {"Inner Color": inner_color, "Outer Color": outer_color, "Seed": seed}).o
               for name in REALM["flowers"]]
     bloom = graph.index_switch(kind - 1, blooms, "GEOMETRY")
     spin = graph.vec(0.0, 0.0, seconds * graph.random(-0.08, 0.08, seed + 2) + azimuth)

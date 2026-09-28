@@ -37,8 +37,9 @@ def spires():
     material = graph.inp("Material", "MATERIAL", default=M.get("CF.CrystalFar"))
 
     variants = [apply(graph, graph.group(get_asset("CF.Crystal.Druse")),
-                      {"Count": 9, "Spread": 42.0, "Length": 1.0, "Levels": 1, "Children": 6, "Child Scale": 0.45,
-                       "Falloff": 0.6, "Seed": seed * 4 + variant, "Material": material}).o for variant in range(4)]
+                      {"Count": 4, "Spread": 14.0, "Length": 1.0, "Thickness": 0.06, "Levels": 1, "Children": 4,
+                       "Child Scale": 0.35, "Falloff": 0.35, "Seed": seed * 4 + variant, "Material": material}).o
+                for variant in range(4)]
     choices = graph.n("GeometryNodeGeometryToInstance", Geometry=variants).o
     t, azimuth = PHY.spiral(graph, count)
     reach = graph.math("SQRT", inner * inner + t * (outer * outer - inner * inner))

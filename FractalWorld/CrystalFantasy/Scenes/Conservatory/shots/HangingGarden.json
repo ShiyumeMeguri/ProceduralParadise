@@ -4,16 +4,16 @@
   "camera": {
     "resolution": [1496, 1160],
     "focal_px": 914.2,
-    "location": [0.2, 5.7, 0.9],
+    "location": [0.25, 5.9, 0.95],
     "yaw_deg": 0.0,
-    "pitch_deg": 12.0,
+    "pitch_deg": 14.0,
     "roll_deg": 0.0
   },
   "render": {
     "samples": 256,
-    "view": "AgX",
-    "look": "AgX - Punchy",
-    "exposure": 0.0,
+    "view": "Standard",
+    "look": null,
+    "exposure": 0.7,
     "cycles": {
       "max_bounces": 16,
       "clamp_indirect": 6.0
@@ -21,14 +21,22 @@
   },
   "look": {
     "glow": {
-      "threshold": 0.9,
+      "threshold": 1.0,
       "size": 9,
-      "strength": 0.35,
+      "strength": 0.45,
       "quality": "High"
     },
     "vignette": {
-      "strength": 0.25,
-      "power": 2.0
+      "strength": 0.5,
+      "power": 1.5
+    },
+    "lift": [1.0, 1.0, 1.02],
+    "gamma": [1.0, 1.0, 1.02],
+    "gain": [1.0, 1.0, 1.0],
+    "hue_sat": {
+      "hue": 0.5,
+      "saturation": 1.2,
+      "value": 1.0
     }
   }
 }

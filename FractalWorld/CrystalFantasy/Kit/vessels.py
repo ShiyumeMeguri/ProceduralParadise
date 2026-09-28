@@ -172,7 +172,7 @@ def lens_bowl():
     leaf_color = graph.inp("Leaf Color", "COLOR", default=M.color("leaf_teal"))
     seed = graph.inp("Seed", "INT", default=0)
     glass = graph.inp("Glass Material", "MATERIAL", default=M.get("CF.Glass"))
-    water = graph.inp("Water Material", "MATERIAL", default=M.get("CF.Water"))
+    water = graph.inp("Water Material", "MATERIAL", default=M.get("CF.WaterDeep"))
 
     profile = PROFILES["lens_bowl"]
     outline = profile["outer"]
@@ -194,7 +194,7 @@ def lens_bowl():
                       graph.smooth_by_angle(graph.mat(liquid, water), 0.7),
                       floating, rising, graph.switch(drip, None, tear))
     scale = radius / rim[0]
-    graph.result(graph.transform(body, s=graph.vec(scale, scale, scale)))
+    graph.result(graph.transform(graph.realize(body), s=graph.vec(scale, scale, scale)))
     return graph
 
 
@@ -272,9 +272,9 @@ def orb():
     graph = GN("CF.Vessel.Orb", orb.__doc__)
     radius = graph.inp("Radius", default=0.12, subtype="DISTANCE")
     style = graph.inp("Style", "INT", default=0, min=0, max=1)
-    stars = graph.inp("Stars", "INT", default=1400, min=0, max=20000)
+    stars = graph.inp("Stars", "INT", default=700, min=0, max=20000)
     arms = graph.inp("Arms", "INT", default=3, min=1, max=6)
-    winding = graph.inp("Winding", default=2.6, desc="Turns of the arms per e-fold of radius (1 / tan pitch)")
+    winding = graph.inp("Winding", default=2.6, desc="Radians the arms turn per e-fold of radius (cot of the pitch)")
     spin = graph.inp("Spin", default=0.2, desc="Radians per second")
     tail = graph.inp("Tail", "BOOL", default=False)
     seed = graph.inp("Seed", "INT", default=0)
@@ -297,7 +297,7 @@ def orb():
     height = graph.random(-1.0, 1.0, seed + 2) * 0.07 * (1.0 - t * 0.7)
     tilt = graph.vec(graph.random(-0.9, 0.9, seed + 3, ID=0), graph.random(-0.9, 0.9, seed + 4, ID=0), 0.0)
     position = graph.rotate_vector(graph.vec(distance * graph.cos(angle), distance * graph.sin(angle), height), tilt)
-    size = 0.006 + graph.math("POWER", graph.random(0.0, 1.0, seed + 5), 4.0) * 0.016
+    size = 0.004 + graph.math("POWER", graph.random(0.0, 1.0, seed + 5), 5.0) * 0.012
     cloud = graph.points(stars, position, size)
     hue = graph.mix(t, (1.0, 0.86, 0.72, 1.0), graph.mix(graph.random(0.0, 1.0, seed + 6), M.color("azure"),
                                                           M.color("lilac"), "RGBA"), "RGBA")
