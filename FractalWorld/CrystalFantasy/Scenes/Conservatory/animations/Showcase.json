@@ -1,0 +1,20 @@
+{
+  "id": "Showcase",
+  "title": "Crystal conservatory - showcase flight",
+  "fps": 30,
+  "resolution": [1920, 1080],
+  "samples": 64,
+  "keys": [
+    {
+      "frame": 1,
+      "camera": "shot",
+      "ease": true,
+      "note": "the reflecting pool"
+    },
+    {
+      "frame": 60,
+      "camera": "shot",
+      "ease": true
+    }
+  ]
+}

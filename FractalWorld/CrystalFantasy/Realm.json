@@ -1,0 +1,111 @@
+{
+  "id": "CrystalFantasy",
+  "name": "Crystal Fantasy (水晶幻想)",
+  "units": "metres, Z up; angles in degrees (angle sockets are converted when a scene is built)",
+  "notes": [
+    "Design system of the crystal conservatory: palette, flower presets (3D Fibonacci), vessel profiles and the butterfly wing outline.",
+    "Colours are linear RGB.  In scene data a colour input may name a palette entry instead of giving RGB."
+  ],
+  "palette": {
+    "navy": [0.004, 0.008, 0.03],
+    "cobalt": [0.012, 0.05, 0.42],
+    "azure": [0.06, 0.32, 1.0],
+    "cyan": [0.25, 0.8, 1.0],
+    "ice": [0.82, 0.94, 1.0],
+    "violet": [0.3, 0.1, 0.95],
+    "lilac": [0.62, 0.45, 1.0],
+    "magenta": [0.85, 0.2, 0.75],
+    "pink": [1.0, 0.5, 0.7],
+    "blush": [1.0, 0.8, 0.86],
+    "leaf_blue": [0.04, 0.22, 0.85],
+    "leaf_teal": [0.03, 0.3, 0.32],
+    "leaf_green": [0.07, 0.3, 0.14],
+    "stem": [0.05, 0.22, 0.3],
+    "iron": [0.012, 0.02, 0.05],
+    "silver": [0.86, 0.9, 0.96],
+    "stone": [0.72, 0.8, 0.9],
+    "water": [0.02, 0.2, 0.75],
+    "glass": [0.94, 0.975, 1.0]
+  },
+  "flowers": {
+    "dahlia": {"Count": 150, "Cap Angle": 108.0, "Openness": 1.0, "Tilt": 6.0, "Receptacle": 0.018, "Petal Length": 0.1,
+               "Petal Width": 0.032, "Size Min": 0.22, "Size Power": 0.65, "Cup": 1.4, "Curl": 0.12, "Roundness": 0.55,
+               "Center Radius": 0.0},
+    "camellia": {"Count": 32, "Cap Angle": 85.0, "Openness": 0.85, "Tilt": 18.0, "Receptacle": 0.01, "Petal Length": 0.07,
+                 "Petal Width": 0.065, "Size Min": 0.45, "Size Power": 0.6, "Cup": 0.7, "Curl": 0.2, "Roundness": 0.7,
+                 "Center Radius": 0.018},
+    "rose": {"Count": 48, "Cap Angle": 75.0, "Openness": 0.7, "Tilt": 4.0, "Receptacle": 0.006, "Petal Length": 0.06,
+             "Petal Width": 0.06, "Size Min": 0.3, "Size Power": 0.8, "Cup": 1.3, "Curl": 0.35, "Roundness": 0.6,
+             "Center Radius": 0.0},
+    "lotus": {"Count": 24, "Cap Angle": 70.0, "Openness": 1.0, "Tilt": 12.0, "Receptacle": 0.02, "Petal Length": 0.15,
+              "Petal Width": 0.065, "Size Min": 0.55, "Size Power": 1.0, "Cup": 0.9, "Curl": -0.05, "Roundness": 1.4,
+              "Center Radius": 0.025},
+    "floret": {"Count": 4, "Divergence": 90.0, "Cap Angle": 90.0, "Openness": 1.0, "Tilt": 72.0, "Receptacle": 0.001,
+               "Petal Length": 0.014, "Petal Width": 0.013, "Size Min": 1.0, "Size Power": 1.0, "Cup": 0.35, "Curl": 0.15,
+               "Roundness": 0.6, "Center Radius": 0.0}
+  },
+  "butterfly": {
+    "notes": "Morpho wing outlines of the right side in half-span units: x outward from the body, y forward along it.  The hindwing sits a hair below the forewing where they overlap.",
+    "forewing": [[0.02, 0.08], [0.15, 0.28], [0.4, 0.45], [0.7, 0.55], [0.93, 0.56], [1.0, 0.48], [0.97, 0.32],
+                 [0.85, 0.12], [0.62, -0.02], [0.35, -0.06], [0.1, -0.02]],
+    "hindwing": [[0.05, -0.02], [0.35, -0.04], [0.62, -0.1], [0.78, -0.25], [0.8, -0.42], [0.68, -0.6], [0.48, -0.72],
+                 [0.28, -0.72], [0.14, -0.58], [0.05, -0.32]],
+    "hindwing_drop": 0.004,
+    "body": {"head": 0.16, "tail": -0.55, "radius": 0.045}
+  },
+  "gems": {
+    "brilliant": {
+      "notes": "Round brilliant (Tolkowsky-like) for a unit diameter: table 60 %, crown 16 %, pavilion 43 %.  Star and lower-girdle points stand just outside the crown and pavilion cones so the hull keeps them as facet corners.",
+      "rings": [
+        {"count": 8, "radius": 0.3, "z": 0.162},
+        {"count": 8, "radius": 0.4, "z": 0.105, "offset": 0.5},
+        {"count": 16, "radius": 0.5, "z": 0.012},
+        {"count": 16, "radius": 0.5, "z": -0.012},
+        {"count": 8, "radius": 0.135, "z": -0.34, "offset": 0.5}
+      ],
+      "culet": -0.43
+    }
+  },
+  "profiles": {
+    "apothecary": {
+      "notes": "Outer wall from the axis at the foot to the rim, height 1.0 m; lathed into a glass wall of 'thickness'.  'fill_top' is the water level of Fill = 1 (the shoulder).",
+      "thickness": 0.012,
+      "fill_top": 0.72,
+      "outer": [[0.0, 0.0], [0.22, 0.0], [0.235, 0.008], [0.225, 0.02], [0.12, 0.045], [0.085, 0.075], [0.08, 0.1],
+                [0.1, 0.118], [0.137, 0.124], [0.229, 0.172], [0.306, 0.243], [0.3625, 0.331], [0.394, 0.4305],
+                [0.3985, 0.535], [0.376, 0.637], [0.3277, 0.7294], [0.2677, 0.797], [0.2, 0.846], [0.155, 0.868],
+                [0.14, 0.89], [0.14, 0.96], [0.175, 0.975], [0.18, 0.99]],
+      "lid": [[0.0, 0.975], [0.19, 0.975], [0.195, 0.99], [0.17, 1.02], [0.12, 1.06], [0.07, 1.08], [0.0, 1.085]],
+      "finial": [[0.0, 1.075], [0.04, 1.075], [0.05, 1.1], [0.055, 1.14], [0.035, 1.17], [0.015, 1.2], [0.004, 1.26],
+                 [0.0, 1.28]]
+    },
+    "globe": {
+      "notes": "Hanging terrarium: glass sphere of unit radius; wall thickness, collar and finial in radii.",
+      "thickness": 0.04,
+      "collar": [[0.0, 0.93], [0.26, 0.93], [0.28, 0.97], [0.22, 1.02], [0.12, 1.06], [0.06, 1.1], [0.0, 1.11]],
+      "finial": [[0.0, -0.9], [0.1, -0.93], [0.13, -1.0], [0.08, -1.08], [0.035, -1.2], [0.0, -1.34]]
+    },
+    "lens_bowl": {
+      "notes": "Wide shallow bowl, rim radius 0.712 m at z = 0.02.",
+      "thickness": 0.012,
+      "outer": [[0.0, -0.11], [0.12, -0.107], [0.3, -0.092], [0.46, -0.066], [0.58, -0.038], [0.66, -0.012],
+                [0.7, 0.008], [0.712, 0.02]]
+    },
+    "plate": {
+      "notes": "Etagere plate of unit radius (scaled per tier); thickness in radii.",
+      "thickness": 0.022,
+      "outer": [[0.0, 0.0], [0.5, 0.004], [0.85, 0.02], [0.97, 0.045], [1.0, 0.065]]
+    },
+    "foot": {
+      "notes": "Etagere foot of unit radius (solid).",
+      "outer": [[0.0, 0.0], [1.0, 0.0], [1.0, 0.03], [0.7, 0.07], [0.25, 0.12], [0.12, 0.2], [0.0, 0.21]]
+    },
+    "tazza": {
+      "notes": "Glass cake stand: dish on a baluster stem; the dish rim stands 0.97 m above the floor.",
+      "thickness": 0.014,
+      "dish": [[0.0, 0.92], [0.2, 0.924], [0.4, 0.936], [0.52, 0.95], [0.56, 0.965]],
+      "stem": [[0.0, 0.0], [0.19, 0.0], [0.2, 0.012], [0.18, 0.02], [0.06, 0.04], [0.035, 0.1], [0.03, 0.5],
+               [0.045, 0.6], [0.028, 0.7], [0.03, 0.88], [0.07, 0.915], [0.0, 0.925]]
+    }
+  }
+}

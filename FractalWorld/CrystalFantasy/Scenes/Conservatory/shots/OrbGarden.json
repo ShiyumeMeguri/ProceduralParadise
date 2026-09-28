@@ -1,0 +1,34 @@
+{
+  "id": "OrbGarden",
+  "notes": "Looking down into the blue planting bed of galaxy orbs, crystals and butterflies, the camera tilted.",
+  "camera": {
+    "resolution": [1496, 1160],
+    "focal_px": 914.2,
+    "location": [-1.0, -12.2, 2.3],
+    "yaw_deg": 145.0,
+    "pitch_deg": -23.0,
+    "roll_deg": -12.0
+  },
+  "render": {
+    "samples": 256,
+    "view": "AgX",
+    "look": "AgX - Punchy",
+    "exposure": 0.0,
+    "cycles": {
+      "max_bounces": 16,
+      "clamp_indirect": 6.0
+    }
+  },
+  "look": {
+    "glow": {
+      "threshold": 0.9,
+      "size": 9,
+      "strength": 0.35,
+      "quality": "High"
+    },
+    "vignette": {
+      "strength": 0.25,
+      "power": 2.0
+    }
+  }
+}
