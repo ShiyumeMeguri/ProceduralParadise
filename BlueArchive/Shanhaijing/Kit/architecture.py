@@ -16,27 +16,12 @@ from __future__ import annotations
 
 import math
 
-from Core.gn import GN, asset, get_asset, set_mode
+from Core.gn import GN, asset, get_asset
 from .. import LEVELS, TIMBER
 
 SQ2 = math.sqrt(2.0)
 STAND = (math.pi * 0.5, 0.0, 0.0)          # XY plane -> XZ plane (face towards -Y)
 PROFILE_X = (math.pi * 0.5, 0.0, math.pi * 0.5)   # XY profile -> YZ plane, normal +X
-
-
-def flat_sweep(g, curve, w, d):
-    """Sweep a planar XY curve with a w (in plane) x d (along Z) bar."""
-    nd = g.n("GeometryNodeSetCurveNormal", curve)
-    set_mode(nd, "Z_UP")
-    return g.sweep(nd.o, g.rect(w, d), True)
-
-
-def solid(g, face, depth, direction=(0.0, 0.0, 1.0)):
-    """Closed prism: extrude a face along ``direction`` and keep the
-    (flipped) original face as the back cap."""
-    ext = g.extrude(face, depth, direction=direction)
-    back = g.n("GeometryNodeFlipFaces", face).o
-    return g.merge(g.join(ext, back), 0.0001)
 
 
 # ------------------------------------------------------------------ basics
@@ -71,7 +56,7 @@ def beam():
     m = g.inp("Material", "MATERIAL")
     prof = g.fill(_rounded_rect_profile(g, W, H, r))
     prof = g.transform(prof, r=PROFILE_X)
-    body = solid(g, prof, L, (1.0, 0.0, 0.0))
+    body = g.solid(prof, L, (1.0, 0.0, 0.0))
     body = g.move(body, z=H * 0.5)
     g.result(g.smooth_by_angle(g.mat(body, m), 0.6))
     return g
@@ -175,7 +160,7 @@ def wall():
     rect = g.transform(g.rect(hw, hh), t=g.vec(hx, hz, 0.0))
     inner = g.index_switch(hole, [None, circ, rect], "GEOMETRY")
     face = g.fill(g.join(outline, inner), mode="NGONS")
-    body = solid(g, face, T)
+    body = g.solid(face, T)
     # the reveal = faces whose normal lies in the wall plane and which are
     # inside the outline (not the outer border)
     P = g.position()
@@ -244,7 +229,7 @@ def octagon_lattice():
     pts = g.grid_points(n, n, p, p, g.vec(p * -(n // 2), p * -(n // 2), 0.0))
     tiles = g.realize(g.iop(pts, unit))
     tiles = g.resample(tiles, 24)
-    bars = flat_sweep(g, tiles, bw, bd)
+    bars = g.flat_sweep(tiles, bw, bd)
     # clip to the disc (face centres); the ring frame covers the cut ends
     far = g.compare(g.vmath("LENGTH", g.position()), R, "GREATER_THAN")
     bars = g.delete(bars, far, "FACE")
@@ -319,7 +304,7 @@ def four_octagon_lattice():
         if name != "flowers":
             cur = g.resample(cur, 48)
         cur = g.transform(cur, s=g.vec(R, R, 1.0))
-        parts.append(flat_sweep(g, cur, bw, bd * depth[name]))
+        parts.append(g.flat_sweep(cur, bw, bd * depth[name]))
     bars = g.join(*parts)
     far = g.compare(g.vmath("LENGTH", g.position()), R, "GREATER_THAN")
     bars = g.delete(bars, far, "FACE")
@@ -344,7 +329,7 @@ def round_window():
     m_ring = g.inp("Ring Material", "MATERIAL", panel="Materials")
     m_lat = g.inp("Lattice Material", "MATERIAL", panel="Materials")
     m_glass = g.inp("Glass Material", "MATERIAL", panel="Materials")
-    ring = flat_sweep(g, g.circle(R - rw * 0.5, 128), rw, rd)
+    ring = g.flat_sweep(g.circle(R - rw * 0.5, 128), rw, rd)
     ring = g.transform(ring, r=STAND)
     lat0 = g.group(get_asset("SHJ.Arch.OctagonLattice"), Radius=R - rw * 0.6, Edge=a,
                    Bar_Width=bw, Material=m_lat).o
@@ -397,7 +382,7 @@ def downlight():
     m_e = g.inp("Emitter Material", "MATERIAL")
     m_t = g.inp("Trim Material", "MATERIAL")
     # satin trim ring (an annulus 12 mm deep) around a slightly recessed glowing disc
-    ring = g.move(flat_sweep(g, g.circle(r + 0.009, 32), 0.018, 0.012), z=-0.006)
+    ring = g.move(g.flat_sweep(g.circle(r + 0.009, 32), 0.018, 0.012), z=-0.006)
     em = g.move(g.fill(g.circle(r, 32)), z=-0.004)
     g.result(g.join(g.mat(ring, m_t), g.mat(em, m_e)))
     return g
@@ -422,7 +407,7 @@ def wave_band():
     yv = g.abs(g.sin(px / wl * math.pi)) * amp
     line = g.set_pos(line, offset=g.vec(0.0, yv, 0.0))
     crv = g.n("GeometryNodeMeshToCurve", line).o
-    waves = flat_sweep(g, crv, lw, 0.008)
+    waves = g.flat_sweep(crv, lw, 0.008)
     fil = g.box(0.0, amp + gap, -0.004, L, amp + gap + lw, 0.004)
     base = g.box(0.0, lw * -1.6, -0.004, L, lw * -0.6, 0.004)
     band = g.join(waves, fil, base)
@@ -441,10 +426,10 @@ def medallions():
     gap = g.inp("Gap", default=0.03, subtype="DISTANCE")
     lw = g.inp("Line Width", default=0.012, subtype="DISTANCE")
     m = g.inp("Material", "MATERIAL")
-    sq = flat_sweep(g, g.rect(s, s), lw, 0.01)
-    dia = flat_sweep(g, g.transform(g.rect(s * 0.55, s * 0.55), r=(0.0, 0.0, math.pi / 4.0)),
+    sq = g.flat_sweep(g.rect(s, s), lw, 0.01)
+    dia = g.flat_sweep(g.transform(g.rect(s * 0.55, s * 0.55), r=(0.0, 0.0, math.pi / 4.0)),
                      lw, 0.01)
-    ring = flat_sweep(g, g.circle(s * 0.16, 24), lw, 0.01)
+    ring = g.flat_sweep(g.circle(s * 0.16, 24), lw, 0.01)
     unit = g.join(sq, dia, ring)
     unit = g.move(unit, s * 0.5, s * 0.5, 0.0)
     row = g.array(unit, cnt, g.vec(s + gap, 0.0, 0.0), (0, 0, 0), realize=True)
@@ -471,8 +456,8 @@ def brace():
     zig = g.polyline([(0.06, -0.05, 0), (0.18, 0.05, 0), (0.3, -0.05, 0), (0.42, 0.05, 0),
                       (0.54, -0.05, 0), (0.66, 0.05, 0), (0.74, -0.05, 0)])
     zig = g.transform(zig, s=g.vec(Ln / 0.8, w / 0.14, 1.0))
-    carving = flat_sweep(g, zig, 0.012, 0.01)
-    border = flat_sweep(g, g.transform(g.rect(Ln - 0.05, w - 0.045), t=g.vec(Ln * 0.5, 0.0, 0.0)),
+    carving = g.flat_sweep(zig, 0.012, 0.01)
+    border = g.flat_sweep(g.transform(g.rect(Ln - 0.05, w - 0.045), t=g.vec(Ln * 0.5, 0.0, 0.0)),
                         0.012, 0.01)
     face = g.join(carving, border)
     gold = g.join(g.move(face, z=t * 0.5), g.move(face, z=t * -0.5))    # carved on both faces

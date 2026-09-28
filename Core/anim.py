@@ -17,7 +17,7 @@ from __future__ import annotations
 import bpy
 from mathutils import Vector
 
-__all__ = ["fcurves_of", "camera_move", "hermite_handles"]
+__all__ = ["fcurves_of", "camera_move", "hermite_handles", "key_seconds", "sway"]
 
 
 def fcurves_of(id_data):
@@ -70,6 +70,37 @@ def _shape(id_data, data_path, frames, series, ease):
         idx = fc.array_index
         vals = [s[idx] if isinstance(s, (tuple, list, Vector)) else s for s in series]
         hermite_handles(fc, frames, vals, ease)
+
+
+def key_seconds(owner, attribute, id_data, fps):
+    """Animate ``owner.attribute`` to equal the scene time in seconds (the
+    clock geometry nodes read from Scene Time): two linear keys, extrapolated
+    linearly forever.  ``id_data`` is the data-block owning the animation
+    (a node tree for a node socket)."""
+    for frame in (0.0, float(fps)):
+        setattr(owner, attribute, frame / fps)
+        owner.keyframe_insert(attribute, frame=frame)
+    for curve in fcurves_of(id_data):
+        if curve.data_path.endswith(attribute):
+            curve.extrapolation = "LINEAR"
+            for point in curve.keyframe_points:
+                point.interpolation = "LINEAR"
+
+
+def sway(obj, angle, period, fps, seed=0, axes=(0, 1)):
+    """Swing ``obj`` gently about its origin: noise F-modifiers on the
+    rotation channels ``axes`` (0 = X, 1 = Y, 2 = Z), ``angle`` radians of
+    peak-to-peak swing over about ``period`` seconds, each channel on its own
+    phase.  The rest pose stays keyed, so the swing plays forever."""
+    for axis in axes:
+        obj.keyframe_insert("rotation_euler", index=axis, frame=0.0)
+    for curve in fcurves_of(obj):
+        if curve.data_path == "rotation_euler" and curve.array_index in axes:
+            noise = curve.modifiers.new("NOISE")
+            noise.scale = period * fps
+            noise.strength = angle
+            noise.phase = seed * 7.31 + curve.array_index * 3.17
+            noise.blend_type = "REPLACE"
 
 
 def camera_move(name, keys, parent_matrix=None, collection=None, sensor=36.0,

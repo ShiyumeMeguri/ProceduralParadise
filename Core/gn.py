@@ -108,6 +108,37 @@ class GN(Tree):
     def bool_not(self, a):
         return self.n("FunctionNodeBooleanMath", a, props={"operation": "NOT"}).o
 
+    def named(self, name, dtype="FLOAT"):
+        """Field of the named attribute ``name``."""
+        return self.n("GeometryNodeInputNamedAttribute", Name=name, props={"data_type": dtype})["Attribute"]
+
+    def scene_time(self):
+        """Scene time in seconds (makes the tree re-evaluate every frame)."""
+        return self.n("GeometryNodeInputSceneTime")["Seconds"]
+
+    # ------------------------------------------------------------ rotations
+    def align_rotation(self, vector, rotation=None, axis="Z", pivot="AUTO"):
+        """Rotation turning local ``axis`` of ``rotation`` onto ``vector``."""
+        return self.n("FunctionNodeAlignRotationToVector", Rotation=rotation, Vector=vector,
+                      props={"axis": axis, "pivot_axis": pivot}).o
+
+    def axis_angle(self, axis, angle):
+        return self.n("FunctionNodeAxisAngleToRotation",
+                      Axis=self.vec(axis) if isinstance(axis, (tuple, list)) else axis, Angle=angle).o
+
+    def rotate_rotation(self, rotation, by, local=True):
+        """``rotation`` turned by ``by`` about its own axes (local) or the
+        world axes."""
+        return self.n("FunctionNodeRotateRotation", Rotation=rotation, Rotate_By=by,
+                      props={"rotation_space": "LOCAL" if local else "GLOBAL"}).o
+
+    def rotate_vector(self, vector, rotation):
+        return self.n("FunctionNodeRotateVector", Vector=vector, Rotation=rotation).o
+
+    def random_spin(self, rotation, seed, axis=(0.0, 0.0, 1.0)):
+        """``rotation`` turned by a random angle about its own ``axis``."""
+        return self.rotate_rotation(rotation, self.axis_angle(axis, self.random(0.0, math.tau, seed)))
+
     # ------------------------------------------------------------ primitives
     def cube(self, size=(1, 1, 1), vx=2, vy=2, vz=2):
         return self.n("GeometryNodeMeshCube", Size=self.vec(size) if isinstance(size, (tuple, list)) else size,
@@ -294,6 +325,19 @@ class GN(Tree):
             pass
         return nd["Mesh"]
 
+    def flat_sweep(self, curve, w, d):
+        """Sweep a planar XY curve with a w (in plane) x d (along Z) bar."""
+        nd = self.n("GeometryNodeSetCurveNormal", curve)
+        set_mode(nd, "Z_UP")
+        return self.sweep(nd.o, self.rect(w, d), True)
+
+    def solid(self, face, depth, direction=(0.0, 0.0, 1.0)):
+        """Closed prism: extrude a face along ``direction`` and keep the
+        (flipped) original face as the back cap."""
+        ext = self.extrude(face, depth, direction=direction)
+        back = self.n("GeometryNodeFlipFaces", face).o
+        return self.merge(self.join(ext, back), 0.0001)
+
     def slab(self, curve, thickness=0.02, z0=0.0):
         """Fill a closed planar (XY) curve and extrude it upward into a slab."""
         face = self.fill(curve)
@@ -340,6 +384,32 @@ class GN(Tree):
         col = self.mesh_line(ny, (0, 0, 0), self.vec(0, dy, 0))
         inst = self.iop(self.mesh_to_points(col), row)
         return self.mesh_to_points(self.realize(inst))
+
+
+def shell_profile(outer, thickness):
+    """Closed lathe profile of a vessel wall: the ``outer`` profile
+    [(r, z), ...] from the axis at the bottom out and up to the rim, then
+    the same line offset ``thickness`` inwards and back down to the axis.
+    Lathing it gives a watertight glass wall of constant thickness."""
+    count = len(outer)
+    inner = []
+    for i, (r, z) in enumerate(outer):
+        before = outer[max(i - 1, 0)]
+        after = outer[min(i + 1, count - 1)]
+        tangent_r, tangent_z = after[0] - before[0], after[1] - before[1]
+        norm = math.hypot(tangent_r, tangent_z) or 1.0
+        inner.append((max(r - thickness * tangent_z / norm, 0.0), z + thickness * tangent_r / norm))
+    inner[0] = (0.0, inner[0][1])
+    return list(outer) + inner[::-1]
+
+
+def inner_profile(outer, thickness):
+    """The inner surface of :func:`shell_profile` as a solid of its own
+    (from the axis at the inner bottom up to the rim and back to the axis):
+    the cavity a liquid fills."""
+    shell = shell_profile(outer, thickness)
+    inner = shell[len(outer):][::-1]
+    return inner + [(0.0, inner[-1][1])]
 
 
 # ---------------------------------------------------------------- registry

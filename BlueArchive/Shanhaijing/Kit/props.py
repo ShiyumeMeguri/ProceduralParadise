@@ -13,7 +13,7 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset, get_asset, set_mode
-from .architecture import flat_sweep, solid, STAND
+from .architecture import STAND
 
 TAU = math.tau
 
@@ -389,7 +389,7 @@ FU_STROKES = [
 def fu_glyph(g, width=0.15):
     """The character 福 as flat stroke ribbons in XY, centred, 1 unit tall."""
     strokes = [g.polyline([(x - 0.5, y - 0.5, 0.0) for x, y in st]) for st in FU_STROKES]
-    return flat_sweep(g, g.join(*strokes), width, 0.02)
+    return g.flat_sweep(g.join(*strokes), width, 0.02)
 
 
 @asset("SHJ.Prop.Lantern", "Props")

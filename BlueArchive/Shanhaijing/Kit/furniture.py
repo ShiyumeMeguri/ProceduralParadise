@@ -21,7 +21,7 @@ import os
 
 from Core import jsonio
 from Core.gn import GN, asset, get_asset
-from .architecture import flat_sweep, solid, STAND
+from .architecture import STAND
 from .. import FURN
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -82,7 +82,7 @@ def tea_table():
     # inlay: two concentric rectangular lines on the top surface
     r1 = g.rect(W - i1 * 2.0, D - i1 * 2.0)
     r2 = g.rect(W - (i1 + i2) * 2.0, D - (i1 + i2) * 2.0)
-    inl = flat_sweep(g, g.join(r1, r2), iw, 0.001)
+    inl = g.flat_sweep(g.join(r1, r2), iw, 0.001)
     inl = g.mat(g.move(inl, z=H + 0.0004), m_inlay)
     # legs
     lx, ly = hw - li - s * 0.5, hd - li - s * 0.5
@@ -200,9 +200,9 @@ def chair():
     # cushion with gold piping
     # the cushion sits inside the seat frame, which shows as a dark border all round
     cw, cd_ = sw - s * 0.7, sd - s * 0.7
-    cush = solid(g, g.fill(g.fillet(g.rect(cw, cd_), 0.015, 4)), ct)
+    cush = g.solid(g.fill(g.fillet(g.rect(cw, cd_), 0.015, 4)), ct)
     cush = g.move(cush, z=sh - 0.02)
-    pipe = flat_sweep(g, g.fillet(g.rect(cw - 0.06, cd_ - 0.06), 0.012, 3), 0.005, 0.003)
+    pipe = g.flat_sweep(g.fillet(g.rect(cw - 0.06, cd_ - 0.06), 0.012, 3), 0.005, 0.003)
     pipe = g.move(pipe, z=sh - 0.02 + ct + 0.0012)
     # studs: front faces of the front legs, front faces of the back posts
     rows = [_studs(g, fx * sx, fy * -1.0 - s * 0.5, 0.06, sh - 0.06, pitch, 0.006, (0.0, -1.0))
@@ -286,7 +286,7 @@ def bogu_shelf():
 
     # --- back panel (dark planks) with the keyhole cut out
     frame_o = outline([(-hw, ph), (hw, ph), (hw, top), (-hw, top)])
-    back = solid(g, g.fill(g.join(frame_o, outline(hole)), mode="NGONS"), 0.02)
+    back = g.solid(g.fill(g.join(frame_o, outline(hole)), mode="NGONS"), 0.02)
     back = g.transform(back, t=(0.0, d, 0.0), r=STAND)
     # --- carcass: sides, top board, stepped cornice; plinth
     # parts never share a face plane where they overlap (coplanar overlaps shadow each other
@@ -304,7 +304,7 @@ def bogu_shelf():
         parts.append(_board(g, x - bt * 0.5, x + bt * 0.5, z0, z1, 0.006, d - 0.033, per_m=2))
     for x, z, sxn, szn in D.get("brackets", []):
         tri = outline([(0.0, 0.0), (0.11 * sxn, 0.0), (0.0, 0.11 * szn)])
-        tri = solid(g, g.fill(tri), 0.012)
+        tri = g.solid(g.fill(tri), 0.012)
         tri = g.transform(tri, t=(x, -0.001, z), r=STAND)
         parts.append(tri)
     boards = g.join(*parts)
@@ -317,9 +317,9 @@ def bogu_shelf():
                    g.compare(pz, gz, "LESS_THAN")))
     boards = g.delete(boards, inside, "FACE")
     # --- gate rim (moulded band following the keyhole) and recessed door
-    rim_g = flat_sweep(g, outline(rim_c, closed=False), rim, d - 0.03)
+    rim_g = g.flat_sweep(outline(rim_c, closed=False), rim, d - 0.03)
     rim_g = g.transform(rim_g, t=(0.0, (d - 0.03) * 0.5, 0.0), r=STAND)
-    door = solid(g, g.fill(outline(hole)), 0.03)
+    door = g.solid(g.fill(outline(hole)), 0.03)
     door = g.transform(door, t=(0.0, d - 0.005, 0.0), r=STAND)
     geo = g.join(g.mat(carcass, m_frame), g.mat(boards, m_board), g.mat(back, m_back),
                  g.mat(plinth, m_base), g.mat(rim_g, m_rim), g.mat(door, m_door))
