@@ -12,7 +12,48 @@ import bpy
 
 from .nodes import Tree, Sock, Node
 
-__all__ = ["material", "principled", "emission_mat", "glass_mat", "new_world"]
+__all__ = ["material", "principled", "emission_mat", "glass_mat", "new_world", "MaterialLibrary"]
+
+
+class MaterialLibrary:
+    """A kit's named procedural materials, each built on first use.
+
+    ``palette`` maps colour keys to RGB.  A shot may override look
+    parameters -- and palette colours, as ``"color:<key>"`` -- by filling
+    ``params`` before the materials are built.  ``tag`` is the custom
+    property that marks a material as built by this library, so a material
+    of the same name from elsewhere is rebuilt rather than reused."""
+
+    def __init__(self, palette, tag):
+        self.palette = palette
+        self.tag = tag
+        self.params = {}
+        self.builders = {}
+
+    def register(self, name):
+        """Decorator: ``function()`` builds and returns material ``name``."""
+        def decorator(function):
+            self.builders[name] = function
+            return function
+        return decorator
+
+    def get(self, name):
+        existing = bpy.data.materials.get(name)
+        if existing is not None and existing.get(self.tag):
+            return existing
+        built = self.builders[name]()
+        built[self.tag] = True
+        return built
+
+    def names(self):
+        return sorted(self.builders)
+
+    def color(self, key, alpha=1.0):
+        red, green, blue = self.params.get("color:" + key, self.palette[key])
+        return (red, green, blue, alpha)
+
+    def param(self, key, default):
+        return self.params.get(key, default)
 
 
 def _new_material(name):

@@ -11,44 +11,17 @@ from __future__ import annotations
 
 import math
 
-import bpy
-
 from Core.nodes import Tree
 from Core import shaders as S
 from .. import PALETTE, FLOOR, TIMBER
 
-_BUILDERS = {}
-# look parameters that shots may override before materials are built
-PARAMS = {}
-
-
-def _reg(name):
-    def deco(fn):
-        _BUILDERS[name] = fn
-        return fn
-    return deco
-
-
-def get(name):
-    m = bpy.data.materials.get(name)
-    if m is not None and m.get("shj_built"):
-        return m
-    m = _BUILDERS[name]()
-    m["shj_built"] = True
-    return m
-
-
-def all_names():
-    return sorted(_BUILDERS)
-
-
-def C(key, a=1.0):
-    r, g, b = PARAMS.get("color:" + key, PALETTE[key])
-    return (r, g, b, a)
-
-
-def P(key, default):
-    return PARAMS.get(key, default)
+LIBRARY = S.MaterialLibrary(PALETTE, "shj_built")
+PARAMS = LIBRARY.params
+_reg = LIBRARY.register
+get = LIBRARY.get
+all_names = LIBRARY.names
+C = LIBRARY.color
+P = LIBRARY.param
 
 
 # ------------------------------------------------------------------ helpers

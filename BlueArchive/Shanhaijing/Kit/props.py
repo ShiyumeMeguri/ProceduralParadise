@@ -18,22 +18,6 @@ from .architecture import flat_sweep, solid, STAND
 TAU = math.tau
 
 
-def lathe(g, pts, segments=40, scale=1.0):
-    """Surface of revolution about Z from a profile [(r, z), ...] listed
-    from the axis at the bottom, out, up and (optionally) back in.  ``scale``
-    (constant or socket) multiplies the profile."""
-    path = g.circle(1.0, segments)
-    # Curve to Mesh along a unit circle: radius = 1 + profile x, z = -profile y
-    prof = g.polyline([(r * scale - 1.0, z * scale * -1.0, 0.0) for r, z in pts])
-    body = g.sweep(path, prof, False)
-    return g.merge(g.n("GeometryNodeFlipFaces", body).o, 0.0005)
-
-
-def ellipsoid(g, rx, ry, rz, seg=24, rings=16):
-    s = g.n("GeometryNodeMeshUVSphere", Segments=seg, Rings=rings, Radius=1.0)["Mesh"]
-    return g.transform(s, s=g.vec(rx, ry, rz))
-
-
 # --------------------------------------------------------------- tableware
 @asset("SHJ.Prop.Teapot", "Props")
 def teapot():
@@ -44,8 +28,8 @@ def teapot():
     m = g.inp("Material", "MATERIAL")
     prof = [(0.0, 0.0), (0.05, 0.0), (0.056, 0.006), (0.075, 0.03), (0.088, 0.065), (0.085, 0.1),
             (0.07, 0.13), (0.045, 0.145), (0.043, 0.152), (0.0, 0.152)]
-    body = lathe(g, prof, 40, sc)
-    lid = lathe(g, [(0.0, 0.152), (0.042, 0.152), (0.035, 0.165), (0.018, 0.172), (0.012, 0.18),
+    body = g.lathe(prof, 40, sc)
+    lid = g.lathe([(0.0, 0.152), (0.042, 0.152), (0.035, 0.165), (0.018, 0.172), (0.012, 0.18),
                     (0.014, 0.19), (0.0, 0.195)], 32, sc)
     spout = g.polyline([(0.07, 0.0, 0.06), (0.1, 0.0, 0.08), (0.125, 0.0, 0.11), (0.14, 0.0, 0.135)])
     spout = g.transform(g.tube(spout, 0.011, 10, True), s=g.vec(sc, sc, sc))
@@ -63,7 +47,7 @@ def cup():
     g = GN("SHJ.Prop.Cup", cup.__doc__)
     sc = g.inp("Scale", default=1.0)
     m = g.inp("Material", "MATERIAL")
-    c = lathe(g, [(0.0, 0.0), (0.02, 0.0), (0.022, 0.006), (0.034, 0.045), (0.036, 0.05), (0.031, 0.05),
+    c = g.lathe([(0.0, 0.0), (0.02, 0.0), (0.022, 0.006), (0.034, 0.045), (0.036, 0.05), (0.031, 0.05),
                   (0.018, 0.012), (0.0, 0.012)], 24, sc)
     g.result(g.smooth(g.mat(c, m), True))
     return g
@@ -76,7 +60,7 @@ def tray():
     r = g.inp("Radius", default=0.11, subtype="DISTANCE")
     m = g.inp("Material", "MATERIAL")
     k = r / 0.11
-    t = lathe(g, [(0.0, 0.0), (0.095, 0.0), (0.11, 0.018), (0.104, 0.019), (0.09, 0.006), (0.0, 0.006)],
+    t = g.lathe([(0.0, 0.0), (0.095, 0.0), (0.11, 0.018), (0.104, 0.019), (0.09, 0.006), (0.0, 0.006)],
               40, k)
     g.result(g.smooth_by_angle(g.mat(t, m), 0.8))
     return g
@@ -92,12 +76,12 @@ def snack_plate():
     m_plate = g.inp("Plate Material", "MATERIAL")
     m_food = g.inp("Food Material", "MATERIAL")
     k = r / 0.1
-    plate = lathe(g, [(0.0, 0.0), (0.06, 0.0), (0.1, 0.012), (0.096, 0.014), (0.06, 0.005), (0.0, 0.005)],
+    plate = g.lathe([(0.0, 0.0), (0.06, 0.0), (0.1, 0.012), (0.096, 0.014), (0.06, 0.005), (0.0, 0.005)],
                   36, k)
     pts = g.mesh_line(n, g.vec(r * -0.45, 0.0, r * 0.12), g.vec(r * 0.3, 0.0, 0.0))
     jit = g.random(-0.012, 0.012, seed, dtype="FLOAT_VECTOR")
     pts = g.set_pos(pts, offset=g.vmath("MULTIPLY", jit, (1.0, 1.0, 0.0)))
-    ball = ellipsoid(g, 0.024, 0.024, 0.016, 12, 8)
+    ball = g.ellipsoid(0.024, 0.024, 0.016, 12, 8)
     food = g.realize(g.iop(g.mesh_to_points(pts), ball, scale=g.vec(k, k, k)))
     g.result(g.join(g.smooth(g.mat(plate, m_plate), True), g.smooth(g.mat(food, m_food), True)))
     return g
@@ -138,7 +122,7 @@ def vase():
     m = g.inp("Material", "MATERIAL")
     shapes = []
     for k in range(len(VASE_PROFILES)):
-        shapes.append(lathe(g, VASE_PROFILES[k], 40, 1.0))
+        shapes.append(g.lathe(VASE_PROFILES[k], 40, 1.0))
     v = g.index_switch(shape, shapes, "GEOMETRY")
     # profiles are unit height with radius ~0.5 -> scale
     v = g.transform(v, s=g.vec(Wd, Wd, Hh))
@@ -153,7 +137,7 @@ def bowl():
     d = g.inp("Diameter", default=0.3, subtype="DISTANCE")
     h = g.inp("Height", default=0.1, subtype="DISTANCE")
     m = g.inp("Material", "MATERIAL")
-    b = lathe(g, [(0.0, 0.0), (0.2, 0.0), (0.22, 0.05), (0.36, 0.45), (0.48, 0.92), (0.5, 1.0),
+    b = g.lathe([(0.0, 0.0), (0.2, 0.0), (0.22, 0.05), (0.36, 0.45), (0.48, 0.92), (0.5, 1.0),
                   (0.47, 1.0), (0.34, 0.5), (0.0, 0.2)], 36, 1.0)
     b = g.transform(b, s=g.vec(d, d, h))
     g.result(g.smooth(g.mat(b, m), True))
@@ -167,20 +151,20 @@ def panda():
     Hh = g.inp("Height", default=0.5, subtype="DISTANCE")
     m_w = g.inp("White Material", "MATERIAL")
     m_k = g.inp("Dark Material", "MATERIAL")
-    body = g.move(ellipsoid(g, 0.3, 0.26, 0.32), z=0.3)
-    head = g.move(ellipsoid(g, 0.24, 0.21, 0.21), z=0.74)
-    muzzle = g.move(ellipsoid(g, 0.09, 0.07, 0.06, 12, 8), 0.0, -0.18, 0.69)
+    body = g.move(g.ellipsoid(0.3, 0.26, 0.32), z=0.3)
+    head = g.move(g.ellipsoid(0.24, 0.21, 0.21), z=0.74)
+    muzzle = g.move(g.ellipsoid(0.09, 0.07, 0.06, 12, 8), 0.0, -0.18, 0.69)
     white = g.join(body, head, muzzle)
-    ears = g.join(g.move(ellipsoid(g, 0.075, 0.05, 0.075, 12, 8), -0.17, 0.0, 0.92),
-                  g.move(ellipsoid(g, 0.075, 0.05, 0.075, 12, 8), 0.17, 0.0, 0.92))
-    eyes = g.join(g.move(ellipsoid(g, 0.06, 0.03, 0.075, 12, 8), -0.085, -0.19, 0.76),
-                  g.move(ellipsoid(g, 0.06, 0.03, 0.075, 12, 8), 0.085, -0.19, 0.76))
-    nose = g.move(ellipsoid(g, 0.03, 0.02, 0.02, 10, 6), 0.0, -0.245, 0.71)
-    arms = g.join(g.transform(ellipsoid(g, 0.08, 0.08, 0.2, 12, 8), t=(-0.25, -0.1, 0.38), r=(0.3, 0.35, 0.0)),
-                  g.transform(ellipsoid(g, 0.08, 0.08, 0.2, 12, 8), t=(0.25, -0.1, 0.38), r=(0.3, -0.35, 0.0)))
-    legs = g.join(g.transform(ellipsoid(g, 0.1, 0.16, 0.09, 12, 8), t=(-0.16, -0.2, 0.08)),
-                  g.transform(ellipsoid(g, 0.1, 0.16, 0.09, 12, 8), t=(0.16, -0.2, 0.08)))
-    band = g.move(ellipsoid(g, 0.31, 0.27, 0.07, 24, 8), z=0.5)
+    ears = g.join(g.move(g.ellipsoid(0.075, 0.05, 0.075, 12, 8), -0.17, 0.0, 0.92),
+                  g.move(g.ellipsoid(0.075, 0.05, 0.075, 12, 8), 0.17, 0.0, 0.92))
+    eyes = g.join(g.move(g.ellipsoid(0.06, 0.03, 0.075, 12, 8), -0.085, -0.19, 0.76),
+                  g.move(g.ellipsoid(0.06, 0.03, 0.075, 12, 8), 0.085, -0.19, 0.76))
+    nose = g.move(g.ellipsoid(0.03, 0.02, 0.02, 10, 6), 0.0, -0.245, 0.71)
+    arms = g.join(g.transform(g.ellipsoid(0.08, 0.08, 0.2, 12, 8), t=(-0.25, -0.1, 0.38), r=(0.3, 0.35, 0.0)),
+                  g.transform(g.ellipsoid(0.08, 0.08, 0.2, 12, 8), t=(0.25, -0.1, 0.38), r=(0.3, -0.35, 0.0)))
+    legs = g.join(g.transform(g.ellipsoid(0.1, 0.16, 0.09, 12, 8), t=(-0.16, -0.2, 0.08)),
+                  g.transform(g.ellipsoid(0.1, 0.16, 0.09, 12, 8), t=(0.16, -0.2, 0.08)))
+    band = g.move(g.ellipsoid(0.31, 0.27, 0.07, 24, 8), z=0.5)
     dark = g.join(ears, eyes, nose, arms, legs, band)
     geo = g.join(g.mat(white, m_w), g.mat(dark, m_k))
     geo = g.transform(geo, s=g.vec(Hh, Hh, Hh))
@@ -198,10 +182,10 @@ def planter():
     Hh = g.inp("Height", default=0.16, subtype="DISTANCE")
     m = g.inp("Material", "MATERIAL")
     m_soil = g.inp("Soil Material", "MATERIAL")
-    pot = lathe(g, [(0.0, 0.0), (0.36, 0.0), (0.4, 0.1), (0.49, 0.7), (0.5, 0.95), (0.52, 1.0),
+    pot = g.lathe([(0.0, 0.0), (0.36, 0.0), (0.4, 0.1), (0.49, 0.7), (0.5, 0.95), (0.52, 1.0),
                     (0.47, 1.0), (0.45, 0.85)], 40, 1.0)
     pot = g.transform(pot, s=g.vec(L, Wd, Hh))
-    soil = g.transform(ellipsoid(g, 0.46, 0.46, 0.12, 24, 8), t=g.vec(0.0, 0.0, Hh * 0.8), s=g.vec(L, Wd, Hh))
+    soil = g.transform(g.ellipsoid(0.46, 0.46, 0.12, 24, 8), t=g.vec(0.0, 0.0, Hh * 0.8), s=g.vec(L, Wd, Hh))
     g.result(g.join(g.smooth(g.mat(pot, m), True), g.mat(soil, m_soil)))
     return g
 
@@ -356,26 +340,26 @@ def lion():
     mir = g.inp("Mirror", "BOOL", default=False)
     m = g.inp("Material", "MATERIAL")
     parts = [
-        g.move(ellipsoid(g, 0.2, 0.26, 0.2), 0.0, 0.08, 0.2),            # haunches
-        g.transform(ellipsoid(g, 0.17, 0.16, 0.27), t=(0.0, -0.04, 0.42), r=(0.25, 0.0, 0.0)),  # chest
-        g.move(ellipsoid(g, 0.23, 0.2, 0.2), 0.0, -0.06, 0.7),           # mane
-        g.move(ellipsoid(g, 0.19, 0.17, 0.17), 0.0, -0.13, 0.76),        # head
-        g.move(ellipsoid(g, 0.11, 0.08, 0.08, 16, 10), 0.0, -0.27, 0.71),  # muzzle
-        g.move(ellipsoid(g, 0.08, 0.05, 0.035, 12, 8), 0.0, -0.3, 0.64),   # jaw
-        g.move(ellipsoid(g, 0.16, 0.06, 0.05, 16, 8), 0.0, -0.24, 0.83),   # brows
-        g.transform(ellipsoid(g, 0.055, 0.06, 0.22, 12, 10), t=(-0.1, -0.16, 0.22), r=(0.15, 0.0, 0.0)),  # foreleg
-        g.move(ellipsoid(g, 0.07, 0.09, 0.05, 12, 8), -0.1, -0.22, 0.04),  # paw
-        g.transform(ellipsoid(g, 0.055, 0.06, 0.16, 12, 10), t=(0.11, -0.2, 0.28), r=(0.7, 0.0, 0.0)),  # raised leg
+        g.move(g.ellipsoid(0.2, 0.26, 0.2), 0.0, 0.08, 0.2),            # haunches
+        g.transform(g.ellipsoid(0.17, 0.16, 0.27), t=(0.0, -0.04, 0.42), r=(0.25, 0.0, 0.0)),  # chest
+        g.move(g.ellipsoid(0.23, 0.2, 0.2), 0.0, -0.06, 0.7),           # mane
+        g.move(g.ellipsoid(0.19, 0.17, 0.17), 0.0, -0.13, 0.76),        # head
+        g.move(g.ellipsoid(0.11, 0.08, 0.08, 16, 10), 0.0, -0.27, 0.71),  # muzzle
+        g.move(g.ellipsoid(0.08, 0.05, 0.035, 12, 8), 0.0, -0.3, 0.64),   # jaw
+        g.move(g.ellipsoid(0.16, 0.06, 0.05, 16, 8), 0.0, -0.24, 0.83),   # brows
+        g.transform(g.ellipsoid(0.055, 0.06, 0.22, 12, 10), t=(-0.1, -0.16, 0.22), r=(0.15, 0.0, 0.0)),  # foreleg
+        g.move(g.ellipsoid(0.07, 0.09, 0.05, 12, 8), -0.1, -0.22, 0.04),  # paw
+        g.transform(g.ellipsoid(0.055, 0.06, 0.16, 12, 10), t=(0.11, -0.2, 0.28), r=(0.7, 0.0, 0.0)),  # raised leg
         g.move(g.n("GeometryNodeMeshUVSphere", Segments=20, Rings=12, Radius=0.08)["Mesh"], 0.12, -0.27, 0.12),  # ball
-        g.move(ellipsoid(g, 0.08, 0.14, 0.06, 12, 8), -0.17, 0.02, 0.05),  # hind paw
-        g.move(ellipsoid(g, 0.08, 0.14, 0.06, 12, 8), 0.17, 0.02, 0.05),
-        g.transform(ellipsoid(g, 0.05, 0.12, 0.05, 12, 8), t=(0.0, 0.3, 0.3), r=(-0.9, 0.0, 0.0)),  # tail
-        g.move(ellipsoid(g, 0.05, 0.035, 0.06, 10, 8), -0.14, -0.08, 0.9),  # ears
-        g.move(ellipsoid(g, 0.05, 0.035, 0.06, 10, 8), 0.14, -0.08, 0.9),
+        g.move(g.ellipsoid(0.08, 0.14, 0.06, 12, 8), -0.17, 0.02, 0.05),  # hind paw
+        g.move(g.ellipsoid(0.08, 0.14, 0.06, 12, 8), 0.17, 0.02, 0.05),
+        g.transform(g.ellipsoid(0.05, 0.12, 0.05, 12, 8), t=(0.0, 0.3, 0.3), r=(-0.9, 0.0, 0.0)),  # tail
+        g.move(g.ellipsoid(0.05, 0.035, 0.06, 10, 8), -0.14, -0.08, 0.9),  # ears
+        g.move(g.ellipsoid(0.05, 0.035, 0.06, 10, 8), 0.14, -0.08, 0.9),
     ]
     body = g.join(*parts)
     # mane curls: little knobs scattered on the mane/head back
-    mane = g.move(ellipsoid(g, 0.22, 0.19, 0.19), 0.0, -0.04, 0.72)
+    mane = g.move(g.ellipsoid(0.22, 0.19, 0.19), 0.0, -0.04, 0.72)
     pts = g.n("GeometryNodeDistributePointsOnFaces", mane, Seed=3,
               props={"distribute_method": "POISSON"}, Distance_Min=0.035, Density_Max=900.0)
     front = g.compare(g.sep(g.position())[1], -0.15, "GREATER_THAN")
@@ -425,7 +409,7 @@ def lantern():
     bh = D * Hr
     cap_h = D * 0.035
     zc = cap_h * -1.0 - bh * 0.5 + D * 0.01              # body centre
-    body = ellipsoid(g, 1.0, 1.0, 1.0, 32, 20)
+    body = g.ellipsoid(1.0, 1.0, 1.0, 32, 20)
     body = g.transform(body, t=g.vec(0.0, 0.0, zc), s=g.vec(r, r, bh * 0.5))
     top = g.join(g.move(g.cylinder(D * 0.13, cap_h, 24), z=cap_h * -0.5),
                  g.move(g.cylinder(D * 0.03, D * 0.04, 8), z=D * 0.02))

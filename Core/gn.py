@@ -221,6 +221,21 @@ class GN(Tree):
         """Straight round rod from a to b."""
         return self.tube(self.curve_line(a, b), r, res)
 
+    def lathe(self, pts, segments=40, scale=1.0):
+        """Surface of revolution about Z from a profile [(r, z), ...] listed
+        from the axis at the bottom, out, up and (optionally) back in.  ``scale``
+        (constant or socket) multiplies the profile."""
+        path = self.circle(1.0, segments)
+        # Curve to Mesh along a unit circle: radius = 1 + profile x, z = -profile y
+        prof = self.polyline([(r * scale - 1.0, z * scale * -1.0, 0.0) for r, z in pts])
+        body = self.sweep(path, prof, False)
+        return self.merge(self.n("GeometryNodeFlipFaces", body).o, 0.0005)
+
+    def ellipsoid(self, rx, ry, rz, seg=24, rings=16):
+        """UV sphere scaled to the semi-axes rx, ry, rz."""
+        s = self.n("GeometryNodeMeshUVSphere", Segments=seg, Rings=rings, Radius=1.0)["Mesh"]
+        return self.transform(s, s=self.vec(rx, ry, rz))
+
     # ------------------------------------------------------------- operators
     def transform(self, geo, t=None, r=None, s=None):
         kw = {}
