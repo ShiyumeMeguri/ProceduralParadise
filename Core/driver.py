@@ -32,7 +32,7 @@ import bpy
 from mathutils import Vector
 
 __all__ = ["fresh_modules", "script_args", "base_parser", "parse", "fingerprint", "shot_cameras",
-           "render_setup", "build_animation", "activate_animation", "activate_still",
+           "render_setup", "build_animation", "build_scene_folder", "activate_animation", "activate_still",
            "viewport_through_camera", "run"]
 
 OUTPUT_OPTIONS = {"out", "no_save", "render", "view", "render_animation"}
@@ -123,18 +123,21 @@ def shot_cameras(shot, matrix):
 
 
 def render_setup(shot, args, lines_defaults=None):
-    """Cycles, colour management and the compositor look of a shot.
+    """Render engine (the shot's ``render.engine``: CYCLES or EEVEE, with its
+    settings under ``render.cycles`` / ``render.eevee``), colour management
+    and the compositor look of a shot.
 
     The look's exposure goes into the compositor *before* the grade, so the
     grade sees exactly the values it was fitted on; a view may carry its own
     camera exposure.  ``lines_defaults`` completes a look's ``lines`` entry
     (collections, occluders) for worlds that draw Freestyle ink lines.
-    Returns ``dict(compositor, look_exposure, exposure)``."""
+    Returns ``dict(engine, compositor, look_exposure, exposure)``."""
     from . import render as RND
     sc = bpy.context.scene
-    settings = shot.get("render", {})
-    RND.setup_cycles(samples=args.samples or settings.get("samples", 128),
-                     **settings.get("cycles", {}))
+    settings = shot["render"]
+    engine = settings["engine"]
+    RND.ENGINES[engine](samples=args.samples or settings.get("samples", 128),
+                        **settings.get(engine.lower(), {}))
     view = shot["views"][args.view] if args.view else None
     exposure = (view or {}).get("exposure", settings.get("exposure", 0.0))
     compositor = None
@@ -156,7 +159,7 @@ def render_setup(shot, args, lines_defaults=None):
         sc.camera = bpy.data.objects[f"VIEW_{args.view}"]
         if "resolution" in view:
             sc.render.resolution_x, sc.render.resolution_y = view["resolution"]
-    return dict(compositor=compositor, look_exposure=look_exposure, exposure=exposure)
+    return dict(engine=engine, compositor=compositor, look_exposure=look_exposure, exposure=exposure)
 
 
 def build_animation(folder, name, shot, matrix, look):
@@ -194,6 +197,51 @@ def build_animation(folder, name, shot, matrix, look):
                 frame_end=int(max(key["frame"] for key in keys)))
 
 
+def build_scene_folder(here, args):
+    """Build the scene folder ``args.scene`` (relative to ``here``, e.g.
+    ``CrystalFantasy/Scenes/Conservatory``) of a world whose first folder is a
+    package with a ``Kit`` (registering its assets and its material library
+    ``Kit.materials``) and a ``scenes`` interpreter (``load_scene``,
+    ``build_scene``).  The scene's ``materials`` fill the library's look
+    parameters before anything is built; every shot in ``shots/`` gets its
+    camera, the active one (``--shot`` or the scene's ``defaults``) with its
+    views, render setup and look; the camera flight (``--animation`` or the
+    defaults) is added when there is one.  Returns the context for
+    :func:`run`."""
+    from mathutils import Matrix
+    from . import camera as CAM, jsonio, scene as SC
+    scene_dir = os.path.join(here, args.scene)
+    package = args.scene.replace("\\", "/").split("/")[0]
+    __import__(f"{package}.Kit")
+    scenes = __import__(f"{package}.scenes", fromlist=["build_scene", "load_scene"])
+    materials = __import__(f"{package}.Kit.materials", fromlist=["PARAMS"])
+
+    sc = SC.reset_scene()
+    definition = scenes.load_scene(scene_dir)
+    defaults = definition.get("defaults", {})
+    materials.PARAMS.clear()
+    materials.PARAMS.update(definition.get("materials", {}))
+    built = scenes.build_scene(scene_dir)
+
+    shots_dir = os.path.join(scene_dir, "shots")
+    active = args.shot or defaults.get("shot")
+    identity = Matrix.Identity(4)
+    for name in sorted(os.path.splitext(file)[0] for file in os.listdir(shots_dir) if file.endswith(".json")):
+        if name != active:
+            other = jsonio.load(os.path.join(shots_dir, f"{name}.json"))
+            CAM.camera_from_solve(f"CAM_{other['id']}", other["camera"], set_active=False)
+    shot = dict(jsonio.load(os.path.join(shots_dir, f"{active}.json")))
+    shot["views"] = {**definition.get("views", {}), **shot.get("views", {})}
+    camera = shot_cameras(shot, identity)
+    look = render_setup(shot, args)
+
+    animation_name = args.animation if args.animation is not None else defaults.get("animation")
+    animation = None
+    if animation_name and animation_name.lower() != "none":
+        animation = build_animation(scene_dir, animation_name, shot, identity, look)
+    return dict(scene=sc, built=built, camera=camera, shot=shot, animation=animation, shot_camera=camera, **look)
+
+
 def activate_animation(context, samples, video, inputs):
     """Make the animation the scene's render: camera, frame range, fps,
     resolution, samples, the PNG frames in ``<video minus extension>/<inputs>/``
@@ -207,7 +255,8 @@ def activate_animation(context, samples, video, inputs):
     sc.frame_set(animation["frame_start"])
     width, height = spec.get("resolution", (1920, 1080))
     sc.render.resolution_x, sc.render.resolution_y = width, height
-    sc.cycles.samples = samples or spec.get("samples", sc.cycles.samples)
+    if samples or "samples" in spec:
+        RND.set_samples(context["engine"], samples or spec["samples"], sc)
     stem = os.path.splitext(video)[0]
     RND.frame_output(f"{stem}/{inputs}/{bpy.path.basename(stem)}_", fps=spec.get("fps", 30))
     context["video_scene"] = RND.video_scene(video, f"{spec['id']} Video", sc)
@@ -258,8 +307,9 @@ def run(context, args, out, root, script_path):
             os.path.join(os.path.dirname(out), "video", f"{video_id}.mp4")
         in_blend = video if args.render_animation or args.no_save else f"//video/{video_id}.mp4"
         activate_animation(context, args.samples, in_blend, fingerprint(args, root, script_path)[:16])
-    backend = RND.use_gpu_if_available()
-    print(f"[build] Cycles device: {backend or 'CPU'}")
+    if context["engine"] == "CYCLES":
+        backend = RND.use_gpu_if_available()
+        print(f"[build] Cycles device: {backend or 'CPU'}")
     if not args.no_save:
         os.makedirs(os.path.dirname(out), exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=out, compress=True)

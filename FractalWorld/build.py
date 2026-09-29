@@ -77,7 +77,6 @@ for path in (ROOT, HERE):
         sys.path.insert(0, path)
 
 import bpy  # noqa: E402,F401
-from mathutils import Matrix  # noqa: E402
 
 
 def parse(argv=None):
@@ -92,37 +91,8 @@ def build_dir(scene_rel):
 
 
 def build(args):
-    from Core import camera as CAM, driver, jsonio, scene as SC
-    scene_dir = os.path.join(HERE, args.scene)
-    realm = args.scene.replace("\\", "/").split("/")[0]
-    __import__(f"{realm}.Kit")
-    scenes = __import__(f"{realm}.scenes", fromlist=["build_scene", "load_scene"])
-    materials = __import__(f"{realm}.Kit.materials", fromlist=["PARAMS"])
-
-    sc = SC.reset_scene()
-    definition = scenes.load_scene(scene_dir)
-    defaults = definition.get("defaults", {})
-    materials.PARAMS.clear()
-    materials.PARAMS.update(definition.get("materials", {}))
-    built = scenes.build_scene(scene_dir)
-
-    shots_dir = os.path.join(scene_dir, "shots")
-    active = args.shot or defaults.get("shot")
-    identity = Matrix.Identity(4)
-    for name in sorted(os.path.splitext(file)[0] for file in os.listdir(shots_dir) if file.endswith(".json")):
-        if name != active:
-            other = jsonio.load(os.path.join(shots_dir, f"{name}.json"))
-            CAM.camera_from_solve(f"CAM_{other['id']}", other["camera"], set_active=False)
-    shot = dict(jsonio.load(os.path.join(shots_dir, f"{active}.json")))
-    shot["views"] = {**definition.get("views", {}), **shot.get("views", {})}
-    camera = driver.shot_cameras(shot, identity)
-    look = driver.render_setup(shot, args)
-
-    animation_name = args.animation if args.animation is not None else defaults.get("animation")
-    animation = None
-    if animation_name and animation_name.lower() != "none":
-        animation = driver.build_animation(scene_dir, animation_name, shot, identity, look)
-    return dict(scene=sc, built=built, camera=camera, shot=shot, animation=animation, shot_camera=camera, **look)
+    from Core import driver
+    return driver.build_scene_folder(HERE, args)
 
 
 def main(argv=None):
