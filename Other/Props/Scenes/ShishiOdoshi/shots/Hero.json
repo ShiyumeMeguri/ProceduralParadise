@@ -1,0 +1,21 @@
+{
+  "id": "Hero",
+  "notes": "Side-on to the tube from the front right, 17 degrees down, 50 mm lens: stone, tube, basin and the wand's nozzle in frame.",
+  "camera": {
+    "resolution": [1920, 1080],
+    "focal_px": 2666.667,
+    "location": [0.7221, -0.9584, 0.5631],
+    "yaw_deg": 35.942,
+    "pitch_deg": -16.888,
+    "roll_deg": 0.0,
+    "dof": {"focus_distance": 1.25, "fstop": 4.0}
+  },
+  "render": {
+    "engine": "EEVEE",
+    "samples": 128,
+    "view": "AgX",
+    "look": "Medium High Contrast",
+    "exposure": 0.0,
+    "eevee": {"viewport_samples": 32}
+  }
+}

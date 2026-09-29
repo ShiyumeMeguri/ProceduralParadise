@@ -1,0 +1,51 @@
+{
+  "id": "Props",
+  "name": "Props (杂物)",
+  "units": "metres, Z up; angles in degrees (angle sockets are converted when a scene is built)",
+  "notes": [
+    "Small interactive props that belong to no world: each one is a simulation on a studio tabletop, rendered with EEVEE.",
+    "Colours are linear RGB.  In scene data a colour input may name a palette entry instead of giving RGB.",
+    "A liquid preset is a Core.physics.liquid material plus the library material its surface renders with.",
+    "The studio is put up for every scene: a tabletop (top face z = 0), a cyclorama, a gradient world and three area lights placed at the scene's subject + offset, aimed at it."
+  ],
+  "palette": {
+    "rubber_red": [0.98, 0.16, 0.38],
+    "slime_green": [0.28, 0.92, 0.22],
+    "slime_absorption": [0.12, 0.7, 0.08],
+    "flash": [1.0, 0.35, 0.3],
+    "water_absorption": [0.62, 0.86, 1.0],
+    "balloon_absorption": [0.75, 0.9, 1.0],
+    "eye_black": [0.005, 0.005, 0.008],
+    "lips": [0.18, 0.02, 0.03],
+    "brass": [0.92, 0.66, 0.3],
+    "bamboo": [0.36, 0.5, 0.16],
+    "bamboo_dry": [0.62, 0.55, 0.3],
+    "bamboo_node": [0.3, 0.33, 0.12],
+    "granite": [0.2, 0.2, 0.19],
+    "granite_light": [0.42, 0.41, 0.38],
+    "moss": [0.1, 0.18, 0.05],
+    "table": [0.72, 0.7, 0.66],
+    "backdrop": [0.26, 0.31, 0.38]
+  },
+  "liquids": {
+    "Water": {"density": 1000.0, "dynamic_viscosity": 0.001, "pic": 0.03, "friction": 0.5, "adhesion": 0.0, "wall_stick": 0.0,
+              "yield": 0.0, "material": "Props.Water"},
+    "Slime Goo": {"density": 1100.0, "dynamic_viscosity": 2.0, "pic": 0.08, "friction": 3.0, "adhesion": 0.5, "wall_stick": 0.85,
+                  "yield": 1.5, "material": "Props.Goo"}
+  },
+  "studio": {
+    "world": {"top": [0.11, 0.12, 0.14], "horizon": [0.07, 0.075, 0.085], "bottom": [0.02, 0.02, 0.022], "strength": 1.0},
+    "items": [
+      {"name": "Table", "stack": [
+        {"asset": "Props.Studio.Table", "inputs": {"Width": 0.9, "Depth": 0.7, "Thickness": 0.06}},
+        {"modifier": "BEVEL", "settings": {"width": 0.004, "segments": 3, "limit_method": "ANGLE"}}]},
+      {"name": "Backdrop", "asset": "Props.Studio.Backdrop", "loc": [0.0, 0.35, -0.002],
+       "inputs": {"Width": 3.0, "Depth": 1.2, "Height": 1.6, "Bend Radius": 0.45}}
+    ],
+    "lights": [
+      {"name": "Key", "light": "AREA", "offset": [0.42, 0.42, 0.5], "power": 6.0, "color": [1.0, 0.95, 0.88], "size": [0.45, 0.35]},
+      {"name": "Fill", "light": "AREA", "offset": [-0.55, -0.5, 0.35], "power": 2.2, "color": [0.86, 0.92, 1.0], "size": [0.9, 0.7]},
+      {"name": "Top", "light": "AREA", "shape": "DISK", "offset": [0.05, -0.05, 0.85], "power": 2.0, "size": [0.6, 0.6]}
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "ShishiOdoshi",
+  "name": "Shishi-odoshi (惊鹿)",
+  "fps": 24,
+  "frames": [1, 1500],
+  "defaults": {
+    "shot": "Hero"
+  },
+  "notes": [
+    "The axle is 22 cm above the table; the tube's mouth points along (0.809, 0.588), to the right of the camera.",
+    "The wand hangs over the mouth like a spout: its nozzle 14 cm above the axle and 13.5 cm out along the tube, spraying 25 degrees forward of straight down.",
+    "The basin stands under the mouth's lowest reach, 19 cm out along the tube; the drain sits in its hole."
+  ],
+  "materials": {
+    "color:table": [0.6, 0.57, 0.52],
+    "color:backdrop": [0.3, 0.34, 0.3]
+  },
+  "studio": {
+    "subject": [0.02, 0.01, 0.2]
+  },
+  "collections": {
+    "ShishiOdoshi": [
+      {"name": "ShishiOdoshi", "loc": [0.0, 0.0, 0.22], "rot": [0.0, 0.0, -54.0], "asset": "Props.ShishiOdoshi.Simulation",
+       "inputs": {"Wand": "Wand", "Solids": "Solids", "Ground": "Table", "Drain": "Drain"}},
+      {"name": "Drain", "empty": "CIRCLE", "size": 1.0, "loc": [0.1537, 0.1117, 0.0], "scale": [0.012, 0.012, 0.008]}
+    ],
+    "Solids": [
+      {"name": "Basin", "asset": "Props.Basin", "loc": [0.1537, 0.1117, 0.0],
+       "inputs": {"Radius": 0.09, "Height": 0.05, "Wall": 0.014, "Floor": 0.014, "Drain Radius": 0.012}},
+      {"name": "Wand", "asset": "Props.Wand", "loc": [0.1092, 0.0794, 0.36], "aim": [-0.3419, -0.2484, 0.9063]}
+    ]
+  },
+  "focus": "ShishiOdoshi"
+}

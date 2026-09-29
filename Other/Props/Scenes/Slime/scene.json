@@ -1,0 +1,41 @@
+{
+  "id": "Slime",
+  "name": "Slime (史莱姆)",
+  "fps": 24,
+  "frames": [1, 300],
+  "defaults": {
+    "shot": "Hero"
+  },
+  "notes": [
+    "The slime sits on the table at the origin facing the camera (its front is local -Y).",
+    "The stick pokes twice from above and the third time from the side, which kills the slime; delete its keys to poke by hand."
+  ],
+  "materials": {
+    "color:table": [0.74, 0.72, 0.7],
+    "color:backdrop": [0.34, 0.28, 0.4]
+  },
+  "studio": {
+    "subject": [0.0, 0.0, 0.035]
+  },
+  "collections": {
+    "Slime": [
+      {"name": "Slime", "rot": [0.0, 0.0, 35.942], "stack": [
+        {"asset": "Props.Slime.Shape", "inputs": {"Radius": 0.05, "Subdivisions": 4, "Bottom Flatten": 0.42, "Peak": 0.35, "Bulge": 0.12}},
+        {"asset": "Props.Slime.Simulation", "inputs": {"Ground": "Table", "Colliders": "Colliders", "Stick": "Stick"}},
+        {"modifier": "SUBSURF", "settings": {"levels": 1, "render_levels": 2, "quality": 3}}]}
+    ],
+    "Colliders": [
+      {"name": "Stick", "asset": "Props.Stick", "inputs": {"Radius": 0.006, "Length": 0.24, "Whittled Length": 0.014}}
+    ]
+  },
+  "choreography": [
+    {"type": "pokes", "object": "Stick", "target": "Slime", "approach": 0.07, "withdraw": 0.16,
+     "frames": {"thrust": 6, "retract": 10, "withdraw": 30},
+     "pokes": [
+       {"frame": 40, "azimuth": -55.0, "elevation": 50.0, "aim_height": 0.05, "depth": 0.012, "hold": 3},
+       {"frame": 95, "azimuth": 50.0, "elevation": 55.0, "aim_height": 0.055, "depth": 0.015, "hold": 3},
+       {"frame": 150, "azimuth": -35.0, "elevation": 10.0, "aim_height": 0.02, "depth": 0.03, "hold": 8}
+     ]}
+  ],
+  "focus": "Slime"
+}

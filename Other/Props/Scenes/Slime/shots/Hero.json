@@ -1,0 +1,21 @@
+{
+  "id": "Hero",
+  "notes": "Three-quarter view from the front right, 17 degrees down, 65 mm lens, focused on the slime.",
+  "camera": {
+    "resolution": [1920, 1080],
+    "focal_px": 3466.667,
+    "location": [0.36507, -0.50355, 0.22383],
+    "yaw_deg": 35.942,
+    "pitch_deg": -16.888,
+    "roll_deg": 0.0,
+    "dof": {"focus_distance": 0.65, "fstop": 2.8}
+  },
+  "render": {
+    "engine": "EEVEE",
+    "samples": 128,
+    "view": "AgX",
+    "look": "Medium High Contrast",
+    "exposure": 0.0,
+    "eevee": {"viewport_samples": 32}
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "WaterBalloon",
+  "name": "Water balloon (水气球)",
+  "fps": 24,
+  "frames": [1, 3000],
+  "defaults": {
+    "shot": "Hero"
+  },
+  "notes": [
+    "The balloon is centred on its origin 5 cm above the table, tilted a little; the stick leans against its shoulder.",
+    "Hand sits on the knot's tip: with Grab on, the knot follows it."
+  ],
+  "studio": {
+    "subject": [0.0, 0.0, 0.055]
+  },
+  "collections": {
+    "Balloon": [
+      {"name": "Balloon", "loc": [0.0, 0.0, 0.05], "rot": [4.0, -3.0, 0.0], "stack": [
+        {"asset": "Props.Balloon.Shape", "inputs": {"Radius": 0.045, "Subdivisions": 4, "Neck Height": 0.006, "Neck Radius": 0.02}},
+        {"asset": "Props.Balloon.Simulation", "inputs": {"Ground": "Table", "Colliders": "Colliders", "Hand": "Hand"}},
+        {"modifier": "SUBSURF", "settings": {"levels": 2, "render_levels": 3, "quality": 3}}]},
+      {"name": "Hand", "empty": "SPHERE", "size": 0.012, "loc": [-0.003289, -0.004395, 0.11276]}
+    ],
+    "Colliders": [
+      {"name": "Stick", "asset": "Props.Stick", "loc": [-0.022212, -0.01851, 0.111118], "aim": [-0.3, -0.25, 0.92],
+       "inputs": {"Radius": 0.008, "Length": 0.2, "Whittled Length": 0.012}}
+    ]
+  },
+  "focus": "Balloon"
+}
