@@ -63,6 +63,7 @@
     "angle": 1.5
   },
   "render": {
+    "engine": "CYCLES",
     "samples": 160,
     "scale": 1.0,
     "view": "Standard",

@@ -11,8 +11,15 @@ from __future__ import annotations
 import bpy
 
 from .nodes import Tree, Sock, Node
+from .gn import GN, asset
 
-__all__ = ["material", "principled", "emission_mat", "glass_mat", "new_world", "MaterialLibrary"]
+__all__ = ["material", "principled", "emission_mat", "glass_mat", "new_world", "MaterialLibrary",
+           "THICKNESS_ATTRIBUTE", "EEVEE_REFRACTION", "beer_lambert", "eevee_refraction"]
+
+THICKNESS_ATTRIBUTE = "thickness"
+THICKNESS_START = 1e-4
+EEVEE_REFRACTION = {"surface_render_method": "DITHERED", "use_raytrace_refraction": True,
+                    "use_transparent_shadow": True, "thickness_mode": "SPHERE"}
 
 
 class MaterialLibrary:
@@ -65,10 +72,11 @@ def _new_material(name):
     return m
 
 
-def material(name, build, **opts):
+def material(name, build, settings=None, **opts):
     """Create material ``name`` and call ``build(t, out)`` where ``t`` is a
     :class:`Tree` wrapping the material node tree and ``out`` is the Material
-    Output node (connect a shader to ``out.n.inputs['Surface']``)."""
+    Output node (connect a shader to ``out.n.inputs['Surface']``).  ``settings``
+    are material properties set afterwards (e.g. :data:`EEVEE_REFRACTION`)."""
     m = _new_material(name)
     t = Tree.wrap(m.node_tree, clear=True)
     out = t.n("ShaderNodeOutputMaterial")
@@ -87,7 +95,47 @@ def material(name, build, **opts):
     for k in ("blend_method",):
         if k in opts and hasattr(m, k):
             setattr(m, k, opts[k])
+    for key, value in (settings or {}).items():
+        setattr(m, key, value)
     return m
+
+
+def beer_lambert(t: Tree, absorption, density, distance):
+    """Transmittance exp(-(1 - colour) density distance) per channel -- the
+    law of the Volume Absorption shader, over a path length ``distance``."""
+    channels = [t.math("EXPONENT", distance * (-(1.0 - channel) * density)) for channel in absorption]
+    return t.n("ShaderNodeCombineColor", Red=channels[0], Green=channels[1], Blue=channels[2]).o
+
+
+def eevee_refraction(t: Tree, surface, transmittance, thickness):
+    """Output sockets of a refractive body for EEVEE (use with
+    :data:`EEVEE_REFRACTION`).  EEVEE refracts through one layer and needs the
+    distance light travels inside: ``thickness`` (from ``Shading.Thickness``)
+    feeds the Thickness output.  Shadow rays see the mean ``transmittance``
+    as transparency, so a clear liquid does not cast a solid black shadow."""
+    shadow_ray = t.n("ShaderNodeLightPath")["Is Shadow Ray"]
+    parts = t.n("ShaderNodeSeparateColor", Color=transmittance)
+    mean = (parts["Red"] + parts["Green"] + parts["Blue"]) / 3.0
+    clear = t.n("ShaderNodeBsdfTransparent").o
+    return {"Surface": t.n("ShaderNodeMixShader", shadow_ray * mean, surface, clear).o, "Thickness": thickness}
+
+
+@asset("Shading.Thickness", "Shading")
+def thickness_asset():
+    """Per-vertex ``thickness`` for EEVEE refraction and Beer-Lambert
+    absorption: from a point just inside the surface a ray runs against the
+    normal to the mesh's far side; the hit distance is how far light travels
+    through the body along the normal.  Without it EEVEE assumes a thickness
+    of the object's size and thin films refract to black.  The mesh must be
+    closed with outward normals."""
+    graph = GN("Shading.Thickness", thickness_asset.__doc__)
+    mesh = graph.inp("Mesh", "GEOMETRY")
+    longest = graph.inp("Max Thickness", default=0.2, min=0.0, desc="m; used where a ray finds no far side")
+    normal = graph.normal()
+    hit = graph.raycast(mesh, graph.position() - normal * THICKNESS_START, normal * -1.0, longest)
+    thickness = graph.switch(hit["Is Hit"], longest, hit["Hit Distance"] + THICKNESS_START, "FLOAT")
+    graph.result(graph.store(mesh, THICKNESS_ATTRIBUTE, thickness))
+    return graph
 
 
 def bsdf(t: Tree, **inputs):

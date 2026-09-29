@@ -11,7 +11,8 @@ image (all in pixels of the reference resolution)::
       "location":     [x, y, z],         # in the parent (room) frame, metres
       "yaw_deg":      21.41,             # rotation about +Z; 0 looks along +Y
       "pitch_deg":    0.0,               # + looks up
-      "roll_deg":     0.0
+      "roll_deg":     0.0,
+      "dof":          {"focus_distance": 0.45, "fstop": 2.8}   # optional depth of field
     }
 
 Blender cameras express the principal point through ``shift_x/shift_y`` in
@@ -66,6 +67,10 @@ def camera_from_solve(name, solve, parent_matrix=None, collection=None, set_acti
              @ _cam_rotation(solve.get("yaw_deg", 0.0), solve.get("pitch_deg", 0.0),
                              solve.get("roll_deg", 0.0)))
     ob.matrix_world = (parent_matrix or Matrix.Identity(4)) @ local
+    if "dof" in solve:
+        cam.dof.use_dof = True
+        cam.dof.focus_distance = solve["dof"]["focus_distance"]
+        cam.dof.aperture_fstop = solve["dof"]["fstop"]
     if set_active:
         sc = bpy.context.scene
         sc.camera = ob

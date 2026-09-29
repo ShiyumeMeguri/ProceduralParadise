@@ -19,7 +19,7 @@ import bpy
 from .nodes import Tree
 from .gn import set_menu
 
-__all__ = ["setup_cycles", "color_management", "compositor", "lines", "LINES_LAYER",
+__all__ = ["ENGINES", "setup_cycles", "setup_eevee", "set_samples", "color_management", "compositor", "lines", "LINES_LAYER",
            "frame_output", "frame_paths", "unfinished_frames", "video_scene",
            "use_gpu_if_available", "render_still"]
 
@@ -55,6 +55,38 @@ def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_i
         pass
     sc.render.use_persistent_data = True
     return sc
+
+
+def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resolution="1", trace_quality=0.75,
+                trace_max_roughness=0.5, fast_gi=True):
+    """EEVEE with screen-space ray tracing (reflections and refraction) at
+    full resolution and fast global illumination."""
+    sc = bpy.context.scene
+    sc.render.engine = "BLENDER_EEVEE"
+    ee = sc.eevee
+    ee.taa_render_samples = samples
+    ee.taa_samples = viewport_samples
+    ee.use_raytracing = raytracing
+    ee.ray_tracing_method = "SCREEN"
+    tracing = ee.ray_tracing_options
+    tracing.resolution_scale = trace_resolution
+    tracing.screen_trace_quality = trace_quality
+    tracing.trace_max_roughness = trace_max_roughness
+    ee.use_shadows = True
+    ee.use_fast_gi = fast_gi
+    ee.fast_gi_method = "GLOBAL_ILLUMINATION"
+    return sc
+
+
+ENGINES = {"CYCLES": setup_cycles, "EEVEE": setup_eevee}
+
+
+def set_samples(engine, samples, scene=None):
+    sc = scene or bpy.context.scene
+    if engine == "CYCLES":
+        sc.cycles.samples = samples
+    else:
+        sc.eevee.taa_render_samples = samples
 
 
 def color_management(view="AgX", look=None, exposure=0.0, gamma=1.0):

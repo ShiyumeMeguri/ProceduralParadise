@@ -10,6 +10,7 @@
     "roll_deg": 0.0
   },
   "render": {
+    "engine": "CYCLES",
     "samples": 256,
     "view": "Standard",
     "look": null,
