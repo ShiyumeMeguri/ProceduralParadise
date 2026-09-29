@@ -35,6 +35,7 @@ SOCKET_TYPES = {
     "STRING": "NodeSocketString",
     "SHADER": "NodeSocketShader",
     "MENU": "NodeSocketMenu",
+    "BUNDLE": "NodeSocketBundle",
 }
 
 _VEC = {"VECTOR", "RGBA", "ROTATION"}
@@ -93,6 +94,12 @@ class Sock:
     def y(self): return self.t.sep(self)[1]
     @property
     def z(self): return self.t.sep(self)[2]
+
+    # -- vector helpers ---------------------------------------------------------
+    def dot(self, o): return self.t.vmath("DOT_PRODUCT", self, o)
+    def cross(self, o): return self.t.vmath("CROSS_PRODUCT", self, o)
+    def length(self): return self.t.vmath("LENGTH", self)
+    def normalized(self): return self.t.vmath("NORMALIZE", self)
 
     def __repr__(self):
         return f"<Sock {self.s.node.name}.{self.s.identifier} {self.s.type}>"

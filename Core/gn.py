@@ -21,7 +21,7 @@ import bpy
 
 from .nodes import Tree, Sock, Node, _is_num
 
-__all__ = ["GN", "asset", "get_asset", "ASSETS", "set_mode"]
+__all__ = ["GN", "Zone", "SimulationZone", "remembered_items", "asset", "get_asset", "ASSETS", "set_mode"]
 
 
 def _norm(s):
@@ -62,9 +62,113 @@ def set_mode(node: Node, value, prop_names=("mode",), input_names=("Mode",)):
             return
 
 
+def _capture_type(value):
+    if isinstance(value, Node):
+        value = value.o
+    if isinstance(value, Sock):
+        return {"VALUE": "FLOAT", "INT": "INT", "BOOLEAN": "BOOLEAN", "VECTOR": "VECTOR", "RGBA": "RGBA",
+                "ROTATION": "ROTATION", "MATRIX": "MATRIX"}[value.type]
+    if isinstance(value, bool):
+        return "BOOLEAN"
+    if isinstance(value, int):
+        return "INT"
+    if isinstance(value, (tuple, list)):
+        return "VECTOR"
+    return "FLOAT"
+
+
+class Zone:
+    """A pair of zone nodes (repeat or simulation) with named state items:
+    ``state(name)`` inside the zone, ``set(name, value)`` at its end,
+    ``result(name)`` after it."""
+
+    def __init__(self, graph, input_node, output_node, names, state_offset, set_offset, initial_offset):
+        self.g = graph
+        self.input_node = input_node
+        self.output_node = output_node
+        self.names = list(names)
+        self._state_offset = state_offset
+        self._set_offset = set_offset
+        self._initial_offset = initial_offset
+
+    def _index(self, name):
+        return self.names.index(name)
+
+    def initial(self, name, value):
+        self.g.assign(self.input_node.inputs[self._initial_offset + self._index(name)], value)
+
+    def state(self, name):
+        return Sock(self.g, self.input_node.outputs[self._state_offset + self._index(name)])
+
+    def set(self, name, value):
+        self.g.assign(self.output_node.inputs[self._set_offset + self._index(name)], value)
+
+    def result(self, name):
+        return Sock(self.g, self.output_node.outputs[self._index(name)])
+
+
+class SimulationZone(Zone):
+    """Simulation zone.  The cache keeps every frame's state geometry, so every
+    geometry that enters, leaves or is read back from it passes through
+    :meth:`GN.detach`; derived data built downstream is then never attached to a
+    cached frame.  ``delta_time`` is the zone's time step in seconds."""
+
+    def __init__(self, graph, input_node, output_node, names, kinds):
+        super().__init__(graph, input_node, output_node, names, state_offset=1, set_offset=1, initial_offset=0)
+        self.kinds = dict(zip(names, kinds))
+        self.delta_time = Sock(graph, input_node.outputs[0])
+        self._states = {}
+        self._results = {}
+
+    def state(self, name):
+        if self.kinds[name] != "GEOMETRY":
+            return super().state(name)
+        if name not in self._states:
+            self._states[name] = self.g.detach(super().state(name))
+        return self._states[name]
+
+    def set(self, name, value):
+        super().set(name, self.g.detach(value) if self.kinds[name] == "GEOMETRY" else value)
+
+    def result(self, name):
+        if self.kinds[name] != "GEOMETRY":
+            return super().result(name)
+        if name not in self._results:
+            self._results[name] = self.g.detach(super().result(name))
+        return self._results[name]
+
+    def remember(self, name, keys, build):
+        """The values of ``build()`` (a dict: item -> value), built only on a
+        frame whose ``keys`` (vectors) differ from the ones they were last
+        built for and otherwise carried on from the previous frame -- a switch
+        on a single value evaluates only the branch it takes, so nothing of
+        ``build`` runs on the other frames.  The zone needs the state items
+        of :func:`remembered_items`."""
+        fresh = self.g.bool_not(self.state(f"{name} Built"))
+        for index, key in enumerate(keys):
+            fresh = self.g.bool_or(fresh, self.g.compare(self.g.vmath("DISTANCE", key, self.state(f"{name} Key {index}")), 0.0, "GREATER_THAN"))
+        values = {}
+        for item, value in build().items():
+            state_name = f"{name} {item}"
+            values[item] = self.g.switch(fresh, self.state(state_name), value, self.kinds[state_name])
+            self.set(state_name, values[item])
+        for index, key in enumerate(keys):
+            self.set(f"{name} Key {index}", key)
+        self.set(f"{name} Built", True)
+        return values
+
+
+def remembered_items(name, key_count, items):
+    """Simulation state items for :meth:`SimulationZone.remember`: ``key_count``
+    key vectors and ``items`` [(item, socket type), ...]."""
+    return [(f"{name} Built", "BOOLEAN"), *[(f"{name} Key {index}", "VECTOR") for index in range(key_count)],
+            *[(f"{name} {item}", kind) for item, kind in items]]
+
+
 class GN(Tree):
-    def __init__(self, name, description="", clear=True):
+    def __init__(self, name, description="", clear=True, modifier=False):
         super().__init__(name, "GeometryNodeTree", clear=clear, description=description)
+        self.ng.is_modifier = modifier
 
     # -------------------------------------------------------------- inputs
     def position(self): return self.n("GeometryNodeInputPosition").o
@@ -115,6 +219,185 @@ class GN(Tree):
     def scene_time(self):
         """Scene time in seconds (makes the tree re-evaluate every frame)."""
         return self.n("GeometryNodeInputSceneTime")["Seconds"]
+
+    def scene_frame(self):
+        return self.n("GeometryNodeInputSceneTime")["Frame"]
+
+    def to_int(self, value, rounding="FLOOR"):
+        return self.n("FunctionNodeFloatToInt", value, props={"rounding_mode": rounding}).o
+
+    def menu_switch(self, menu, names, dtype="INT"):
+        """Index (0, 1, ...) of the item of ``names`` chosen by ``menu``."""
+        node = self.ng.nodes.new("GeometryNodeMenuSwitch")
+        node.data_type = dtype
+        items = node.enum_items
+        while len(items) < len(names):
+            items.new("")
+        for index, name in enumerate(names):
+            items[index].name = name
+        self.assign(node.inputs[0], menu)
+        for index in range(len(names)):
+            node.inputs[index + 1].default_value = index
+        return Node(self, node).o
+
+    # -------------------------------------------------------------- fields
+    def capture(self, geo, domain="POINT", **items):
+        """Capture the fields ``items`` on ``geo``: (geometry, {name: field})."""
+        node = self.ng.nodes.new("GeometryNodeCaptureAttribute")
+        node.domain = domain
+        node.capture_items.clear()
+        for name, value in items.items():
+            node.capture_items.new(_capture_type(value), name)
+        self.assign(node.inputs[0], geo)
+        captured = Node(self, node)
+        for name, value in items.items():
+            self.assign(self._in_socket(node, name), value)
+        return captured[0], {name: captured[name] for name in items}
+
+    def statistic(self, geo, value, dtype="FLOAT", domain="POINT", sel=None):
+        return self.n("GeometryNodeAttributeStatistic", Geometry=geo, Selection=sel, Attribute=value,
+                      props={"data_type": dtype, "domain": domain})
+
+    def accumulate(self, value, group=None, dtype="FLOAT", domain="POINT"):
+        return self.n("GeometryNodeAccumulateField", Value=value, Group_ID=group,
+                      props={"data_type": dtype, "domain": domain})
+
+    def field_max(self, value, group=None, dtype="FLOAT", domain="POINT"):
+        return self.n("GeometryNodeFieldMinAndMax", Value=value, Group_ID=group,
+                      props={"data_type": dtype, "domain": domain})["Max"]
+
+    def on_domain(self, value, domain, dtype="FLOAT"):
+        return self.n("GeometryNodeFieldOnDomain", value, props={"data_type": dtype, "domain": domain}).o
+
+    def sample_index(self, geo, value, index, dtype="FLOAT", domain="POINT", clamp=False):
+        return self.n("GeometryNodeSampleIndex", Geometry=geo, Value=value, Index=index,
+                      props={"data_type": dtype, "domain": domain, "clamp": clamp})["Value"]
+
+    def sample_nearest(self, geo, position=None, domain="POINT"):
+        return self.n("GeometryNodeSampleNearest", Geometry=geo, Sample_Position=position,
+                      props={"domain": domain})["Index"]
+
+    def sample_nearest_surface(self, mesh, value, position=None, dtype="FLOAT"):
+        return self.n("GeometryNodeSampleNearestSurface", Mesh=mesh, Value=value, Sample_Position=position,
+                      props={"data_type": dtype})["Value"]
+
+    def raycast(self, target, source, direction, length):
+        return self.n("GeometryNodeRaycast", Target_Geometry=target, Source_Position=source,
+                      Ray_Direction=direction, Ray_Length=length)
+
+    def face_vertex(self, sort_index):
+        """Field on the face domain: index of the face's ``sort_index``-th vertex."""
+        corner = self.n("GeometryNodeCornersOfFace", Face_Index=self.index(), Sort_Index=sort_index)["Corner Index"]
+        return self.n("GeometryNodeVertexOfCorner", Corner_Index=corner)["Vertex Index"]
+
+    def domain_size(self, geo, component="MESH"):
+        return self.n("GeometryNodeAttributeDomainSize", Geometry=geo, props={"component": component})
+
+    def remove_attribute(self, geo, name, wildcard=False):
+        node = self.n("GeometryNodeRemoveAttribute", Geometry=geo, Name=name)
+        if wildcard:
+            set_mode(node, "Wildcard", prop_names=(), input_names=("Pattern Mode",))
+        return node.o
+
+    # ------------------------------------------------------------- objects
+    def object_info(self, obj, relative=False, as_instance=False):
+        return self.n("GeometryNodeObjectInfo", Object=obj, As_Instance=as_instance,
+                      props={"transform_space": "RELATIVE" if relative else "ORIGINAL"})
+
+    def collection_info(self, collection, separate=True, reset=False):
+        """Instances of ``collection``'s objects, in world space."""
+        return self.n("GeometryNodeCollectionInfo", Collection=collection, Separate_Children=separate,
+                      Reset_Children=reset, props={"transform_space": "ORIGINAL"})["Instances"]
+
+    def self_object(self):
+        return self.n("GeometryNodeSelfObject").o
+
+    def bound_box(self, geo):
+        return self.n("GeometryNodeBoundBox", Geometry=geo)
+
+    # ------------------------------------------------------------ matrices
+    def transform_point(self, vector, matrix):
+        return self.n("FunctionNodeTransformPoint", vector, matrix).o
+
+    def transform_direction(self, vector, matrix):
+        return self.n("FunctionNodeTransformDirection", vector, matrix).o
+
+    def invert(self, matrix):
+        return self.n("FunctionNodeInvertMatrix", matrix)["Matrix"]
+
+    def matmul(self, first, second):
+        return self.n("FunctionNodeMatrixMultiply", first, second).o
+
+    def combine_transform(self, t=None, r=None, s=None):
+        return self.n("FunctionNodeCombineTransform", Translation=t, Rotation=r, Scale=s).o
+
+    def separate_transform(self, matrix):
+        return self.n("FunctionNodeSeparateTransform", matrix)
+
+    def transform_by(self, geo, matrix):
+        """``geo`` transformed by the 4x4 ``matrix``."""
+        node = self.n("GeometryNodeTransform", Geometry=geo)
+        set_mode(node, "Matrix", prop_names=(), input_names=("Mode",))
+        self.assign(self._in_socket(node.n, "Transform"), matrix)
+        return node.o
+
+    # ------------------------------------------------------------- bundles
+    def bundle(self, items):
+        """Combine Bundle from ``items`` [(name, socket type, value), ...]."""
+        node = self.ng.nodes.new("NodeCombineBundle")
+        node.bundle_items.clear()
+        for name, stype, _value in items:
+            node.bundle_items.new(stype, name)
+        for name, _stype, value in items:
+            self.assign(self._in_socket(node, name), value)
+        return Node(self, node).o
+
+    def bundle_item(self, bundle, path, stype):
+        return self.n("NodeGetBundleItem", Bundle=bundle, Path=path, props={"socket_type": stype})["Item"]
+
+    # --------------------------------------------------------------- zones
+    def simulation(self, items):
+        """Simulation zone with state ``items`` [(name, socket type), ...]."""
+        input_node = self.ng.nodes.new("GeometryNodeSimulationInput")
+        output_node = self.ng.nodes.new("GeometryNodeSimulationOutput")
+        input_node.pair_with_output(output_node)
+        output_node.state_items.clear()
+        for name, stype in items:
+            output_node.state_items.new(stype, name)
+        return SimulationZone(self, input_node, output_node, [name for name, _ in items], [stype for _, stype in items])
+
+    def repeat(self, iterations, items):
+        """Repeat zone with ``items`` [(name, socket type, initial value), ...];
+        ``zone.iteration`` counts from 0."""
+        input_node = self.ng.nodes.new("GeometryNodeRepeatInput")
+        output_node = self.ng.nodes.new("GeometryNodeRepeatOutput")
+        input_node.pair_with_output(output_node)
+        output_node.repeat_items.clear()
+        for name, stype, _initial in items:
+            output_node.repeat_items.new(stype, name)
+        zone = Zone(self, input_node, output_node, [name for name, _, _ in items], state_offset=1, set_offset=0, initial_offset=1)
+        self.assign(input_node.inputs[0], iterations)
+        for name, _stype, initial in items:
+            zone.initial(name, initial)
+        zone.iteration = Sock(self, input_node.outputs[0])
+        return zone
+
+    def fingerprint(self, geometry, *fields):
+        """A vector that changes whenever the points of ``geometry`` do: for
+        each vector field (the position when none is given) the sum over the
+        points of (field + 1) weighted component-wise by pseudo-random numbers
+        fixed per point index.  Moving, turning, deforming, adding or removing
+        points gives another sum, barring coincidences of measure zero."""
+        total = None
+        for seed, field in enumerate(fields or (self.position(),)):
+            weights = self.random(-1.0, 1.0, seed + 1, ID=self.index(), dtype="FLOAT_VECTOR")
+            term = self.statistic(geometry, weights * (field + (1.0, 1.0, 1.0)), "FLOAT_VECTOR")["Sum"]
+            total = term if total is None else total + term
+        return total
+
+    def detach(self, geo):
+        """``geo`` with derived data of its own (``Core.Detach``)."""
+        return self.group(get_asset("Core.Detach"), Geometry=geo).o
 
     # ------------------------------------------------------------ rotations
     def align_rotation(self, vector, rotation=None, axis="Z", pivot="AUTO"):
@@ -168,6 +451,12 @@ class GN(Tree):
 
     def points(self, count=1, position=(0, 0, 0), radius=0.05):
         return self.n("GeometryNodePoints", Count=count, Position=position, Radius=radius).o
+
+    def new_points(self, count):
+        """``count`` points that carry nothing but their position; no geometry
+        at all for a count of zero (so removing the radius never warns)."""
+        points = self.remove_attribute(self.points(count), "radius")
+        return self.switch(self.compare(count, 0, "GREATER_THAN", "INT"), None, points)
 
     def mesh_to_points(self, mesh, sel=None):
         return self.n("GeometryNodeMeshToPoints", Mesh=mesh, Selection=sel).o
@@ -447,3 +736,18 @@ def get_asset(name, rebuild=False):
 
 def reset_registry():
     _BUILT.clear()
+
+
+@asset("Core.Detach", "Core")
+def detach_asset():
+    """The geometry with derived data of its own.  A simulation cache keeps
+    every frame's state geometry, and normals or BVH trees built on that object
+    (Sample Nearest, Sample Nearest Surface, Raycast ...) would stay with every
+    cached frame -- megabytes per frame.  Rewriting ``position`` gives a copy
+    whose derived data is freed with the evaluation; every other attribute
+    array stays shared.  (An identity Transform is skipped by Blender and does
+    not detach.)"""
+    graph = GN("Core.Detach", detach_asset.__doc__)
+    geometry = graph.inp("Geometry", "GEOMETRY")
+    graph.result(graph.store(geometry, "position", graph.position(), "FLOAT_VECTOR"))
+    return graph
