@@ -33,7 +33,7 @@
     "leaf_sheen": 0.12,
     "air_density": 0.01,
     "air_anisotropy": 0.0,
-    "bottle_density": 120.0,
+    "bottle_density": 60.0,
     "water_density": 4.0,
     "water_turbidity": 0.0
   },
@@ -719,7 +719,7 @@
           "Rise": 0.12308,
           "Going": 0.433,
           "Width": 1.5,
-          "Tread Thickness": 0.06,
+          "Tread Thickness": 0.12308,
           "Stringer Height": 0.26,
           "Glass Treads": false
         }
@@ -768,7 +768,7 @@
           "Rise": 0.12308,
           "Going": 0.433,
           "Width": 1.5,
-          "Tread Thickness": 0.06,
+          "Tread Thickness": 0.12308,
           "Stringer Height": 0.26,
           "Glass Treads": false
         }

@@ -120,20 +120,26 @@ def orb():
 def squircle_body(graph, width, depth, height, neck_radius, shoulder, bevel, power, rings=48):
     """Solid surface of revolution along +Z from z = 0 to ``height``: a
     rounded rectangle (superellipse of ``power``, ``width`` by ``depth``)
-    that rounds off into a circle of ``neck_radius`` over the top
-    ``shoulder`` of the height; the foot is chamfered by ``bevel``."""
+    domed over the top ``shoulder`` of the height -- a quarter ellipse from
+    the upright sides to a level top round a circle of ``neck_radius``; the
+    foot is chamfered by ``bevel``.  The rings crowd into the dome: it takes
+    four times its share of the height in rings, up to half of them."""
     body = graph.cylinder(1.0, 1.0, 96, "NGON", rings)
     x, y, z = graph.sep(graph.position())
-    u = z + 0.5
+    ring = z + 0.5
+    start = 1.0 - shoulder
+    share = graph.min(shoulder * 4.0, 0.5)
+    split = 1.0 - share
+    u = graph.min(ring, split) / split * start + graph.max(ring - split, 0.0) / graph.max(share, 0.000001) * shoulder
     angle = graph.math("ARCTAN2", y, x)
     c = graph.abs(graph.cos(angle))
     s = graph.abs(graph.sin(angle))
     ax = width * 0.5
     ay = depth * 0.5
     superellipse = graph.math("POWER", graph.math("POWER", c / ax, power) + graph.math("POWER", s / ay, power), -1.0 / power)
-    start = 1.0 - shoulder
-    blend = graph.map_range(u, start, 1.0, 0.0, 1.0, interp="SMOOTHSTEP")
-    radial = superellipse + (neck_radius - superellipse) * blend
+    along = graph.map_range(u, start, 1.0, 0.0, 1.0)
+    dome = graph.math("SQRT", graph.max(1.0 - along * along, 0.0))
+    radial = neck_radius + (superellipse - neck_radius) * dome
     foot = graph.min(u * height / graph.max(bevel, 0.000001), 1.0)
     radial = radial * (1.0 - (1.0 - foot) * 0.25)
     radius_xy = graph.vec(x, y, 0.0).length()
