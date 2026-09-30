@@ -1,0 +1,104 @@
+"""
+Furniture kit -- geometry-node groups (``GH.Furniture.*``): glass furniture
+of the gallery.
+
+Local frames: everything stands on z = 0; a chair faces -Y (its back is on
+the +Y side); tables are centred on the origin.
+"""
+from __future__ import annotations
+
+import math
+
+from Core.gn import GN, asset
+from . import materials as M
+
+
+def rounded_slab(graph, width, depth, thickness, radius):
+    """Rounded rectangle ``width`` x ``depth`` extruded ``thickness`` up
+    from z = 0."""
+    outline = graph.fillet(graph.rect(width, depth), radius, 6, True, "POLY")
+    return graph.solid(graph.fill(outline), thickness)
+
+
+def rod(graph, start, end, radius):
+    """Glass rod with rounded ends between two points."""
+    tube = graph.tube(graph.curve_line(start, end), radius, 16, True)
+    ends = graph.join(graph.transform(graph.ellipsoid(radius, radius, radius, 16, 8), t=start),
+                      graph.transform(graph.ellipsoid(radius, radius, radius, 16, 8), t=end))
+    union = graph.n("GeometryNodeMeshBoolean", props={"operation": "UNION", "solver": "MANIFOLD"})
+    graph.assign(graph._in_socket(union.n, "Mesh 2"), [tube, ends])
+    return union["Mesh"]
+
+
+@asset("GH.Furniture.GlassChair", "Furniture")
+def glass_chair():
+    """Chair of thick green glass: a rounded seat slab at ``Seat Height``, a
+    tall back slab rising behind it (leaning back by ``Back Lean``), and
+    four round legs splayed out from under the seat to the floor."""
+    graph = GN("GH.Furniture.GlassChair", glass_chair.__doc__)
+    width = graph.inp("Width", default=0.44, subtype="DISTANCE")
+    depth = graph.inp("Depth", default=0.42, subtype="DISTANCE")
+    seat_height = graph.inp("Seat Height", default=0.45, subtype="DISTANCE")
+    seat_thickness = graph.inp("Seat Thickness", default=0.03, subtype="DISTANCE")
+    back_height = graph.inp("Back Height", default=0.62, subtype="DISTANCE")
+    back_width = graph.inp("Back Width", default=0.16, subtype="DISTANCE")
+    back_thickness = graph.inp("Back Thickness", default=0.045, subtype="DISTANCE")
+    back_lean = graph.inp("Back Lean", default=math.radians(8.0), subtype="ANGLE")
+    leg_radius = graph.inp("Leg Radius", default=0.018, subtype="DISTANCE")
+    splay = graph.inp("Splay", default=0.09, subtype="DISTANCE")
+    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
+
+    seat = graph.move(rounded_slab(graph, width, depth, seat_thickness, 0.05), z=seat_height - seat_thickness)
+    back = rounded_slab(graph, back_width, back_thickness, back_height, back_thickness * 0.45)
+    back = graph.transform(back, r=graph.vec(back_lean * -1.0, 0.0, 0.0), t=graph.vec(0.0, depth * 0.5 - back_thickness * 0.5, seat_height - seat_thickness * 0.5))
+    legs = []
+    for sx, sy in ((-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)):
+        top = graph.vec(width * 0.32 * sx, depth * 0.32 * sy, seat_height - seat_thickness - leg_radius * 0.5)
+        foot = graph.vec((width * 0.32 + splay) * sx, (depth * 0.32 + splay) * sy, leg_radius)
+        legs.append(rod(graph, top, foot, leg_radius))
+    union = graph.n("GeometryNodeMeshBoolean", props={"operation": "UNION", "solver": "MANIFOLD"})
+    graph.assign(graph._in_socket(union.n, "Mesh 2"), [seat, back, *legs])
+    graph.result(graph.mat(graph.smooth_by_angle(union["Mesh"], 0.6), glass))
+    return graph
+
+
+@asset("GH.Furniture.PedestalTable", "Furniture")
+def pedestal_table():
+    """Round table: a glass top of ``Radius`` at ``Height`` on a slender
+    steel column and a round foot plate."""
+    graph = GN("GH.Furniture.PedestalTable", pedestal_table.__doc__)
+    radius = graph.inp("Radius", default=0.3, subtype="DISTANCE")
+    height = graph.inp("Height", default=0.6, subtype="DISTANCE")
+    top_thickness = graph.inp("Top Thickness", default=0.012, subtype="DISTANCE")
+    column_radius = graph.inp("Column Radius", default=0.012, subtype="DISTANCE")
+    foot_radius = graph.inp("Foot Radius", default=0.18, subtype="DISTANCE")
+    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
+    metal = graph.inp("Metal", "MATERIAL", default=M.get("GH.GlassGreen"))
+
+    top = graph.cylinder(radius, top_thickness, 96)
+    top = graph.smooth_by_angle(graph.move(top, z=height - top_thickness * 0.5), 0.8)
+    column = graph.smooth(graph.move(graph.cylinder(column_radius, height - top_thickness, 16), z=(height - top_thickness) * 0.5))
+    foot = graph.smooth_by_angle(graph.move(graph.cylinder(foot_radius, 0.01, 64), z=0.005), 0.8)
+    graph.result(graph.join(graph.mat(top, glass), graph.mat(graph.join(column, foot), metal)))
+    return graph
+
+
+@asset("GH.Furniture.GlassTable", "Furniture")
+def glass_table():
+    """Round glass table on ``Legs`` round glass legs set in from the rim."""
+    graph = GN("GH.Furniture.GlassTable", glass_table.__doc__)
+    radius = graph.inp("Radius", default=0.5, subtype="DISTANCE")
+    height = graph.inp("Height", default=0.45, subtype="DISTANCE")
+    top_thickness = graph.inp("Top Thickness", default=0.019, subtype="DISTANCE")
+    legs = graph.inp("Legs", "INT", default=3, min=1)
+    leg_radius = graph.inp("Leg Radius", default=0.02, subtype="DISTANCE")
+    inset = graph.inp("Leg Inset", default=0.75, min=0.0, max=1.0)
+    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
+
+    top = graph.smooth_by_angle(graph.move(graph.cylinder(radius, top_thickness, 128), z=height - top_thickness * 0.5), 0.8)
+    stations = graph.points(legs, (0.0, 0.0, 0.0))
+    angle = graph.index() * (math.tau / graph.max(legs, 1))
+    stations = graph.set_pos(stations, pos=graph.vec(graph.cos(angle) * radius * inset, graph.sin(angle) * radius * inset, 0.0))
+    leg = graph.smooth(graph.move(graph.cylinder(leg_radius, height - top_thickness, 16), z=(height - top_thickness) * 0.5))
+    graph.result(graph.mat(graph.join(top, graph.realize(graph.iop(stations, leg))), glass))
+    return graph

@@ -1,0 +1,155 @@
+"""
+Environment kit -- geometry-node groups (``GH.Garden.*``, ``GH.Env.*``):
+the garden floor, the planting and the city outside.
+
+The garden is laid on data meshes: paving flags and deck boards fill the
+faces of the object's mesh, planting scatters a collection of plant
+prototypes over them.  The city is far enough away to be simple solids.
+
+Local frames: garden assets work in the object's own space on the faces
+they are given; the tower stands on z = 0 centred on the origin.
+"""
+from __future__ import annotations
+
+import math
+
+from Core.gn import GN, asset
+from . import materials as M
+
+
+@asset("GH.Garden.Paving", "Garden")
+def paving():
+    """Stone flags: every face of the mesh is cut into flags of ``Flag
+    Size`` with ``Joint`` gaps, each flag ``Thickness`` thick with its own
+    ``flag_shade``."""
+    graph = GN("GH.Garden.Paving", paving.__doc__)
+    area = graph.inp("Geometry", "GEOMETRY")
+    size = graph.inp("Flag Size", default=0.6, subtype="DISTANCE")
+    joint = graph.inp("Joint", default=0.01, subtype="DISTANCE")
+    thickness = graph.inp("Thickness", default=0.04, subtype="DISTANCE")
+    seed = graph.inp("Seed", "INT", default=0)
+    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Paving"))
+
+    bounds = graph.bound_box(area)
+    low, high = bounds["Min"], bounds["Max"]
+    extent = high - low
+    columns = graph.to_int(extent.x / size, "CEILING")
+    rows = graph.to_int(extent.y / size, "CEILING")
+    grid = graph.grid(1.0, 1.0, columns + 1, rows + 1)
+    grid = graph.transform(grid, t=graph.vec(low.x + columns * size * 0.5, low.y + rows * size * 0.5, low.z),
+                           s=graph.vec(columns * size, rows * size, 1.0))
+    inside = graph.raycast(area, graph.position() + graph.vec(0.0, 0.0, 1.0), graph.vec(0.0, 0.0, -1.0), 2.0)["Is Hit"]
+    grid = graph.delete(grid, graph.bool_not(inside), "FACE")
+    flags = graph.n("GeometryNodeSplitEdges", Mesh=grid).o
+    flags = graph.n("GeometryNodeScaleElements", Geometry=flags, Scale=1.0 - joint / size, props={"domain": "FACE"}).o
+    flags = graph.store(flags, "flag_shade", graph.random(0.0, 1.0, seed), "FLOAT", "FACE")
+    slabs = graph.extrude(flags, thickness, individual=True)
+    graph.result(graph.mat(graph.move(slabs, z=thickness * -1.0), material))
+    return graph
+
+
+@asset("GH.Garden.Deck", "Garden")
+def deck():
+    """Timber decking over the faces of the mesh: boards of ``Board Width``
+    running along X with ``Gap`` between them, each with its own
+    ``board_shade``."""
+    graph = GN("GH.Garden.Deck", deck.__doc__)
+    area = graph.inp("Geometry", "GEOMETRY")
+    board = graph.inp("Board Width", default=0.14, subtype="DISTANCE")
+    gap = graph.inp("Gap", default=0.006, subtype="DISTANCE")
+    thickness = graph.inp("Thickness", default=0.03, subtype="DISTANCE")
+    seed = graph.inp("Seed", "INT", default=0)
+    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Deck"))
+
+    bounds = graph.bound_box(area)
+    low, high = bounds["Min"], bounds["Max"]
+    extent = high - low
+    count = graph.to_int(extent.y / board, "CEILING")
+    stations = graph.mesh_line(count, graph.vec(low.x + extent.x * 0.5, low.y + board * 0.5, low.z - thickness * 0.5), graph.vec(0.0, board, 0.0))
+    plank = graph.cube(graph.vec(extent.x, board - gap, thickness))
+    boards = graph.iop(graph.mesh_to_points(stations), plank)
+    boards = graph.store(boards, "board_shade", graph.random(0.0, 1.0, seed), "FLOAT", "INSTANCE")
+    graph.result(graph.mat(graph.realize(boards), material))
+    return graph
+
+
+@asset("GH.Garden.Bed", "Garden")
+def bed():
+    """Planting bed over the faces of the mesh: soil filled to ``Soil``
+    above the mesh, mounded by ``Mound`` towards the middle, edged by a low
+    steel kerb of ``Kerb`` height."""
+    graph = GN("GH.Garden.Bed", bed.__doc__)
+    area = graph.inp("Geometry", "GEOMETRY")
+    soil_height = graph.inp("Soil", default=0.1, subtype="DISTANCE")
+    mound = graph.inp("Mound", default=0.1, subtype="DISTANCE")
+    kerb = graph.inp("Kerb", default=0.15, subtype="DISTANCE")
+    soil_material = graph.inp("Soil Material", "MATERIAL", default=M.get("GH.Soil"))
+    kerb_material = graph.inp("Kerb Material", "MATERIAL", default=M.get("GH.Steel"))
+
+    surface = graph.subdiv(graph.merge(area, 0.0001), 3)
+    center = graph.bound_box(area)
+    middle = (center["Min"] + center["Max"]) * 0.5
+    reach = (center["Max"] - center["Min"]).length() * 0.5
+    closeness = 1.0 - graph.vmath("DISTANCE", graph.position(), middle) / graph.max(reach, 0.001)
+    top = graph.set_pos(surface, offset=graph.vec(0.0, 0.0, soil_height + mound * graph.max(closeness, 0.0)))
+    soil = graph.mat(graph.smooth(top), soil_material)
+    boundary = graph.compare(graph.n("GeometryNodeInputMeshEdgeNeighbors")["Face Count"], 1, "EQUAL", "INT")
+    edges = graph.n("GeometryNodeMeshToCurve", Mesh=area, Selection=boundary).o
+    kerb_mesh = graph.flat_sweep(graph.move(edges, z=kerb * 0.5), 0.012, kerb)
+    graph.result(graph.join(soil, graph.mat(kerb_mesh, kerb_material)))
+    return graph
+
+
+@asset("GH.Garden.Planting", "Garden")
+def planting():
+    """Plants scattered over the faces of the mesh: instances of the objects
+    in ``Plants`` (picked at random) at ``Density`` per square metre, at
+    least ``Spacing`` apart, each turned at random and scaled between
+    ``Scale Min`` and ``Scale Max``, lifted by ``Lift``."""
+    graph = GN("GH.Garden.Planting", planting.__doc__)
+    area = graph.inp("Geometry", "GEOMETRY")
+    plants = graph.inp("Plants", "COLLECTION")
+    density = graph.inp("Density", default=4.0, min=0.0)
+    spacing = graph.inp("Spacing", default=0.3, subtype="DISTANCE")
+    low = graph.inp("Scale Min", default=0.8)
+    high = graph.inp("Scale Max", default=1.2)
+    lift = graph.inp("Lift", default=0.0, subtype="DISTANCE")
+    seed = graph.inp("Seed", "INT", default=0)
+
+    spots = graph.n("GeometryNodeDistributePointsOnFaces", Mesh=area, Distance_Min=spacing, Density_Max=density, Seed=seed,
+                    props={"distribute_method": "POISSON"})["Points"]
+    spots = graph.set_pos(spots, offset=graph.vec(0.0, 0.0, lift))
+    library = graph.collection_info(plants, True, True)
+    rotation = graph.vec(0.0, 0.0, graph.random(0.0, math.tau, seed + 1))
+    scale = graph.random(low, high, seed + 2)
+    graph.result(graph.iop(spots, library, rot=rotation, scale=scale, pick=True, index=graph.random(0, 1000, seed + 3, dtype="INT")))
+    return graph
+
+
+@asset("GH.Env.Tower", "Environment")
+def tower():
+    """Office tower of ``Width`` x ``Depth`` x ``Height``: a curtain wall of
+    ``Bay`` wide, ``Floor`` high panes, each catching the sky differently
+    (``pane_shade``), on a grid of mullions."""
+    graph = GN("GH.Env.Tower", tower.__doc__)
+    width = graph.inp("Width", default=30.0, subtype="DISTANCE")
+    depth = graph.inp("Depth", default=30.0, subtype="DISTANCE")
+    height = graph.inp("Height", default=120.0, subtype="DISTANCE")
+    bay = graph.inp("Bay", default=1.5, subtype="DISTANCE")
+    floor = graph.inp("Floor", default=4.0, subtype="DISTANCE")
+    frame = graph.inp("Frame", default=0.12, subtype="DISTANCE")
+    seed = graph.inp("Seed", "INT", default=0)
+
+    columns_x = graph.to_int(width / bay, "ROUND") + 1
+    columns_y = graph.to_int(depth / bay, "ROUND") + 1
+    floors = graph.to_int(height / floor, "ROUND") + 1
+    box = graph.cube(graph.vec(width, depth, height), columns_x, columns_y, floors)
+    box = graph.move(box, z=height * 0.5)
+    walls = graph.delete(box, graph.compare(graph.abs(graph.normal().z), 0.5, "GREATER_THAN"), "FACE")
+    panes = graph.store(walls, "pane_shade", graph.random(0.0, 1.0, seed), "FLOAT", "FACE")
+    glass_mesh = graph.mat(panes, M.get("GH.TowerGlass"))
+    grid_lines = graph.n("GeometryNodeMeshToCurve", Mesh=walls).o
+    mullions = graph.sweep(grid_lines, graph.rect(frame, frame), True)
+    roof = graph.mat(graph.box(width * -0.5, depth * -0.5, height - 0.1, width * 0.5, depth * 0.5, height + 0.6), M.get("GH.TowerFrame"))
+    graph.result(graph.join(glass_mesh, graph.mat(mullions, M.get("GH.TowerFrame")), roof))
+    return graph

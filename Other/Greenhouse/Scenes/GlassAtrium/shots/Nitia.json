@@ -1,0 +1,26 @@
+{
+  "id": "Nitia",
+  "notes": "The painting's viewpoint: standing 2.5 m above the gallery's glass floor, looking down across the gallery into the atrium; lens shifted (the principal point sits left of and above the frame centre).",
+  "camera": {
+    "resolution": [2166, 3000],
+    "focal_px": 2798.348,
+    "principal_px": [710.432, 1001.701],
+    "location": [0.0, 0.0, 2.5],
+    "yaw_deg": 23.528,
+    "pitch_deg": -25.633,
+    "roll_deg": -0.06
+  },
+  "render": {
+    "engine": "CYCLES",
+    "samples": 256,
+    "view": "AgX",
+    "look": null,
+    "exposure": 0.0,
+    "cycles": {
+      "max_bounces": 24,
+      "clamp_indirect": 8.0
+    }
+  },
+  "look": {
+  }
+}
