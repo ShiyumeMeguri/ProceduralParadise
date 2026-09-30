@@ -71,11 +71,15 @@ def steel():
 @register("GH.Glass")
 def glass():
     """Architectural glass: clear with the faint green of float glass, a real
-    dielectric for camera rays, tinted transparency for shadow rays."""
+    dielectric for camera rays, tinted transparency for shadow rays.
+    ``glass_ior`` below 1.5 stands for an anti-reflective coating.  Inside,
+    the float glass absorbs towards ``glass_green`` (``pane_density``), so a
+    pane seen through its edge is deep teal and face on almost clear."""
     def build(tree: Tree):
         tint = color("glass")
-        shader = tree.n("ShaderNodeBsdfGlass", Color=tint, Roughness=0.0, IOR=1.5)["BSDF"]
-        return shadow_clear(tree, shader, scaled(tint, param("glass_shadow", 0.92)))
+        shader = tree.n("ShaderNodeBsdfGlass", Color=tint, Roughness=0.0, IOR=param("glass_ior", 1.5))["BSDF"]
+        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("glass_green"), Density=param("pane_density", 6.0))["Volume"]
+        return {"Surface": shadow_clear(tree, shader, scaled(tint, param("glass_shadow", 0.92))), "Volume": volume}
     return S.material("GH.Glass", build)
 
 

@@ -114,12 +114,12 @@ def pinnate():
         heading = graph.vec(0.0, 0.0, -1.0) * graph.sin(leaflet_droop) + (
             captured["tangent"] * graph.cos(leaflet_angle) + outward * graph.sin(leaflet_angle)) * graph.cos(leaflet_droop)
         rotation = graph.align_rotation(captured["tangent"] * -sign, rotation=graph.align_rotation(heading, axis="Z"), axis="X", pivot="Z")
-        scale = graph.vec(leaflet_width, leaflet_width, leaflet_length) * size * graph.random(0.85, 1.1, seed + 7)
+        scale = graph.vec(leaflet_width, leaflet_width, leaflet_length) * (size * graph.random(0.85, 1.1, seed + 7) / graph.max(length, 0.001))
         return graph.iop(spine, leaf, rot=rotation, scale=scale)
 
     frond = graph.realize(graph.join(side(1.0), side(-1.0)))
     rachis_curve = graph.n("GeometryNodeMeshToCurve", spine).o
-    rachis = graph.sweep(rachis_curve, graph.circle(0.006, 6), True)
+    rachis = graph.sweep(rachis_curve, graph.circle(0.007 / graph.max(length, 0.001), 6), True)
     rachis = graph.store(rachis, "leaf_u", 0.0)
     frond = graph.join(frond, rachis)
 
@@ -172,25 +172,31 @@ def rosette():
 
 
 def broad_blade(graph, splits, split_depth, lobe):
-    """Unit broad leaf along +Z (length 1, width 1): ovate with rounded basal
-    lobes (``lobe``), cupped, with ``splits`` pairs of slits cut from the
-    margin to ``split_depth`` of the half width (monstera)."""
-    grid = graph.grid(1.0, 1.0, 17, 25)
+    """Unit broad leaf along +Z (length 1, width 1): an acuminate ovate
+    outline (widest at two fifths of the length, drawn to a point), basal
+    lobes swept back past the petiole by ``lobe`` (heart-shaped leaves),
+    folded along the midrib and drooping to the tip, with ``splits`` pairs
+    of slanted slits cut from the margin to ``split_depth`` of the half
+    width (monstera)."""
+    grid = graph.grid(1.0, 1.0, 29, 81)
     x, y, _ = graph.sep(graph.position())
     u = y + 0.5
     v = x * 2.0
     grid = graph.store(grid, "leaf_u", u)
     grid = graph.store(grid, "leaf_v", v)
-    body = graph.max(graph.sin(graph.math("POWER", graph.max(u, 0.0001), 0.75) * math.pi), 0.0)
-    base = lobe * graph.max(1.0 - u * 4.0, 0.0)
-    half = (graph.math("POWER", body, 0.6) + base) * 0.5
-    droop = half * v * v * 0.18 - u * u * 0.12
-    shaped = graph.set_pos(grid, pos=graph.vec(v * half, droop, u - base * 0.2))
-    slit_phase = graph.math("FRACT", u * splits + 0.5)
-    in_slit = graph.bool_and(graph.compare(graph.abs(slit_phase - 0.5), 0.06, "LESS_THAN"),
-                             graph.compare(graph.abs(v), 1.0 - split_depth, "GREATER_THAN"))
+    outline = graph.math("POWER", graph.max(u, 0.0), 0.5) * graph.math("POWER", graph.max(1.0 - u, 0.0), 0.75) * 2.32
+    basal = graph.max(1.0 - u * 4.0, 0.0)
+    half = (outline + lobe * basal) * 0.5
+    across = graph.abs(v)
+    fold = half * across * 0.22
+    droop = u * u * 0.18
+    back = lobe * basal * across * 0.35
+    shaped = graph.set_pos(grid, pos=graph.vec(v * half, fold - droop, u - back))
+    slit_phase = graph.math("FRACT", u * splits + across * 0.35)
+    in_slit = graph.bool_and(graph.compare(graph.abs(slit_phase - 0.5), across * 0.12 + 0.02, "LESS_THAN"),
+                             graph.compare(across, 1.0 - split_depth, "GREATER_THAN"))
     in_slit = graph.bool_and(in_slit, graph.compare(splits, 0.5, "GREATER_THAN"))
-    in_slit = graph.bool_and(in_slit, graph.bool_and(graph.compare(u, 0.12, "GREATER_THAN"), graph.compare(u, 0.92, "LESS_THAN")))
+    in_slit = graph.bool_and(in_slit, graph.bool_and(graph.compare(u, 0.15, "GREATER_THAN"), graph.compare(u, 0.9, "LESS_THAN")))
     face_slit = graph.on_domain(graph.switch(in_slit, 0.0, 1.0, "FLOAT"), "FACE")
     return graph.smooth(graph.delete(shaped, graph.compare(face_slit, 0.5, "GREATER_THAN"), "FACE"))
 
@@ -246,19 +252,24 @@ def umbrella_leaf(graph, leaflets, leaflet_length, leaflet_width, droop):
 
 @asset("GH.Flora.Umbrella", "Flora")
 def umbrella():
-    """A crown of umbrella leaves: ``Leaves`` palmate leaves scattered
+    """A crown of leaves gathered in clumps: ``Clumps`` clump centres lie
     through an ellipsoid crown (``Crown Radius``, ``Crown Height`` above
-    ``Stem``), each facing up and outwards; ``Leaflets`` 1 gives simple
-    leaves (the round crowns of trees and shrubs).  ``Stems`` branches
-    carry the crown on a trunk."""
+    ``Stem``), and ``Leaves`` palmate leaves gather round them within
+    ``Clump Size`` of the crown radius, each facing out of its clump and up
+    (``Facing``).  ``Leaflets`` 1 gives simple leaves -- the lumpy crowns of
+    trees and shrubs; more give the umbrellas of schefflera.  ``Stems``
+    branches fork from the top of the trunk (``Stem`` tall) to the first
+    clumps."""
     graph = GN("GH.Flora.Umbrella", umbrella.__doc__)
-    leaves = graph.inp("Leaves", "INT", default=80, min=1, max=20000)
+    leaves = graph.inp("Leaves", "INT", default=80, min=1, max=40000)
     leaflets = graph.inp("Leaflets", "INT", default=7, min=1, max=16)
     leaflet_length = graph.inp("Leaflet Length", default=0.12, subtype="DISTANCE")
     leaflet_width = graph.inp("Leaflet Width", default=0.045, subtype="DISTANCE")
     droop = graph.inp("Droop", default=math.radians(15.0), subtype="ANGLE")
     radius = graph.inp("Crown Radius", default=0.5, subtype="DISTANCE")
     height = graph.inp("Crown Height", default=0.8, subtype="DISTANCE")
+    clumps = graph.inp("Clumps", "INT", default=8, min=1, max=400)
+    clump_size = graph.inp("Clump Size", default=0.35, min=0.01, max=1.0)
     stem = graph.inp("Stem", default=0.3, subtype="DISTANCE")
     stems = graph.inp("Stems", "INT", default=5, min=0, max=64)
     stem_radius = graph.inp("Stem Radius", default=0.012, subtype="DISTANCE")
@@ -269,35 +280,39 @@ def umbrella():
     leaf_material = graph.inp("Material", "MATERIAL", default=M.get("GH.Leaf"))
     stem_material = graph.inp("Stem Material", "MATERIAL", default=M.get("GH.Bark"))
 
-    leaf = umbrella_leaf(graph, leaflets, leaflet_length, leaflet_width, droop)
-    points = graph.n("GeometryNodePoints", Count=leaves).o
-    index = graph.index()
-    azimuth = index * GOLDEN_ANGLE
-    lift = graph.random(-1.0, 1.0, seed + 1)
-    reach = graph.math("POWER", graph.random(0.0, 1.0, seed + 2), 0.35)
-    ring = graph.math("SQRT", graph.max(1.0 - lift * lift, 0.0)) * reach
-    direction = graph.vec(graph.cos(azimuth) * ring, graph.sin(azimuth) * ring, lift * reach)
     center = graph.vec(0.0, 0.0, stem + height * 0.5)
-    points = graph.set_pos(points, pos=center + graph.vec(direction.x * radius, direction.y * radius, direction.z * height * 0.5))
-    outward = graph.vec(direction.x, direction.y, graph.max(direction.z, 0.0) + 1.0)
-    normal = (graph.vec(0.0, 0.0, 1.0) * (1.0 - facing) + outward.normalized() * facing).normalized()
-    rotation = graph.random_spin(graph.align_rotation(normal, axis="Z"), seed + 4)
-    crown = graph.iop(points, leaf, rot=rotation, scale=graph.random(0.75, 1.15, seed + 5))
-    crown = leaf_colors(graph, crown, first, second, seed + 6)
+    semi_axes = graph.vec(radius, radius, height * 0.5)
+    index = graph.index()
+    azimuth = index * GOLDEN_ANGLE + graph.random(0.0, 0.5, seed)
+    lift = graph.random(-0.55, 0.95, seed + 1)
+    reach = graph.math("POWER", graph.random(0.0, 1.0, seed + 2), 0.5) * (1.0 - clump_size * 0.5)
+    ring = graph.math("SQRT", graph.max(1.0 - lift * lift, 0.0)) * reach
+    unit_direction = graph.vec(graph.cos(azimuth) * ring, graph.sin(azimuth) * ring, lift * reach)
+    hubs = graph.set_pos(graph.points(clumps, (0.0, 0.0, 0.0)), pos=center + graph.vmath("MULTIPLY", unit_direction, semi_axes))
+
+    owner = graph.random(0, 100000, seed + 3, dtype="INT") % graph.max(clumps, 1)
+    hub = graph.sample_index(hubs, graph.position(), owner, "FLOAT_VECTOR")
+    spin = graph.random(0.0, TAU, seed + 4)
+    rise = graph.random(-0.6, 1.0, seed + 5)
+    spread = graph.math("SQRT", graph.max(1.0 - rise * rise, 0.0))
+    offset_direction = graph.vec(graph.cos(spin) * spread, graph.sin(spin) * spread, rise)
+    offset = offset_direction * (graph.math("POWER", graph.random(0.0, 1.0, seed + 6), 0.4) * clump_size * radius)
+    points = graph.set_pos(graph.points(leaves, (0.0, 0.0, 0.0)), pos=hub + offset)
+    outward = (offset_direction + graph.vec(0.0, 0.0, 0.35)).normalized()
+    normal = (graph.vec(0.0, 0.0, 1.0) * (1.0 - facing) + outward * facing).normalized()
+    rotation = graph.random_spin(graph.align_rotation(normal, axis="Z"), seed + 7)
+    leaf = umbrella_leaf(graph, leaflets, leaflet_length, leaflet_width, droop)
+    crown = graph.iop(points, leaf, rot=rotation, scale=graph.random(0.75, 1.15, seed + 8))
+    crown = leaf_colors(graph, crown, first, second, seed + 9)
     foliage = graph.mat(graph.realize(crown), leaf_material)
 
-    tips = graph.points(stems, (0.0, 0.0, 0.0))
-    stem_index = graph.index()
-    stem_angle = stem_index * GOLDEN_ANGLE
-    stem_reach = graph.random(0.3, 0.8, seed + 8)
-    tip = center + graph.vec(graph.cos(stem_angle) * radius * stem_reach, graph.sin(stem_angle) * radius * stem_reach,
-                             graph.random(-0.1, 0.35, seed + 9) * height)
-    tips = graph.set_pos(tips, pos=tip)
+    fork = graph.vec(0.0, 0.0, stem)
+    tip = graph.sample_index(hubs, graph.position(), graph.index() % graph.max(clumps, 1), "FLOAT_VECTOR") * graph.vec(0.8, 0.8, 0.92) - fork
+    base = graph.points(stems, fork)
     branch = graph.sweep(graph.curve_line((0.0, 0.0, 0.0), (0.0, 0.0, 1.0)), graph.circle(1.0, 6), True)
-    branch_length = graph.vec(tip.x, tip.y, tip.z).length()
-    branch_rotation = graph.align_rotation(tip, axis="Z")
-    branches = graph.iop(tips, branch, rot=branch_rotation, scale=graph.vec(stem_radius, stem_radius, branch_length))
-    wood = graph.mat(graph.smooth(graph.realize(branches)), stem_material)
+    branches = graph.iop(base, branch, rot=graph.align_rotation(tip, axis="Z"), scale=graph.vec(stem_radius * 0.6, stem_radius * 0.6, tip.length()))
+    trunk = graph.transform(branch, s=graph.vec(stem_radius, stem_radius, stem))
+    wood = graph.mat(graph.smooth(graph.join(graph.realize(branches), trunk)), stem_material)
     graph.result(graph.join(foliage, graph.switch(graph.compare(stems, 0, "GREATER_THAN", "INT"), None, wood)))
     return graph
 

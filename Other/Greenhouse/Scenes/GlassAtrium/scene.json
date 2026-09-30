@@ -5,134 +5,1080 @@
   "defaults": {
     "shot": "Nitia"
   },
-  "notes": [
-    "Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the atrium, +X along the gallery edge, Z up; metres.",
-    "Gallery: glass floor (top at z = 0) on steel beams; its edge is the row y = 4.18 with a 1.04 m balustrade; a stair drops from the corner (-2.2, 4.0) towards -Y into the garden, guarded by the balustrade along x = -2.16.",
-    "Garden: the atrium floor at z = -4.5, paved, with planting beds either side of a path.",
-    "Curtain wall at y = 16 (mullions every 2 m, transoms every 3.9 m); beyond it a roof garden of trees and, far off, the city."
-  ],
-  "materials": {},
-  "sky": {"camera_strength": 1.0, "light_strength": 1.0, "haze_top": -0.1, "zenith_height": 0.7},
+  "notes": ["Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the atrium, +X along the gallery edge, Z up; metres.", "Gallery: glass floor (top at z = 0) on steel beams, frosted panes along its edge row; its edge is the row y = 4.18 with a 1.04 m balustrade, returning along x = -2.16.", "West stair (dog-leg): a broad landscape flight of 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rises from the garden at y = 0.32 to a landing at z = -1.3538 (y = 6.382..8.002), solved from the painted nosings (16 px rms); a second flight of 11 treads turns west up to the west gallery wing (x < -5.0), which joins the main gallery by a walkway behind the viewpoint (y < -1.6).", "Garden: the atrium floor at z = -3.2, paved, with planting beds west of, between and east of the stair and path; the round glass table stands on it.", "Curtain wall at y = 16 (mullions every 2 m, transoms every 3.9 m); beyond it a roof garden of trees and, far off, the city.", "The painting draws the chair legs inconsistently (one rises to the seat centre, one stands vertical); the chair is a coherent tall glass chair whose four splayed legs land on the painted feet."],
+  "materials": {
+    "glassware_density": 14.0,
+    "glass_ior": 1.25,
+    "pane_density": 10.0,
+    "leaf_translucency": 0.45,
+    "frosted_roughness": 0.22,
+    "frosted_shadow": 0.8
+  },
+  "sky": {
+    "camera_strength": 1.0,
+    "light_strength": 1.0,
+    "haze_top": -0.1,
+    "zenith_height": 0.7
+  },
   "library": {
     "Understory": [
-      {"name": "Proto Boston Fern", "asset": "GH.Flora.Pinnate", "preset": "boston_fern", "inputs": {"Seed": 3}},
-      {"name": "Proto Sword Fern", "asset": "GH.Flora.Pinnate", "preset": "sword_fern", "inputs": {"Seed": 5}},
-      {"name": "Proto Philodendron", "asset": "GH.Flora.Broadleaf", "preset": "philodendron", "inputs": {"Seed": 7}},
-      {"name": "Proto Spider Plant", "asset": "GH.Flora.Rosette", "preset": "spider", "inputs": {"Seed": 9}},
-      {"name": "Proto Grass", "asset": "GH.Flora.Rosette", "preset": "grass", "inputs": {"Seed": 11}},
-      {"name": "Proto Shrub", "asset": "GH.Flora.Umbrella", "preset": "shrub", "inputs": {"Seed": 13}}
+      {
+        "name": "Proto Boston Fern",
+        "asset": "GH.Flora.Pinnate",
+        "preset": "boston_fern",
+        "inputs": {
+          "Seed": 3
+        }
+      },
+      {
+        "name": "Proto Sword Fern",
+        "asset": "GH.Flora.Pinnate",
+        "preset": "sword_fern",
+        "inputs": {
+          "Seed": 5
+        }
+      },
+      {
+        "name": "Proto Philodendron",
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "philodendron",
+        "inputs": {
+          "Seed": 7
+        }
+      },
+      {
+        "name": "Proto Spider Plant",
+        "asset": "GH.Flora.Rosette",
+        "preset": "spider",
+        "inputs": {
+          "Seed": 9
+        }
+      },
+      {
+        "name": "Proto Grass",
+        "asset": "GH.Flora.Rosette",
+        "preset": "grass",
+        "inputs": {
+          "Seed": 11
+        }
+      },
+      {
+        "name": "Proto Shrub",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "shrub",
+        "inputs": {
+          "Seed": 13
+        }
+      }
     ],
     "Shrubs": [
-      {"name": "Proto Schefflera", "asset": "GH.Flora.Umbrella", "preset": "schefflera", "inputs": {"Seed": 21}},
-      {"name": "Proto Monstera", "asset": "GH.Flora.Broadleaf", "preset": "monstera", "inputs": {"Seed": 23}},
-      {"name": "Proto Alocasia", "asset": "GH.Flora.Broadleaf", "preset": "alocasia", "inputs": {"Seed": 25}},
-      {"name": "Proto Areca", "asset": "GH.Flora.Pinnate", "preset": "areca", "inputs": {"Seed": 27, "Stem": 0.4}}
+      {
+        "name": "Proto Schefflera",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "schefflera",
+        "inputs": {
+          "Seed": 21
+        }
+      },
+      {
+        "name": "Proto Monstera",
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "monstera",
+        "inputs": {
+          "Seed": 23
+        }
+      },
+      {
+        "name": "Proto Alocasia",
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "alocasia",
+        "inputs": {
+          "Seed": 25
+        }
+      },
+      {
+        "name": "Proto Areca",
+        "asset": "GH.Flora.Pinnate",
+        "preset": "areca",
+        "inputs": {
+          "Seed": 27,
+          "Stem": 0.4
+        }
+      }
     ]
   },
   "collections": {
     "Frame": [
-      {"name": "Floor Beams", "mesh": {"segments": [
-        [[-2.16, 0.17, -0.06], [4.5, 0.17, -0.06]],
-        [[-2.16, 1.6, -0.06], [4.5, 1.6, -0.06]],
-        [[-2.16, 3.03, -0.06], [4.5, 3.03, -0.06]],
-        [[-2.16, 4.18, -0.06], [4.5, 4.18, -0.06]],
-        [[-2.16, -3.0, -0.06], [-2.16, 4.18, -0.06]],
-        [[-0.75, -3.0, -0.06], [-0.75, 4.18, -0.06]],
-        [[0.08, -3.0, -0.06], [0.08, 4.18, -0.06]],
-        [[1.5, -3.0, -0.06], [1.5, 4.18, -0.06]],
-        [[2.92, -3.0, -0.06], [2.92, 4.18, -0.06]]]},
-       "asset": "GH.Structure.Members", "inputs": {"Width": 0.03, "Depth": 0.08, "Overrun": 0.015}},
-      {"name": "Columns", "mesh": {"segments": [
-        [[-0.75, 1.6, -4.5], [-0.75, 1.6, 7.0]],
-        [[-0.72, 3.03, -4.5], [-0.72, 3.03, 7.0]],
-        [[0.08, 1.6, -4.5], [0.08, 1.6, 7.0]],
-        [[0.08, 3.03, -4.5], [0.08, 3.03, 7.0]],
-        [[-2.16, 3.03, -4.5], [-2.16, 3.03, 7.0]],
-        [[-2.16, 4.18, -4.5], [-2.16, 4.18, 7.0]],
-        [[-2.35, 4.18, -4.5], [-2.35, 4.18, 7.0]],
-        [[-0.79, 4.18, -4.5], [-0.79, 4.18, 7.0]],
-        [[-0.56, 4.18, -4.5], [-0.56, 4.18, 7.0]],
-        [[0.0, 4.18, -4.5], [0.0, 4.18, 7.0]],
-        [[0.19, 4.18, -4.5], [0.19, 4.18, 7.0]]]},
-       "asset": "GH.Structure.Members", "inputs": {"Width": 0.03, "Depth": 0.03}},
-      {"name": "Curtain Wall Frame", "mesh": {"grid": {"plane": "XZ", "u": [-16.46, -14.46, -12.46, -10.46, -8.46, -6.46, -4.46, -2.46, -0.46, 1.54, 3.54, 5.54, 7.54, 9.54, 11.54, 13.54],
-                                                      "v": [-4.5, -0.58, 3.32, 7.22], "w": 16.0}},
-       "asset": "GH.Structure.Members", "inputs": {"Width": 0.08, "Depth": 0.16, "Overrun": 0.04}}
+      {
+        "name": "Floor Beams",
+        "mesh": {
+          "segments": [
+            [[-2.16, 0.17, -0.06], [4.5, 0.17, -0.06]],
+            [[-2.16, 1.6, -0.06], [4.5, 1.6, -0.06]],
+            [[-2.16, 3.03, -0.06], [4.5, 3.03, -0.06]],
+            [[-2.16, 4.18, -0.06], [4.5, 4.18, -0.06]],
+            [[-2.16, -3.0, -0.06], [-2.16, 4.18, -0.06]],
+            [[-0.75, -3.0, -0.06], [-0.75, 4.18, -0.06]],
+            [[0.08, -3.0, -0.06], [0.08, 4.18, -0.06]],
+            [[1.5, -3.0, -0.06], [1.5, 4.18, -0.06]],
+            [[2.92, -3.0, -0.06], [2.92, 4.18, -0.06]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.03,
+          "Depth": 0.08,
+          "Overrun": 0.015
+        }
+      },
+      {
+        "name": "Columns",
+        "mesh": {
+          "segments": [
+            [[-0.75, 1.6, -3.2], [-0.75, 1.6, 7.0]],
+            [[-0.72, 3.03, -3.2], [-0.72, 3.03, 7.0]],
+            [[0.08, 1.6, -3.2], [0.08, 1.6, 7.0]],
+            [[0.08, 3.03, -3.2], [0.08, 3.03, 7.0]],
+            [[-2.16, 3.03, -3.2], [-2.16, 3.03, 7.0]],
+            [[-2.16, 4.18, -3.2], [-2.16, 4.18, 7.0]],
+            [[-2.35, 4.18, -3.2], [-2.35, 4.18, 7.0]],
+            [[-0.79, 4.18, -3.2], [-0.79, 4.18, 7.0]],
+            [[-0.56, 4.18, -3.2], [-0.56, 4.18, 7.0]],
+            [[0.0, 4.18, -3.2], [0.0, 4.18, 7.0]],
+            [[0.19, 4.18, -3.2], [0.19, 4.18, 7.0]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.03,
+          "Depth": 0.03
+        }
+      },
+      {
+        "name": "Curtain Wall Frame",
+        "mesh": {
+          "grid": {
+            "plane": "XZ",
+            "u": [
+              -16.46,
+              -14.46,
+              -12.46,
+              -10.46,
+              -8.46,
+              -6.46,
+              -4.46,
+              -2.46,
+              -0.46,
+              1.54,
+              3.54,
+              5.54,
+              7.54,
+              9.54,
+              11.54,
+              13.54
+            ],
+            "v": [-3.2, -0.58, 3.32, 7.22],
+            "w": 16.0
+          }
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.08,
+          "Depth": 0.16,
+          "Overrun": 0.04
+        }
+      },
+      {
+        "name": "West Wing Beams",
+        "mesh": {
+          "segments": [
+            [[-11.5, -3.0, -0.06], [-5.0, -3.0, -0.06]],
+            [[-11.5, -1.6, -0.06], [-5.0, -1.6, -0.06]],
+            [[-11.5, 0.17, -0.06], [-5.0, 0.17, -0.06]],
+            [[-11.5, 1.6, -0.06], [-5.0, 1.6, -0.06]],
+            [[-11.5, 3.03, -0.06], [-5.0, 3.03, -0.06]],
+            [[-11.5, 4.18, -0.06], [-5.0, 4.18, -0.06]],
+            [[-11.5, -3.0, -0.06], [-11.5, 4.18, -0.06]],
+            [[-9.9, -3.0, -0.06], [-9.9, 4.18, -0.06]],
+            [[-8.46, -3.0, -0.06], [-8.46, 4.18, -0.06]],
+            [[-7.04, -3.0, -0.06], [-7.04, 4.18, -0.06]],
+            [[-5.62, -3.0, -0.06], [-5.62, 4.18, -0.06]],
+            [[-5.0, -3.0, -0.06], [-5.0, 4.18, -0.06]],
+            [[-5.0, -3.0, -0.06], [-2.16, -3.0, -0.06]],
+            [[-5.0, -1.6, -0.06], [-2.16, -1.6, -0.06]],
+            [[-9.383, 4.18, -0.06], [-9.383, 8.002, -0.06]],
+            [[-11.5, 8.002, -0.06], [-9.383, 8.002, -0.06]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.03,
+          "Depth": 0.08,
+          "Overrun": 0.015
+        }
+      }
     ],
     "Glazing": [
-      {"name": "Floor Glass", "mesh": {"grids": [
-        {"plane": "XY", "u": [-2.16, -0.75, 0.08, 1.5, 2.92, 4.5], "v": [-3.0, 0.17, 1.6, 3.03], "w": -0.02, "edges": false, "faces": true},
-        {"plane": "XY", "u": [-2.16, -0.75], "v": [3.03, 4.18], "w": -0.02, "edges": false, "faces": true}]},
-       "asset": "GH.Structure.Panes", "inputs": {"Thickness": 0.02, "Margin": 0.005}},
-      {"name": "Floor Frosted", "mesh": {"grid": {"plane": "XY", "u": [-0.75, 0.08, 1.5, 2.92, 4.5], "v": [3.03, 4.18], "w": -0.02, "edges": false, "faces": true}},
-       "asset": "GH.Structure.Panes", "inputs": {"Thickness": 0.02, "Margin": 0.005, "Material": "GH.GlassFrosted"}},
-      {"name": "Edge Balustrade", "mesh": {"polyline": [[6.0, 4.18, 0.0], [-2.16, 4.18, 0.0], [-2.16, -1.6, 0.0]]},
-       "asset": "GH.Structure.Balustrade", "inputs": {"Height": 1.04, "Post Spacing": 1.42, "Rails": 5, "Rail Bottom": 0.11, "Rail Size": 0.008,
-                                                      "Top Rail Width": 0.03, "Top Rail Depth": 0.03, "Post Size": 0.022}},
-      {"name": "Curtain Wall Glass", "mesh": {"grid": {"plane": "XZ", "u": [-16.46, -14.46, -12.46, -10.46, -8.46, -6.46, -4.46, -2.46, -0.46, 1.54, 3.54, 5.54, 7.54, 9.54, 11.54, 13.54],
-                                                      "v": [-4.5, -0.58, 3.32, 7.22], "w": 16.0, "edges": false, "faces": true}},
-       "asset": "GH.Structure.Panes", "inputs": {"Thickness": 0.012, "Margin": 0.02}}
+      {
+        "name": "Floor Glass",
+        "mesh": {
+          "grids": [
+            {
+              "plane": "XY",
+              "u": [-2.16, -0.75, 0.08, 1.5, 2.92, 4.5],
+              "v": [-3.0, 0.17, 1.6, 3.03],
+              "w": -0.02,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [-2.16, -0.75],
+              "v": [3.03, 4.18],
+              "w": -0.02,
+              "edges": false,
+              "faces": true
+            }
+          ]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "Floor Frosted",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-0.75, 0.08, 1.5, 2.92, 4.5],
+            "v": [3.03, 4.18],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005,
+          "Material": "GH.GlassFrosted"
+        }
+      },
+      {
+        "name": "Edge Balustrade",
+        "mesh": {
+          "polyline": [[6.0, 4.18, 0.0], [-2.16, 4.18, 0.0], [-2.16, -1.6, 0.0]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 1.04,
+          "Post Spacing": 1.42,
+          "Rails": 5,
+          "Rail Bottom": 0.11,
+          "Rail Size": 0.008,
+          "Top Rail Width": 0.03,
+          "Top Rail Depth": 0.03,
+          "Post Size": 0.022
+        }
+      },
+      {
+        "name": "Curtain Wall Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XZ",
+            "u": [
+              -16.46,
+              -14.46,
+              -12.46,
+              -10.46,
+              -8.46,
+              -6.46,
+              -4.46,
+              -2.46,
+              -0.46,
+              1.54,
+              3.54,
+              5.54,
+              7.54,
+              9.54,
+              11.54,
+              13.54
+            ],
+            "v": [-3.2, -0.58, 3.32, 7.22],
+            "w": 16.0,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.02
+        }
+      },
+      {
+        "name": "West Wing Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-11.5, -9.9, -8.46, -7.04, -5.62, -5.0],
+            "v": [-3.0, -1.6, 0.17, 1.6, 3.03, 4.18],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "West Walkway Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-5.0, -3.58, -2.16],
+            "v": [-3.0, -1.6],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "Upper Landing Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-11.5, -9.383],
+            "v": [4.18, 8.002],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "West Wing Guard",
+        "mesh": {
+          "polyline": [[-2.16, -1.6, 0.0], [-5.0, -1.6, 0.0], [-5.0, 4.18, 0.0], [-9.383, 4.18, 0.0], [-9.383, 7.602, 0.0]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 1.04,
+          "Post Spacing": 1.42,
+          "Rails": 5,
+          "Rail Bottom": 0.11,
+          "Rail Size": 0.008,
+          "Top Rail Width": 0.03,
+          "Top Rail Depth": 0.03,
+          "Post Size": 0.022
+        }
+      }
     ],
     "Stair": [
-      {"name": "Garden Stair", "loc": [-2.75, -1.28, -4.5], "asset": "GH.Structure.Stair",
-       "inputs": {"Steps": 22, "Rise": 0.2045, "Going": 0.24, "Width": 1.1, "Tread Thickness": 0.05, "Stringer Height": 0.28}}
+      {
+        "name": "Lower Flight",
+        "loc": [-3.87, 0.32, -3.2],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Steps": 14,
+          "Rise": 0.12308,
+          "Going": 0.433,
+          "Width": 1.5,
+          "Tread Thickness": 0.06,
+          "Stringer Height": 0.26
+        }
+      },
+      {
+        "name": "Stair Landing",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-4.62, -3.12],
+            "v": [6.382, 8.002],
+            "w": -1.4138,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.06,
+          "Material": "GH.Tread"
+        }
+      },
+      {
+        "name": "Landing Posts",
+        "mesh": {
+          "segments": [
+            [[-3.12, 6.382, -3.2], [-3.12, 6.382, -1.4138]],
+            [[-3.12, 8.002, -3.2], [-3.12, 8.002, -1.4138]],
+            [[-4.62, 8.002, -3.2], [-4.62, 8.002, -1.4138]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.03,
+          "Depth": 0.03
+        }
+      },
+      {
+        "name": "Upper Flight",
+        "loc": [-4.62, 7.192, -1.47688],
+        "rot": [0, 0, 90],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Steps": 11,
+          "Rise": 0.12308,
+          "Going": 0.433,
+          "Width": 1.5,
+          "Tread Thickness": 0.06,
+          "Stringer Height": 0.26
+        }
+      },
+      {
+        "name": "Lower Flight Guard",
+        "mesh": {
+          "polyline": [[-3.0900000000000003, 0.32, -3.0769], [-3.0900000000000003, 6.382, -1.3538]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 0.95,
+          "Post Spacing": 1.2,
+          "Rails": 0,
+          "Top Rail Width": 0.03,
+          "Top Rail Depth": 0.03,
+          "Post Size": 0.022
+        }
+      },
+      {
+        "name": "Landing Guard",
+        "mesh": {
+          "polyline": [[-3.0900000000000003, 6.382, -1.3538], [-3.0900000000000003, 7.972, -1.3538], [-4.62, 7.972, -1.3538]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 0.95,
+          "Post Spacing": 1.2,
+          "Rails": 0,
+          "Top Rail Width": 0.03,
+          "Top Rail Depth": 0.03,
+          "Post Size": 0.022
+        }
+      },
+      {
+        "name": "Upper Flight Guard",
+        "mesh": {
+          "polyline": [[-4.62, 7.972, -1.3538], [-9.383, 7.972, 0.0]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 0.95,
+          "Post Spacing": 1.2,
+          "Rails": 0,
+          "Top Rail Width": 0.03,
+          "Top Rail Depth": 0.03,
+          "Post Size": 0.022
+        }
+      }
     ],
     "Garden": [
-      {"name": "Garden Paving", "mesh": {"grid": {"plane": "XY", "u": [-16.0, 16.0], "v": [-6.0, 15.9], "w": -4.5, "edges": false, "faces": true}},
-       "asset": "GH.Garden.Paving", "inputs": {"Flag Size": 0.6, "Joint": 0.012, "Seed": 1}},
-      {"name": "Bed West", "mesh": {"grid": {"plane": "XY", "u": [-9.0, -1.0], "v": [2.8, 15.0], "w": -4.5, "edges": false, "faces": true}},
-       "asset": "GH.Garden.Bed", "inputs": {"Soil": 0.12, "Mound": 0.15, "Kerb": 0.14}},
-      {"name": "Bed East", "mesh": {"grid": {"plane": "XY", "u": [0.4, 9.0], "v": [2.8, 15.0], "w": -4.5, "edges": false, "faces": true}},
-       "asset": "GH.Garden.Bed", "inputs": {"Soil": 0.12, "Mound": 0.15, "Kerb": 0.14}},
-      {"name": "Understory West", "mesh": {"grid": {"plane": "XY", "u": [-9.0, -1.1], "v": [2.9, 14.9], "w": -4.36, "edges": false, "faces": true}},
-       "asset": "GH.Garden.Planting", "inputs": {"Plants": "GlassAtrium.Understory", "Density": 3.0, "Spacing": 0.35, "Scale Min": 0.8, "Scale Max": 1.4, "Seed": 2}},
-      {"name": "Understory East", "mesh": {"grid": {"plane": "XY", "u": [0.5, 9.0], "v": [2.9, 14.9], "w": -4.36, "edges": false, "faces": true}},
-       "asset": "GH.Garden.Planting", "inputs": {"Plants": "GlassAtrium.Understory", "Density": 3.0, "Spacing": 0.35, "Scale Min": 0.8, "Scale Max": 1.4, "Seed": 4}},
-      {"name": "Shrubs West", "mesh": {"grid": {"plane": "XY", "u": [-9.0, -1.4], "v": [3.0, 14.8], "w": -4.36, "edges": false, "faces": true}},
-       "asset": "GH.Garden.Planting", "inputs": {"Plants": "GlassAtrium.Shrubs", "Density": 0.35, "Spacing": 1.2, "Scale Min": 0.8, "Scale Max": 1.3, "Seed": 6}},
-      {"name": "Shrubs East", "mesh": {"grid": {"plane": "XY", "u": [0.8, 9.0], "v": [3.0, 14.8], "w": -4.36, "edges": false, "faces": true}},
-       "asset": "GH.Garden.Planting", "inputs": {"Plants": "GlassAtrium.Shrubs", "Density": 0.35, "Spacing": 1.2, "Scale Min": 0.8, "Scale Max": 1.3, "Seed": 8}},
-      {"name": "Dracaena", "loc": [-2.66, 4.05, -4.38], "asset": "GH.Flora.Rosette", "preset": "dracaena", "inputs": {"Stem": 1.1, "Seed": 31}},
-      {"name": "Schefflera Near", "loc": [-1.67, 4.92, -4.38], "asset": "GH.Flora.Umbrella", "preset": "schefflera", "inputs": {"Crown Height": 2.2, "Crown Radius": 1.0, "Stem": 0.8, "Seed": 33}},
-      {"name": "Schefflera Far", "loc": [-2.54, 6.48, -4.38], "asset": "GH.Flora.Umbrella", "preset": "schefflera", "inputs": {"Crown Height": 2.0, "Crown Radius": 1.1, "Stem": 0.7, "Seed": 35}},
-      {"name": "Monstera", "loc": [-3.2, 6.1, -4.38], "asset": "GH.Flora.Broadleaf", "preset": "monstera", "inputs": {"Seed": 37}},
-      {"name": "Alocasia Near", "loc": [-0.75, 3.63, -4.38], "asset": "GH.Flora.Broadleaf", "preset": "alocasia", "inputs": {"Petiole": 1.2, "Seed": 39}},
-      {"name": "Fern Near", "loc": [-0.94, 3.2, -4.38], "asset": "GH.Flora.Pinnate", "preset": "boston_fern", "inputs": {"Frond Length": 1.0, "Seed": 41}},
-      {"name": "Alocasia Right", "loc": [0.52, 6.42, -4.38], "asset": "GH.Flora.Broadleaf", "preset": "alocasia", "inputs": {"Petiole": 1.4, "Leaf Length": 0.9, "Seed": 43}},
-      {"name": "Banana", "loc": [-0.2, 6.9, -4.38], "asset": "GH.Flora.Pinnate", "preset": "areca", "inputs": {"Stem": 1.2, "Frond Length": 2.0, "Seed": 45}},
-      {"name": "Round Glass Table", "loc": [-2.94, 3.54, -4.5], "asset": "GH.Furniture.GlassTable", "inputs": {"Radius": 0.85, "Height": 0.75, "Legs": 3}}
+      {
+        "name": "Bed West",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-9.0, -4.8],
+            "v": [0.3, 15.0],
+            "w": -3.2,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.12,
+          "Mound": 0.15,
+          "Kerb": 0.14
+        }
+      },
+      {
+        "name": "Understory West",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-8.9, -4.8999999999999995],
+            "v": [0.4, 14.9],
+            "w": -3.08,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Understory",
+          "Density": 4.5,
+          "Spacing": 0.28,
+          "Scale Min": 0.9,
+          "Scale Max": 1.5,
+          "Seed": 2
+        }
+      },
+      {
+        "name": "Bed Inner",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-2.95, -1.0],
+            "v": [0.3, 8.0],
+            "w": -3.2,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.12,
+          "Mound": 0.15,
+          "Kerb": 0.14
+        }
+      },
+      {
+        "name": "Understory Inner",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-2.85, -1.1],
+            "v": [0.4, 7.9],
+            "w": -3.08,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Understory",
+          "Density": 4.5,
+          "Spacing": 0.28,
+          "Scale Min": 0.7,
+          "Scale Max": 1.1,
+          "Seed": 4
+        }
+      },
+      {
+        "name": "Bed Centre",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-1.0, 0.5],
+            "v": [0.3, 5.0],
+            "w": -3.2,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.12,
+          "Mound": 0.15,
+          "Kerb": 0.14
+        }
+      },
+      {
+        "name": "Understory Centre",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-0.9, 0.4],
+            "v": [0.4, 4.9],
+            "w": -3.08,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Understory",
+          "Density": 4.5,
+          "Spacing": 0.28,
+          "Scale Min": 0.9,
+          "Scale Max": 1.5,
+          "Seed": 6
+        }
+      },
+      {
+        "name": "Shrubs Centre",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-0.9, 0.4],
+            "v": [0.4, 4.9],
+            "w": -3.08,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Shrubs",
+          "Density": 0.7,
+          "Spacing": 0.8,
+          "Scale Min": 1.1,
+          "Scale Max": 1.7,
+          "Seed": 7
+        }
+      },
+      {
+        "name": "Bed East",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [0.5, 8.0],
+            "v": [0.3, 8.0],
+            "w": -3.2,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.12,
+          "Mound": 0.15,
+          "Kerb": 0.14
+        }
+      },
+      {
+        "name": "Understory East",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [0.6, 7.9],
+            "v": [0.4, 7.9],
+            "w": -3.08,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Understory",
+          "Density": 4.5,
+          "Spacing": 0.28,
+          "Scale Min": 0.9,
+          "Scale Max": 1.5,
+          "Seed": 8
+        }
+      },
+      {
+        "name": "Shrubs East",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [0.6, 7.9],
+            "v": [0.4, 7.9],
+            "w": -3.08,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Shrubs",
+          "Density": 0.7,
+          "Spacing": 0.8,
+          "Scale Min": 1.1,
+          "Scale Max": 1.7,
+          "Seed": 9
+        }
+      },
+      {
+        "name": "Garden Paving",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-16.0, 16.0],
+            "v": [-6.0, 15.9],
+            "w": -3.2,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Garden.Paving",
+        "inputs": {
+          "Flag Size": 0.6,
+          "Joint": 0.012,
+          "Seed": 1
+        }
+      },
+      {
+        "name": "Schefflera Great",
+        "loc": [-1.6, 4.5, -3.08],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "schefflera",
+        "inputs": {
+          "Crown Height": 2.1,
+          "Crown Radius": 1.15,
+          "Stem": 0.6,
+          "Leaves": 520,
+          "Clumps": 20,
+          "Seed": 33,
+          "Leaflet Length": 0.1,
+          "Leaflet Width": 0.038
+        }
+      },
+      {
+        "name": "Schefflera Low",
+        "loc": [-0.46, 3.9, -3.08],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "schefflera",
+        "inputs": {
+          "Crown Height": 1.3,
+          "Crown Radius": 0.7,
+          "Stem": 0.5,
+          "Seed": 34,
+          "Leaflet Length": 0.1,
+          "Leaflet Width": 0.038,
+          "Leaves": 260
+        }
+      },
+      {
+        "name": "Monstera",
+        "loc": [-2.3, 5.3, -3.08],
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "monstera",
+        "inputs": {
+          "Petiole": 1.0,
+          "Leaf Length": 0.7,
+          "Leaf Width": 0.62,
+          "Seed": 37
+        }
+      },
+      {
+        "name": "Elephant Ear",
+        "loc": [-0.48, 2.35, -3.08],
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "alocasia",
+        "inputs": {
+          "Petiole": 1.4,
+          "Leaf Length": 0.9,
+          "Leaf Width": 0.6,
+          "Seed": 39
+        }
+      },
+      {
+        "name": "Fern Near",
+        "loc": [-0.79, 2.86, -3.08],
+        "asset": "GH.Flora.Pinnate",
+        "preset": "boston_fern",
+        "inputs": {
+          "Frond Length": 0.9,
+          "Seed": 41
+        }
+      },
+      {
+        "name": "Philodendron Right",
+        "loc": [0.37, 5.21, -3.08],
+        "asset": "GH.Flora.Pinnate",
+        "preset": "areca",
+        "inputs": {
+          "Stem": 0.6,
+          "Frond Length": 1.6,
+          "Seed": 43
+        }
+      },
+      {
+        "name": "Banana",
+        "loc": [-0.28, 5.4, -3.08],
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "banana",
+        "inputs": {
+          "Seed": 45
+        }
+      },
+      {
+        "name": "Dracaena",
+        "loc": [-1.95, 3.55, -3.08],
+        "asset": "GH.Flora.Rosette",
+        "preset": "dracaena",
+        "inputs": {
+          "Stem": 1.1,
+          "Seed": 31
+        }
+      },
+      {
+        "name": "Elephant Ear West",
+        "loc": [-1.83, 2.0, -3.08],
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "alocasia",
+        "inputs": {
+          "Petiole": 1.1,
+          "Seed": 47
+        }
+      },
+      {
+        "name": "Areca Low",
+        "loc": [0.67, 3.23, -3.08],
+        "asset": "GH.Flora.Pinnate",
+        "preset": "areca",
+        "inputs": {
+          "Stem": 0.3,
+          "Frond Length": 1.3,
+          "Seed": 49
+        }
+      },
+      {
+        "name": "Round Glass Table",
+        "loc": [-2.43, 2.74, -3.2],
+        "asset": "GH.Furniture.GlassTable",
+        "inputs": {
+          "Radius": 0.66,
+          "Height": 0.75,
+          "Legs": 3
+        }
+      }
     ],
     "Gallery": [
-      {"name": "Glass Chair", "loc": [-0.915, 1.79, 0.0], "rot": [0, 0, 100.4], "asset": "GH.Furniture.GlassChair"},
-      {"name": "Tall Bottle", "loc": [-1.445, 1.996, 0.0], "asset": "GH.Vessel.SquareBottle",
-       "inputs": {"Width": 0.24, "Depth": 0.24, "Height": 1.8, "Shoulder": 0.1, "Neck Radius": 0.036, "Neck Length": 0.07, "Bore": 0.026, "Bore Depth": 0.12}},
-      {"name": "Flask", "loc": [-0.8, 1.4, 0.0], "asset": "GH.Vessel.Flask", "inputs": {"Radius": 0.16, "Neck Radius": 0.035, "Neck Length": 0.13}},
-      {"name": "Side Table", "loc": [-0.58, 3.83, 0.0], "asset": "GH.Furniture.PedestalTable", "inputs": {"Radius": 0.33, "Height": 0.6}},
-      {"name": "Bud Vase", "loc": [-0.781, 3.948, 0.6], "asset": "GH.Vessel.BudVase"},
-      {"name": "Glass Block", "loc": [-0.622, 4.09, 0.6], "rot": [0, 0, 20], "asset": "GH.Vessel.SquareBottle",
-       "inputs": {"Width": 0.11, "Depth": 0.065, "Height": 0.27, "Shoulder": 0.02, "Neck Length": 0.0, "Bore": 0.005, "Bore Depth": 0.06, "Squareness": 14}},
-      {"name": "Glass Ball", "loc": [-0.498, 3.959, 0.6], "asset": "GH.Vessel.Ball", "inputs": {"Radius": 0.034}},
-      {"name": "Book", "loc": [-0.53, 3.9, 0.6], "rot": [0, 0, 25], "asset": "GH.Vessel.Book"},
-      {"name": "Areca Palm", "loc": [0.75, 1.25, 0.0], "asset": "GH.Flora.Pinnate", "preset": "areca", "inputs": {"Stem": 0.35, "Seed": 51}}
+      {
+        "name": "Glass Chair",
+        "loc": [-0.916, 1.792, 0.0],
+        "rot": [0, 0, 101.4],
+        "asset": "GH.Furniture.GlassChair",
+        "inputs": {
+          "Seat Height": 0.62,
+          "Seat Thickness": 0.035,
+          "Leg Radius": 0.02,
+          "Leg Inset": 0.3,
+          "Back Height": 0.7
+        }
+      },
+      {
+        "name": "Tall Bottle",
+        "loc": [-1.445, 1.996, 0.0],
+        "asset": "GH.Vessel.SquareBottle",
+        "inputs": {
+          "Width": 0.24,
+          "Depth": 0.24,
+          "Height": 1.8,
+          "Shoulder": 0.1,
+          "Neck Radius": 0.036,
+          "Neck Length": 0.07,
+          "Bore": 0.026,
+          "Bore Depth": 0.12,
+          "Wall": 0.012
+        }
+      },
+      {
+        "name": "Flask",
+        "loc": [-0.794, 1.509, 0.0],
+        "asset": "GH.Vessel.Flask",
+        "inputs": {
+          "Radius": 0.181,
+          "Neck Radius": 0.035,
+          "Neck Length": 0.13
+        }
+      },
+      {
+        "name": "Side Table",
+        "loc": [-0.58, 3.83, 0.0],
+        "asset": "GH.Furniture.PedestalTable",
+        "inputs": {
+          "Radius": 0.33,
+          "Height": 0.6,
+          "Foot Radius": 0.14,
+          "Metal": "GH.Steel",
+          "Column Radius": 0.01
+        }
+      },
+      {
+        "name": "Bud Vase",
+        "loc": [-0.781, 3.948, 0.6],
+        "asset": "GH.Vessel.BudVase"
+      },
+      {
+        "name": "Glass Block",
+        "loc": [-0.622, 4.09, 0.6],
+        "rot": [0, 0, 20],
+        "asset": "GH.Vessel.SquareBottle",
+        "inputs": {
+          "Width": 0.11,
+          "Depth": 0.065,
+          "Height": 0.27,
+          "Shoulder": 0.02,
+          "Neck Length": 0.0,
+          "Bore": 0.005,
+          "Bore Depth": 0.06,
+          "Squareness": 14
+        }
+      },
+      {
+        "name": "Glass Ball",
+        "loc": [-0.498, 3.959, 0.6],
+        "asset": "GH.Vessel.Ball",
+        "inputs": {
+          "Radius": 0.034
+        }
+      },
+      {
+        "name": "Book",
+        "loc": [-0.53, 3.9, 0.6],
+        "rot": [0, 0, 25],
+        "asset": "GH.Vessel.Book"
+      },
+      {
+        "name": "Areca Palm",
+        "loc": [0.95, 1.55, 0.0],
+        "asset": "GH.Flora.Pinnate",
+        "preset": "areca",
+        "inputs": {
+          "Stem": 0.5,
+          "Seed": 51,
+          "Frond Length": 1.35,
+          "Leaflet Width": 0.02,
+          "Leaflet Length": 0.36,
+          "Leaflets": 34,
+          "Fronds": 12
+        }
+      }
     ],
     "Terraria": [
-      {"name": "Terrarium West", "loc": [-1.498, 1.937, 7.0], "asset": "GH.Vessel.Orb", "inputs": {"Radius": 0.16, "Drop": 4.937, "Facing": [0.551, -0.712, 0.435], "Seed": 1}},
-      {"name": "Terrarium Aloe", "loc": [-0.204, 2.355, 7.0], "asset": "GH.Vessel.Orb", "inputs": {"Radius": 0.14, "Drop": 4.935, "Facing": [0.078, -0.895, 0.439], "Seed": 2}},
-      {"name": "Terrarium Large", "loc": [0.102, 2.484, 7.0], "asset": "GH.Vessel.Orb", "inputs": {"Radius": 0.2, "Drop": 5.389, "Facing": [-0.034, -0.828, 0.56], "Seed": 3}},
-      {"name": "Terrarium Small", "loc": [0.007, 2.066, 7.0], "asset": "GH.Vessel.Orb", "inputs": {"Radius": 0.12, "Drop": 5.786, "Facing": [-0.002, -0.716, 0.698], "Seed": 4}},
-      {"name": "Terrarium West Plant", "loc": [-1.498, 1.937, 1.999], "asset": "GH.Flora.Umbrella", "preset": "shrub",
-       "inputs": {"Leaves": 120, "Crown Radius": 0.1, "Crown Height": 0.12, "Leaflet Length": 0.035, "Leaflet Width": 0.025, "Stem": 0.0, "Seed": 61}},
-      {"name": "Terrarium Aloe Plant", "loc": [-0.204, 2.355, 2.009], "asset": "GH.Flora.Succulent", "preset": "aloe", "inputs": {"Seed": 63}},
-      {"name": "Terrarium Large Plant", "loc": [0.102, 2.484, 1.531], "scale": 1.7, "asset": "GH.Flora.Succulent", "preset": "echeveria", "inputs": {"Seed": 65}},
-      {"name": "Terrarium Small Plant", "loc": [0.007, 2.066, 1.166], "asset": "GH.Flora.Succulent", "preset": "echeveria", "inputs": {"Seed": 67}}
+      {
+        "name": "Terrarium West",
+        "loc": [-1.498, 1.937, 7.0],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.16,
+          "Drop": 4.937,
+          "Facing": [0.551, -0.712, 0.435],
+          "Seed": 1
+        }
+      },
+      {
+        "name": "Terrarium Aloe",
+        "loc": [-0.204, 2.355, 7.0],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.14,
+          "Drop": 4.935,
+          "Facing": [0.078, -0.895, 0.439],
+          "Seed": 2
+        }
+      },
+      {
+        "name": "Terrarium Large",
+        "loc": [0.102, 2.484, 7.0],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.2,
+          "Drop": 5.389,
+          "Facing": [-0.034, -0.828, 0.56],
+          "Seed": 3
+        }
+      },
+      {
+        "name": "Terrarium Small",
+        "loc": [0.007, 2.066, 7.0],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.12,
+          "Drop": 5.786,
+          "Facing": [-0.002, -0.716, 0.698],
+          "Seed": 4
+        }
+      },
+      {
+        "name": "Terrarium West Plant",
+        "loc": [-1.498, 1.937, 1.999],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "shrub",
+        "inputs": {
+          "Leaves": 120,
+          "Crown Radius": 0.1,
+          "Crown Height": 0.12,
+          "Leaflet Length": 0.035,
+          "Leaflet Width": 0.025,
+          "Stem": 0.0,
+          "Seed": 61
+        }
+      },
+      {
+        "name": "Terrarium Aloe Plant",
+        "loc": [-0.204, 2.355, 2.009],
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 63
+        }
+      },
+      {
+        "name": "Terrarium Large Plant",
+        "loc": [0.102, 2.484, 1.531],
+        "scale": 1.7,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 65
+        }
+      },
+      {
+        "name": "Terrarium Small Plant",
+        "loc": [0.007, 2.066, 1.166],
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 67
+        }
+      }
     ],
     "Outside": [
-      {"name": "Roof Garden Tree", "at": [[-13.0, 19.0, -4.5], [-9.0, 21.5, -4.5], [-5.5, 19.5, -4.5], [-2.0, 22.0, -4.5], [1.5, 19.2, -4.5], [5.0, 21.0, -4.5], [8.5, 19.5, -4.5], [12.0, 21.0, -4.5]],
-       "turn": [0, 360], "size": [0.85, 1.25], "vary": {"Seed": "index"}, "asset": "GH.Flora.Umbrella", "preset": "tree"},
-      {"name": "Tower", "loc": [-70.0, 100.0, -60.0], "rot": [0, 0, 8], "asset": "GH.Env.Tower", "inputs": {"Width": 32, "Depth": 28, "Height": 170, "Bay": 1.6, "Floor": 4.0}}
+      {
+        "name": "Roof Garden Tree",
+        "at": [[-13.0, 18.2, -3.2], [-9.5, 17.6, -3.2], [-6.0, 18.4, -3.2], [-2.5, 17.5, -3.2], [1.0, 18.3, -3.2], [4.5, 17.4, -3.2], [8.0, 18.2, -3.2], [11.5, 17.6, -3.2], [-11.0, 22.0, -3.2], [-4.0, 22.5, -3.2], [3.0, 22.0, -3.2], [10.0, 22.5, -3.2]],
+        "turn": [0, 360],
+        "size": [0.85, 1.25],
+        "vary": {
+          "Seed": "index"
+        },
+        "asset": "GH.Flora.Umbrella",
+        "preset": "tree"
+      },
+      {
+        "name": "Tower",
+        "loc": [-70.0, 100.0, -60.0],
+        "rot": [0, 0, 8],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 32,
+          "Depth": 28,
+          "Height": 170,
+          "Bay": 1.6,
+          "Floor": 4.0
+        }
+      }
     ]
   },
   "lights": [
-    {"name": "Sun", "light": "SUN", "power": 4.0, "color": [1.0, 0.95, 0.9], "angle": 1.5, "direction": [-0.5, 0.75, 0.6]}
+    {
+      "name": "Sun",
+      "light": "SUN",
+      "power": 6.0,
+      "color": [1.0, 0.95, 0.9],
+      "angle": 1.5,
+      "direction": [-0.4, -0.2, 0.9]
+    }
   ]
 }

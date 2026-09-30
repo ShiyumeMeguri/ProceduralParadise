@@ -12,6 +12,10 @@ import math
 from Core.gn import GN, asset
 from . import materials as M
 
+ROD_BOTTOM = [(math.sin(math.pi * 0.5 * k / 8), 1.0 - math.cos(math.pi * 0.5 * k / 8)) for k in range(9)]
+ROD_TOP = [(math.cos(math.pi * 0.5 * k / 8), 2.0 + math.sin(math.pi * 0.5 * k / 8)) for k in range(9)]
+ROD_PROFILE = ROD_BOTTOM + ROD_TOP
+
 
 def rounded_slab(graph, width, depth, thickness, radius):
     """Rounded rectangle ``width`` x ``depth`` extruded ``thickness`` up
@@ -21,20 +25,23 @@ def rounded_slab(graph, width, depth, thickness, radius):
 
 
 def rod(graph, start, end, radius):
-    """Glass rod with rounded ends between two points."""
-    tube = graph.tube(graph.curve_line(start, end), radius, 16, True)
-    ends = graph.join(graph.transform(graph.ellipsoid(radius, radius, radius, 16, 8), t=start),
-                      graph.transform(graph.ellipsoid(radius, radius, radius, 16, 8), t=end))
-    union = graph.n("GeometryNodeMeshBoolean", props={"operation": "UNION", "solver": "MANIFOLD"})
-    graph.assign(graph._in_socket(union.n, "Mesh 2"), [tube, ends])
-    return union["Mesh"]
+    """Glass rod with rounded ends from ``start`` to ``end``: a capsule
+    lathed as one closed surface, its upper half moved up to the length."""
+    span = end - start
+    capsule = graph.lathe(ROD_PROFILE, 24, 1.0)
+    x, y, z = graph.sep(graph.position())
+    lift = graph.switch(graph.compare(z, 1.5, "GREATER_THAN"), 0.0, span.length() - radius * 3.0, "FLOAT")
+    capsule = graph.set_pos(capsule, pos=graph.vec(x * radius, y * radius, z * radius + lift))
+    return graph.transform(capsule, r=graph.align_rotation(span, axis="Z"), t=start)
 
 
 @asset("GH.Furniture.GlassChair", "Furniture")
 def glass_chair():
     """Chair of thick green glass: a rounded seat slab at ``Seat Height``, a
     tall back slab rising behind it (leaning back by ``Back Lean``), and
-    four round legs splayed out from under the seat to the floor."""
+    four round legs splayed out from under the seat to the floor: each leaves
+    the seat ``Leg Inset`` of the way from the centre to the corner and
+    lands ``Splay`` beyond the corner."""
     graph = GN("GH.Furniture.GlassChair", glass_chair.__doc__)
     width = graph.inp("Width", default=0.44, subtype="DISTANCE")
     depth = graph.inp("Depth", default=0.42, subtype="DISTANCE")
@@ -45,6 +52,7 @@ def glass_chair():
     back_thickness = graph.inp("Back Thickness", default=0.045, subtype="DISTANCE")
     back_lean = graph.inp("Back Lean", default=math.radians(8.0), subtype="ANGLE")
     leg_radius = graph.inp("Leg Radius", default=0.018, subtype="DISTANCE")
+    inset = graph.inp("Leg Inset", default=0.64, min=0.0, max=1.0)
     splay = graph.inp("Splay", default=0.09, subtype="DISTANCE")
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
 
@@ -53,12 +61,10 @@ def glass_chair():
     back = graph.transform(back, r=graph.vec(back_lean * -1.0, 0.0, 0.0), t=graph.vec(0.0, depth * 0.5 - back_thickness * 0.5, seat_height - seat_thickness * 0.5))
     legs = []
     for sx, sy in ((-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)):
-        top = graph.vec(width * 0.32 * sx, depth * 0.32 * sy, seat_height - seat_thickness - leg_radius * 0.5)
+        top = graph.vec(width * 0.5 * inset * sx, depth * 0.5 * inset * sy, seat_height - seat_thickness - leg_radius - 0.001)
         foot = graph.vec((width * 0.32 + splay) * sx, (depth * 0.32 + splay) * sy, leg_radius)
         legs.append(rod(graph, top, foot, leg_radius))
-    union = graph.n("GeometryNodeMeshBoolean", props={"operation": "UNION", "solver": "MANIFOLD"})
-    graph.assign(graph._in_socket(union.n, "Mesh 2"), [seat, back, *legs])
-    graph.result(graph.mat(graph.smooth_by_angle(union["Mesh"], 0.6), glass))
+    graph.result(graph.mat(graph.join(graph.smooth_by_angle(graph.join(seat, back), 0.6), graph.smooth(graph.join(*legs))), glass))
     return graph
 
 

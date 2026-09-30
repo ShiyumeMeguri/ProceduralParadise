@@ -50,6 +50,19 @@ def pebbles(graph, count, radius, size, height, seed, dome=0.0):
     return graph.mat(graph.realize(scattered), M.get("GH.Pebble"))
 
 
+def open_sphere(graph, radius, opening, segments=72, rings=36):
+    """Sphere of ``radius`` about the origin with a round opening of angular
+    radius ``opening`` about +Z: a grid wrapped from the south pole up to
+    the rim, so the rim is an exact circle; normals point outwards."""
+    grid = graph.grid(1.0, 1.0, segments + 1, rings + 1)
+    x, y, _ = graph.sep(graph.position())
+    azimuth = (x + 0.5) * TAU
+    polar = math.pi - (y + 0.5) * (math.pi - opening)
+    ring = graph.sin(polar) * radius
+    grid = graph.set_pos(grid, pos=graph.vec(graph.cos(azimuth) * ring, graph.sin(azimuth) * ring, graph.cos(polar) * radius))
+    return graph.merge(grid, radius * 0.0005)
+
+
 @asset("GH.Vessel.Orb", "Vessels")
 def orb():
     """Hanging glass terrarium: a blown sphere of ``Radius`` with a round
@@ -71,18 +84,17 @@ def orb():
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassClear"))
     wire_material = graph.inp("Wire Material", "MATERIAL", default=M.get("GH.Steel"))
 
-    ball = sphere(graph, radius - wall, 64, 32)
-    toward = graph.vmath("NORMALIZE", facing)
-    cap = graph.compare(graph.vmath("DOT_PRODUCT", graph.normal(), toward), graph.cos(opening), "GREATER_THAN")
-    ball = graph.delete(ball, cap, "FACE")
-    body = graph.mat(graph.smooth(shell(graph, ball, wall)), glass)
+    ball = open_sphere(graph, radius - wall, opening)
+    body = graph.smooth(shell(graph, ball, wall))
+    body = graph.transform(body, r=graph.align_rotation(graph.vmath("NORMALIZE", facing), axis="Z"))
+    body = graph.mat(body, glass)
 
     level = radius * (fill * 2.0 - 1.0)
     bed_radius = graph.math("SQRT", graph.max(radius * radius - level * level, 0.0)) - wall * 1.5
     bed = graph.n("GeometryNodeMeshUVSphere", Segments=48, Rings=24, Radius=radius - wall * 1.2)["Mesh"]
     _, _, bed_z = graph.sep(graph.position())
     bed = graph.set_pos(bed, pos=graph.vec(graph.position().x, graph.position().y, graph.min(bed_z, level)))
-    bed = graph.mat(graph.merge(bed, 0.0005), M.get("GH.Soil"))
+    bed = graph.mat(graph.merge(bed, 0.0005), M.get("GH.Pebble"))
     stones = pebbles(graph, pebble_count, bed_radius * 0.96, pebble_size, level, seed, dome=radius * 0.04)
 
     ring = graph.n("GeometryNodeCurvePrimitiveCircle", Resolution=24, Radius=loop).o
@@ -125,7 +137,8 @@ def square_bottle():
     solid rounded-square body ``Width`` x ``Depth`` rising ``Height``,
     rounding over the top ``Shoulder`` into a neck of ``Neck Radius`` and
     ``Neck Length`` with a lip; a bore of ``Bore`` radius and ``Bore Depth``
-    is drilled down from the top."""
+    is drilled down from the top.  With a ``Wall`` the body is blown hollow:
+    a cavity that thick inside every face, opening into the bore."""
     graph = GN("GH.Vessel.SquareBottle", square_bottle.__doc__)
     width = graph.inp("Width", default=0.2, subtype="DISTANCE")
     depth = graph.inp("Depth", default=0.2, subtype="DISTANCE")
@@ -137,6 +150,7 @@ def square_bottle():
     bore_depth = graph.inp("Bore Depth", default=0.1, subtype="DISTANCE")
     bevel = graph.inp("Bevel", default=0.02, subtype="DISTANCE")
     power = graph.inp("Squareness", default=6.0, min=2.0)
+    wall = graph.inp("Wall", default=0.0, min=0.0, subtype="DISTANCE")
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
 
     body = squircle_body(graph, width, depth, height, neck_radius, shoulder, bevel, power)
@@ -152,7 +166,9 @@ def square_bottle():
     solid = graph.n("GeometryNodeMeshBoolean", props={"operation": "UNION", "solver": "MANIFOLD"})
     graph.assign(graph._in_socket(solid.n, "Mesh 2"), [body, neck])
     bored = graph.n("GeometryNodeMeshBoolean", Mesh_1=solid["Mesh"], props={"operation": "DIFFERENCE", "solver": "MANIFOLD"})
-    graph.assign(graph._in_socket(bored.n, "Mesh 2"), [hole])
+    cavity = squircle_body(graph, width - wall * 2.0, depth - wall * 2.0, height - wall, bore, shoulder, 0.0, power)
+    cavity = graph.switch(graph.compare(wall, 0.0001, "GREATER_THAN"), None, graph.move(cavity, z=wall))
+    graph.assign(graph._in_socket(bored.n, "Mesh 2"), [hole, cavity])
     graph.result(graph.mat(graph.smooth_by_angle(bored["Mesh"], 0.9), glass))
     return graph
 
