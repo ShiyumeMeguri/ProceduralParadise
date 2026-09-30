@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset, get_asset, set_mode
+from Core.render import INK_QUIET
 from . import materials as M
 
 UP = (0.0, 0.0, 1.0)
@@ -66,7 +67,9 @@ def panes():
     """Every face of the mesh becomes a pane ``Thickness`` thick, shrunk by
     ``Margin`` on every side (the rebate the frame hides) and lifted by
     ``Offset`` along its normal.  ``See Through`` marks the panes as glass
-    for the ink pass."""
+    for the ink pass, their thin edges quiet: the frame draws a pane's
+    outline, and where panes meet without a frame their joint is not a
+    line."""
     graph = GN("GH.Structure.Panes", panes.__doc__)
     mesh = graph.inp("Geometry", "GEOMETRY")
     thickness = graph.inp("Thickness", default=0.012, min=0.0, subtype="DISTANCE")
@@ -81,7 +84,13 @@ def panes():
     factor = graph.max(1.0 - margin * 2.0 / graph.max(side, 0.001), 0.0)
     faces = graph.n("GeometryNodeScaleElements", Geometry=faces, Scale=factor, props={"domain": "FACE"}).o
     faces = graph.set_pos(faces, offset=graph.normal() * offset)
-    slabs = graph.extrude(faces, thickness, individual=True)
+    extrusion = graph.n("GeometryNodeExtrudeMesh")
+    set_mode(extrusion, "FACES")
+    graph.assign(graph._in_socket(extrusion.n, "Mesh"), faces)
+    graph.assign(graph._in_socket(extrusion.n, "Offset Scale"), thickness)
+    graph.assign(graph._in_socket(extrusion.n, "Individual"), True)
+    quiet_edges = graph.bool_and(extrusion["Side"], see_through)
+    slabs = graph.store(extrusion["Mesh"], INK_QUIET, graph.switch(quiet_edges, 0.0, 1.0, "FLOAT"), "FLOAT", "FACE")
     bottoms = graph.n("GeometryNodeFlipFaces", faces).o
     graph.result(M.glazed(graph, graph.merge(graph.join(slabs, bottoms), 0.00001), material, see_through))
     return graph

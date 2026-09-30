@@ -18,8 +18,9 @@
     "Sun: 55 deg high from azimuth 30 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do.  It shines through the city smog, which scatters the blue out of it: golden light (1.0, 0.9, 0.45) -- the painted sun patches on the pale pink floor are orange-yellow, not pink-white.",
     "Shade trees: three umbrella trees in the unseen north-east of the garden (outside the painting frame) whose crowns stand between the sun and the paved court: their dappled shade is the green-and-pink mottling of the court floor seen through the balustrade, and the sun shafts come down between their leaves.",
     "North wall: structurally glazed -- its panes meet on silicone joints, so only the transoms and the corner mullions are frames (the painting shows the pink haze through it undivided but for two horizontal bars).  Posts that the painting shows only below the gallery floor stop under it.",
-    "Daylight: the sky's strength is 0.26 of the sun's power (sky.sun_ratio): a hazy sky giving some 45 % of the light on a level surface with the sun 55 degrees up (pi L = 0.45 / 0.7 * sin 55 E, for a dome averaging 0.7 of its strength); the fit scales both together.",
-    "Vines: climbing plants trained along the roof frame, 6.3-6.6 m above the gallery, above every sight line of the painting's camera: they are seen only in their dappled shade -- the leaf-shaped sun patches on the court, the treads and the gallery -- and in the shafts of sun between them.  The sun is the real sun, half a degree across, so the patches keep sharp edges from nine metres up."
+    "Daylight: the sky's strength is 0.26 of the sun's power (sky.sun_ratio): a hazy sky giving some 40 % of the light on a level surface with the sun 55 degrees up (pi * 0.26 * 0.7 against sin 55, for a dome averaging 0.7 of its strength); the fit scales both together.",
+    "Vines: climbing plants trained along the roof frame, 6.3-6.6 m above the gallery, above every sight line of the painting's camera: they are seen only in their dappled shade -- the leaf-shaped sun patches on the court, the treads and the gallery -- and in the shafts of sun between them.  The sun is the real sun, half a degree across, so the patches keep sharp edges from nine metres up.",
+    "City extent: the city ground and the haze reach 6 km out: the top row of the frame looks 6 degrees down, so its sight line meets the ground 1.2 km away -- inside the haze, where the ground has no edge to show."
   ],
   "materials": {
     "glassware_density": 57.0,
@@ -28,7 +29,7 @@
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.0031,
+    "smog_brightness": 1.0019,
     "leaf_sheen": 0.12,
     "air_density": 0.002,
     "air_anisotropy": 0.6,
@@ -37,8 +38,8 @@
     "water_turbidity": 0.0
   },
   "sky": {
-    "camera_strength": 3.0641,
-    "light_strength": 3.0641,
+    "camera_strength": 3.0135,
+    "light_strength": 3.0135,
     "haze_top": -0.1,
     "zenith_height": 0.7,
     "sun_ratio": 0.26
@@ -633,7 +634,7 @@
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
-          "Margin": 0.02
+          "Margin": 0.001
         }
       },
       {
@@ -1462,8 +1463,8 @@
         "mesh": {
           "grid": {
             "plane": "XY",
-            "u": [-900.0, 900.0],
-            "v": [-900.0, 900.0],
+            "u": [-6000.0, 6000.0],
+            "v": [-6000.0, 6000.0],
             "w": -120.0,
             "edges": false,
             "faces": true
@@ -1721,8 +1722,8 @@
         "name": "City Haze",
         "asset": "GH.Env.Haze",
         "inputs": {
-          "Min": [-900.0, -900.0, -120.0],
-          "Max": [900.0, 900.0, 320.0],
+          "Min": [-6000.0, -6000.0, -120.0],
+          "Max": [6000.0, 6000.0, 320.0],
           "Hole Min": [-12.62, -6.16, -3.85],
           "Hole Max": [13.7, 16.16, 7.5]
         }
@@ -1742,7 +1743,7 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 11.7851,
+      "power": 11.5902,
       "color": [1.0, 0.9, 0.45],
       "angle": 0.53,
       "direction": [0.497, 0.287, 0.819]
