@@ -374,12 +374,13 @@ def succulent():
 # ------------------------------------------------------------------ air
 @register("GH.Air")
 def air():
-    """Sunlit air of the conservatory: a thin forward-scattering volume
-    (``air_density``, ``air_anisotropy``) that turns the sun into shafts
-    between the glazing bars.  Only volume, no surface."""
+    """Humid air of the conservatory: a thin scattering volume of
+    ``air_density`` whose ``air_anisotropy`` runs from 0 (light scattered
+    evenly) towards 1 (onwards), lit by the sun between the leaves above and
+    the glazing bars.  Only volume, no surface."""
     def build(tree: Tree):
-        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("air"), Density=param("air_density", 0.02),
-                        Anisotropy=param("air_anisotropy", 0.6))["Volume"]
+        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("air"), Density=param("air_density", 0.01),
+                        Anisotropy=param("air_anisotropy", 0.0))["Volume"]
         return {"Volume": volume}
     return S.material("GH.Air", build)
 
