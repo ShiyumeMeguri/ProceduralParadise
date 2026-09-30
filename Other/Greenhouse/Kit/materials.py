@@ -109,13 +109,13 @@ def dielectric(tree: Tree, density_key, density, wall, ior=1.5):
 def glass():
     """Architectural glass: floor panes, stair treads, balustrade infill,
     curtain wall and roof (``pane_density``).  The panes are anti-reflection
-    coated: the coating's reflectance curve -- about 0.2 % face on, rising
-    to a mirror at grazing angles -- is that of an uncoated dielectric of
-    ``pane_ior`` (1.1), so the garden seen down through the floor is not
-    veiled by the bright sky it mirrors, and the floor mirrors the windows
-    only far off."""
+    coated: the coating's reflectance curve -- about 1 % face on, rising to
+    a mirror at grazing angles -- is that of an uncoated dielectric of
+    ``pane_ior`` (1.22), so the garden seen down through the floor is not
+    veiled by the bright conservatory it mirrors, and the floor turns pale
+    only far off, where it mirrors the pink walls."""
     def build(tree: Tree):
-        return dielectric(tree, "pane_density", 10.0, 0.02, param("pane_ior", 1.1))
+        return dielectric(tree, "pane_density", 10.0, 0.02, param("pane_ior", 1.22))
     return S.material("GH.Glass", build)
 
 

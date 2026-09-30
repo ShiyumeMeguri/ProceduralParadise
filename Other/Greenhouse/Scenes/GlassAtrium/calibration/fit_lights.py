@@ -2,12 +2,17 @@
 Light balancing as an inverse problem.
 
 Light transport is linear in the light sources, so the atrium is rendered
-once with every source in its own Cycles light group: each lamp, the sky
-(the world) and every emissive object (the city smog glows with the skylight
-it scatters in).  Any balance is then sum_g w_g * I_g with one strength per
-group.  The colours are the scene's -- the sun's, the hazy dome's, the
-smog's pink: free, they would tint every surface and every reflection to
-imitate the painting's colours instead of leaving them to the materials.
+once with every source in its own Cycles light group: the daylight (the
+sun lamps and the sky, the world -- skylight is sunlight scattered by the
+air, so the two keep the balance the scene gives them: ``sky`` strengths
+at ``sun_ratio`` of the sun's power), every other lamp, and every emissive
+object (the city smog glows with the skylight it scatters in).  Any balance
+is then sum_g w_g * I_g with one strength per group.  The colours are the
+scene's -- the sun's, the hazy dome's, the smog's pink: free, they would
+tint every surface and every reflection to imitate the painting's colours
+instead of leaving them to the materials; and a sky free of the sun is
+fitted as bright as the painting's pale shadows ask, which no sky is: every
+pane would mirror it as a milky veil.
 The strengths are fitted so that this sum, after the Standard view
 transform (sRGB encoding, clipping at white), reproduces the painting with
 the figure removed.  Leaves, flags and shadows cannot line up with the
@@ -24,8 +29,9 @@ Two steps, because Blender's Python has no SciPy::
     blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py -- groups.npz [--samples 64] [--scale 0.25]
     python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py groups.npz [--apply]
 
-``--apply`` multiplies the scene's strengths by the result: a lamp's power,
-the sky's strength, an emissive material's brightness parameter
+``--apply`` multiplies the scene's strengths by the result: the daylight's
+(the sun lamps' power, and the sky's strengths set to ``sun_ratio`` of
+it), another lamp's power, an emissive material's brightness parameter
 (``EMISSIVE``).  Render ungraded; refit the grade afterwards.
 """
 from __future__ import annotations
@@ -45,7 +51,7 @@ import numpy as np  # noqa: E402
 
 SCENE_JSON = os.path.join(SCENE, "scene.json")
 REFERENCE = os.path.join(SCENE, "Reference", "Nitia_clean.webp")
-SKY = "sky"
+DAYLIGHT = "daylight"
 EMISSIVE = {"GH.Smog": "smog_brightness"}
 BANDS = (0.0, 0.2, 0.4, 0.7, 1.0)
 QUANTILES = np.linspace(5.0, 95.0, 10)
@@ -72,16 +78,17 @@ def render_groups(out, samples, scale):
     scene = bpy.context.scene
     scene.render.resolution_percentage = int(round(scale * 100))
     layer = scene.view_layers[0]
-    groups = {}
+    groups = {DAYLIGHT: {"kind": "daylight"}}
+    scene.world.lightgroup = DAYLIGHT
     for obj in scene.objects:
-        if obj.type == "LIGHT":
+        if obj.type == "LIGHT" and obj.data.type == "SUN":
+            obj.lightgroup = DAYLIGHT
+        elif obj.type == "LIGHT":
             groups[obj.name] = {"kind": "lamp"}
             obj.lightgroup = obj.name
         elif obj.type == "MESH" and emissive_material(obj):
             groups[obj.name] = {"kind": "emissive", "material": emissive_material(obj)}
             obj.lightgroup = obj.name
-    scene.world.lightgroup = SKY
-    groups[SKY] = {"kind": "sky"}
     for name in groups:
         layer.lightgroups.add(name=name)
     folder = tempfile.mkdtemp(prefix="gh_lightgroups_")
@@ -172,12 +179,15 @@ def apply(groups, weights):
     materials = scene.setdefault("materials", {})
     for name, info in groups.items():
         strength = weights[name]
-        if info["kind"] == "lamp":
+        if info["kind"] == "daylight":
+            suns = [item for item in scene["lights"] if item["light"] == "SUN"]
+            for sun in suns:
+                sun["power"] = round(sun["power"] * strength, 4)
+            sky = scene["sky"]
+            sky["camera_strength"] = sky["light_strength"] = round(sky["sun_ratio"] * max(sun["power"] for sun in suns), 4)
+        elif info["kind"] == "lamp":
             lamp = next(item for item in scene["lights"] if item["name"] == name)
             lamp["power"] = round(lamp["power"] * strength, 4)
-        elif info["kind"] == "sky":
-            scene["sky"]["camera_strength"] = round(scene["sky"]["camera_strength"] * strength, 4)
-            scene["sky"]["light_strength"] = round(scene["sky"]["light_strength"] * strength, 4)
         else:
             key = EMISSIVE[info["material"]]
             materials[key] = round(materials.get(key, 1.0) * strength, 4)
