@@ -53,6 +53,7 @@ SCENE_JSON = os.path.join(SCENE, "scene.json")
 REFERENCE = os.path.join(SCENE, "Reference", "Nitia_clean.webp")
 DAYLIGHT = "daylight"
 EMISSIVE = {"GH.Smog": "smog_brightness"}
+BLUR = 1.0 / 60.0
 BANDS = (0.0, 0.2, 0.4, 0.7, 1.0)
 QUANTILES = np.linspace(5.0, 95.0, 10)
 LAB_RANGE = np.array([100.0, 60.0, 60.0])
@@ -135,9 +136,28 @@ def band_quantiles(display):
                      for top, bottom in zip(BANDS[:-1], BANDS[1:])])
 
 
-def fit(images, reference, blur_fraction=1.0 / 60.0, prior=0.002, iterations=3000, lift=2.0):
+class Target:
+    """The painting as the fits compare a display image of ``size`` with
+    it: ``terms`` gives the error on display values blurred by ``BLUR`` of
+    the width, and the distance of the band quantiles."""
+
+    def __init__(self, reference, size):
+        import cv2
+        self.display = cv2.resize(reference.astype(np.float32), size, interpolation=cv2.INTER_AREA)
+        self.sigma = size[0] * BLUR
+        self.blurred = cv2.GaussianBlur(self.display, (0, 0), self.sigma)
+        self.bands = band_quantiles(self.display)
+
+    def terms(self, image):
+        import cv2
+        layout = float(np.mean(np.abs(cv2.GaussianBlur(image, (0, 0), self.sigma) - self.blurred)))
+        bands = float(np.mean(np.abs(band_quantiles(image) - self.bands) / LAB_RANGE))
+        return layout, bands
+
+
+def fit(images, reference, prior=0.002, iterations=3000, lift=2.0):
     """{group: strength} minimising the band-quantile distance plus the
-    error on display values blurred by ``blur_fraction`` of the width."""
+    error on blurred display values (:class:`Target`)."""
     import cv2
     from scipy.optimize import minimize
 
@@ -145,20 +165,14 @@ def fit(images, reference, blur_fraction=1.0 / 60.0, prior=0.002, iterations=300
     height, width = reference.shape[:2]
     size = (width // 2, height // 2)
     stack = np.stack([cv2.resize(images[name].astype(np.float32), size, interpolation=cv2.INTER_AREA) for name in names], 0)
-    target_display = cv2.resize(reference.astype(np.float32), size, interpolation=cv2.INTER_AREA)
-    sigma = size[0] * blur_fraction
-    target_blurred = cv2.GaussianBlur(target_display, (0, 0), sigma)
-    target_bands = band_quantiles(target_display)
+    target = Target(reference, size)
 
     def display(log_weights):
         light = np.maximum(np.einsum("ghwc,g->hwc", stack, np.exp(log_weights)), 0.0)
         return np.minimum(srgb(light), 1.0).astype(np.float32)
 
     def terms(log_weights):
-        image = display(log_weights)
-        layout = float(np.mean(np.abs(cv2.GaussianBlur(image, (0, 0), sigma) - target_blurred)))
-        bands = float(np.mean(np.abs(band_quantiles(image) - target_bands) / LAB_RANGE))
-        return layout, bands
+        return target.terms(display(log_weights))
 
     def objective(log_weights):
         return sum(terms(log_weights)) + prior * float(np.mean(log_weights ** 2))

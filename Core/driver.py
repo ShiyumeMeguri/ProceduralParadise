@@ -73,6 +73,7 @@ def base_parser(description, target, default_target):
     parser.add_argument("--samples", type=int, default=None)
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--no-look", action="store_true")
+    parser.add_argument("--no-grade", action="store_true")
     return parser
 
 
@@ -125,7 +126,8 @@ def shot_cameras(shot, matrix):
 def render_setup(shot, args, lines_defaults=None):
     """Render engine (the shot's ``render.engine``: CYCLES or EEVEE, with its
     settings under ``render.cycles`` / ``render.eevee``), colour management
-    and the compositor look of a shot.
+    and the compositor look of a shot -- without its ``grade`` for
+    ``--no-grade`` (the image a new grade is fitted on).
 
     The look's exposure goes into the compositor *before* the grade, so the
     grade sees exactly the values it was fitted on; a view may carry its own
@@ -144,6 +146,8 @@ def render_setup(shot, args, lines_defaults=None):
     look_exposure = 0.0
     if not args.no_look and shot.get("look"):
         look = dict(shot["look"])
+        if args.no_grade:
+            look.pop("grade", None)
         look_exposure = look.get("exposure", 0.0)
         look["exposure"] = look_exposure + exposure
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), 0.0)

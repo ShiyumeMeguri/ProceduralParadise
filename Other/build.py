@@ -29,6 +29,7 @@ scene                scene folder relative to Other/ (default Props/Scenes/Shish
 --samples N          override the render samples
 --scale S            resolution scale (e.g. 0.5 for previews)
 --no-look            disable the compositor look
+--no-grade           keep the compositor look but leave out its grade
 """
 from __future__ import annotations
 
