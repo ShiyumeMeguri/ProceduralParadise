@@ -1,31 +1,27 @@
 """
-Light balancing as an inverse problem, per colour channel.
+Light balancing as an inverse problem.
 
 Light transport is linear in the light sources, so the atrium is rendered
 once with every source in its own Cycles light group: each lamp, the sky
 (the world) and every emissive object (the city smog glows with the skylight
-it scatters in).  Any balance is then sum_g w_g * I_g with a weight per
-group -- and, for the glowing smog, per channel, so one solve finds both
-how bright and what colour it is (it is the pink seen through the walls).
-The sun and the sky keep their colours (pink-white sunlight, the hazy
-dome) and only their strengths are solved: free to take any colour, they
-would tint every surface and every reflection to imitate the painting's
-colours instead of leaving them to the materials.  (``linked`` groups
-share one strength, for a balance fixed by hand.)  The weights are fitted so that this sum, after the
-Standard view transform (sRGB encoding, clipping at white), reproduces the
-painting with the figure removed: a robust (Charbonnier) error on
-downsampled, blurred display values, optimised over log-weights with
-L-BFGS, a weak prior keeping every weight near 1.
+it scatters in).  Any balance is then sum_g w_g * I_g with one strength per
+group.  The colours are the scene's -- the sun's, the hazy dome's, the
+smog's pink: free, they would tint every surface and every reflection to
+imitate the painting's colours instead of leaving them to the materials.
+The strengths are fitted so that this sum, after the Standard view
+transform (sRGB encoding, clipping at white), reproduces the painting with
+the figure removed: a robust (Charbonnier) error on downsampled, blurred
+display values, optimised over log-strengths with L-BFGS, a weak prior
+keeping every strength near 1.
 
 Two steps, because Blender's Python has no SciPy::
 
     blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py -- groups.npz [--samples 64] [--scale 0.25]
     python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py groups.npz [--apply]
 
-``--apply`` writes the result into scene.json: a lamp's power and colour,
-the sky's strength and tint (``color:`` overrides of the sky palette
-entries), an emissive object's colour (``color:<its colour key>``,
-``EMISSIVE_COLORS``).  Render ungraded; refit the grade afterwards.
+``--apply`` multiplies the scene's strengths by the result: a lamp's power,
+the sky's strength, an emissive material's brightness parameter
+(``EMISSIVE``).  Render ungraded; refit the grade afterwards.
 """
 from __future__ import annotations
 
@@ -45,15 +41,14 @@ import numpy as np  # noqa: E402
 SCENE_JSON = os.path.join(SCENE, "scene.json")
 REFERENCE = os.path.join(SCENE, "Reference", "Nitia_clean.webp")
 SKY = "sky"
-SKY_COLORS = ("sky_zenith", "sky_horizon", "haze")
-EMISSIVE_COLORS = {"GH.Smog": "smog"}
+EMISSIVE = {"GH.Smog": "smog_brightness"}
 
 
 def emissive_material(obj):
     """Name of the library material with emission an object renders with."""
     evaluated = obj.evaluated_get(__import__("bpy").context.evaluated_depsgraph_get())
     for slot in evaluated.material_slots:
-        if slot.material is not None and slot.material.name in EMISSIVE_COLORS:
+        if slot.material is not None and slot.material.name in EMISSIVE:
             return slot.material.name
     return None
 
@@ -116,11 +111,8 @@ def srgb(linear):
     return np.where(linear <= 0.0031308, linear * 12.92, 1.055 * np.power(np.maximum(linear, 1e-8), 1.0 / 2.4) - 0.055)
 
 
-def fit(images, reference, tinted, linked=(), size=(217, 300), blur=1.5, prior=0.002, iterations=400, grid=(3, 4), contrast=0.5):
-    """{group: RGB weights} minimising the display-space error.  Groups in
-    ``tinted`` get a weight per channel (their colour is free); the others
-    one weight for all three (only their strength is); the groups in
-    ``linked`` share one weight (their balance stays as the scene sets it).
+def fit(images, reference, size=(217, 300), blur=1.5, prior=0.002, iterations=400, grid=(3, 4), contrast=0.5):
+    """{group: strength} minimising the display-space error.
 
     A pixelwise error alone favours flat light -- where leaves and shadows
     do not line up leaf for leaf, averaging them scores best -- so a second,
@@ -136,35 +128,22 @@ def fit(images, reference, tinted, linked=(), size=(217, 300), blur=1.5, prior=0
     names = sorted(images)
     stack = np.stack([prepare(images[name]) for name in names], 0)
     target = prepare(reference)
-    columns = []
-    shared = [(names.index(name), channel) for name in linked for channel in range(3)]
-    if shared:
-        columns.append(shared)
-    for index, name in enumerate(names):
-        if name in linked:
-            continue
-        columns += [[(index, channel) for channel in range(3)]] if name not in tinted else [[(index, channel)] for channel in range(3)]
-    expand = np.zeros((len(columns), len(names) * 3))
-    for column, cells in enumerate(columns):
-        for index, channel in cells:
-            expand[column, index * 3 + channel] = 1.0
 
-    def objective(parameters):
-        log_weights = parameters @ expand
-        weights = np.exp(log_weights).reshape(len(names), 3)
-        light = np.maximum(np.einsum("ghwc,gc->hwc", stack, weights), 0.0)
+    def objective(log_weights):
+        weights = np.exp(log_weights)
+        light = np.maximum(np.einsum("ghwc,g->hwc", stack, weights), 0.0)
         display = np.minimum(srgb(light), 1.0)
         residual = display - target
         charbonnier = np.sqrt(residual * residual + 1e-4)
         slope = np.where(light <= 0.0031308, 12.92, 1.055 / 2.4 * np.power(np.maximum(light, 1e-8), 1.0 / 2.4 - 1.0))
         slope = np.where(display >= 1.0, 0.0, slope)
         pixel_gradient = residual / charbonnier * slope / residual.size
-        gradient = np.einsum("ghwc,hwc->gc", stack, pixel_gradient) * weights
-        gradient = expand @ gradient.ravel() + 2.0 * prior * parameters / parameters.size
-        return charbonnier.mean() + prior * np.mean(parameters ** 2), gradient
+        gradient = np.einsum("ghwc,hwc->g", stack, pixel_gradient) * weights + 2.0 * prior * log_weights / log_weights.size
+        return charbonnier.mean() + prior * np.mean(log_weights ** 2), gradient
 
-    start = np.zeros(len(columns))
-    result = minimize(objective, start, jac=True, method="L-BFGS-B", bounds=[(-6.0, 4.0)] * len(columns), options={"maxiter": iterations})
+    start = np.zeros(len(names))
+    bounds = [(-6.0, 4.0)] * len(names)
+    result = minimize(objective, start, jac=True, method="L-BFGS-B", bounds=bounds, options={"maxiter": iterations})
     print("display error: before %.4f after %.4f" % (objective(start)[0], result.fun))
 
     sharp = np.stack([cv2.resize(images[name].astype(np.float32), size, interpolation=cv2.INTER_AREA) for name in names], 0)
@@ -176,58 +155,36 @@ def fit(images, reference, tinted, linked=(), size=(217, 300), blur=1.5, prior=0
     quantiles = [5, 50, 95]
     target_levels = np.array([np.percentile(sharp_target[cell] @ luma, quantiles) for cell in cells])
 
-    def levels(parameters):
-        weights = np.exp(parameters @ expand).reshape(len(names), 3)
-        display = np.minimum(srgb(np.maximum(np.einsum("ghwc,gc->hwc", sharp, weights), 0.0)), 1.0) @ luma
+    def levels(log_weights):
+        display = np.minimum(srgb(np.maximum(np.einsum("ghwc,g->hwc", sharp, np.exp(log_weights)), 0.0)), 1.0) @ luma
         return np.array([np.percentile(display[cell], quantiles) for cell in cells])
 
-    def combined(parameters):
-        return objective(parameters)[0] + contrast * np.mean(np.abs(levels(parameters) - target_levels))
+    def combined(log_weights):
+        return objective(log_weights)[0] + contrast * np.mean(np.abs(levels(log_weights) - target_levels))
 
-    before = combined(result.x)
-    second = minimize(combined, result.x, method="Powell", bounds=[(-6.0, 4.0)] * len(columns), options={"maxiter": 4000, "xtol": 1e-3, "ftol": 1e-5})
-    print("with contrast: before %.4f after %.4f (display %.4f, levels %.4f)"
-          % (before, second.fun, objective(second.x)[0], np.mean(np.abs(levels(second.x) - target_levels))))
-    weights = np.exp(second.x @ expand).reshape(len(names), 3)
-    return {name: weights[index].tolist() for index, name in enumerate(names)}
-
-
-def split(weights):
-    """(strength, tint): the mean of the RGB weights and the colour they
-    leave once it is divided out."""
-    strength = float(np.mean(weights))
-    return strength, [float(value / strength) for value in weights]
+    second = minimize(combined, result.x, method="Powell", bounds=bounds, options={"maxiter": 4000, "xtol": 1e-3, "ftol": 1e-5})
+    best = second.x if second.fun < combined(result.x) else result.x
+    print("with contrast: %.4f (display %.4f, levels %.4f)"
+          % (combined(best), objective(best)[0], np.mean(np.abs(levels(best) - target_levels))))
+    return {name: float(np.exp(best[index])) for index, name in enumerate(names)}
 
 
 def apply(groups, weights):
     from Core.jsonio import dump
-    from Greenhouse import PALETTE
     with open(SCENE_JSON, encoding="utf-8") as handle:
         scene = json.load(handle)
     materials = scene.setdefault("materials", {})
-
-    def tinted(key, tint):
-        base = materials.get(f"color:{key}", PALETTE[key])
-        materials[f"color:{key}"] = [round(min(channel * factor, 1.0), 4) for channel, factor in zip(base, tint)]
-
     for name, info in groups.items():
-        strength, tint = split(weights[name])
+        strength = weights[name]
         if info["kind"] == "lamp":
             lamp = next(item for item in scene["lights"] if item["name"] == name)
             lamp["power"] = round(lamp["power"] * strength, 4)
-            color = lamp.get("color", [1.0, 1.0, 1.0])
-            peak = max(channel * factor for channel, factor in zip(color, tint))
-            lamp["color"] = [round(channel * factor / peak, 4) for channel, factor in zip(color, tint)]
-            lamp["power"] = round(lamp["power"] * peak, 4)
         elif info["kind"] == "sky":
             scene["sky"]["camera_strength"] = round(scene["sky"]["camera_strength"] * strength, 4)
             scene["sky"]["light_strength"] = round(scene["sky"]["light_strength"] * strength, 4)
-            for key in SKY_COLORS:
-                tinted(key, tint)
         else:
-            key = EMISSIVE_COLORS[info["material"]]
-            materials["smog_brightness"] = round(materials.get("smog_brightness", 1.0) * strength, 4)
-            tinted(key, tint)
+            key = EMISSIVE[info["material"]]
+            materials[key] = round(materials.get(key, 1.0) * strength, 4)
     dump(scene, SCENE_JSON)
     print("applied to", SCENE_JSON)
 
@@ -249,8 +206,8 @@ def main(argv):
     height, width = next(iter(images.values())).shape[:2]
     reference = cv2.imread(REFERENCE)[:, :, ::-1].astype(np.float32) / 255.0
     reference = cv2.resize(reference, (width, height), interpolation=cv2.INTER_AREA)
-    weights = fit(images, reference, [name for name, info in groups.items() if info["kind"] == "emissive"])
-    print(json.dumps({name: [round(value, 3) for value in rgb] for name, rgb in weights.items()}, indent=1))
+    weights = fit(images, reference)
+    print(json.dumps({name: round(value, 4) for name, value in weights.items()}))
     if "--apply" in argv:
         apply(groups, weights)
 

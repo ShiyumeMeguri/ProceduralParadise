@@ -16,6 +16,7 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset, set_menu, shell_profile
+from Core.render import INK_QUIET
 from . import materials as M
 
 TAU = math.tau
@@ -44,7 +45,8 @@ def shell(graph, mesh, thickness):
 def pebbles(graph, count, radius, size, height, seed, dome=0.0):
     """``count`` rounded pebbles scattered on a disc of ``radius`` at
     ``height`` (heaped by ``dome`` towards the middle), each with its own
-    ``pebble_shade``."""
+    ``pebble_shade``; quiet for the ink pass (a bed of stones, not stones
+    drawn one by one)."""
     points = graph.points(count, (0.0, 0.0, 0.0))
     index = graph.index()
     reach = graph.math("SQRT", (index + 0.5) / graph.max(count, 1)) * radius
@@ -55,6 +57,7 @@ def pebbles(graph, count, radius, size, height, seed, dome=0.0):
     rotation = graph.vec(graph.random(-0.3, 0.3, seed), graph.random(-0.3, 0.3, seed + 1), graph.random(0.0, TAU, seed + 2))
     scattered = graph.iop(points, stone, rot=rotation, scale=size * graph.random(0.6, 1.3, seed + 3))
     scattered = graph.store(scattered, "pebble_shade", graph.random(0.0, 1.0, seed + 4), "FLOAT", "INSTANCE")
+    scattered = graph.store(scattered, INK_QUIET, 1.0, "FLOAT", "INSTANCE")
     return graph.mat(graph.realize(scattered), M.get("GH.Pebble"))
 
 
@@ -102,7 +105,7 @@ def orb():
     bed = graph.n("GeometryNodeMeshUVSphere", Segments=48, Rings=24, Radius=radius - wall * 1.2)["Mesh"]
     _, _, bed_z = graph.sep(graph.position())
     bed = graph.set_pos(bed, pos=graph.vec(graph.position().x, graph.position().y, graph.min(bed_z, level)))
-    bed = graph.mat(graph.merge(bed, 0.0005), M.get("GH.Pebble"))
+    bed = graph.mat(graph.store(graph.merge(bed, 0.0005), INK_QUIET, 1.0, "FLOAT", "FACE"), M.get("GH.Pebble"))
     stones = pebbles(graph, pebble_count, bed_radius * 0.96, pebble_size, level, seed, dome=radius * 0.04)
 
     ring = graph.n("GeometryNodeCurvePrimitiveCircle", Resolution=24, Radius=loop).o
@@ -243,17 +246,19 @@ def flask():
 
 @asset("GH.Vessel.BudVase", "Vessels")
 def bud_vase():
-    """Brass bud vase: a slender cone on a wide shallow saucer."""
+    """Bud vase: a slender dark bronze cone on a wide shallow brass
+    saucer."""
     graph = GN("GH.Vessel.BudVase", bud_vase.__doc__)
     saucer = graph.inp("Saucer Radius", default=0.075, subtype="DISTANCE")
     height = graph.inp("Height", default=0.1, subtype="DISTANCE")
     base = graph.inp("Base Radius", default=0.03, subtype="DISTANCE")
     material = graph.inp("Material", "MATERIAL", default=M.get("GH.Brass"))
+    vase_material = graph.inp("Vase Material", "MATERIAL", default=M.get("GH.Bronze"))
     plate = graph.lathe([(0.0, 0.0), (0.92, 0.0), (1.0, 0.06), (0.98, 0.08), (0.2, 0.05), (0.0, 0.05)], 64, 1.0)
     plate = graph.transform(plate, s=graph.vec(saucer, saucer, saucer))
     cone = graph.lathe([(0.0, 0.0), (1.0, 0.0), (0.4, 0.9), (0.28, 0.97), (0.22, 1.0), (0.16, 0.99), (0.16, 0.8), (0.0, 0.8)], 48, 1.0)
     cone = graph.transform(cone, t=graph.vec(0.0, 0.0, saucer * 0.05), s=graph.vec(base, base, height))
-    graph.result(graph.mat(graph.smooth_by_angle(graph.join(plate, cone), 0.7), material))
+    graph.result(graph.join(graph.mat(graph.smooth_by_angle(plate, 0.7), material), graph.mat(graph.smooth_by_angle(cone, 0.7), vase_material)))
     return graph
 
 

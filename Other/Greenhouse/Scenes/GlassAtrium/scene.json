@@ -15,7 +15,8 @@
     "Garden specimens (\"Painted ...\"): each placed where its mass is in the painting -- the centre pixel of the mass back-projected through the solved camera at the height of its crown; the random understory fills the beds between them.",
     "Air: the sunlit air fills the conservatory 10 cm clear of the floor and roof -- a volume boundary must not coincide with another volume boundary (the glass posts end on those planes), or the volume stack at the camera breaks and every camera ray is absorbed.",
     "Side table: the painting draws its top as an ellipse rounder (aspect 0.57) than a horizontal disc can project to at that place (every point on that view ray gives sin 26 deg = 0.44); the disc matches the painted width and centre, the objects on it their painted corners.",
-    "Sun: 55 deg high from azimuth 30 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do."
+    "Sun: 55 deg high from azimuth 30 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do.",
+    "Shade trees: three umbrella trees in the unseen north-east of the garden (outside the painting frame) whose crowns stand between the sun and the paved court: their dappled shade is the green-and-pink mottling of the court floor seen through the balustrade, and the sun shafts come down between their leaves."
   ],
   "materials": {
     "glassware_density": 57.0,
@@ -24,21 +25,16 @@
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 0.993,
-    "leaf_sheen": 0.35,
+    "smog_brightness": 1.0347,
+    "leaf_sheen": 0.12,
     "air_density": 0.002,
     "air_anisotropy": 0.6,
     "bottle_density": 10.0,
-    "water_density": 8.0,
-    "pane_ior": 1.22,
-    "color:sky_zenith": [0.12, 0.42, 0.95],
-    "color:sky_horizon": [0.72, 0.84, 1.0],
-    "color:haze": [0.97, 0.84, 0.9],
-    "color:smog": [0.9657, 0.7897, 0.8789]
+    "water_density": 8.0
   },
   "sky": {
-    "camera_strength": 3.3534,
-    "light_strength": 3.3534,
+    "camera_strength": 5.3975,
+    "light_strength": 5.3975,
     "haze_top": -0.1,
     "zenith_height": 1.2
   },
@@ -112,7 +108,9 @@
         "asset": "GH.Flora.Broadleaf",
         "preset": "monstera",
         "inputs": {
-          "Seed": 23
+          "Seed": 23,
+          "Leaf Length": 0.45,
+          "Leaf Width": 0.4
         }
       },
       {
@@ -120,18 +118,10 @@
         "asset": "GH.Flora.Broadleaf",
         "preset": "alocasia",
         "inputs": {
-          "Seed": 25
-        }
-      },
-      {
-        "name": "Proto Banana",
-        "asset": "GH.Flora.Broadleaf",
-        "preset": "banana",
-        "inputs": {
-          "Seed": 29,
-          "Petiole": 0.9,
-          "Leaf Length": 1.0,
-          "Leaves": 5
+          "Seed": 25,
+          "Leaf Length": 0.5,
+          "Leaf Width": 0.36,
+          "Petiole": 0.8
         }
       }
     ]
@@ -908,8 +898,8 @@
           "Plants": "GlassAtrium.Shrubs",
           "Density": 0.35,
           "Spacing": 0.8,
-          "Scale Min": 1.0,
-          "Scale Max": 1.4,
+          "Scale Min": 0.85,
+          "Scale Max": 1.15,
           "Seed": 5
         }
       },
@@ -1024,10 +1014,10 @@
         "inputs": {
           "Leaves": 7,
           "Petiole": 1.0,
-          "Leaf Length": 0.75,
-          "Leaf Width": 0.55,
-          "Color A": "leaf_light",
-          "Color B": "leaf",
+          "Leaf Length": 0.55,
+          "Leaf Width": 0.4,
+          "Color A": "leaf",
+          "Color B": "leaf_light",
           "Seed": 39
         }
       },
@@ -1079,6 +1069,66 @@
           "Leaf Width": 0.32,
           "Seed": 47
         }
+      },
+      {
+        "name": "Shade Tree 1",
+        "loc": [3.8, 12.5, -3.08],
+        "rot": [0, 0, 0],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "schefflera",
+        "inputs": {
+          "Stem": 3.0,
+          "Crown Height": 4.2,
+          "Crown Radius": 2.2,
+          "Leaves": 700,
+          "Clumps": 26,
+          "Clump Size": 0.2,
+          "Stems": 6,
+          "Stem Radius": 0.07,
+          "Leaflet Length": 0.16,
+          "Leaflet Width": 0.06,
+          "Seed": 81
+        }
+      },
+      {
+        "name": "Shade Tree 2",
+        "loc": [5.3, 14.6, -3.08],
+        "rot": [0, 0, 131],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "schefflera",
+        "inputs": {
+          "Stem": 3.4,
+          "Crown Height": 4.0,
+          "Crown Radius": 2.0,
+          "Leaves": 700,
+          "Clumps": 26,
+          "Clump Size": 0.2,
+          "Stems": 6,
+          "Stem Radius": 0.07,
+          "Leaflet Length": 0.16,
+          "Leaflet Width": 0.06,
+          "Seed": 82
+        }
+      },
+      {
+        "name": "Shade Tree 3",
+        "loc": [3.0, 15.2, -3.08],
+        "rot": [0, 0, 262],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "schefflera",
+        "inputs": {
+          "Stem": 2.6,
+          "Crown Height": 3.8,
+          "Crown Radius": 1.8,
+          "Leaves": 700,
+          "Clumps": 26,
+          "Clump Size": 0.2,
+          "Stems": 6,
+          "Stem Radius": 0.07,
+          "Leaflet Length": 0.16,
+          "Leaflet Width": 0.06,
+          "Seed": 83
+        }
       }
     ],
     "Gallery": [
@@ -1096,7 +1146,7 @@
           "Neck Length": 0.04,
           "Bore": 0.025,
           "Bore Depth": 0.12,
-          "Wall": 0.0,
+          "Wall": 0.012,
           "Squareness": 14.0,
           "Glass": "GH.GlassBottle",
           "Bevel": 0.01
@@ -1151,7 +1201,8 @@
           "Bore": 0.009,
           "Bore Depth": 0.12,
           "Squareness": 14.0,
-          "Bevel": 0.004
+          "Bevel": 0.004,
+          "Glass": "GH.GlassClear"
         }
       },
       {
@@ -1666,7 +1717,9 @@
         "asset": "GH.Env.Haze",
         "inputs": {
           "Min": [-900.0, -900.0, -120.0],
-          "Max": [900.0, 900.0, -3.85]
+          "Max": [900.0, 900.0, 320.0],
+          "Hole Min": [-12.62, -6.16, -3.85],
+          "Hole Max": [13.7, 16.16, 7.5]
         }
       },
       {
@@ -1684,9 +1737,9 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 3.7259,
-      "color": [1.0, 0.9, 0.74],
-      "angle": 1.5,
+      "power": 2.5259,
+      "color": [1.0, 0.95, 0.9],
+      "angle": 10.0,
       "direction": [0.497, 0.287, 0.819]
     }
   ],
@@ -1722,10 +1775,16 @@
       "resolution": [1920, 1080]
     },
     "plan": {
-      "location": [0.5, 5.0, 40.0],
-      "target": [0.5, 5.001, -3.2],
-      "lens": 30.0,
-      "resolution": [1300, 1100]
+      "location": [0.5, 9.0, 30.0],
+      "target": [0.5, 9.001, -3.2],
+      "lens": 24.0,
+      "resolution": [1000, 1000]
+    },
+    "plants": {
+      "location": [0.9, 1.2, 0.2],
+      "target": [-0.8, 3.4, -2.6],
+      "lens": 24.0,
+      "resolution": [1600, 1000]
     }
   }
 }

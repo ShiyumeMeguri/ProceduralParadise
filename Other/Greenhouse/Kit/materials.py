@@ -52,12 +52,17 @@ def mix_shader(tree: Tree, factor, first, second):
     return tree.n("ShaderNodeMixShader", factor, first, second)["Shader"]
 
 
-def shadow_clear(tree: Tree, shader, tint):
-    """``shader`` for camera and indirect rays, a tinted transparent surface
-    for shadow rays."""
-    shadow = tree.n("ShaderNodeLightPath")["Is Shadow Ray"]
+def light_clear(tree: Tree, shader, tint):
+    """``shader`` for camera and glossy rays; for the rays that carry light
+    to a surface -- shadow rays and rays scattered off a diffuse surface --
+    a tinted transparent surface.  Light reaches the garden through glass;
+    refracted, it would be a caustic path, which the render does not trace,
+    and the sky would light the conservatory only through its sampled
+    shadow rays, a fraction of its light."""
+    path = tree.n("ShaderNodeLightPath")
+    carries_light = tree.math("MAXIMUM", path["Is Shadow Ray"], path["Is Diffuse Ray"])
     transparent = tree.n("ShaderNodeBsdfTransparent", Color=tint)["BSDF"]
-    return mix_shader(tree, shadow, shader, transparent)
+    return mix_shader(tree, carries_light, shader, transparent)
 
 
 def scaled(rgba, factor):
@@ -89,27 +94,28 @@ FRESNEL_LOSS = 0.96
 
 def dielectric(tree: Tree, density_key, density, wall, ior=1.5):
     """Surface and volume of jade glass: a dielectric of ``ior`` filled with
-    absorption towards ``jade`` at ``density_key``.  A shadow ray crosses a
-    surface and half a ``wall`` of glass per surface it meets, so it is
-    tinted by the Fresnel loss and the Beer-Lambert transmittance of half a
-    wall -- the light a pane really lets through."""
+    absorption towards ``jade`` at ``density_key``.  A ray carrying light
+    crosses a surface and half a ``wall`` of glass per surface it meets, so
+    it is tinted by the Fresnel loss and the Beer-Lambert transmittance of
+    half a wall -- the light a pane really lets through."""
     density = param(density_key, density)
     surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=ior)["BSDF"]
     volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("jade"), Density=density)["Volume"]
     half_wall = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * wall * 0.5) for channel in color("jade")[:3])
-    return {"Surface": shadow_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
+    return {"Surface": light_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
 
 
 @register("GH.Glass")
 def glass():
     """Architectural glass: floor panes, stair treads, balustrade infill,
     curtain wall and roof (``pane_density``).  The panes are anti-reflection
-    coated: the coating's reflectance curve -- about 1 % face on, rising to
-    a mirror at grazing angles -- is that of an uncoated dielectric of
-    ``pane_ior`` (1.22), so the floor is clear underfoot and mirrors the
-    windows far off."""
+    coated: the coating's reflectance curve -- about 0.2 % face on, rising
+    to a mirror at grazing angles -- is that of an uncoated dielectric of
+    ``pane_ior`` (1.1), so the garden seen down through the floor is not
+    veiled by the bright sky it mirrors, and the floor mirrors the windows
+    only far off."""
     def build(tree: Tree):
-        return dielectric(tree, "pane_density", 10.0, 0.02, param("pane_ior", 1.22))
+        return dielectric(tree, "pane_density", 10.0, 0.02, param("pane_ior", 1.1))
     return S.material("GH.Glass", build)
 
 
@@ -132,20 +138,23 @@ def glass_bottle():
         surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.5)["BSDF"]
         volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("bottle_glass"), Density=density)["Volume"]
         half_wall = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * 0.006) for channel in color("bottle_glass")[:3])
-        return {"Surface": shadow_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
+        return {"Surface": light_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
     return S.material("GH.GlassBottle", build)
 
 
 @register("GH.Water")
 def water():
     """Water: an IOR 1.333 dielectric absorbing towards ``water_tint``
-    (``water_density``)."""
+    (``water_density``), faintly turbid (``water_turbidity``): the sunlight
+    it scatters lights the whole body of water teal."""
     def build(tree: Tree):
         density = param("water_density", 8.0)
         surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.333)["BSDF"]
-        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("water_tint"), Density=density)["Volume"]
+        absorption = tree.n("ShaderNodeVolumeAbsorption", Color=color("water_tint"), Density=density)["Volume"]
+        scatter = tree.n("ShaderNodeVolumeScatter", Color=color("water_tint"), Density=param("water_turbidity", 2.0), Anisotropy=0.3)["Volume"]
+        volume = tree.n("ShaderNodeAddShader", absorption, scatter)["Shader"]
         half = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * 0.1) for channel in color("water_tint")[:3])
-        return {"Surface": shadow_clear(tree, surface, (*half, 1.0)), "Volume": volume}
+        return {"Surface": light_clear(tree, surface, (*half, 1.0)), "Volume": volume}
     return S.material("GH.Water", build)
 
 
@@ -257,8 +266,16 @@ def bark():
 @register("GH.Brass")
 def brass():
     def build(tree: Tree):
-        return S.bsdf(tree, Base_Color=color("brass"), Metallic=1.0, Roughness=0.28)["BSDF"]
+        return S.bsdf(tree, Base_Color=color("brass"), Metallic=1.0, Roughness=0.35)["BSDF"]
     return S.material("GH.Brass", build)
+
+
+@register("GH.Bronze")
+def bronze():
+    """Dark patinated bronze."""
+    def build(tree: Tree):
+        return S.bsdf(tree, Base_Color=color("bronze"), Metallic=1.0, Roughness=0.45)["BSDF"]
+    return S.material("GH.Bronze", build)
 
 
 @register("GH.PhoneBody")
@@ -316,7 +333,7 @@ def leaf_shader(tree: Tree, sheen, translucency, roughness):
     base_shade = tree.map_range(along, 0.0, 0.35, 0.7, 1.0)
     shaded = tree.vmath("SCALE", tint, scale=rib * base_shade)
     surface = S.bsdf(tree, Base_Color=shaded, Roughness=roughness, Specular_IOR_Level=sheen)["BSDF"]
-    backlit = tree.n("ShaderNodeBsdfTranslucent", Color=tree.vmath("MULTIPLY", shaded, (1.3, 1.5, 0.6)))["BSDF"]
+    backlit = tree.n("ShaderNodeBsdfTranslucent", Color=tree.vmath("MULTIPLY", shaded, (1.5, 1.4, 0.45)))["BSDF"]
     return mix_shader(tree, translucency, surface, backlit)
 
 

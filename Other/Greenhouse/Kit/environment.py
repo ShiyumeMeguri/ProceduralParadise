@@ -23,9 +23,8 @@ def paving():
     """Stone flags: every face of the mesh is cut into flags of ``Flag
     Size`` with ``Joint`` gaps, each flag ``Thickness`` thick with its own
     ``flag_shade``, bedded on grout (the mesh itself, a little below the
-    flags' tops) that shows in the joints.  The flags' edges and the grout
-    are quiet for the ink pass: a joint is a change of shade, not a drawn
-    line."""
+    flags' tops) that shows in the joints.  The paving is quiet for the ink
+    pass: a joint is a change of shade, not a drawn line."""
     graph = GN("GH.Garden.Paving", paving.__doc__)
     area = graph.inp("Geometry", "GEOMETRY")
     size = graph.inp("Flag Size", default=0.6, subtype="DISTANCE")
@@ -48,10 +47,9 @@ def paving():
     flags = graph.n("GeometryNodeScaleElements", Geometry=flags, Scale=1.0 - joint / size, props={"domain": "FACE"}).o
     flags = graph.store(flags, "flag_shade", graph.random(0.0, 1.0, seed), "FLOAT", "FACE")
     slabs = graph.extrude(flags, thickness, individual=True)
-    slabs = graph.store(slabs, INK_QUIET, graph.switch(graph.compare(graph.abs(graph.normal().z), 0.5, "LESS_THAN"), 0.0, 1.0, "FLOAT"), "FLOAT", "FACE")
     grout = graph.store(graph.move(area, z=-0.003), "flag_shade", 0.35, "FLOAT", "FACE")
-    grout = graph.store(grout, INK_QUIET, 1.0, "FLOAT", "FACE")
-    graph.result(graph.mat(graph.join(graph.move(slabs, z=thickness * -1.0), grout), material))
+    paving_mesh = graph.join(graph.move(slabs, z=thickness * -1.0), grout)
+    graph.result(graph.mat(graph.store(paving_mesh, INK_QUIET, 1.0, "FLOAT", "FACE"), material))
     return graph
 
 
@@ -168,10 +166,18 @@ def tower():
 @asset("GH.Env.Haze", "Environment")
 def haze():
     """Box of air between the corners ``Min`` and ``Max`` (in the object's
-    space), filled with the smog volume."""
+    space), filled with the smog volume, less the box between ``Hole Min``
+    and ``Hole Max`` when that is not empty: a building the haze surrounds
+    but does not fill (its faces turned inwards, so a ray leaving the hole
+    enters the haze)."""
     graph = GN("GH.Env.Haze", haze.__doc__)
     low = graph.inp("Min", "VECTOR", default=(-5.0, -5.0, 0.0))
     high = graph.inp("Max", "VECTOR", default=(5.0, 5.0, 5.0))
+    hole_low = graph.inp("Hole Min", "VECTOR", default=(0.0, 0.0, 0.0))
+    hole_high = graph.inp("Hole Max", "VECTOR", default=(0.0, 0.0, 0.0))
     material = graph.inp("Material", "MATERIAL", default=M.get("GH.Smog"))
-    graph.result(graph.mat(graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(low + high) * 0.5, s=high - low), material))
+    outer = graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(low + high) * 0.5, s=high - low)
+    hole = graph.n("GeometryNodeFlipFaces", graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(hole_low + hole_high) * 0.5, s=hole_high - hole_low)).o
+    has_hole = graph.compare((hole_high - hole_low).length(), 0.0001, "GREATER_THAN")
+    graph.result(graph.mat(graph.join(outer, graph.switch(has_hole, None, hole)), material))
     return graph
