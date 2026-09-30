@@ -3,11 +3,14 @@ Planting plan of the garden, read from the painting.
 
 The garden floor is divided into 0.5 m cells.  For every cell the plant
 heights ``HEIGHTS`` above the soil are projected through the solved camera
-into the figure-free painting: a cell may carry plants as tall as the
+into the figure-free painting, the soil itself first (a point above the
+cell projects higher in the image, where a plant further back may stand,
+so only the cell's own soil tells whether the cell is paved): a cell may carry plants as tall as the
 highest of those points that all land on painted foliage (saturated
 yellow-green through the teal shade to its blue depths, in blobs wider
-than the glazing bars) or outside the
-frame; a point landing on the pale floor, on the pink haze or on the sky
+than the glazing bars -- not the sun patches on the floor, which are
+orange-yellow, under 48 degrees of hue, and paler than sunlit leaves) or
+outside the frame; a point landing on the pale floor, on the pink haze or on the sky
 caps the height below it.  A point hidden behind glassware (its boxes come
 from the scene) tells nothing: a cell seen only through glassware takes
 the class most of its seen neighbours within ``NEIGHBOURHOOD`` cells have.
@@ -47,7 +50,7 @@ SHOT = os.path.join(SCENE, "shots", "Nitia.json")
 SCENE_JSON = os.path.join(SCENE, "scene.json")
 OUT = os.path.join(SCENE, "data", "planting.json")
 SOIL = -3.08
-HEIGHTS = [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6]
+HEIGHTS = [0.0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6]
 GROUND = 0.9
 UNDERSTORY = 1.8
 CELL = 0.5
@@ -83,7 +86,7 @@ def foliage_mask(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hue, saturation, value = (hsv[..., k].astype(int) for k in range(3))
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (BLOB, BLOB))
-    foliage = (hue >= 20) & (hue <= 100) & (saturation >= 55) & (value >= 40)
+    foliage = (hue >= 24) & (hue <= 100) & (saturation >= 70) & (value >= 40)
     return cv2.morphologyEx(foliage.astype(np.uint8), cv2.MORPH_OPEN, kernel) > 0
 
 

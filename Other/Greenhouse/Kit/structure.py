@@ -93,8 +93,9 @@ def balustrade():
     flat top rail at ``Height``, ``Rails`` round rails evenly spaced from
     ``Rail Bottom`` up to it, posts every ``Post Spacing`` (and at both
     ends) from ``Post Bottom`` up to the top rail, and a glass infill panel
-    from the floor up to ``Glass Top`` (the posts below it are clamps on its
-    edge when ``Post Bottom`` is above the floor)."""
+    ``Glass Thickness`` thick from the floor up to ``Glass Top`` (the posts
+    below it are clamps on its edge when ``Post Bottom`` is above the
+    floor)."""
     graph = GN("GH.Structure.Balustrade", balustrade.__doc__)
     path = graph.inp("Geometry", "GEOMETRY")
     height = graph.inp("Height", default=1.05, subtype="DISTANCE")
@@ -108,6 +109,7 @@ def balustrade():
     rail_size = graph.inp("Rail Size", default=0.012, subtype="DISTANCE")
     glass_on = graph.inp("Glass", "BOOL", default=True)
     glass_top = graph.inp("Glass Top", default=0.95, subtype="DISTANCE")
+    glass_thickness = graph.inp("Glass Thickness", default=0.012, subtype="DISTANCE")
     frame_material = graph.inp("Material", "MATERIAL", default=M.get("GH.Jade"))
     glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("GH.Glass"))
 
@@ -132,7 +134,7 @@ def balustrade():
     extrude = graph.n("GeometryNodeExtrudeMesh", Mesh=path, Offset=graph.vec(0.0, 0.0, 1.0), Offset_Scale=glass_top - 0.03)
     set_mode(extrude, "EDGES")
     wall = graph.set_pos(extrude["Mesh"], offset=graph.vec(0.0, 0.0, 0.03))
-    glass_panel = graph.switch(glass_on, None, graph.group(get_asset("GH.Structure.Panes"), Geometry=wall, Thickness=0.012, Offset=-0.006, Material=glass_material).o)
+    glass_panel = graph.switch(glass_on, None, graph.group(get_asset("GH.Structure.Panes"), Geometry=wall, Thickness=glass_thickness, Offset=glass_thickness * -0.5, Material=glass_material).o)
     frame = graph.mat(graph.realize(graph.join(posts, top, rail_mesh)), frame_material)
     graph.result(graph.join(frame, glass_panel))
     return graph
