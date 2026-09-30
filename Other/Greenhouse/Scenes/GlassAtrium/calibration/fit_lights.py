@@ -41,7 +41,7 @@ SCENE_JSON = os.path.join(SCENE, "scene.json")
 REFERENCE = os.path.join(SCENE, "Reference", "Nitia_clean.webp")
 SKY = "sky"
 SKY_COLORS = ("sky_zenith", "sky_horizon", "haze")
-EMISSIVE_COLORS = {"GH.HazeFar": "smog"}
+EMISSIVE_COLORS = {"GH.Smog": "smog"}
 
 
 def emissive_material(obj):

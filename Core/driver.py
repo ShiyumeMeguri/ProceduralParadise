@@ -148,9 +148,12 @@ def render_setup(shot, args, lines_defaults=None):
         look["exposure"] = look_exposure + exposure
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), 0.0)
         lines_layer = None
-        if look.get("lines") and not getattr(args, "no_lines", False):
-            lines_layer = RND.lines({**(lines_defaults or {}), **look["lines"]})
-        compositor = RND.compositor(look, lines_layer)
+        ink_layer = None
+        if not getattr(args, "no_lines", False):
+            if look.get("lines"):
+                lines_layer = RND.lines({**(lines_defaults or {}), **look["lines"]})
+            ink_layer = RND.ink(look.get("ink"))
+        compositor = RND.compositor(look, lines_layer, ink_layer)
     else:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), exposure)
     if args.scale or settings.get("scale"):

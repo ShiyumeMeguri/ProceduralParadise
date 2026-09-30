@@ -9,13 +9,13 @@ glass block are one surface of revolution whose cross-section is a
 superellipse (a rounded square) that morphs into the round neck.
 
 Local frames: standing things rest on z = 0; a hanging terrarium hangs
-from the origin (the end of its wire); the book lies on z = 0.
+from the origin (the end of its wire); the phone lies on z = 0.
 """
 from __future__ import annotations
 
 import math
 
-from Core.gn import GN, asset, shell_profile
+from Core.gn import GN, asset, set_menu, shell_profile
 from . import materials as M
 
 TAU = math.tau
@@ -87,7 +87,7 @@ def orb():
     ball = open_sphere(graph, radius - wall, opening)
     body = graph.smooth(shell(graph, ball, wall))
     body = graph.transform(body, r=graph.align_rotation(graph.vmath("NORMALIZE", facing), axis="Z"))
-    body = graph.mat(body, glass)
+    body = M.glazed(graph, body, glass)
 
     level = radius * (fill * 2.0 - 1.0)
     bed_radius = graph.math("SQRT", graph.max(radius * radius - level * level, 0.0)) - wall * 1.5
@@ -102,7 +102,7 @@ def orb():
     ring = graph.smooth(graph.sweep(ring, graph.circle(0.0025, 8), False))
     wire_length = drop - radius - loop * 2.0
     wire = graph.rod(graph.vec(0.0, 0.0, radius + loop * 2.0), graph.vec(0.0, 0.0, radius + loop * 2.0 + wire_length), 0.0008, 6)
-    hanging = graph.join(graph.mat(ring, glass), graph.mat(wire, wire_material))
+    hanging = graph.join(M.glazed(graph, ring, glass), graph.mat(wire, wire_material))
     graph.result(graph.move(graph.join(body, bed, stones, hanging), z=drop * -1.0))
     return graph
 
@@ -151,7 +151,7 @@ def square_bottle():
     bevel = graph.inp("Bevel", default=0.02, subtype="DISTANCE")
     power = graph.inp("Squareness", default=6.0, min=2.0)
     wall = graph.inp("Wall", default=0.0, min=0.0, subtype="DISTANCE")
-    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
+    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassJade"))
 
     body = squircle_body(graph, width, depth, height, neck_radius, shoulder, bevel, power)
     neck = graph.n("GeometryNodeMeshCylinder", Vertices=48, Side_Segments=1, Radius=1.0, Depth=1.0, props={"fill_type": "NGON"})["Mesh"]
@@ -169,7 +169,7 @@ def square_bottle():
     cavity = squircle_body(graph, width - wall * 2.0, depth - wall * 2.0, height - wall, bore, shoulder, 0.0, power)
     cavity = graph.switch(graph.compare(wall, 0.0001, "GREATER_THAN"), None, graph.move(cavity, z=wall))
     graph.assign(graph._in_socket(bored.n, "Mesh 2"), [hole, cavity])
-    graph.result(graph.mat(graph.smooth_by_angle(bored["Mesh"], 0.9), glass))
+    graph.result(M.glazed(graph, graph.smooth_by_angle(bored["Mesh"], 0.9), glass))
     return graph
 
 
@@ -217,7 +217,7 @@ def flask():
     widened = graph.switch(above, radius, radius * neck_scale, "FLOAT")
     stretch = graph.switch(above, z * radius, top * radius + (z - top) * neck_length / 0.75, "FLOAT")
     body = graph.set_pos(body, pos=graph.vec(x * widened, y * widened, stretch))
-    graph.result(graph.mat(graph.smooth_by_angle(body, 1.2), glass))
+    graph.result(M.glazed(graph, graph.smooth_by_angle(body, 1.2), glass))
     return graph
 
 
@@ -243,34 +243,59 @@ def ball():
     graph = GN("GH.Vessel.Ball", ball.__doc__)
     radius = graph.inp("Radius", default=0.035, subtype="DISTANCE")
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassClear"))
-    graph.result(graph.mat(graph.smooth(graph.move(sphere(graph, radius, 48, 24), z=radius)), glass))
+    graph.result(M.glazed(graph, graph.smooth(graph.move(sphere(graph, radius, 48, 24), z=radius)), glass))
     return graph
 
 
-@asset("GH.Vessel.Book", "Vessels")
-def book():
-    """Hardback lying flat: cloth boards over a block of pages, a picture
-    plate and the title on the front board, the spine along -X."""
-    graph = GN("GH.Vessel.Book", book.__doc__)
-    width = graph.inp("Width", default=0.17, subtype="DISTANCE")
-    length = graph.inp("Length", default=0.24, subtype="DISTANCE")
-    thickness = graph.inp("Thickness", default=0.025, subtype="DISTANCE")
-    board = graph.inp("Board", default=0.003, subtype="DISTANCE")
-    title = graph.inp("Title", "STRING", default="KEW")
-    title_size = graph.inp("Title Size", default=0.03, subtype="DISTANCE")
-    cover_material = graph.inp("Cover", "MATERIAL", default=M.get("GH.Cover"))
-    plate_material = graph.inp("Plate", "MATERIAL", default=M.get("GH.Leaf"))
+def rounded_face(graph, width, length, radius, z):
+    """Rounded rectangle ``width`` (X) by ``length`` (Y) filled flat at
+    height ``z``."""
+    outline = graph.fillet(graph.rect(width, length), radius, 6, True, "POLY")
+    return graph.move(graph.fill(outline), z=z)
 
-    pages = graph.box(width * -0.5 + board, length * -0.5 + board * 2.0, board, width * 0.5 - board * 2.0, length * 0.5 - board * 2.0, thickness - board)
-    lower = graph.box(width * -0.5, length * -0.5, 0.0, width * 0.5, length * 0.5, board)
-    upper = graph.box(width * -0.5, length * -0.5, thickness - board, width * 0.5, length * 0.5, thickness)
-    spine = graph.box(width * -0.5, length * -0.5, 0.0, width * -0.5 + board, length * 0.5, thickness)
-    boards = graph.mat(graph.join(lower, upper, spine), cover_material)
-    plate = graph.box(width * -0.36, length * -0.36, thickness, width * 0.36, length * 0.12, thickness + 0.0004)
-    plate = graph.store(plate, "leaf_color", M.color("leaf_light"), "FLOAT_COLOR", "POINT")
-    letters = graph.realize(graph.text_curves(title, title_size))
-    letters = graph.fill(letters)
-    letters = graph.extrude(letters, 0.0004)
-    letters = graph.transform(letters, r=graph.vec(0.0, 0.0, math.pi * 0.5), t=graph.vec(width * 0.2, length * 0.22, thickness))
-    graph.result(graph.join(boards, graph.mat(pages, M.get("GH.Paper")), graph.mat(plate, plate_material), graph.mat(letters, M.get("GH.Ink"))))
+
+def centred_text(graph, text, size):
+    """Curve instances of ``text`` centred on the origin."""
+    node = graph.n("GeometryNodeStringToCurves", String=text, Size=size)
+    set_menu(graph._in_socket(node.n, "Align X"), "Center")
+    set_menu(graph._in_socket(node.n, "Align Y"), "Middle")
+    return node["Curve Instances"]
+
+
+@asset("GH.Vessel.Phone", "Vessels")
+def phone():
+    """Phone lying face up, its long side along Y: a rounded slab ``Width``
+    x ``Length`` x ``Thickness`` in its case, the screen inset by ``Bezel``
+    showing a photo over the +Y ``Photo`` fraction of its length and the
+    ``Title`` with a ``Caption`` line below the photo.  The title reads
+    along -X with its letters' tops towards -Y."""
+    graph = GN("GH.Vessel.Phone", phone.__doc__)
+    width = graph.inp("Width", default=0.075, subtype="DISTANCE")
+    length = graph.inp("Length", default=0.16, subtype="DISTANCE")
+    thickness = graph.inp("Thickness", default=0.009, subtype="DISTANCE")
+    corner = graph.inp("Corner", default=0.008, subtype="DISTANCE")
+    bezel = graph.inp("Bezel", default=0.004, subtype="DISTANCE")
+    photo = graph.inp("Photo", default=0.62, min=0.0, max=1.0)
+    title = graph.inp("Title", "STRING", default="KEW")
+    title_size = graph.inp("Title Size", default=0.012, subtype="DISTANCE")
+    caption = graph.inp("Caption", "STRING", default="ROYAL BOTANIC GARDENS")
+    body_material = graph.inp("Body", "MATERIAL", default=M.get("GH.PhoneBody"))
+    screen_material = graph.inp("Screen", "MATERIAL", default=M.get("GH.PhoneScreen"))
+    photo_material = graph.inp("Photo Material", "MATERIAL", default=M.get("GH.PhonePhoto"))
+
+    body = graph.solid(rounded_face(graph, width, length, corner, 0.0), thickness)
+    inner_width = width - bezel * 2.0
+    inner_length = length - bezel * 2.0
+    screen = rounded_face(graph, inner_width, inner_length, graph.max(corner - bezel, 0.001), thickness + 0.0002)
+    margin = inner_width * 0.08
+    photo_length = inner_length * photo
+    picture = rounded_face(graph, inner_width - margin * 2.0, photo_length - margin * 2.0, margin * 0.6, thickness + 0.0004)
+    picture = graph.move(picture, y=inner_length * 0.5 - photo_length * 0.5)
+    text_centre = inner_length * 0.5 - photo_length - (inner_length - photo_length) * 0.45
+    letters = graph.fill(graph.realize(centred_text(graph, title, title_size)))
+    letters = graph.transform(letters, r=graph.vec(0.0, 0.0, math.pi), t=graph.vec(0.0, text_centre, thickness + 0.0006))
+    small = graph.fill(graph.realize(centred_text(graph, caption, title_size * 0.18)))
+    small = graph.transform(small, r=graph.vec(0.0, 0.0, math.pi), t=graph.vec(0.0, text_centre + title_size * 0.75, thickness + 0.0006))
+    graph.result(graph.join(graph.mat(graph.smooth_by_angle(body, 0.6), body_material), graph.mat(screen, screen_material),
+                            graph.mat(picture, photo_material), graph.mat(graph.join(letters, small), M.get("GH.Ink"))))
     return graph

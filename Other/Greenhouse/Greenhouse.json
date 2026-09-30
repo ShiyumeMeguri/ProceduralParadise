@@ -2,15 +2,11 @@
   "id": "Greenhouse",
   "name": "Greenhouse (温室)",
   "units": "metres, Z up; angles in degrees (angle sockets are converted when a scene is built)",
-  "notes": ["Glass conservatories: a structure of slender green-painted steel, glass floors, glass furniture and glassware, planted densely.", "Colours are linear RGB.  In scene data a colour input may name a palette entry instead of giving RGB.", "A plant preset is a set of inputs of one flora asset; a scene item names the preset and may override any of its inputs."],
+  "notes": ["Glass conservatories: a structure of slender green-painted steel, jade glass floors, glass furniture and glassware, planted densely.", "Colours are linear RGB.  In scene data a colour input may name a palette entry instead of giving RGB.", "A plant preset is a set of inputs of one flora asset; a scene item names the preset and may override any of its inputs."],
   "palette": {
     "steel": [0.045, 0.16, 0.12],
     "steel_light": [0.2, 0.45, 0.34],
-    "glass": [0.975, 0.99, 0.985],
-    "glass_green": [0.55, 0.9, 0.72],
     "brass": [0.78, 0.55, 0.3],
-    "paper": [0.82, 0.83, 0.8],
-    "cover": [0.72, 0.78, 0.74],
     "cover_ink": [0.06, 0.09, 0.08],
     "tread": [0.7, 0.66, 0.55],
     "deck": [0.62, 0.6, 0.52],
@@ -32,9 +28,12 @@
     "haze": [0.97, 0.84, 0.9],
     "tower_glass": [0.2, 0.45, 0.6],
     "tower_frame": [0.5, 0.6, 0.65],
-    "haze_light": [1.0, 0.96, 0.88],
     "planter": [0.72, 0.74, 0.7],
-    "smog": [1.0, 0.72, 0.84]
+    "smog": [1.0, 0.72, 0.84],
+    "jade": [0.3, 0.92, 0.88],
+    "ink": [0.012, 0.045, 0.045],
+    "phone": [0.02, 0.12, 0.11],
+    "screen": [0.86, 0.9, 0.88]
   },
   "plants": {
     "areca": {

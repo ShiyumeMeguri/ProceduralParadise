@@ -1,16 +1,21 @@
 """
 Greenhouse material library (``GH.*``), made for Cycles.
 
-Architectural glass (floor panes, balustrades, the curtain wall) is a real
-dielectric for camera, reflection and refraction rays but lets shadow rays
-through tinted, so sunlight reaches the garden under a glass floor instead
-of being lost to caustics.  Glassware is thick glass with Beer-Lambert
-absorption inside (a Volume Absorption shader), so a bottle is deep green
-where the light crosses much glass and clear where it crosses little.
+All glass is one dielectric (IOR 1.5) with Beer-Lambert absorption inside
+towards ``jade`` (a Volume Absorption shader): seen face on, a pane or a
+bottle wall is nearly clear; seen through its edge, where light crosses
+decimetres of glass, it turns the deep blue-green of jade -- the colour the
+painting gives every glass edge.  Near the camera the floor is transparent,
+far off it mirrors the windows, because that is what Fresnel reflection of
+IOR 1.5 does at grazing angles.  Shadow rays see tinted transparency, so
+sunlight reaches the garden under the glass floor instead of being lost to
+caustics.
 
 Organic surfaces read colours the kit stores on the geometry:
 ``leaf_color`` (per leaf), ``leaf_u`` (0 at the base, 1 at the tip) and
-``leaf_v`` (-1..1 across) on every blade the flora kit grows.
+``leaf_v`` (-1..1 across) on every blade the flora kit grows.  A leaf's
+margin is inked (``leaf_outline`` of its half width in ``ink``), the
+painting's line art carried by the material, so it shows through glass.
 
 Base colours come from the palette (``Greenhouse.json``); a scene may
 override parameters and palette colours (``"color:<key>"``) through
@@ -18,10 +23,13 @@ override parameters and palette colours (``"color:<key>"``) through
 """
 from __future__ import annotations
 
+import math
+
 import bpy
 
 from Core import shaders as S
-from Core.nodes import Tree
+from Core.nodes import Sock, Tree
+from Core.render import INK_SKIP
 from .. import PALETTE
 
 LIBRARY = S.MaterialLibrary(PALETTE, "greenhouse_built")
@@ -56,6 +64,14 @@ def scaled(rgba, factor):
     return tuple(channel * factor for channel in rgba[:3]) + (1.0,)
 
 
+def glazed(graph, geometry, material, see_through=True):
+    """``geometry`` in ``material``, marked as glass for the ink pass
+    (``Core.render.INK_SKIP``): lines of what lies behind it are drawn
+    through it.  ``see_through`` is a constant or an asset's switch."""
+    skip = graph.switch(see_through, 0.0, 1.0, "FLOAT") if isinstance(see_through, Sock) else float(see_through)
+    return graph.mat(graph.store(geometry, INK_SKIP, skip, "FLOAT", "FACE"), material)
+
+
 # ------------------------------------------------------------------ structure
 @register("GH.Steel")
 def steel():
@@ -68,52 +84,47 @@ def steel():
     return S.material("GH.Steel", build)
 
 
+FRESNEL_LOSS = 0.96
+
+
+def dielectric(tree: Tree, density_key, density, wall):
+    """Surface and volume of jade glass: an IOR 1.5 dielectric filled with
+    absorption towards ``jade`` at ``density_key``.  A shadow ray crosses a
+    surface and half a ``wall`` of glass per surface it meets, so it is
+    tinted by the Fresnel loss and the Beer-Lambert transmittance of half a
+    wall -- the light a pane really lets through."""
+    density = param(density_key, density)
+    surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.5)["BSDF"]
+    volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("jade"), Density=density)["Volume"]
+    half_wall = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * wall * 0.5) for channel in color("jade")[:3])
+    return {"Surface": shadow_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
+
+
 @register("GH.Glass")
 def glass():
-    """Architectural glass: clear with the faint green of float glass, a real
-    dielectric for camera rays, tinted transparency for shadow rays.
-    ``glass_ior`` below 1.5 stands for an anti-reflective coating.  Inside,
-    the float glass absorbs towards ``glass_green`` (``pane_density``), so a
-    pane seen through its edge is deep teal and face on almost clear."""
+    """Architectural glass: floor panes, stair treads, balustrade infill,
+    curtain wall and roof (``pane_density``)."""
     def build(tree: Tree):
-        tint = color("glass")
-        shader = tree.n("ShaderNodeBsdfGlass", Color=tint, Roughness=0.0, IOR=param("glass_ior", 1.5))["BSDF"]
-        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("glass_green"), Density=param("pane_density", 6.0))["Volume"]
-        return {"Surface": shadow_clear(tree, shader, scaled(tint, param("glass_shadow", 0.92))), "Volume": volume}
+        return dielectric(tree, "pane_density", 10.0, 0.02)
     return S.material("GH.Glass", build)
 
 
-@register("GH.GlassFrosted")
-def glass_frosted():
-    """Sand-blasted floor glass: a rough dielectric that turns what lies
-    below into a pale glow."""
+@register("GH.GlassJade")
+def glass_jade():
+    """Thick jade glass of the glassware and glass furniture
+    (``glassware_density``): pale where a wall is crossed face on, deep
+    blue-green along edges and in solid rods."""
     def build(tree: Tree):
-        tint = color("glass")
-        shader = tree.n("ShaderNodeBsdfGlass", Color=tint, Roughness=param("frosted_roughness", 0.45), IOR=1.5)["BSDF"]
-        return shadow_clear(tree, shader, scaled(tint, param("frosted_shadow", 0.6)))
-    return S.material("GH.GlassFrosted", build)
-
-
-@register("GH.GlassGreen")
-def glass_green():
-    """Thick green glass of glassware and glass furniture: clear surfaces,
-    colour from absorption inside the body (deep where the glass is thick).
-    Shadow rays see a pale tinted transparency."""
-    def build(tree: Tree):
-        surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.5)["BSDF"]
-        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("glass_green"), Density=param("glassware_density", 6.0))["Volume"]
-        return {"Surface": shadow_clear(tree, surface, scaled(color("glass_green"), 0.9)), "Volume": volume}
-    return S.material("GH.GlassGreen", build)
+        return dielectric(tree, "glassware_density", 60.0, 0.012)
+    return S.material("GH.GlassJade", build)
 
 
 @register("GH.GlassClear")
 def glass_clear():
-    """Clear thin-walled glassware (terrarium orbs, the flask): a dielectric
-    with a whisper of absorption."""
+    """Thin clear glassware -- terrarium orbs, the flask, the ball
+    (``clear_glass_density``)."""
     def build(tree: Tree):
-        surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.5)["BSDF"]
-        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("glass_green"), Density=param("clear_glass_density", 1.5))["Volume"]
-        return {"Surface": shadow_clear(tree, surface, scaled(color("glass"), 0.95)), "Volume": volume}
+        return dielectric(tree, "clear_glass_density", 3.0, 0.003)
     return S.material("GH.GlassClear", build)
 
 
@@ -210,23 +221,41 @@ def brass():
     return S.material("GH.Brass", build)
 
 
-@register("GH.Paper")
-def paper():
-    """Page edges of a book."""
+@register("GH.PhoneBody")
+def phone_body():
+    """Glossy phone case."""
     def build(tree: Tree):
-        lines = S.noise(tree, tree.vmath("MULTIPLY", S.tex_coord(tree), (1.0, 1.0, 900.0)), 3.0, 1.0)["Fac"]
-        base = S.mix_rgb(tree, lines, scaled(color("paper"), 0.9), color("paper"))
-        return S.bsdf(tree, Base_Color=base, Roughness=0.8)["BSDF"]
-    return S.material("GH.Paper", build)
+        return S.bsdf(tree, Base_Color=color("phone"), Roughness=0.25, Coat_Weight=0.6, Coat_Roughness=0.05)["BSDF"]
+    return S.material("GH.PhoneBody", build)
 
 
-@register("GH.Cover")
-def cover():
-    """Cloth book cover."""
+def screen(tree: Tree, base):
+    """A lit screen under cover glass: ``base`` glowing at
+    ``screen_glow`` under a clear coat that mirrors the room."""
+    lit = S.bsdf(tree, Base_Color=base, Roughness=0.4, Emission_Color=base, Emission_Strength=param("screen_glow", 0.6),
+                 Coat_Weight=1.0, Coat_Roughness=0.02, Coat_IOR=1.5)["BSDF"]
+    return lit
+
+
+@register("GH.PhoneScreen")
+def phone_screen():
+    """The white page the phone shows."""
     def build(tree: Tree):
-        weave = S.noise(tree, S.tex_coord(tree), 400.0, 2.0)["Fac"]
-        return S.bsdf(tree, Base_Color=color("cover"), Roughness=0.7, Normal=bump(tree, weave, 0.1))["BSDF"]
-    return S.material("GH.Cover", build)
+        return screen(tree, color("screen"))
+    return S.material("GH.PhoneScreen", build)
+
+
+@register("GH.PhonePhoto")
+def phone_photo():
+    """A photo of greenery on the screen: leaf-sized cells of dark teal and
+    fresh green."""
+    def build(tree: Tree):
+        coordinates = S.tex_coord(tree)
+        cells = tree.n("ShaderNodeTexVoronoi", coordinates, Scale=90.0, props={"voronoi_dimensions": "3D", "feature": "F1"})["Color"]
+        shade = tree.sep(cells)[0]
+        base = S.mix_rgb(tree, tree.map_range(shade, 0.2, 0.9, 0.0, 1.0), scaled(color("leaf_deep"), 0.8), color("leaf_light"))
+        return screen(tree, base)
+    return S.material("GH.PhonePhoto", build)
 
 
 @register("GH.Ink")
@@ -237,9 +266,19 @@ def ink():
 
 
 # ------------------------------------------------------------------ plants
+def inked(tree: Tree, shader, margin):
+    """``shader`` with the painting's line art where ``margin`` (0 inside,
+    1 at the edge) reaches the last ``leaf_outline`` of the way out."""
+    width = param("leaf_outline", 0.08)
+    line = tree.map_range(margin, 1.0 - width, 1.0 - width * 0.6, 0.0, 1.0)
+    ink = S.bsdf(tree, Base_Color=color("ink"), Roughness=0.6)["BSDF"]
+    return mix_shader(tree, line, shader, ink)
+
+
 def leaf_shader(tree: Tree, sheen, translucency, roughness):
     """Two-sided leaf: the per-leaf ``leaf_color`` darkened along the midrib
-    and towards the base, a waxy sheen on top, light through the blade."""
+    and towards the base, a waxy sheen on top, light through the blade, an
+    inked margin."""
     tint = attribute(tree, "leaf_color", "Color")
     across = tree.abs(attribute(tree, "leaf_v"))
     along = attribute(tree, "leaf_u")
@@ -249,7 +288,7 @@ def leaf_shader(tree: Tree, sheen, translucency, roughness):
     surface = S.bsdf(tree, Base_Color=shaded, Roughness=roughness, Specular_IOR_Level=sheen, Coat_Weight=sheen * 0.6,
                      Coat_Roughness=0.25)["BSDF"]
     backlit = tree.n("ShaderNodeBsdfTranslucent", Color=tree.vmath("MULTIPLY", shaded, (1.3, 1.5, 0.6)))["BSDF"]
-    return mix_shader(tree, translucency, surface, backlit)
+    return inked(tree, mix_shader(tree, translucency, surface, backlit), across)
 
 
 @register("GH.Leaf")
@@ -275,24 +314,8 @@ def succulent():
 
 
 # ------------------------------------------------------------------ air
-def air(name, color_key, density_key, density):
-    """Sunlit air: a forward-scattering volume (``haze_anisotropy``) of
-    ``density_key`` scattering ``color_key``, thin enough to turn the sun
-    into shafts between the glazing bars.  Only volume, no surface."""
-    def build(tree: Tree):
-        volume = tree.n("ShaderNodeVolumePrincipled", Color=color(color_key), Density=param(density_key, density),
-                        Anisotropy=param("haze_anisotropy", 0.55))["Volume"]
-        return {"Volume": volume}
-    return S.material(name, build)
-
-
-@register("GH.Haze")
-def haze():
-    return air("GH.Haze", "haze_light", "haze_density", 0.01)
-
-
-@register("GH.HazeFar")
-def haze_far():
+@register("GH.Smog")
+def smog():
     """Aerial perspective of the city smog: an absorbing medium that glows
     with the skylight it scatters in, so along a path of transmittance T the
     view becomes L * T + smog * brightness * (1 - T) -- the closed form of
@@ -303,7 +326,7 @@ def haze_far():
         absorb = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=density)["Volume"]
         glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=density * param("far_haze_brightness", 1.0))["Emission"]
         return {"Volume": tree.n("ShaderNodeAddShader", absorb, glow)["Shader"]}
-    return S.material("GH.HazeFar", build)
+    return S.material("GH.Smog", build)
 
 
 # ------------------------------------------------------------------ backdrop

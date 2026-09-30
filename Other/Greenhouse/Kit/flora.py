@@ -26,6 +26,7 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset
+from Core.render import INK_ID
 from . import materials as M
 
 TAU = math.tau
@@ -51,9 +52,11 @@ def blade(graph, length, width, cup, curl, fullness, taper, resolution=(5, 10)):
 
 def leaf_colors(graph, geometry, first, second, seed, domain="INSTANCE"):
     """``leaf_color`` on every element of ``domain``: a random mix of the two
-    colours."""
+    colours; and an ``ink_id`` of its own, so the ink pass outlines every
+    leaf."""
     mix = graph.mix(graph.random(0.0, 1.0, seed), first, second, "RGBA")
-    return graph.store(geometry, "leaf_color", mix, "FLOAT_COLOR", domain)
+    geometry = graph.store(geometry, "leaf_color", mix, "FLOAT_COLOR", domain)
+    return graph.store(geometry, INK_ID, graph.random(0.0, 1.0, seed + 101), "FLOAT", domain)
 
 
 def crown_points(graph, count, spread_low, spread_high, seed):

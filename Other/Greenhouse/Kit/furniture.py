@@ -37,11 +37,12 @@ def rod(graph, start, end, radius):
 
 @asset("GH.Furniture.GlassChair", "Furniture")
 def glass_chair():
-    """Chair of thick green glass: a rounded seat slab at ``Seat Height``, a
-    tall back slab rising behind it (leaning back by ``Back Lean``), and
-    four round legs splayed out from under the seat to the floor: each leaves
-    the seat ``Leg Inset`` of the way from the centre to the corner and
-    lands ``Splay`` beyond the corner."""
+    """Chair of thick jade glass: a rounded seat slab at ``Seat Height``, a
+    tall back slab rising from its back edge (leaning back by ``Back
+    Lean``), and four round legs from the corners of the seat (``Leg
+    Inset`` of the way from the centre) to the floor.  Front feet land
+    ``Front Splay`` ahead of their corner, back feet ``Back Splay`` behind
+    it, all feet ``Side Splay`` out to the side."""
     graph = GN("GH.Furniture.GlassChair", glass_chair.__doc__)
     width = graph.inp("Width", default=0.44, subtype="DISTANCE")
     depth = graph.inp("Depth", default=0.42, subtype="DISTANCE")
@@ -52,19 +53,24 @@ def glass_chair():
     back_thickness = graph.inp("Back Thickness", default=0.045, subtype="DISTANCE")
     back_lean = graph.inp("Back Lean", default=math.radians(8.0), subtype="ANGLE")
     leg_radius = graph.inp("Leg Radius", default=0.018, subtype="DISTANCE")
-    inset = graph.inp("Leg Inset", default=0.64, min=0.0, max=1.0)
-    splay = graph.inp("Splay", default=0.09, subtype="DISTANCE")
-    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
+    inset = graph.inp("Leg Inset", default=0.9, min=0.0, max=1.0)
+    front_splay = graph.inp("Front Splay", default=0.0, subtype="DISTANCE")
+    back_splay = graph.inp("Back Splay", default=0.09, subtype="DISTANCE")
+    side_splay = graph.inp("Side Splay", default=0.0, subtype="DISTANCE")
+    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassJade"))
 
     seat = graph.move(rounded_slab(graph, width, depth, seat_thickness, 0.05), z=seat_height - seat_thickness)
     back = rounded_slab(graph, back_width, back_thickness, back_height, back_thickness * 0.45)
     back = graph.transform(back, r=graph.vec(back_lean * -1.0, 0.0, 0.0), t=graph.vec(0.0, depth * 0.5 - back_thickness * 0.5, seat_height - seat_thickness * 0.5))
     legs = []
     for sx, sy in ((-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)):
-        top = graph.vec(width * 0.5 * inset * sx, depth * 0.5 * inset * sy, seat_height - seat_thickness - leg_radius - 0.001)
-        foot = graph.vec((width * 0.32 + splay) * sx, (depth * 0.32 + splay) * sy, leg_radius)
+        corner_x = width * 0.5 * inset * sx
+        corner_y = depth * 0.5 * inset * sy
+        top = graph.vec(corner_x, corner_y, seat_height - seat_thickness - leg_radius - 0.001)
+        reach = front_splay if sy < 0.0 else back_splay
+        foot = graph.vec(corner_x + side_splay * sx, corner_y + reach * sy, leg_radius)
         legs.append(rod(graph, top, foot, leg_radius))
-    graph.result(graph.mat(graph.join(graph.smooth_by_angle(graph.join(seat, back), 0.6), graph.smooth(graph.join(*legs))), glass))
+    graph.result(M.glazed(graph, graph.join(graph.smooth_by_angle(graph.join(seat, back), 0.6), graph.smooth(graph.join(*legs))), glass))
     return graph
 
 
@@ -78,14 +84,14 @@ def pedestal_table():
     top_thickness = graph.inp("Top Thickness", default=0.012, subtype="DISTANCE")
     column_radius = graph.inp("Column Radius", default=0.012, subtype="DISTANCE")
     foot_radius = graph.inp("Foot Radius", default=0.18, subtype="DISTANCE")
-    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
-    metal = graph.inp("Metal", "MATERIAL", default=M.get("GH.GlassGreen"))
+    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassJade"))
+    metal = graph.inp("Metal", "MATERIAL", default=M.get("GH.GlassJade"))
 
     top = graph.cylinder(radius, top_thickness, 96)
     top = graph.smooth_by_angle(graph.move(top, z=height - top_thickness * 0.5), 0.8)
     column = graph.smooth(graph.move(graph.cylinder(column_radius, height - top_thickness, 16), z=(height - top_thickness) * 0.5))
     foot = graph.smooth_by_angle(graph.move(graph.cylinder(foot_radius, 0.01, 64), z=0.005), 0.8)
-    graph.result(graph.join(graph.mat(top, glass), graph.mat(graph.join(column, foot), metal)))
+    graph.result(graph.join(M.glazed(graph, top, glass), graph.mat(graph.join(column, foot), metal)))
     return graph
 
 
@@ -99,12 +105,12 @@ def glass_table():
     legs = graph.inp("Legs", "INT", default=3, min=1)
     leg_radius = graph.inp("Leg Radius", default=0.02, subtype="DISTANCE")
     inset = graph.inp("Leg Inset", default=0.75, min=0.0, max=1.0)
-    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassGreen"))
+    glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassJade"))
 
     top = graph.smooth_by_angle(graph.move(graph.cylinder(radius, top_thickness, 128), z=height - top_thickness * 0.5), 0.8)
     stations = graph.points(legs, (0.0, 0.0, 0.0))
     angle = graph.index() * (math.tau / graph.max(legs, 1))
     stations = graph.set_pos(stations, pos=graph.vec(graph.cos(angle) * radius * inset, graph.sin(angle) * radius * inset, 0.0))
     leg = graph.smooth(graph.move(graph.cylinder(leg_radius, height - top_thickness, 16), z=(height - top_thickness) * 0.5))
-    graph.result(graph.mat(graph.join(top, graph.realize(graph.iop(stations, leg))), glass))
+    graph.result(M.glazed(graph, graph.join(top, graph.realize(graph.iop(stations, leg))), glass))
     return graph

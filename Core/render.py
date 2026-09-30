@@ -20,10 +20,14 @@ from .nodes import Tree
 from .gn import set_menu
 
 __all__ = ["ENGINES", "setup_cycles", "setup_eevee", "set_samples", "color_management", "compositor", "lines", "LINES_LAYER",
+           "ink", "INK_LAYER", "INK_SKIP", "INK_ID",
            "frame_output", "frame_paths", "unfinished_frames", "video_scene",
            "use_gpu_if_available", "render_still"]
 
 LINES_LAYER = "Lines"
+INK_LAYER = "Ink"
+INK_SKIP = "ink_skip"
+INK_ID = "ink_id"
 _PNG_END = b"\x00\x00\x00\x00IEND\xaeB`\x82"
 
 
@@ -176,7 +180,7 @@ def vignette_nodes(t, img, v):
     return t.n("CompositorNodeCombineColor", sep[0] * gain, sep[1] * gain, sep[2] * gain, 1.0).o
 
 
-def compositor(look: dict | None = None, lines_layer: str | None = None):
+def compositor(look: dict | None = None, lines_layer: str | None = None, ink_layer: str | None = None):
     """Build the compositor graph from a ``look`` dict::
 
         {"bloom": {"threshold": 1.0, "size": 7, "strength": 0.6},
@@ -189,7 +193,9 @@ def compositor(look: dict | None = None, lines_layer: str | None = None):
 
     ``lines_layer`` (from :func:`lines`) is laid over the render first, with
     the premultiplied over Freestyle itself uses on a combined pass, so the
-    exposure and grade see the ink lines as part of the image.
+    exposure and grade see the ink lines as part of the image.  An
+    ``ink_layer`` (from :func:`ink`) is drawn the same way, from the edges
+    of its identity, normal and depth images (``look["ink"]``).
     """
     look = look or {}
     sc = bpy.context.scene
@@ -226,6 +232,9 @@ def compositor(look: dict | None = None, lines_layer: str | None = None):
         _set(over, "Straight Alpha", False)
         _set(over, "premul", 1.0)
         img = over.o
+
+    if ink_layer:
+        img = ink_nodes(t, img, ink_layer, look["ink"])
 
     if "exposure" in look:
         ex = t.n("CompositorNodeExposure", img, look["exposure"])
@@ -373,6 +382,112 @@ def lines(cfg: dict | None):
     st.thickness = cfg.get("thickness", 1.2)
     st.chaining = "PLAIN"
     return vl.name
+
+
+def ink(cfg: dict | None):
+    """Screen-space ink lines: the painted line art for any camera, drawn
+    wherever surfaces part -- one object from another, one leaf from the
+    next (``ink_id``), a crease, a jump in depth -- and seen through glass.
+
+    cfg = {"color": [r,g,b], "alpha": a, "width": px at 100 %,
+           "id": threshold, "normal": threshold, "depth": threshold (optional),
+           "rim": facing, "samples": n, "exclude": [collection names]}
+
+    A view layer of its own renders every surface of the main layer (minus
+    ``exclude``, e.g. volumes) with one override material: an emission of
+    the object's random value mixed with the element's ``ink_id``, so every
+    object -- and every leaf that stores an ``ink_id`` -- has its own
+    colour.  Surfaces marked ``ink_skip`` (glass) are transparent to it
+    except where seen edge-on (facing beyond ``rim``): lines of whatever
+    lies behind glass are drawn, and the glass still gets its outline.
+    :func:`compositor` turns the layer's colour, normal and depth images
+    into lines.  Returns the layer name (None without ink)."""
+    sc = bpy.context.scene
+    if not cfg:
+        return None
+    main = sc.view_layers[0]
+    layer = sc.view_layers.get(INK_LAYER) or sc.view_layers.new(INK_LAYER)
+    excluded = set(cfg.get("exclude") or [])
+
+    def mirror(source, target):
+        for child_source, child_target in zip(source.children, target.children):
+            child_target.exclude = child_source.exclude or child_source.name in excluded
+            if not child_target.exclude:
+                mirror(child_source, child_target)
+
+    mirror(main.layer_collection, layer.layer_collection)
+    layer.use_pass_z = True
+    layer.use_pass_normal = True
+    layer.use_volumes = False
+    layer.use_sky = False
+    layer.samples = cfg.get("samples", 4)
+    layer.use_freestyle = False
+    layer.material_override = _ink_material(cfg.get("rim", 0.82))
+    return layer.name
+
+
+def _ink_material(rim):
+    from . import shaders as S
+
+    def build(t: Tree):
+        random = t.n("ShaderNodeObjectInfo")["Random"]
+        element = t.n("ShaderNodeAttribute", props={"attribute_name": INK_ID, "attribute_type": "GEOMETRY"})["Fac"]
+        identity = t.n("ShaderNodeCombineColor", random, t.math("FRACT", random * 7.13 + element * 3.71),
+                       t.math("FRACT", element * 13.7 + random * 1.37)).o
+        emission = t.n("ShaderNodeEmission", identity, 1.0)["Emission"]
+        skip = t.n("ShaderNodeAttribute", props={"attribute_name": INK_SKIP, "attribute_type": "GEOMETRY"})["Fac"]
+        facing = t.n("ShaderNodeLayerWeight", Blend=0.5)["Facing"]
+        edge_on = t.map_range(facing, rim, rim + 0.02, 0.0, 1.0)
+        see_through = skip * (1.0 - edge_on)
+        clear = t.n("ShaderNodeBsdfTransparent")["BSDF"]
+        return t.n("ShaderNodeMixShader", see_through, emission, clear)["Shader"]
+    return S.material("__ink", build)
+
+
+def ink_nodes(t, img, layer, cfg):
+    """Lay the ink of ``layer`` over ``img``: Sobel edges of its identity
+    colours (a unit step gives 4) and normals (a crease of angle a gives
+    8 sin(a / 2)), and -- with a ``depth`` threshold -- of its inverse depth
+    under a Laplace kernel (planes have a linear inverse depth, so only
+    steps and creases in depth remain), scaled by the depth to make the
+    threshold relative.  Each passes a soft threshold (full ink at 1.5 x)."""
+    sc = bpy.context.scene
+    rl = t.n("CompositorNodeRLayers")
+    rl.n.layer = layer
+
+    def filtered(image, kind):
+        node = t.n("CompositorNodeFilter")
+        t.link(image, node.n.inputs["Image"])
+        _set(node, "Type", kind)
+        _set(node, "Factor", 1.0)
+        return node.o
+
+    def strongest(image):
+        parts = t.n("CompositorNodeSeparateColor", image)
+        return t.math("MAXIMUM", t.math("MAXIMUM", t.math("ABSOLUTE", parts[0]), t.math("ABSOLUTE", parts[1])),
+                      t.math("ABSOLUTE", parts[2]))
+
+    def over(value, threshold):
+        return t.math("MULTIPLY", t.math("SUBTRACT", value, threshold), 1.0 / max(threshold * 0.5, 1e-4), clamp=True)
+
+    mask = t.math("MAXIMUM", over(strongest(filtered(rl["Image"], "Sobel")), cfg.get("id", 0.1)),
+                  over(strongest(filtered(rl["Normal"], "Sobel")), cfg.get("normal", 2.0)))
+    if cfg.get("depth"):
+        depth = rl["Depth"]
+        inverse = t.math("DIVIDE", 1.0, t.math("MAXIMUM", depth, 1e-3))
+        inverse_image = t.n("CompositorNodeCombineColor", inverse, inverse, inverse, 1.0).o
+        jumps = t.math("MULTIPLY", strongest(filtered(inverse_image, "Laplace")), depth)
+        mask = t.math("MAXIMUM", mask, over(jumps, cfg["depth"]))
+    width = int(round(cfg.get("width", 0.0) * sc.render.resolution_percentage / 100.0))
+    if width > 0:
+        grow = t.n("CompositorNodeDilateErode")
+        t.link(mask, grow.n.inputs["Mask"])
+        _set(grow, "Type", "Distance")
+        _set(grow, "Size", width)
+        mask = grow.o
+    factor = t.math("MULTIPLY", mask, cfg.get("alpha", 1.0), clamp=True)
+    line = tuple(cfg.get("color", (0.005, 0.03, 0.03))) + (1.0,)
+    return t.mix(factor, img, line, data_type="RGBA")
 
 
 def _keep_only(layer_collection, keep):

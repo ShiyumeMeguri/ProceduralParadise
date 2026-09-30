@@ -62,13 +62,15 @@ def members():
 def panes():
     """Every face of the mesh becomes a pane ``Thickness`` thick, shrunk by
     ``Margin`` on every side (the rebate the frame hides) and lifted by
-    ``Offset`` along its normal."""
+    ``Offset`` along its normal.  ``See Through`` marks the panes as glass
+    for the ink pass."""
     graph = GN("GH.Structure.Panes", panes.__doc__)
     mesh = graph.inp("Geometry", "GEOMETRY")
     thickness = graph.inp("Thickness", default=0.012, min=0.0, subtype="DISTANCE")
     margin = graph.inp("Margin", default=0.0, min=0.0, subtype="DISTANCE")
     offset = graph.inp("Offset", default=0.0, subtype="DISTANCE")
     material = graph.inp("Material", "MATERIAL", default=M.get("GH.Glass"))
+    see_through = graph.inp("See Through", "BOOL", default=True)
 
     faces = graph.n("GeometryNodeSplitEdges", Mesh=mesh).o
     area = graph.n("GeometryNodeInputMeshFaceArea").o
@@ -78,7 +80,7 @@ def panes():
     faces = graph.set_pos(faces, offset=graph.normal() * offset)
     slabs = graph.extrude(faces, thickness, individual=True)
     bottoms = graph.n("GeometryNodeFlipFaces", faces).o
-    graph.result(graph.mat(graph.merge(graph.join(slabs, bottoms), 0.00001), material))
+    graph.result(M.glazed(graph, graph.merge(graph.join(slabs, bottoms), 0.00001), material, see_through))
     return graph
 
 
@@ -142,11 +144,12 @@ def stair():
     stringer = graph.inp("Stringer Height", default=0.3, subtype="DISTANCE")
     stringer_thickness = graph.inp("Stringer Thickness", default=0.024, subtype="DISTANCE")
     tread_material = graph.inp("Tread Material", "MATERIAL", default=M.get("GH.Tread"))
-    glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("GH.GlassGreen"))
+    glass_treads = graph.inp("Glass Treads", "BOOL", default=False)
+    glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("GH.GlassJade"))
 
     stations = graph.mesh_line(steps, graph.vec(0.0, going * 0.5, rise - thickness * 0.5), graph.vec(0.0, going, rise))
     tread = graph.cube(graph.vec(width, going + 0.02, thickness))
-    treads = graph.mat(graph.realize(graph.iop(graph.mesh_to_points(stations), tread)), tread_material)
+    treads = M.glazed(graph, graph.realize(graph.iop(graph.mesh_to_points(stations), tread)), tread_material, glass_treads)
 
     run = going * steps
     total = rise * steps
@@ -158,5 +161,5 @@ def stair():
     center_z = total * 0.5 - stringer * 0.35
     left = graph.transform(plate, t=graph.vec(width * -0.5 + stringer_thickness * 0.5, center_y, center_z))
     right = graph.transform(plate, t=graph.vec(width * 0.5 - stringer_thickness * 0.5, center_y, center_z))
-    graph.result(graph.join(treads, graph.mat(graph.join(left, right), glass_material)))
+    graph.result(graph.join(treads, M.glazed(graph, graph.join(left, right), glass_material)))
     return graph

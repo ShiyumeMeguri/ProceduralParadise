@@ -157,11 +157,11 @@ def tower():
 
 @asset("GH.Env.Haze", "Environment")
 def haze():
-    """Box of sunlit air between the corners ``Min`` and ``Max`` (in the
-    object's space), filled with the haze volume."""
+    """Box of air between the corners ``Min`` and ``Max`` (in the object's
+    space), filled with the smog volume."""
     graph = GN("GH.Env.Haze", haze.__doc__)
     low = graph.inp("Min", "VECTOR", default=(-5.0, -5.0, 0.0))
     high = graph.inp("Max", "VECTOR", default=(5.0, 5.0, 5.0))
-    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Haze"))
+    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Smog"))
     graph.result(graph.mat(graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(low + high) * 0.5, s=high - low), material))
     return graph
