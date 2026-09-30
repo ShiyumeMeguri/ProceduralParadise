@@ -32,7 +32,7 @@
     "air_density": 0.002,
     "air_anisotropy": 0.6,
     "bottle_density": 40.0,
-    "water_density": 12.0,
+    "water_density": 4.0,
     "water_turbidity": 0.0
   },
   "sky": {
@@ -1142,7 +1142,7 @@
           "Neck Length": 0.04,
           "Bore": 0.025,
           "Bore Depth": 0.12,
-          "Wall": 0.012,
+          "Wall": 0.004,
           "Squareness": 14.0,
           "Glass": "GH.GlassJade",
           "Bevel": 0.01
