@@ -32,7 +32,7 @@
     "leaf_sheen": 0.12,
     "air_density": 0.002,
     "air_anisotropy": 0.6,
-    "bottle_density": 40.0,
+    "bottle_density": 120.0,
     "water_density": 4.0,
     "water_turbidity": 0.0
   },
@@ -1169,7 +1169,7 @@
           "Bore Depth": 0.12,
           "Wall": 0.004,
           "Squareness": 14.0,
-          "Glass": "GH.GlassJade",
+          "Glass": "GH.GlassBottle",
           "Bevel": 0.01
         }
       },
@@ -1306,8 +1306,8 @@
           "Leaflet Curl": 0.4,
           "Leaflet Cup": 0.3,
           "Leaflet Jitter": 12,
-          "Sector Center": 90,
-          "Sector Width": 240
+          "Sector Center": 60,
+          "Sector Width": 200
         }
       },
       {
@@ -1335,8 +1335,8 @@
           "Leaflet Curl": 0.4,
           "Leaflet Cup": 0.3,
           "Leaflet Jitter": 12,
-          "Sector Center": 90,
-          "Sector Width": 240
+          "Sector Center": 60,
+          "Sector Width": 200
         }
       }
     ],

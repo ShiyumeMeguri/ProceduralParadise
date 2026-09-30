@@ -135,7 +135,7 @@ def squircle_body(graph, width, depth, height, neck_radius, shoulder, bevel, pow
     start = 1.0 - shoulder
     blend = graph.map_range(u, start, 1.0, 0.0, 1.0, interp="SMOOTHSTEP")
     radial = superellipse + (neck_radius - superellipse) * blend
-    foot = graph.map_range(u * height, 0.0, bevel, 0.0, 1.0)
+    foot = graph.min(u * height / graph.max(bevel, 0.000001), 1.0)
     radial = radial * (1.0 - (1.0 - foot) * 0.25)
     radius_xy = graph.vec(x, y, 0.0).length()
     scale = radial / graph.max(radius_xy, 0.00001)
