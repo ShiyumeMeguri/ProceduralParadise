@@ -1195,7 +1195,8 @@
           "Radius": 0.296,
           "Height": 0.6,
           "Foot Radius": 0.07,
-          "Column Radius": 0.012
+          "Column Radius": 0.012,
+          "Top Thickness": 0.018
         }
       },
       {
