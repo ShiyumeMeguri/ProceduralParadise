@@ -106,6 +106,16 @@ blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py -- g
 python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py groups.npz --apply
 ```
 
+**种子**（`calibration/seed_search.py`，最后一步）：种植层把植物撒在哪、每株主景植物怎么长叶子，都是随机的——同样合理的
+花园有无数个。所以种子按原画挑：逐个对象把 `Seed` 换成另外几个值，每个值渲一张原画机位的小图，留下让整张图最接近原画的
+那个（模糊色调误差 + 四分之一逐像素误差，也就是报告的指标本身）。只按整张图挑是有意的：同一种植配比换七个种子，
+色调误差就在 0.091–0.098 之间跳；若按画面分块各挑各的（例如每块挑最像的物种），这种噪声会被当成收益挑出来——
+六个随机种子逐块取最优就能"降到" 0.083，和六个物种逐块取最优（0.081）几乎一样，真正归于物种的只有零头。
+
+```bash
+blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/seed_search.py -- "Ground Painted,Areca Palm,Roof Vines" --tries 6
+```
+
 ## 6. 与去人物参考画的定量对比（`Renders/Nitia.png`，2166 × 3000）
 
 | 指标 | 值 |
