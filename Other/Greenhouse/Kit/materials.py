@@ -275,13 +275,12 @@ def succulent():
 
 
 # ------------------------------------------------------------------ air
-def air(name, density_key, density):
+def air(name, color_key, density_key, density):
     """Sunlit air: a forward-scattering volume (``haze_anisotropy``) of
-    ``density_key`` -- thin indoors, where it turns the sun into shafts
-    between the glazing bars; thicker outdoors, where it pales the city
-    with distance.  Only volume, no surface."""
+    ``density_key`` scattering ``color_key``, thin enough to turn the sun
+    into shafts between the glazing bars.  Only volume, no surface."""
     def build(tree: Tree):
-        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("haze_light"), Density=param(density_key, density),
+        volume = tree.n("ShaderNodeVolumePrincipled", Color=color(color_key), Density=param(density_key, density),
                         Anisotropy=param("haze_anisotropy", 0.55))["Volume"]
         return {"Volume": volume}
     return S.material(name, build)
@@ -289,12 +288,22 @@ def air(name, density_key, density):
 
 @register("GH.Haze")
 def haze():
-    return air("GH.Haze", "haze_density", 0.01)
+    return air("GH.Haze", "haze_light", "haze_density", 0.01)
 
 
 @register("GH.HazeFar")
 def haze_far():
-    return air("GH.HazeFar", "far_haze_density", 0.02)
+    """Aerial perspective of the city smog: an absorbing medium that glows
+    with the skylight it scatters in, so along a path of transmittance T the
+    view becomes L * T + smog * brightness * (1 - T) -- the closed form of
+    single-scattered skylight, without the volume bounces a scattering
+    medium this thick would need."""
+    def build(tree: Tree):
+        density = param("far_haze_density", 0.02)
+        absorb = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=density)["Volume"]
+        glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=density * param("far_haze_brightness", 1.0))["Emission"]
+        return {"Volume": tree.n("ShaderNodeAddShader", absorb, glow)["Shader"]}
+    return S.material("GH.HazeFar", build)
 
 
 # ------------------------------------------------------------------ backdrop

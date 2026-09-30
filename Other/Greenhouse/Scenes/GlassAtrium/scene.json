@@ -5,21 +5,24 @@
   "defaults": {
     "shot": "Nitia"
   },
-  "notes": ["Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the atrium, +X along the gallery edge, Z up; metres.", "Gallery: glass floor (top at z = 0) on steel beams, frosted panes along its edge row; its edge is the row y = 4.18 with a 1.04 m balustrade, returning along x = -2.16.", "West stair (dog-leg): a broad landscape flight of 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rises from the garden at y = 0.32 to a landing at z = -1.3538 (y = 6.382..8.002), solved from the painted nosings (16 px rms); a second flight of 11 treads turns west up to the west gallery wing (x < -5.0), which joins the main gallery by a walkway behind the viewpoint (y < -1.6).", "Garden: the atrium floor at z = -3.2, paved, with planting beds west of, between and east of the stair and path; the round glass table stands on it.", "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6.0 / 16.0 (transoms at [-3.2, -0.58, 3.32, 7.22]), a glazed roof on a 2 m steel grid at z = 7.22; the conservatory crowns a two-storey glass podium; street trees 8.8 m below reach up past its walls, and far off stands the city.", "The painting draws the chair legs inconsistently (one rises to the seat centre, one stands vertical); the chair is a coherent tall glass chair whose four splayed legs land on the painted feet."],
+  "notes": ["Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the atrium, +X along the gallery edge, Z up; metres.", "Gallery: glass floor (top at z = 0) on steel beams; its edge is the row y = 4.18 with a 1.04 m balustrade, returning along x = -2.16.", "West stair (dog-leg): a broad landscape flight of 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rises from the garden at y = 0.32 to a landing at z = -1.3538 (y = 6.382..8.002), solved from the painted nosings (16 px rms); a second flight of 11 treads turns west up to the west gallery wing (x < -5.0), which joins the main gallery by a walkway behind the viewpoint (y < -1.6).", "Garden: the atrium floor at z = -3.2, paved, with planting beds west of, between and east of the stair and path; the round glass table stands on it.", "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6.0 / 16.0 (transoms at [-3.2, -0.58, 3.32, 7.22]), a glazed roof on a 2 m steel grid at z = 7.22; the conservatory crowns a two-storey glass podium; street trees 8.8 m below reach up past its walls, and far off stands the city.", "The painting draws the chair legs inconsistently (one rises to the seat centre, one stands vertical); the chair is a coherent tall glass chair whose four splayed legs land on the painted feet."],
   "materials": {
     "glassware_density": 14.0,
     "glass_ior": 1.25,
     "pane_density": 10.0,
     "leaf_translucency": 0.45,
-    "frosted_roughness": 0.22,
-    "frosted_shadow": 0.8,
     "haze_density": 0.012,
     "haze_anisotropy": 0.55,
-    "far_haze_density": 0.05
+    "far_haze_density": 0.12,
+    "far_haze_brightness": 1.3112,
+    "color:smog": [1.0, 0.7156, 0.7614],
+    "color:sky_zenith": [0.1728, 0.573, 1.0],
+    "color:sky_horizon": [0.5184, 0.8154, 1.0],
+    "color:haze": [0.5587, 0.9256, 1.0]
   },
   "sky": {
-    "camera_strength": 1.0,
-    "light_strength": 1.0,
+    "camera_strength": 17.609,
+    "light_strength": 17.609,
     "haze_top": -0.1,
     "zenith_height": 0.7
   },
@@ -450,7 +453,7 @@
         }
       },
       {
-        "name": "Floor Frosted",
+        "name": "Floor Glass Edge Row",
         "mesh": {
           "grid": {
             "plane": "XY",
@@ -477,8 +480,7 @@
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.02,
-          "Margin": 0.005,
-          "Material": "GH.GlassFrosted"
+          "Margin": 0.005
         }
       },
       {
@@ -1236,7 +1238,7 @@
       },
       {
         "name": "Palm Planter",
-        "loc": [1.25, 1.2, 0.0],
+        "loc": [1.45, 1.75, 0.0],
         "asset": "GH.Vessel.Planter",
         "inputs": {
           "Radius": 0.3,
@@ -1245,7 +1247,7 @@
       },
       {
         "name": "Kentia Palm",
-        "loc": [1.25, 1.2, 0.45],
+        "loc": [1.45, 1.75, 0.45],
         "asset": "GH.Flora.Pinnate",
         "preset": "areca",
         "inputs": {
@@ -1433,8 +1435,8 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 6.0,
-      "color": [1.0, 0.95, 0.9],
+      "power": 6.4205,
+      "color": [0.9475, 1.0, 0.7316],
       "angle": 1.5,
       "direction": [-0.4, -0.2, 0.9]
     }
