@@ -1186,7 +1186,8 @@
         "inputs": {
           "Radius": 0.181,
           "Neck Radius": 0.035,
-          "Neck Length": 0.13
+          "Neck Length": 0.13,
+          "Glass": "GH.GlassGreen"
         }
       },
       {

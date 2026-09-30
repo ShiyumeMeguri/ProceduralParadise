@@ -63,16 +63,35 @@ blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium --view overview --
 | 画廊外沿的一排地面比其他玻璃白 | 外沿一排是磨砂玻璃 |
 | 立柱在外沿成对出现、间距不均（0.19 / 0.23 / 0.56 m） | 按原画位置保留：结构柱加栏杆立柱，两套构件并排 |
 
-## 4. 外观
+## 4. 外观与标定
 
-Cycles，Standard 视图变换。材质都是程序化的：建筑玻璃是带绿色吸收的真实电介质（侧看是深青色、正看几乎透明），
-阴影光线用带色透明，这样阳光能穿过玻璃地面照进花园；玻璃器皿有体积吸收；叶片按每片叶子自己的 `leaf_color`
-着色，带中脉暗化、蜡质高光和透光；光雾是前向散射的体积。
+Cycles，Standard 视图变换，不调色（`look` 为空）。材质都是程序化的：建筑玻璃是带绿色吸收的真实电介质（侧看深青、正看几乎透明），
+阴影光线用带色透明，阳光能穿过玻璃地面照进花园；玻璃器皿有体积吸收；叶片按每片叶子自己的 `leaf_color` 着色，
+带中脉暗化、蜡质高光和透光；室内是一层前向散射的薄光雾。
 
-`calibration/fit_grade.py`：用未调色的渲染与去人物参考画做直方图匹配，拟合出按显示值的逐通道色调曲线，
-写入 `shots/Nitia.json` 的 `look.grade`。直方图匹配不会像逐像素回归那样把对比度压平。
+**窗外的粉色**：原画机位是俯视，地平线在画面上方之外，所以窗外那片粉白不是天空，而是街面方向被城市烟霭吞没的远景。
+`GH.HazeFar` 用空气透视的闭式解：吸收介质 + 按密度发光，沿视线透射率为 T 时画面 = 原景 × T + 烟霭色 × (1 − T)，
+不需要大量体积反弹就能得到明亮的烟霭。
+
+**灯光反解**（`calibration/fit_lights.py`）：光照对光源强度是线性的，太阳、天空、城市烟霭各放进一个 Cycles light group，
+一次渲染得到每组的线性图像，再在显示空间（sRGB 编码、白点截断之后）对去人物参考画做鲁棒误差最小化，
+**逐通道**解出每组的 RGB 权重——同时解出每个光源的亮度和颜色；`--apply` 写回 `scene.json`
+（太阳功率与颜色、天空强度与色板覆盖 `color:sky_*`、烟霭亮度与 `color:smog`）。
 
 ```bash
-blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium --no-save --no-look --render ungraded.png
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_grade.py -- ungraded.png --write
+blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py -- groups.npz --samples 64 --scale 0.25
+python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py groups.npz --apply
 ```
+
+`calibration/fit_grade.py` 可在未调色渲染上拟合直方图匹配的色调曲线；在灯光反解之后它不再降低误差，所以当前镜头不调色。
+
+## 5. 与参考画的定量对比（`Renders/Nitia.png`，2166 × 3000，对去人物参考画）
+
+| 指标 | 值 |
+|------|----|
+| 结构线对齐（不含植物与陈设的钢玻结构轮廓，逐像素到原画边缘的距离） | 中位数 3.0 px；2 px 内 41.9%，4 px 内 60.1%，8 px 内 79.9% |
+| 逐像素平均绝对误差（sRGB 0–1） | 0.201 |
+| 色调误差（1/60 画宽高斯模糊后，只看颜色与明暗分布） | 0.114 |
+| 标定历程（色调误差） | 初版 0.178 → 远景烟霭 0.122 → 灯光逐通道反解 0.114 |
+
+剩余差异主要是逐片叶子的构成（原画的植物是手绘的，位置与轮廓无法从单张画面唯一确定）、手绘的高光笔触和光柱强度。
