@@ -14,6 +14,7 @@ README.md is inside as the text ``Guide``).
       blender -b -P Other/build.py
       blender -b -P Other/build.py -- Props/Scenes/Slime
       blender -b -P Other/build.py -- Props/Scenes/WaterBalloon --out balloon.blend
+      blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium --render atrium.png
       blender -b -P Other/build.py -- --render still.png
 
 Arguments (all optional)

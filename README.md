@@ -23,6 +23,13 @@
 
   ![Crystal conservatory](FractalWorld/CrystalFantasy/Scenes/Conservatory/Renders/ReflectingPool.png)
 
+* **温室 · 玻璃中庭（Other / Greenhouse / GlassAtrium）**：钢与玻璃的三层中庭温室——玻璃地面画廊、双跑景观楼梯、
+  开口玻璃吊球里的多肉、高玻璃瓶与烧瓶、玻璃椅，中庭花园里的鹅掌柴、龟背竹、海芋、散尾葵与蕨类，窗外裙楼下的行道树。
+  由一幅插画的背景还原而来（人物不在还原范围内），详见
+  [`Other/Greenhouse/Scenes/GlassAtrium/README.md`](Other/Greenhouse/Scenes/GlassAtrium/README.md)。
+
+  ![Glass atrium](Other/Greenhouse/Scenes/GlassAtrium/Renders/Nitia.png)
+
 * **小物件（Other / Props）**：不属于任何世界的交互模板，全部用几何节点写的物理：戳得动、拎得起的**水气球**，
   被戳死后流出黏液的**史莱姆**，喷水棍注水、装满翻倒再敲回石头的**惊鹿**。打开 `.blend` 按空格播放就能玩，
   每个场景的玩法写在 `Other/Props/Scenes/<场景>/README.md`（也放在 `.blend` 里的文本 `Guide`），EEVEE 渲染。
@@ -77,6 +84,7 @@ blender -b -P BlueArchive/build.py -- --view reverse --render reverse.png
 
 **小物件模板**：`blender -b -P Other/build.py -- Props/Scenes/ShishiOdoshi`（或 `Slime`、`WaterBalloon`），
 存到 `Build/Props/<场景>/<场景>.blend`；在 Blender 界面里打开 `Other/build.py` 运行即可。
+**玻璃中庭温室**：`blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium`，存到 `Build/Greenhouse/GlassAtrium/GlassAtrium.blend`。
 
 **其他房间**：在参数最前面写房间目录（相对 `BlueArchive/`）。在 Blender 界面里运行时，把 `build.py` 顶部的
 `DEFAULT_ROOM` 改成这个目录即可。例如山海经茶楼：
@@ -130,6 +138,8 @@ FractalWorld/
   CrystalFantasy/         水晶幻想：Realm.json 设计系统、Kit/ GN 资产库、scenes.py 场景解释器、Scenes/Conservatory/
 Other/
   build.py                命令行入口：家族 → 场景 → 镜头
+  Greenhouse/             温室：Greenhouse.json 设计系统（色板、植物预设）、Kit/ GN 资产库（钢玻结构、植物、玻璃器皿、家具、
+                          花园与窗外环境、材质）、scenes.py 场景解释器、Scenes/GlassAtrium（玻璃中庭）
   Props/                  无归属的小物件：Props.json 设计系统、Kit/ GN 资产库（形状、材质、喷水棍、水气球、史莱姆、惊鹿、摄影台）、
                           scenes.py 场景解释器、choreography.py 预设动作、Scenes/（WaterBalloon、Slime、ShishiOdoshi）
 Build/                    构建输出（.blend、视频），git 忽略

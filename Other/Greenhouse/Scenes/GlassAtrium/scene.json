@@ -5,14 +5,17 @@
   "defaults": {
     "shot": "Nitia"
   },
-  "notes": ["Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the atrium, +X along the gallery edge, Z up; metres.", "Gallery: glass floor (top at z = 0) on steel beams, frosted panes along its edge row; its edge is the row y = 4.18 with a 1.04 m balustrade, returning along x = -2.16.", "West stair (dog-leg): a broad landscape flight of 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rises from the garden at y = 0.32 to a landing at z = -1.3538 (y = 6.382..8.002), solved from the painted nosings (16 px rms); a second flight of 11 treads turns west up to the west gallery wing (x < -5.0), which joins the main gallery by a walkway behind the viewpoint (y < -1.6).", "Garden: the atrium floor at z = -3.2, paved, with planting beds west of, between and east of the stair and path; the round glass table stands on it.", "Curtain wall at y = 16 (mullions every 2 m, transoms every 3.9 m); beyond it a roof garden of trees and, far off, the city.", "The painting draws the chair legs inconsistently (one rises to the seat centre, one stands vertical); the chair is a coherent tall glass chair whose four splayed legs land on the painted feet."],
+  "notes": ["Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the atrium, +X along the gallery edge, Z up; metres.", "Gallery: glass floor (top at z = 0) on steel beams, frosted panes along its edge row; its edge is the row y = 4.18 with a 1.04 m balustrade, returning along x = -2.16.", "West stair (dog-leg): a broad landscape flight of 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rises from the garden at y = 0.32 to a landing at z = -1.3538 (y = 6.382..8.002), solved from the painted nosings (16 px rms); a second flight of 11 treads turns west up to the west gallery wing (x < -5.0), which joins the main gallery by a walkway behind the viewpoint (y < -1.6).", "Garden: the atrium floor at z = -3.2, paved, with planting beds west of, between and east of the stair and path; the round glass table stands on it.", "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6.0 / 16.0 (transoms at [-3.2, -0.58, 3.32, 7.22]), a glazed roof on a 2 m steel grid at z = 7.22; the conservatory crowns a two-storey glass podium; street trees 8.8 m below reach up past its walls, and far off stands the city.", "The painting draws the chair legs inconsistently (one rises to the seat centre, one stands vertical); the chair is a coherent tall glass chair whose four splayed legs land on the painted feet."],
   "materials": {
     "glassware_density": 14.0,
     "glass_ior": 1.25,
     "pane_density": 10.0,
     "leaf_translucency": 0.45,
     "frosted_roughness": 0.22,
-    "frosted_shadow": 0.8
+    "frosted_shadow": 0.8,
+    "haze_density": 0.012,
+    "haze_anisotropy": 0.55,
+    "far_haze_density": 0.05
   },
   "sky": {
     "camera_strength": 1.0,
@@ -67,7 +70,9 @@
         "asset": "GH.Flora.Umbrella",
         "preset": "shrub",
         "inputs": {
-          "Seed": 13
+          "Seed": 13,
+          "Leaflet Length": 0.055,
+          "Leaflet Width": 0.035
         }
       }
     ],
@@ -77,7 +82,11 @@
         "asset": "GH.Flora.Umbrella",
         "preset": "schefflera",
         "inputs": {
-          "Seed": 21
+          "Seed": 21,
+          "Leaflet Length": 0.09,
+          "Leaflet Width": 0.034,
+          "Leaves": 320,
+          "Clumps": 14
         }
       },
       {
@@ -113,15 +122,27 @@
         "name": "Floor Beams",
         "mesh": {
           "segments": [
-            [[-2.16, 0.17, -0.06], [4.5, 0.17, -0.06]],
-            [[-2.16, 1.6, -0.06], [4.5, 1.6, -0.06]],
-            [[-2.16, 3.03, -0.06], [4.5, 3.03, -0.06]],
-            [[-2.16, 4.18, -0.06], [4.5, 4.18, -0.06]],
-            [[-2.16, -3.0, -0.06], [-2.16, 4.18, -0.06]],
-            [[-0.75, -3.0, -0.06], [-0.75, 4.18, -0.06]],
-            [[0.08, -3.0, -0.06], [0.08, 4.18, -0.06]],
-            [[1.5, -3.0, -0.06], [1.5, 4.18, -0.06]],
-            [[2.92, -3.0, -0.06], [2.92, 4.18, -0.06]]
+            [[-2.16, -6.0, -0.06], [13.54, -6.0, -0.06]],
+            [[-2.16, -4.12, -0.06], [13.54, -4.12, -0.06]],
+            [[-2.16, -2.69, -0.06], [13.54, -2.69, -0.06]],
+            [[-2.16, -1.26, -0.06], [13.54, -1.26, -0.06]],
+            [[-2.16, 0.17, -0.06], [13.54, 0.17, -0.06]],
+            [[-2.16, 1.6, -0.06], [13.54, 1.6, -0.06]],
+            [[-2.16, 3.03, -0.06], [13.54, 3.03, -0.06]],
+            [[-2.16, 4.18, -0.06], [13.54, 4.18, -0.06]],
+            [[-2.16, -6.0, -0.06], [-2.16, 4.18, -0.06]],
+            [[-0.75, -6.0, -0.06], [-0.75, 4.18, -0.06]],
+            [[0.08, -6.0, -0.06], [0.08, 4.18, -0.06]],
+            [[1.5, -6.0, -0.06], [1.5, 4.18, -0.06]],
+            [[2.92, -6.0, -0.06], [2.92, 4.18, -0.06]],
+            [[4.34, -6.0, -0.06], [4.34, 4.18, -0.06]],
+            [[5.76, -6.0, -0.06], [5.76, 4.18, -0.06]],
+            [[7.18, -6.0, -0.06], [7.18, 4.18, -0.06]],
+            [[8.6, -6.0, -0.06], [8.6, 4.18, -0.06]],
+            [[10.02, -6.0, -0.06], [10.02, 4.18, -0.06]],
+            [[11.44, -6.0, -0.06], [11.44, 4.18, -0.06]],
+            [[12.86, -6.0, -0.06], [12.86, 4.18, -0.06]],
+            [[13.54, -6.0, -0.06], [13.54, 4.18, -0.06]]
           ]
         },
         "asset": "GH.Structure.Members",
@@ -135,17 +156,31 @@
         "name": "Columns",
         "mesh": {
           "segments": [
-            [[-0.75, 1.6, -3.2], [-0.75, 1.6, 7.0]],
-            [[-0.72, 3.03, -3.2], [-0.72, 3.03, 7.0]],
-            [[0.08, 1.6, -3.2], [0.08, 1.6, 7.0]],
-            [[0.08, 3.03, -3.2], [0.08, 3.03, 7.0]],
-            [[-2.16, 3.03, -3.2], [-2.16, 3.03, 7.0]],
-            [[-2.16, 4.18, -3.2], [-2.16, 4.18, 7.0]],
-            [[-2.35, 4.18, -3.2], [-2.35, 4.18, 7.0]],
-            [[-0.79, 4.18, -3.2], [-0.79, 4.18, 7.0]],
-            [[-0.56, 4.18, -3.2], [-0.56, 4.18, 7.0]],
-            [[0.0, 4.18, -3.2], [0.0, 4.18, 7.0]],
-            [[0.19, 4.18, -3.2], [0.19, 4.18, 7.0]]
+            [[-0.75, 1.6, -3.2], [-0.75, 1.6, 7.22]],
+            [[-0.72, 3.03, -3.2], [-0.72, 3.03, 7.22]],
+            [[0.08, 1.6, -3.2], [0.08, 1.6, 7.22]],
+            [[0.08, 3.03, -3.2], [0.08, 3.03, 7.22]],
+            [[-2.16, 3.03, -3.2], [-2.16, 3.03, 7.22]],
+            [[-2.16, 4.18, -3.2], [-2.16, 4.18, 7.22]],
+            [[-2.35, 4.18, -3.2], [-2.35, 4.18, 7.22]],
+            [[-0.79, 4.18, -3.2], [-0.79, 4.18, 7.22]],
+            [[-0.56, 4.18, -3.2], [-0.56, 4.18, 7.22]],
+            [[0.0, 4.18, -3.2], [0.0, 4.18, 7.22]],
+            [[0.19, 4.18, -3.2], [0.19, 4.18, 7.22]],
+            [[2.92, 4.18, -3.2], [2.92, 4.18, 7.22]],
+            [[5.76, 4.18, -3.2], [5.76, 4.18, 7.22]],
+            [[8.6, 4.18, -3.2], [8.6, 4.18, 7.22]],
+            [[11.44, 4.18, -3.2], [11.44, 4.18, 7.22]],
+            [[-5.0, 4.18, -3.2], [-5.0, 4.18, 7.22]],
+            [[-7.04, 4.18, -3.2], [-7.04, 4.18, 7.22]],
+            [[-9.9, 4.18, -3.2], [-9.9, 4.18, 7.22]],
+            [[-2.16, -1.6, -3.2], [-2.16, -1.6, 7.22]],
+            [[-5.0, -1.6, -3.2], [-5.0, -1.6, 7.22]],
+            [[-0.75, -2.69, -3.2], [-0.75, -2.69, 7.22]],
+            [[2.92, -2.69, -3.2], [2.92, -2.69, 7.22]],
+            [[5.76, 0.17, -3.2], [5.76, 0.17, 7.22]],
+            [[8.6, -2.69, -3.2], [8.6, -2.69, 7.22]],
+            [[11.44, 0.17, -3.2], [11.44, 0.17, 7.22]]
           ]
         },
         "asset": "GH.Structure.Members",
@@ -157,11 +192,104 @@
       {
         "name": "Curtain Wall Frame",
         "mesh": {
+          "grids": [
+            {
+              "plane": "XZ",
+              "u": [
+                -12.46,
+                -10.46,
+                -8.46,
+                -6.46,
+                -4.46,
+                -2.46,
+                -0.46,
+                1.54,
+                3.54,
+                5.54,
+                7.54,
+                9.54,
+                11.54,
+                13.54,
+                13.54
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": 16.0
+            },
+            {
+              "plane": "XZ",
+              "u": [
+                -12.46,
+                -10.46,
+                -8.46,
+                -6.46,
+                -4.46,
+                -2.46,
+                -0.46,
+                1.54,
+                3.54,
+                5.54,
+                7.54,
+                9.54,
+                11.54,
+                13.54,
+                13.54
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": -6.0
+            },
+            {
+              "plane": "YZ",
+              "u": [
+                -6.0,
+                -4.0,
+                -2.0,
+                0.0,
+                2.0,
+                4.0,
+                6.0,
+                8.0,
+                10.0,
+                12.0,
+                14.0,
+                16.0
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": -12.46
+            },
+            {
+              "plane": "YZ",
+              "u": [
+                -6.0,
+                -4.0,
+                -2.0,
+                0.0,
+                2.0,
+                4.0,
+                6.0,
+                8.0,
+                10.0,
+                12.0,
+                14.0,
+                16.0
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": 13.54
+            }
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.08,
+          "Depth": 0.16,
+          "Overrun": 0.04
+        }
+      },
+      {
+        "name": "Roof Frame",
+        "mesh": {
           "grid": {
-            "plane": "XZ",
+            "plane": "XY",
             "u": [
-              -16.46,
-              -14.46,
               -12.46,
               -10.46,
               -8.46,
@@ -175,39 +303,56 @@
               7.54,
               9.54,
               11.54,
+              13.54,
               13.54
             ],
-            "v": [-3.2, -0.58, 3.32, 7.22],
-            "w": 16.0
+            "v": [
+              -6.0,
+              -4.0,
+              -2.0,
+              0.0,
+              2.0,
+              4.0,
+              6.0,
+              8.0,
+              10.0,
+              12.0,
+              14.0,
+              16.0
+            ],
+            "w": 7.22
           }
         },
         "asset": "GH.Structure.Members",
         "inputs": {
-          "Width": 0.08,
-          "Depth": 0.16,
-          "Overrun": 0.04
+          "Width": 0.06,
+          "Depth": 0.2,
+          "Overrun": 0.03
         }
       },
       {
         "name": "West Wing Beams",
         "mesh": {
           "segments": [
-            [[-11.5, -3.0, -0.06], [-5.0, -3.0, -0.06]],
-            [[-11.5, -1.6, -0.06], [-5.0, -1.6, -0.06]],
-            [[-11.5, 0.17, -0.06], [-5.0, 0.17, -0.06]],
-            [[-11.5, 1.6, -0.06], [-5.0, 1.6, -0.06]],
-            [[-11.5, 3.03, -0.06], [-5.0, 3.03, -0.06]],
-            [[-11.5, 4.18, -0.06], [-5.0, 4.18, -0.06]],
-            [[-11.5, -3.0, -0.06], [-11.5, 4.18, -0.06]],
-            [[-9.9, -3.0, -0.06], [-9.9, 4.18, -0.06]],
-            [[-8.46, -3.0, -0.06], [-8.46, 4.18, -0.06]],
-            [[-7.04, -3.0, -0.06], [-7.04, 4.18, -0.06]],
-            [[-5.62, -3.0, -0.06], [-5.62, 4.18, -0.06]],
-            [[-5.0, -3.0, -0.06], [-5.0, 4.18, -0.06]],
-            [[-5.0, -3.0, -0.06], [-2.16, -3.0, -0.06]],
+            [[-12.46, -6.0, -0.06], [-5.0, -6.0, -0.06]],
+            [[-12.46, -4.12, -0.06], [-5.0, -4.12, -0.06]],
+            [[-12.46, -2.69, -0.06], [-5.0, -2.69, -0.06]],
+            [[-12.46, -1.26, -0.06], [-5.0, -1.26, -0.06]],
+            [[-12.46, 0.17, -0.06], [-5.0, 0.17, -0.06]],
+            [[-12.46, 1.6, -0.06], [-5.0, 1.6, -0.06]],
+            [[-12.46, 3.03, -0.06], [-5.0, 3.03, -0.06]],
+            [[-12.46, 4.18, -0.06], [-5.0, 4.18, -0.06]],
+            [[-12.46, -6.0, -0.06], [-12.46, 4.18, -0.06]],
+            [[-11.5, -6.0, -0.06], [-11.5, 4.18, -0.06]],
+            [[-9.9, -6.0, -0.06], [-9.9, 4.18, -0.06]],
+            [[-8.46, -6.0, -0.06], [-8.46, 4.18, -0.06]],
+            [[-7.04, -6.0, -0.06], [-7.04, 4.18, -0.06]],
+            [[-5.62, -6.0, -0.06], [-5.62, 4.18, -0.06]],
+            [[-5.0, -6.0, -0.06], [-5.0, 4.18, -0.06]],
+            [[-5.0, -6.0, -0.06], [-2.16, -6.0, -0.06]],
             [[-5.0, -1.6, -0.06], [-2.16, -1.6, -0.06]],
             [[-9.383, 4.18, -0.06], [-9.383, 8.002, -0.06]],
-            [[-11.5, 8.002, -0.06], [-9.383, 8.002, -0.06]]
+            [[-12.46, 8.002, -0.06], [-9.383, 8.002, -0.06]]
           ]
         },
         "asset": "GH.Structure.Members",
@@ -219,141 +364,6 @@
       }
     ],
     "Glazing": [
-      {
-        "name": "Floor Glass",
-        "mesh": {
-          "grids": [
-            {
-              "plane": "XY",
-              "u": [-2.16, -0.75, 0.08, 1.5, 2.92, 4.5],
-              "v": [-3.0, 0.17, 1.6, 3.03],
-              "w": -0.02,
-              "edges": false,
-              "faces": true
-            },
-            {
-              "plane": "XY",
-              "u": [-2.16, -0.75],
-              "v": [3.03, 4.18],
-              "w": -0.02,
-              "edges": false,
-              "faces": true
-            }
-          ]
-        },
-        "asset": "GH.Structure.Panes",
-        "inputs": {
-          "Thickness": 0.02,
-          "Margin": 0.005
-        }
-      },
-      {
-        "name": "Floor Frosted",
-        "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-0.75, 0.08, 1.5, 2.92, 4.5],
-            "v": [3.03, 4.18],
-            "w": -0.02,
-            "edges": false,
-            "faces": true
-          }
-        },
-        "asset": "GH.Structure.Panes",
-        "inputs": {
-          "Thickness": 0.02,
-          "Margin": 0.005,
-          "Material": "GH.GlassFrosted"
-        }
-      },
-      {
-        "name": "Edge Balustrade",
-        "mesh": {
-          "polyline": [[6.0, 4.18, 0.0], [-2.16, 4.18, 0.0], [-2.16, -1.6, 0.0]]
-        },
-        "asset": "GH.Structure.Balustrade",
-        "inputs": {
-          "Height": 1.04,
-          "Post Spacing": 1.42,
-          "Rails": 5,
-          "Rail Bottom": 0.11,
-          "Rail Size": 0.008,
-          "Top Rail Width": 0.03,
-          "Top Rail Depth": 0.03,
-          "Post Size": 0.022
-        }
-      },
-      {
-        "name": "Curtain Wall Glass",
-        "mesh": {
-          "grid": {
-            "plane": "XZ",
-            "u": [
-              -16.46,
-              -14.46,
-              -12.46,
-              -10.46,
-              -8.46,
-              -6.46,
-              -4.46,
-              -2.46,
-              -0.46,
-              1.54,
-              3.54,
-              5.54,
-              7.54,
-              9.54,
-              11.54,
-              13.54
-            ],
-            "v": [-3.2, -0.58, 3.32, 7.22],
-            "w": 16.0,
-            "edges": false,
-            "faces": true
-          }
-        },
-        "asset": "GH.Structure.Panes",
-        "inputs": {
-          "Thickness": 0.012,
-          "Margin": 0.02
-        }
-      },
-      {
-        "name": "West Wing Glass",
-        "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-11.5, -9.9, -8.46, -7.04, -5.62, -5.0],
-            "v": [-3.0, -1.6, 0.17, 1.6, 3.03, 4.18],
-            "w": -0.02,
-            "edges": false,
-            "faces": true
-          }
-        },
-        "asset": "GH.Structure.Panes",
-        "inputs": {
-          "Thickness": 0.02,
-          "Margin": 0.005
-        }
-      },
-      {
-        "name": "West Walkway Glass",
-        "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-5.0, -3.58, -2.16],
-            "v": [-3.0, -1.6],
-            "w": -0.02,
-            "edges": false,
-            "faces": true
-          }
-        },
-        "asset": "GH.Structure.Panes",
-        "inputs": {
-          "Thickness": 0.02,
-          "Margin": 0.005
-        }
-      },
       {
         "name": "Upper Landing Glass",
         "mesh": {
@@ -375,7 +385,7 @@
       {
         "name": "West Wing Guard",
         "mesh": {
-          "polyline": [[-2.16, -1.6, 0.0], [-5.0, -1.6, 0.0], [-5.0, 4.18, 0.0], [-9.383, 4.18, 0.0], [-9.383, 7.602, 0.0]]
+          "polyline": [[-2.16, -1.6, 0.0], [-5.0, -1.6, 0.0], [-5.0, 4.18, 0.0], [-9.383, 4.18, 0.0], [-9.383, 7.6, 0.0]]
         },
         "asset": "GH.Structure.Balustrade",
         "inputs": {
@@ -387,6 +397,290 @@
           "Top Rail Width": 0.03,
           "Top Rail Depth": 0.03,
           "Post Size": 0.022
+        }
+      },
+      {
+        "name": "Floor Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [
+              -2.16,
+              -0.75,
+              0.08,
+              1.5,
+              2.92,
+              4.34,
+              5.76,
+              7.18,
+              8.6,
+              10.02,
+              11.44,
+              12.86,
+              13.54
+            ],
+            "v": [-6.0, -4.12, -2.69, -1.26, 0.17, 1.6, 3.03],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "Floor Glass Edge",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-2.16, -0.75],
+            "v": [3.03, 4.18],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "Floor Frosted",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [
+              -0.75,
+              0.08,
+              1.5,
+              2.92,
+              4.34,
+              5.76,
+              7.18,
+              8.6,
+              10.02,
+              11.44,
+              12.86,
+              13.54
+            ],
+            "v": [3.03, 4.18],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005,
+          "Material": "GH.GlassFrosted"
+        }
+      },
+      {
+        "name": "West Wing Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-12.46, -11.5, -9.9, -8.46, -7.04, -5.62, -5.0],
+            "v": [-6.0, -4.12, -2.69, -1.26, 0.17, 1.6, 3.03, 4.18],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "West Walkway Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-5.0, -3.58, -2.16],
+            "v": [-6.0, -4.12, -2.69, -1.6],
+            "w": -0.02,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.005
+        }
+      },
+      {
+        "name": "Edge Balustrade",
+        "mesh": {
+          "polyline": [[13.44, 4.18, 0.0], [-2.16, 4.18, 0.0], [-2.16, -1.6, 0.0]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 1.04,
+          "Post Spacing": 1.42,
+          "Rails": 5,
+          "Rail Bottom": 0.11,
+          "Rail Size": 0.008,
+          "Top Rail Width": 0.03,
+          "Top Rail Depth": 0.03,
+          "Post Size": 0.022
+        }
+      },
+      {
+        "name": "Curtain Wall Glass",
+        "mesh": {
+          "grids": [
+            {
+              "plane": "XZ",
+              "u": [
+                -12.46,
+                -10.46,
+                -8.46,
+                -6.46,
+                -4.46,
+                -2.46,
+                -0.46,
+                1.54,
+                3.54,
+                5.54,
+                7.54,
+                9.54,
+                11.54,
+                13.54,
+                13.54
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": 16.0,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XZ",
+              "u": [
+                -12.46,
+                -10.46,
+                -8.46,
+                -6.46,
+                -4.46,
+                -2.46,
+                -0.46,
+                1.54,
+                3.54,
+                5.54,
+                7.54,
+                9.54,
+                11.54,
+                13.54,
+                13.54
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": -6.0,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "YZ",
+              "u": [
+                -6.0,
+                -4.0,
+                -2.0,
+                0.0,
+                2.0,
+                4.0,
+                6.0,
+                8.0,
+                10.0,
+                12.0,
+                14.0,
+                16.0
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": -12.46,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "YZ",
+              "u": [
+                -6.0,
+                -4.0,
+                -2.0,
+                0.0,
+                2.0,
+                4.0,
+                6.0,
+                8.0,
+                10.0,
+                12.0,
+                14.0,
+                16.0
+              ],
+              "v": [-3.2, -0.58, 3.32, 7.22],
+              "w": 13.54,
+              "edges": false,
+              "faces": true
+            }
+          ]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.02
+        }
+      },
+      {
+        "name": "Roof Glass",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [
+              -12.46,
+              -10.46,
+              -8.46,
+              -6.46,
+              -4.46,
+              -2.46,
+              -0.46,
+              1.54,
+              3.54,
+              5.54,
+              7.54,
+              9.54,
+              11.54,
+              13.54,
+              13.54
+            ],
+            "v": [
+              -6.0,
+              -4.0,
+              -2.0,
+              0.0,
+              2.0,
+              4.0,
+              6.0,
+              8.0,
+              10.0,
+              12.0,
+              14.0,
+              16.0
+            ],
+            "w": 7.319999999999999,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.02
         }
       }
     ],
@@ -638,8 +932,8 @@
           "Plants": "GlassAtrium.Shrubs",
           "Density": 0.7,
           "Spacing": 0.8,
-          "Scale Min": 1.1,
-          "Scale Max": 1.7,
+          "Scale Min": 0.8,
+          "Scale Max": 1.25,
           "Seed": 7
         }
       },
@@ -701,8 +995,8 @@
           "Plants": "GlassAtrium.Shrubs",
           "Density": 0.7,
           "Spacing": 0.8,
-          "Scale Min": 1.1,
-          "Scale Max": 1.7,
+          "Scale Min": 0.8,
+          "Scale Max": 1.25,
           "Seed": 9
         }
       },
@@ -711,8 +1005,8 @@
         "mesh": {
           "grid": {
             "plane": "XY",
-            "u": [-16.0, 16.0],
-            "v": [-6.0, 15.9],
+            "u": [-12.41, 13.489999999999998],
+            "v": [-5.95, 15.95],
             "w": -3.2,
             "edges": false,
             "faces": true
@@ -751,9 +1045,10 @@
           "Crown Radius": 0.7,
           "Stem": 0.5,
           "Seed": 34,
-          "Leaflet Length": 0.1,
-          "Leaflet Width": 0.038,
-          "Leaves": 260
+          "Leaflet Length": 0.085,
+          "Leaflet Width": 0.032,
+          "Leaves": 300,
+          "Clumps": 12
         }
       },
       {
@@ -940,18 +1235,27 @@
         "asset": "GH.Vessel.Book"
       },
       {
-        "name": "Areca Palm",
-        "loc": [0.95, 1.55, 0.0],
+        "name": "Palm Planter",
+        "loc": [1.25, 1.2, 0.0],
+        "asset": "GH.Vessel.Planter",
+        "inputs": {
+          "Radius": 0.3,
+          "Height": 0.5
+        }
+      },
+      {
+        "name": "Kentia Palm",
+        "loc": [1.25, 1.2, 0.45],
         "asset": "GH.Flora.Pinnate",
         "preset": "areca",
         "inputs": {
-          "Stem": 0.5,
-          "Seed": 51,
-          "Frond Length": 1.35,
-          "Leaflet Width": 0.02,
-          "Leaflet Length": 0.36,
-          "Leaflets": 34,
-          "Fronds": 12
+          "Stem": 0.4,
+          "Fronds": 14,
+          "Frond Length": 1.8,
+          "Leaflets": 38,
+          "Leaflet Length": 0.42,
+          "Leaflet Width": 0.024,
+          "Seed": 51
         }
       }
     ],
@@ -1046,15 +1350,20 @@
     ],
     "Outside": [
       {
-        "name": "Roof Garden Tree",
-        "at": [[-13.0, 18.2, -3.2], [-9.5, 17.6, -3.2], [-6.0, 18.4, -3.2], [-2.5, 17.5, -3.2], [1.0, 18.3, -3.2], [4.5, 17.4, -3.2], [8.0, 18.2, -3.2], [11.5, 17.6, -3.2], [-11.0, 22.0, -3.2], [-4.0, 22.5, -3.2], [3.0, 22.0, -3.2], [10.0, 22.5, -3.2]],
+        "name": "Street Tree",
+        "at": [[-13.0, 21.0, -12.0], [-9.0, 20.4, -12.0], [-5.0, 21.4, -12.0], [-1.0, 20.2, -12.0], [3.0, 21.2, -12.0], [7.0, 20.3, -12.0], [11.0, 21.1, -12.0], [15.0, 20.5, -12.0], [-11.0, 26.0, -12.0], [-3.0, 26.5, -12.0], [5.0, 26.0, -12.0], [13.0, 26.5, -12.0]],
         "turn": [0, 360],
         "size": [0.85, 1.25],
         "vary": {
           "Seed": "index"
         },
         "asset": "GH.Flora.Umbrella",
-        "preset": "tree"
+        "preset": "tree",
+        "inputs": {
+          "Stem": 7.6,
+          "Crown Height": 7.0,
+          "Crown Radius": 3.2
+        }
       },
       {
         "name": "Tower",
@@ -1068,6 +1377,55 @@
           "Bay": 1.6,
           "Floor": 4.0
         }
+      },
+      {
+        "name": "Podium",
+        "loc": [0.54, 5.0, -12.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 26.0,
+          "Depth": 22.0,
+          "Height": 8.2,
+          "Bay": 2.0,
+          "Floor": 4.1
+        }
+      },
+      {
+        "name": "Park",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [-80.0, 80.0],
+            "v": [-60.0, 90.0],
+            "w": -12.05,
+            "edges": false,
+            "faces": true
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.05,
+          "Material": "GH.Lawn"
+        }
+      }
+    ],
+    "Atmosphere": [
+      {
+        "name": "Atrium Haze",
+        "asset": "GH.Env.Haze",
+        "inputs": {
+          "Min": [-12.360000000000001, -5.9, -3.2],
+          "Max": [13.44, 15.9, 7.22]
+        }
+      },
+      {
+        "name": "City Haze",
+        "asset": "GH.Env.Haze",
+        "inputs": {
+          "Min": [-90.0, 16.2, -12.0],
+          "Max": [90.0, 160.0, 60.0],
+          "Material": "GH.HazeFar"
+        }
       }
     ]
   },
@@ -1080,5 +1438,37 @@
       "angle": 1.5,
       "direction": [-0.4, -0.2, 0.9]
     }
-  ]
+  ],
+  "views": {
+    "gallery": {
+      "location": [1.6, -2.4, 1.6],
+      "target": [-1.2, 4.5, 0.2],
+      "lens": 24.0,
+      "resolution": [1920, 1080]
+    },
+    "garden": {
+      "location": [0.2, 11.5, -1.7],
+      "target": [-1.2, 2.0, 0.4],
+      "lens": 20.0,
+      "resolution": [1920, 1080]
+    },
+    "stair": {
+      "location": [-4.4, 7.7, 0.3],
+      "target": [-3.4, 0.5, -2.8],
+      "lens": 22.0,
+      "resolution": [1920, 1080]
+    },
+    "overview": {
+      "location": [11.5, 14.5, 5.5],
+      "target": [-2.0, 2.5, -1.5],
+      "lens": 18.0,
+      "resolution": [1920, 1080]
+    },
+    "table": {
+      "location": [0.2, 3.0, 1.15],
+      "target": [-0.62, 3.95, 0.6],
+      "lens": 40.0,
+      "resolution": [1920, 1080]
+    }
+  }
 }

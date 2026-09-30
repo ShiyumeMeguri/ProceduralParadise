@@ -153,3 +153,15 @@ def tower():
     roof = graph.mat(graph.box(width * -0.5, depth * -0.5, height - 0.1, width * 0.5, depth * 0.5, height + 0.6), M.get("GH.TowerFrame"))
     graph.result(graph.join(glass_mesh, graph.mat(mullions, M.get("GH.TowerFrame")), roof))
     return graph
+
+
+@asset("GH.Env.Haze", "Environment")
+def haze():
+    """Box of sunlit air between the corners ``Min`` and ``Max`` (in the
+    object's space), filled with the haze volume."""
+    graph = GN("GH.Env.Haze", haze.__doc__)
+    low = graph.inp("Min", "VECTOR", default=(-5.0, -5.0, 0.0))
+    high = graph.inp("Max", "VECTOR", default=(5.0, 5.0, 5.0))
+    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Haze"))
+    graph.result(graph.mat(graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(low + high) * 0.5, s=high - low), material))
+    return graph

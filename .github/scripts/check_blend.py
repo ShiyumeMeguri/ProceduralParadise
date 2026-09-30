@@ -18,18 +18,37 @@ import bpy
 def external_paths():
     """(datablock, path) for every datablock that reads a file from disk."""
     out = []
-    for coll in (bpy.data.images, bpy.data.libraries, bpy.data.fonts, bpy.data.sounds,
-                 bpy.data.movieclips, bpy.data.volumes, bpy.data.cache_files):
-        for d in coll:
+    for kind in ("images", "libraries", "fonts", "sounds", "movieclips", "volumes", "cache_files"):
+        for d in getattr(bpy.data, kind):
             path = getattr(d, "filepath", "")
             if not path or getattr(d, "packed_file", None) is not None:
                 continue
-            if coll is bpy.data.fonts and path == "<builtin>":
+            if kind == "fonts" and path == "<builtin>":
                 continue
-            if coll is bpy.data.images and d.source in {"GENERATED", "VIEWER"}:
+            if kind == "images" and d.source in {"GENERATED", "VIEWER"}:
                 continue
             out.append((d.name, path))
     return out
+
+
+def triangles_by_object(dg):
+    """Triangles every mesh object puts in the render: its own evaluated
+    mesh plus the geometry it instances (scattered plants are instances of
+    other objects, reported by the depsgraph under their emitter)."""
+    own = {}
+    counts = {}
+    for inst in dg.object_instances:
+        source = inst.object
+        if source.type != "MESH":
+            continue
+        key = source.original.name if not inst.is_instance else inst.parent.original.name
+        if source.name not in own:
+            me = source.to_mesh()
+            me.calc_loop_triangles()
+            own[source.name] = len(me.loop_triangles)
+            source.to_mesh_clear()
+        counts[key] = counts.get(key, 0) + own[source.name]
+    return counts
 
 
 def check(path, render_dir=None):
@@ -41,16 +60,14 @@ def check(path, render_dir=None):
     for name, fp in external_paths():
         problems.append(f"external file: {name} -> {fp}")
     dg = bpy.context.evaluated_depsgraph_get()
+    counts = triangles_by_object(dg)
     n_obj = n_tri = 0
     empty = []
     for ob in sc.objects:
-        if ob.type != "MESH":
+        if ob.type != "MESH" or not ob.visible_get():
             continue
         n_obj += 1
-        me = ob.evaluated_get(dg).to_mesh()
-        me.calc_loop_triangles()
-        tris = len(me.loop_triangles)
-        ob.evaluated_get(dg).to_mesh_clear()
+        tris = counts.get(ob.name, 0)
         n_tri += tris
         if tris == 0 and not ob.hide_render:
             empty.append(ob.name)

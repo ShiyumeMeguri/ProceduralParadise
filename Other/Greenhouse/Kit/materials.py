@@ -153,6 +153,28 @@ def deck():
     return S.material("GH.Deck", build)
 
 
+@register("GH.Lawn")
+def lawn():
+    """Mown grass seen from afar: mottled greens with a fine blade bump."""
+    def build(tree: Tree):
+        coordinates = S.tex_coord(tree)
+        mottle = S.noise(tree, coordinates, 0.4, 6.0, 0.6)["Fac"]
+        blades = S.noise(tree, coordinates, 300.0, 2.0)["Fac"]
+        base = S.mix_rgb(tree, tree.map_range(mottle, 0.3, 0.7, 0.0, 1.0), color("leaf"), color("leaf_light"))
+        return S.bsdf(tree, Base_Color=base, Roughness=0.9, Normal=bump(tree, blades, 0.3))["BSDF"]
+    return S.material("GH.Lawn", build)
+
+
+@register("GH.Planter")
+def planter():
+    """Glazed stoneware planter."""
+    def build(tree: Tree):
+        speckle = S.noise(tree, S.tex_coord(tree), 80.0, 3.0)["Fac"]
+        base = S.mix_rgb(tree, tree.map_range(speckle, 0.4, 0.7, 0.0, 1.0), color("planter"), scaled(color("planter"), 0.8))
+        return S.bsdf(tree, Base_Color=base, Roughness=0.25, Coat_Weight=0.3)["BSDF"]
+    return S.material("GH.Planter", build)
+
+
 @register("GH.Soil")
 def soil():
     def build(tree: Tree):
@@ -250,6 +272,29 @@ def succulent():
         return S.bsdf(tree, Base_Color=base, Roughness=0.38, Subsurface_Weight=0.25, Subsurface_Radius=(0.01, 0.02, 0.008),
                       Coat_Weight=0.3, Coat_Roughness=0.3)["BSDF"]
     return S.material("GH.Succulent", build)
+
+
+# ------------------------------------------------------------------ air
+def air(name, density_key, density):
+    """Sunlit air: a forward-scattering volume (``haze_anisotropy``) of
+    ``density_key`` -- thin indoors, where it turns the sun into shafts
+    between the glazing bars; thicker outdoors, where it pales the city
+    with distance.  Only volume, no surface."""
+    def build(tree: Tree):
+        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("haze_light"), Density=param(density_key, density),
+                        Anisotropy=param("haze_anisotropy", 0.55))["Volume"]
+        return {"Volume": volume}
+    return S.material(name, build)
+
+
+@register("GH.Haze")
+def haze():
+    return air("GH.Haze", "haze_density", 0.01)
+
+
+@register("GH.HazeFar")
+def haze_far():
+    return air("GH.HazeFar", "far_haze_density", 0.02)
 
 
 # ------------------------------------------------------------------ backdrop

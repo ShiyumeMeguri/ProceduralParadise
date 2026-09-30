@@ -173,6 +173,24 @@ def square_bottle():
     return graph
 
 
+@asset("GH.Vessel.Planter", "Vessels")
+def planter():
+    """Tapered round planter of ``Radius`` (at the rim) and ``Height`` with a
+    rolled lip, filled with soil ``Fill`` of the way up."""
+    graph = GN("GH.Vessel.Planter", planter.__doc__)
+    radius = graph.inp("Radius", default=0.25, subtype="DISTANCE")
+    height = graph.inp("Height", default=0.45, subtype="DISTANCE")
+    fill = graph.inp("Fill", default=0.9, min=0.0, max=1.0)
+    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Planter"))
+    outer = [(0.0, 0.0), (0.72, 0.0), (0.76, 0.02), (0.96, 0.9), (1.0, 0.94), (1.0, 1.0)]
+    body = graph.lathe(shell_profile(outer, 0.06), 64, 1.0)
+    body = graph.transform(body, s=graph.vec(radius, radius, height))
+    soil = graph.transform(graph.cylinder(1.0, 1.0, 64), t=graph.vec(0.0, 0.0, height * fill * 0.5),
+                           s=graph.vec(radius * (0.72 + 0.2 * fill), radius * (0.72 + 0.2 * fill), height * fill))
+    graph.result(graph.join(graph.mat(graph.smooth_by_angle(body, 0.8), material), graph.mat(soil, M.get("GH.Soil"))))
+    return graph
+
+
 @asset("GH.Vessel.Flask", "Vessels")
 def flask():
     """Round-bottomed flask: a blown sphere of ``Radius`` with a straight
