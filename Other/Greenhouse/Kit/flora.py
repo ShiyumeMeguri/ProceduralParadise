@@ -26,7 +26,7 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset
-from Core.render import INK_ID
+from Core.render import INK_QUIET
 from . import materials as M
 
 TAU = math.tau
@@ -52,11 +52,11 @@ def blade(graph, length, width, cup, curl, fullness, taper, resolution=(5, 10)):
 
 def leaf_colors(graph, geometry, first, second, seed, domain="INSTANCE"):
     """``leaf_color`` on every element of ``domain``: a random mix of the two
-    colours; and an ``ink_id`` of its own, so the ink pass outlines every
-    leaf."""
+    colours; foliage is quiet for the ink pass (outlined against what lies
+    behind it, not leaf by leaf)."""
     mix = graph.mix(graph.random(0.0, 1.0, seed), first, second, "RGBA")
     geometry = graph.store(geometry, "leaf_color", mix, "FLOAT_COLOR", domain)
-    return graph.store(geometry, INK_ID, graph.random(0.0, 1.0, seed + 101), "FLOAT", domain)
+    return graph.store(geometry, INK_QUIET, 1.0, "FLOAT", domain)
 
 
 def crown_points(graph, count, spread_low, spread_high, seed):
@@ -243,9 +243,10 @@ def broadleaf():
 
 
 def umbrella_leaf(graph, leaflets, leaflet_length, leaflet_width, droop):
-    """Palmately compound leaf facing +Z: ``leaflets`` blades radiating from
-    the origin in the XY plane, drooping by ``droop``."""
-    blade_mesh = blade(graph, 1.0, 1.0, 0.25, 0.1, 0.65, 0.7, (3, 7))
+    """Palmately compound leaf facing +Z: ``leaflets`` obovate blades --
+    widest two thirds of the way out, round-tipped, like schefflera's --
+    radiating from the origin in the XY plane, drooping by ``droop``."""
+    blade_mesh = blade(graph, 1.0, 1.0, 0.25, 0.1, 1.7, 0.45, (5, 9))
     ring = graph.points(leaflets, (0.0, 0.0, 0.0))
     angle = graph.index() * (TAU / graph.max(leaflets, 1))
     rotation = graph.vec(math.pi * 0.5 + droop, 0.0, angle)

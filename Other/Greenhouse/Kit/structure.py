@@ -36,14 +36,16 @@ def member_rotation(graph, direction):
 def members():
     """Every edge of the mesh becomes a bar centred on it: a box ``Width``
     by ``Depth`` (``Round``: a tube of diameter ``Width``) running the edge's
-    length plus ``Overrun`` at each end, so members meet without gaps."""
+    length plus ``Overrun`` at each end, so members meet without gaps.
+    ``See Through`` marks the bars as glass for the ink pass."""
     graph = GN("GH.Structure.Members", members.__doc__)
     mesh = graph.inp("Geometry", "GEOMETRY")
     width = graph.inp("Width", default=0.06, min=0.0, subtype="DISTANCE")
     depth = graph.inp("Depth", default=0.06, min=0.0, subtype="DISTANCE")
     overrun = graph.inp("Overrun", default=0.0, subtype="DISTANCE")
     rounded = graph.inp("Round", "BOOL", default=False)
-    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Steel"))
+    material = graph.inp("Material", "MATERIAL", default=M.get("GH.GlassJade"))
+    see_through = graph.inp("See Through", "BOOL", default=True)
 
     ends = graph.n("GeometryNodeInputMeshEdgeVertices")
     mesh, fields = graph.capture(mesh, "EDGE", span=ends["Position 2"] - ends["Position 1"])
@@ -54,7 +56,7 @@ def members():
     tube = graph.smooth(graph.cylinder(0.5, 1.0, 16))
     bar = graph.switch(rounded, box, tube)
     bars = graph.iop(points, bar, rot=member_rotation(graph, span), scale=graph.vec(width, graph.switch(rounded, depth, width, "FLOAT"), length))
-    graph.result(graph.mat(graph.realize(bars), material))
+    graph.result(M.glazed(graph, graph.realize(bars), material, see_through))
     return graph
 
 
@@ -86,22 +88,26 @@ def panes():
 
 @asset("GH.Structure.Balustrade", "Structure")
 def balustrade():
-    """Balustrade along the edges of the mesh (its path, at floor level):
-    square posts every ``Post Spacing`` (and at both ends), a flat top rail
-    at ``Height``, ``Rails`` round intermediate rails evenly spaced between
-    ``Rail Bottom`` and the top rail, and a glass infill panel."""
+    """Balustrade along the edges of the mesh (its path, at floor level): a
+    flat top rail at ``Height``, ``Rails`` round rails evenly spaced from
+    ``Rail Bottom`` up to it, posts every ``Post Spacing`` (and at both
+    ends) from ``Post Bottom`` up to the top rail, and a glass infill panel
+    from the floor up to ``Glass Top`` (the posts below it are clamps on its
+    edge when ``Post Bottom`` is above the floor)."""
     graph = GN("GH.Structure.Balustrade", balustrade.__doc__)
     path = graph.inp("Geometry", "GEOMETRY")
     height = graph.inp("Height", default=1.05, subtype="DISTANCE")
     spacing = graph.inp("Post Spacing", default=1.2, min=0.1, subtype="DISTANCE")
     post = graph.inp("Post Size", default=0.04, subtype="DISTANCE")
+    post_bottom = graph.inp("Post Bottom", default=0.0, subtype="DISTANCE")
     top_width = graph.inp("Top Rail Width", default=0.05, subtype="DISTANCE")
     top_depth = graph.inp("Top Rail Depth", default=0.03, subtype="DISTANCE")
     rails = graph.inp("Rails", "INT", default=4, min=0)
     rail_bottom = graph.inp("Rail Bottom", default=0.12, subtype="DISTANCE")
     rail_size = graph.inp("Rail Size", default=0.012, subtype="DISTANCE")
     glass_on = graph.inp("Glass", "BOOL", default=True)
-    steel = graph.inp("Material", "MATERIAL", default=M.get("GH.Steel"))
+    glass_top = graph.inp("Glass Top", default=0.95, subtype="DISTANCE")
+    frame_material = graph.inp("Material", "MATERIAL", default=M.get("GH.GlassJade"))
     glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("GH.Glass"))
 
     curve = graph.n("GeometryNodeMeshToCurve", path).o
@@ -113,7 +119,8 @@ def balustrade():
     set_mode(stations, "LENGTH")
     graph.assign(graph._in_socket(stations.n, "Length"), spacing)
     points = graph.n("GeometryNodeCurveToPoints", Curve=stations.o, props={"mode": "EVALUATED"})["Points"]
-    posts = graph.iop(points, graph.move(graph.cube((1.0, 1.0, 1.0)), z=0.5), scale=graph.vec(post, post, height - top_depth))
+    points = graph.set_pos(points, offset=graph.vec(0.0, 0.0, post_bottom))
+    posts = graph.iop(points, graph.move(graph.cube((1.0, 1.0, 1.0)), z=0.5), scale=graph.vec(post, post, height - top_depth - post_bottom))
 
     top = graph.sweep(graph.set_pos(curve, offset=graph.vec(0.0, 0.0, height - top_depth * 0.5)), graph.rect(top_width, top_depth), True)
     step = (height - top_depth - rail_bottom) / graph.max(rails, 1)
@@ -121,12 +128,12 @@ def balustrade():
     rail_curves = graph.realize(graph.iop(graph.mesh_to_points(levels), curve))
     rail_mesh = graph.smooth(graph.sweep(rail_curves, graph.circle(rail_size * 0.5, 10), True))
 
-    extrude = graph.n("GeometryNodeExtrudeMesh", Mesh=path, Offset=graph.vec(0.0, 0.0, 1.0), Offset_Scale=height - top_depth - 0.05)
+    extrude = graph.n("GeometryNodeExtrudeMesh", Mesh=path, Offset=graph.vec(0.0, 0.0, 1.0), Offset_Scale=glass_top - 0.03)
     set_mode(extrude, "EDGES")
     wall = graph.set_pos(extrude["Mesh"], offset=graph.vec(0.0, 0.0, 0.03))
-    glass_panel = graph.switch(glass_on, None, graph.group(get_asset("GH.Structure.Panes"), Geometry=wall, Thickness=0.01, Offset=-0.005, Material=glass_material).o)
-    metal = graph.mat(graph.realize(graph.join(posts, top, rail_mesh)), steel)
-    graph.result(graph.join(metal, glass_panel))
+    glass_panel = graph.switch(glass_on, None, graph.group(get_asset("GH.Structure.Panes"), Geometry=wall, Thickness=0.012, Offset=-0.006, Material=glass_material).o)
+    frame = M.glazed(graph, graph.realize(graph.join(posts, top, rail_mesh)), frame_material)
+    graph.result(graph.join(frame, glass_panel))
     return graph
 
 

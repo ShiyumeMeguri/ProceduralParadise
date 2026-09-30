@@ -20,7 +20,7 @@ from .nodes import Tree
 from .gn import set_menu
 
 __all__ = ["ENGINES", "setup_cycles", "setup_eevee", "set_samples", "color_management", "compositor", "lines", "LINES_LAYER",
-           "ink", "INK_LAYER", "INK_SKIP", "INK_ID",
+           "ink", "INK_LAYER", "INK_SKIP", "INK_ID", "INK_QUIET",
            "frame_output", "frame_paths", "unfinished_frames", "video_scene",
            "use_gpu_if_available", "render_still"]
 
@@ -28,6 +28,7 @@ LINES_LAYER = "Lines"
 INK_LAYER = "Ink"
 INK_SKIP = "ink_skip"
 INK_ID = "ink_id"
+INK_QUIET = "ink_quiet"
 _PNG_END = b"\x00\x00\x00\x00IEND\xaeB`\x82"
 
 
@@ -400,6 +401,9 @@ def ink(cfg: dict | None):
     colour.  Surfaces marked ``ink_skip`` (glass) are transparent to it
     except where seen edge-on (facing beyond ``rim``): lines of whatever
     lies behind glass are drawn, and the glass still gets its outline.
+    Surfaces marked ``ink_quiet`` (foliage) share one identity and are never
+    inked: the painter draws line art on the architecture and the
+    glassware, and lets plants cut those lines without outlining them.
     :func:`compositor` turns the layer's colour, normal and depth images
     into lines.  Returns the layer name (None without ink)."""
     sc = bpy.context.scene
@@ -433,7 +437,9 @@ def _ink_material(rim):
         random = t.n("ShaderNodeObjectInfo")["Random"]
         element = t.n("ShaderNodeAttribute", props={"attribute_name": INK_ID, "attribute_type": "GEOMETRY"})["Fac"]
         identity = t.n("ShaderNodeCombineColor", random, t.math("FRACT", random * 7.13 + element * 3.71),
-                       t.math("FRACT", element * 13.7 + random * 1.37)).o
+                       t.math("FRACT", element * 13.7 + random * 1.37) * 0.9).o
+        quiet = t.n("ShaderNodeAttribute", props={"attribute_name": INK_QUIET, "attribute_type": "GEOMETRY"})["Fac"]
+        identity = t.mix(quiet, identity, (0.5, 0.5, 1.0, 1.0), data_type="RGBA")
         emission = t.n("ShaderNodeEmission", identity, 1.0)["Emission"]
         skip = t.n("ShaderNodeAttribute", props={"attribute_name": INK_SKIP, "attribute_type": "GEOMETRY"})["Fac"]
         facing = t.n("ShaderNodeLayerWeight", Blend=0.5)["Facing"]
@@ -450,7 +456,9 @@ def ink_nodes(t, img, layer, cfg):
     8 sin(a / 2)), and -- with a ``depth`` threshold -- of its inverse depth
     under a Laplace kernel (planes have a linear inverse depth, so only
     steps and creases in depth remain), scaled by the depth to make the
-    threshold relative.  Each passes a soft threshold (full ink at 1.5 x)."""
+    threshold relative.  Each passes a soft threshold (full ink at 1.5 x).
+    No ink lies within ``quiet_margin`` px of a quiet surface (identity blue
+    1): plants cut the lines behind them and carry none."""
     sc = bpy.context.scene
     rl = t.n("CompositorNodeRLayers")
     rl.n.layer = layer
@@ -472,6 +480,12 @@ def ink_nodes(t, img, layer, cfg):
 
     mask = t.math("MAXIMUM", over(strongest(filtered(rl["Image"], "Sobel")), cfg.get("id", 0.1)),
                   over(strongest(filtered(rl["Normal"], "Sobel")), cfg.get("normal", 2.0)))
+    quiet = t.math("GREATER_THAN", t.n("CompositorNodeSeparateColor", rl["Image"])[2], 0.95)
+    margin = t.n("CompositorNodeDilateErode")
+    t.link(quiet, margin.n.inputs["Mask"])
+    _set(margin, "Type", "Distance")
+    _set(margin, "Size", max(int(round(cfg.get("quiet_margin", 2) * sc.render.resolution_percentage / 100.0)), 1))
+    mask = t.math("MULTIPLY", mask, t.math("SUBTRACT", 1.0, margin.o, clamp=True))
     if cfg.get("depth"):
         depth = rl["Depth"]
         inverse = t.math("DIVIDE", 1.0, t.math("MAXIMUM", depth, 1e-3))

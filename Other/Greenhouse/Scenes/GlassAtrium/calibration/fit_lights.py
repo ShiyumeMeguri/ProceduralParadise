@@ -177,7 +177,7 @@ def apply(groups, weights):
                 tinted(key, tint)
         else:
             key = EMISSIVE_COLORS[info["material"]]
-            materials["far_haze_brightness"] = round(materials.get("far_haze_brightness", 1.0) * strength, 4)
+            materials["smog_brightness"] = round(materials.get("smog_brightness", 1.0) * strength, 4)
             tinted(key, tint)
     dump(scene, SCENE_JSON)
     print("applied to", SCENE_JSON)

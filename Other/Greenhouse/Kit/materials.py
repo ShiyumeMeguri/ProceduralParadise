@@ -87,14 +87,14 @@ def steel():
 FRESNEL_LOSS = 0.96
 
 
-def dielectric(tree: Tree, density_key, density, wall):
-    """Surface and volume of jade glass: an IOR 1.5 dielectric filled with
+def dielectric(tree: Tree, density_key, density, wall, ior=1.5):
+    """Surface and volume of jade glass: a dielectric of ``ior`` filled with
     absorption towards ``jade`` at ``density_key``.  A shadow ray crosses a
     surface and half a ``wall`` of glass per surface it meets, so it is
     tinted by the Fresnel loss and the Beer-Lambert transmittance of half a
     wall -- the light a pane really lets through."""
     density = param(density_key, density)
-    surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.5)["BSDF"]
+    surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=ior)["BSDF"]
     volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("jade"), Density=density)["Volume"]
     half_wall = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * wall * 0.5) for channel in color("jade")[:3])
     return {"Surface": shadow_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
@@ -103,9 +103,13 @@ def dielectric(tree: Tree, density_key, density, wall):
 @register("GH.Glass")
 def glass():
     """Architectural glass: floor panes, stair treads, balustrade infill,
-    curtain wall and roof (``pane_density``)."""
+    curtain wall and roof (``pane_density``).  The panes are anti-reflection
+    coated: the coating's reflectance curve -- about 1 % face on, rising to
+    a mirror at grazing angles -- is that of an uncoated dielectric of
+    ``pane_ior`` (1.22), so the floor is clear underfoot and mirrors the
+    windows far off."""
     def build(tree: Tree):
-        return dielectric(tree, "pane_density", 10.0, 0.02)
+        return dielectric(tree, "pane_density", 10.0, 0.02, param("pane_ior", 1.22))
     return S.material("GH.Glass", build)
 
 
@@ -117,6 +121,32 @@ def glass_jade():
     def build(tree: Tree):
         return dielectric(tree, "glassware_density", 60.0, 0.012)
     return S.material("GH.GlassJade", build)
+
+
+@register("GH.GlassBottle")
+def glass_bottle():
+    """Green bottle glass of the tall bottle and the flask: absorbs red and
+    blue (``bottle_glass``, ``bottle_density``)."""
+    def build(tree: Tree):
+        density = param("bottle_density", 30.0)
+        surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.5)["BSDF"]
+        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("bottle_glass"), Density=density)["Volume"]
+        half_wall = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * 0.006) for channel in color("bottle_glass")[:3])
+        return {"Surface": shadow_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
+    return S.material("GH.GlassBottle", build)
+
+
+@register("GH.Water")
+def water():
+    """Water: an IOR 1.333 dielectric absorbing towards ``water_tint``
+    (``water_density``)."""
+    def build(tree: Tree):
+        density = param("water_density", 8.0)
+        surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.333)["BSDF"]
+        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("water_tint"), Density=density)["Volume"]
+        half = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * 0.1) for channel in color("water_tint")[:3])
+        return {"Surface": shadow_clear(tree, surface, (*half, 1.0)), "Volume": volume}
+    return S.material("GH.Water", build)
 
 
 @register("GH.GlassClear")
@@ -266,29 +296,18 @@ def ink():
 
 
 # ------------------------------------------------------------------ plants
-def inked(tree: Tree, shader, margin):
-    """``shader`` with the painting's line art where ``margin`` (0 inside,
-    1 at the edge) reaches the last ``leaf_outline`` of the way out."""
-    width = param("leaf_outline", 0.08)
-    line = tree.map_range(margin, 1.0 - width, 1.0 - width * 0.6, 0.0, 1.0)
-    ink = S.bsdf(tree, Base_Color=color("ink"), Roughness=0.6)["BSDF"]
-    return mix_shader(tree, line, shader, ink)
-
-
 def leaf_shader(tree: Tree, sheen, translucency, roughness):
     """Two-sided leaf: the per-leaf ``leaf_color`` darkened along the midrib
-    and towards the base, a waxy sheen on top, light through the blade, an
-    inked margin."""
+    and towards the base, a waxy sheen on top, light through the blade."""
     tint = attribute(tree, "leaf_color", "Color")
     across = tree.abs(attribute(tree, "leaf_v"))
     along = attribute(tree, "leaf_u")
     rib = tree.map_range(across, 0.0, 0.08, 0.72, 1.0)
     base_shade = tree.map_range(along, 0.0, 0.35, 0.7, 1.0)
     shaded = tree.vmath("SCALE", tint, scale=rib * base_shade)
-    surface = S.bsdf(tree, Base_Color=shaded, Roughness=roughness, Specular_IOR_Level=sheen, Coat_Weight=sheen * 0.6,
-                     Coat_Roughness=0.25)["BSDF"]
+    surface = S.bsdf(tree, Base_Color=shaded, Roughness=roughness, Specular_IOR_Level=sheen)["BSDF"]
     backlit = tree.n("ShaderNodeBsdfTranslucent", Color=tree.vmath("MULTIPLY", shaded, (1.3, 1.5, 0.6)))["BSDF"]
-    return inked(tree, mix_shader(tree, translucency, surface, backlit), across)
+    return mix_shader(tree, translucency, surface, backlit)
 
 
 @register("GH.Leaf")
@@ -314,17 +333,33 @@ def succulent():
 
 
 # ------------------------------------------------------------------ air
+@register("GH.Air")
+def air():
+    """Sunlit air of the conservatory: a thin forward-scattering volume
+    (``air_density``, ``air_anisotropy``) that turns the sun into shafts
+    between the glazing bars.  Only volume, no surface."""
+    def build(tree: Tree):
+        volume = tree.n("ShaderNodeVolumePrincipled", Color=color("air"), Density=param("air_density", 0.02),
+                        Anisotropy=param("air_anisotropy", 0.6))["Volume"]
+        return {"Volume": volume}
+    return S.material("GH.Air", build)
+
+
 @register("GH.Smog")
 def smog():
-    """Aerial perspective of the city smog: an absorbing medium that glows
-    with the skylight it scatters in, so along a path of transmittance T the
-    view becomes L * T + smog * brightness * (1 - T) -- the closed form of
-    single-scattered skylight, without the volume bounces a scattering
-    medium this thick would need."""
+    """The city haze below the tower: an absorbing medium that glows with
+    the skylight it scatters in, so along a path of transmittance T the view
+    becomes L * T + smog * brightness * (1 - T) -- single-scattered skylight
+    in closed form.  It thins with height, exp(-(z - ``smog_ground``) /
+    ``smog_scale``) from ``smog_density`` at the ground: the streets far
+    below vanish into pink while a neighbouring tower at the conservatory's
+    height stays clear."""
     def build(tree: Tree):
-        density = param("far_haze_density", 0.02)
+        _, _, z = tree.sep(tree.n("ShaderNodeNewGeometry")["Position"])
+        falloff = tree.math("EXPONENT", (z - param("smog_ground", -120.0)) * (-1.0 / param("smog_scale", 30.0)))
+        density = tree.math("MULTIPLY", falloff, param("smog_density", 0.05))
         absorb = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=density)["Volume"]
-        glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=density * param("far_haze_brightness", 1.0))["Emission"]
+        glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=tree.math("MULTIPLY", density, param("smog_brightness", 1.0)))["Emission"]
         return {"Volume": tree.n("ShaderNodeAddShader", absorb, glow)["Shader"]}
     return S.material("GH.Smog", build)
 

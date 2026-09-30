@@ -25,6 +25,14 @@ def sphere(graph, radius, segments=48, rings=24):
     return graph.n("GeometryNodeMeshUVSphere", Segments=segments, Rings=rings, Radius=radius)["Mesh"]
 
 
+def cut_below(graph, solid, level, floor):
+    """The part of the closed mesh ``solid`` below the plane z = ``level``."""
+    below = graph.box(-10.0, -10.0, floor - 1.0, 10.0, 10.0, level)
+    node = graph.n("GeometryNodeMeshBoolean", props={"operation": "INTERSECT", "solver": "MANIFOLD"})
+    graph.assign(graph._in_socket(node.n, "Mesh 2"), [solid, below])
+    return node["Mesh"]
+
+
 def shell(graph, mesh, thickness):
     """Closed wall from an open surface: the surface pushed out along its
     normals by ``thickness`` plus the original, flipped, as the inside."""
@@ -194,12 +202,17 @@ def planter():
 @asset("GH.Vessel.Flask", "Vessels")
 def flask():
     """Round-bottomed flask: a blown sphere of ``Radius`` with a straight
-    neck, lathed as a wall of constant thickness, standing on its curve."""
+    neck, lathed as a wall of constant thickness, standing on its curve;
+    filled with water to ``Fill`` of the sphere's height (the water stands
+    a fraction of a millimetre into the glass, so the two dielectrics meet
+    without a film of air)."""
     graph = GN("GH.Vessel.Flask", flask.__doc__)
     radius = graph.inp("Radius", default=0.16, subtype="DISTANCE")
     neck_radius = graph.inp("Neck Radius", default=0.035, subtype="DISTANCE")
     neck_length = graph.inp("Neck Length", default=0.12, subtype="DISTANCE")
+    fill = graph.inp("Fill", default=0.0, min=0.0, max=1.0)
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassClear"))
+    liquid = graph.inp("Liquid", "MATERIAL", default=M.get("GH.Water"))
 
     steps = 24
     neck_angle = math.asin(0.22)
@@ -217,7 +230,11 @@ def flask():
     widened = graph.switch(above, radius, radius * neck_scale, "FLOAT")
     stretch = graph.switch(above, z * radius, top * radius + (z - top) * neck_length / 0.75, "FLOAT")
     body = graph.set_pos(body, pos=graph.vec(x * widened, y * widened, stretch))
-    graph.result(M.glazed(graph, graph.smooth_by_angle(body, 1.2), glass))
+    wall = 0.018 * radius
+    water = graph.smooth(sphere(graph, radius - wall + 0.0004, 64, 32))
+    water = cut_below(graph, graph.move(water, z=radius), radius * 2.0 * fill, -1.0)
+    water = graph.switch(graph.compare(fill, 0.001, "GREATER_THAN"), None, M.glazed(graph, water, liquid))
+    graph.result(graph.join(M.glazed(graph, graph.smooth_by_angle(body, 1.2), glass), water))
     return graph
 
 
