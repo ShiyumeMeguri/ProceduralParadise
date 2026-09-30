@@ -16,8 +16,10 @@ image (all in pixels of the reference resolution)::
     }
 
 Blender cameras express the principal point through ``shift_x/shift_y`` in
-units of the larger sensor dimension; this module converts exactly, so a
-render at the solve resolution lands on the reference pixel grid.
+units of the sensor dimension the camera is fitted to -- the image width,
+since every camera here fits the sensor horizontally, portrait frames
+included; this module converts exactly, so a render at the solve resolution
+lands on the reference pixel grid.
 """
 from __future__ import annotations
 
@@ -35,9 +37,8 @@ def solve_intrinsics(solve):
     cx, cy = solve.get("principal_px", (W / 2, H / 2))
     sensor = 36.0
     lens = f_px / W * sensor
-    m = max(W, H)
-    shift_x = (W / 2 - cx) / m
-    shift_y = (cy - H / 2) / m
+    shift_x = (W / 2 - cx) / W
+    shift_y = (cy - H / 2) / W
     return dict(lens=lens, sensor=sensor, shift_x=shift_x, shift_y=shift_y, W=W, H=H)
 
 
