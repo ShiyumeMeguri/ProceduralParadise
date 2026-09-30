@@ -3,17 +3,23 @@ The free parts of the garden's layout, chosen against the painting.
 
 Where the planting scatters its plants and how each specimen spreads its
 leaves is random -- one garden among equally good ones; where a painted
-specimen stands is known only to the width of its painted mass, and which
-way it faces not at all.  So these are chosen as the painting's: object by
-object, one field is tried at a few other values, the painting's camera
-view rendered for each, and the value that brings the render closest to
-the painting kept.  The fields:
+specimen stands and how large it grows is known only to the width of its
+painted mass, which way it faces not at all, and where the sun stands only
+to the few degrees its painted shafts and shadows give.  So these are
+chosen as the painting's: object by object, one field is tried at a few
+other values, the painting's camera view rendered for each, and the value
+that brings the render closest to the painting kept.  The fields
+(``FIELDS``):
 
 * ``seed`` -- the object's ``Seed`` input, tried at ``--tries`` other values;
 * ``move`` -- its position, shifted by ``--step`` metres (default 0.2)
   along +X, -X, +Y and -Y;
 * ``turn`` -- its heading, turned by ``--tries`` multiples of ``--step``
-  degrees (default 45).
+  degrees (default 45);
+* ``size`` -- its scale, larger and smaller by the fraction ``--step``
+  (default 0.1);
+* ``aim`` -- a lamp's direction, its azimuth and its elevation turned by
+  ``--step`` degrees (default 2) either way.
 
 Closeness is the reported measure: the error of colours blurred by
 ``BLUR`` of the image width, plus ``PIXEL_WEIGHT`` of the error pixel by
@@ -24,7 +30,7 @@ whole garden better or worse, never be picked piecewise.
 One Blender session changes the objects in place and renders again, so a
 try costs one small render::
 
-    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm" [--field seed|move|turn] [--tries 6] [--step S] [--rounds 1] [--samples 32] [--scale 0.25]
+    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm" [--field seed|move|turn|size|aim] [--tries 6] [--step S] [--rounds 1] [--samples 32] [--scale 0.25]
 
 writes the chosen values into scene.json.  Run it last: lighting and
 material fits change what the best garden is.
@@ -51,7 +57,6 @@ REFERENCE = os.path.join(SCENE, "Reference", "Nitia_clean.webp")
 BLUR = 1.0 / 60.0
 PIXEL_WEIGHT = 0.25
 STRIDE = 97
-STEPS = {"move": 0.2, "turn": 45.0}
 
 
 def display(path, size=None):
@@ -80,51 +85,141 @@ def gaussian(image, sigma):
     return blurred[pad:-pad, pad:-pad]
 
 
-class Field:
-    """One kind of free choice: ``get``/``set`` it on the Blender object,
-    list its ``candidates`` around a value, ``store`` it in the item."""
+class Seed:
+    """The object's geometry-nodes ``Seed``."""
+    step = 0.0
 
-    def __init__(self, kind, tries, step):
-        self.kind, self.tries, self.step = kind, tries, step
+    def __init__(self, tries, step):
+        self.tries = tries
+
+    @staticmethod
+    def modifier(obj):
+        return next(m for m in obj.modifiers if m.type == "NODES")
 
     def get(self, obj):
         from Core import scene as SC
-        if self.kind == "seed":
-            return SC.get_gn_input(next(m for m in obj.modifiers if m.type == "NODES"), "Seed")
-        if self.kind == "move":
-            return (obj.location.x, obj.location.y)
-        return math.degrees(obj.rotation_euler.z)
+        return SC.get_gn_input(self.modifier(obj), "Seed")
 
     def set(self, obj, value):
         from Core import scene as SC
-        if self.kind == "seed":
-            SC.set_gn_inputs(next(m for m in obj.modifiers if m.type == "NODES"), {"Seed": value})
-        elif self.kind == "move":
-            obj.location.x, obj.location.y = value
-        else:
-            obj.rotation_euler.z = math.radians(value)
-        obj.update_tag()
+        SC.set_gn_inputs(self.modifier(obj), {"Seed": value})
 
     def candidates(self, value):
-        if self.kind == "seed":
-            return [value + index * STRIDE for index in range(1, self.tries + 1)]
-        if self.kind == "move":
-            x, y = value
-            return [(x + dx, y + dy) for dx, dy in ((self.step, 0.0), (-self.step, 0.0), (0.0, self.step), (0.0, -self.step))]
-        return [(value + index * self.step) % 360.0 for index in range(1, self.tries + 1)]
+        return [value + index * STRIDE for index in range(1, self.tries + 1)]
 
     def store(self, item, value):
-        if self.kind == "seed":
-            item.setdefault("inputs", {})["Seed"] = value
-        elif self.kind == "move":
-            item["loc"] = [round(value[0], 3), round(value[1], 3)] + list(item.get("loc", [0.0, 0.0, 0.0]))[2:]
-        else:
-            rotation = list(item.get("rot", [0.0, 0.0, 0.0]))
-            rotation[2] = round(value, 1)
-            item["rot"] = rotation
+        item.setdefault("inputs", {})["Seed"] = value
 
     def show(self, value):
-        return "(%.3f, %.3f)" % value if self.kind == "move" else "%g" % value
+        return "%d" % value
+
+
+class Move:
+    """The object's position on the floor."""
+    step = 0.2
+
+    def __init__(self, tries, step):
+        self.distance = step
+
+    def get(self, obj):
+        return (obj.location.x, obj.location.y)
+
+    def set(self, obj, value):
+        obj.location.x, obj.location.y = value
+
+    def candidates(self, value):
+        x, y = value
+        return [(x + dx, y + dy) for dx, dy in ((self.distance, 0.0), (-self.distance, 0.0), (0.0, self.distance), (0.0, -self.distance))]
+
+    def store(self, item, value):
+        item["loc"] = [round(value[0], 3), round(value[1], 3)] + list(item.get("loc", [0.0, 0.0, 0.0]))[2:]
+
+    def show(self, value):
+        return "(%.3f, %.3f)" % value
+
+
+class Turn:
+    """The object's heading, degrees about Z."""
+    step = 45.0
+
+    def __init__(self, tries, step):
+        self.tries, self.angle = tries, step
+
+    def get(self, obj):
+        return math.degrees(obj.rotation_euler.z)
+
+    def set(self, obj, value):
+        obj.rotation_euler.z = math.radians(value)
+
+    def candidates(self, value):
+        return [(value + index * self.angle) % 360.0 for index in range(1, self.tries + 1)]
+
+    def store(self, item, value):
+        rotation = list(item.get("rot", [0.0, 0.0, 0.0]))
+        rotation[2] = round(value, 1)
+        item["rot"] = rotation
+
+    def show(self, value):
+        return "%g" % value
+
+
+class Size:
+    """The object's uniform scale."""
+    step = 0.1
+
+    def __init__(self, tries, step):
+        self.fraction = step
+
+    def get(self, obj):
+        return obj.scale.x
+
+    def set(self, obj, value):
+        obj.scale = (value, value, value)
+
+    def candidates(self, value):
+        return [value * (1.0 + self.fraction), value * (1.0 - self.fraction)]
+
+    def store(self, item, value):
+        item["scale"] = round(value, 3)
+
+    def show(self, value):
+        return "%.3f" % value
+
+
+class Aim:
+    """A lamp's direction (towards the light) as azimuth and elevation,
+    degrees."""
+    step = 2.0
+
+    def __init__(self, tries, step):
+        self.angle = step
+
+    def get(self, obj):
+        from mathutils import Vector
+        x, y, z = obj.rotation_euler.to_matrix() @ Vector((0.0, 0.0, 1.0))
+        return (math.degrees(math.atan2(y, x)), math.degrees(math.asin(max(-1.0, min(1.0, z)))))
+
+    @staticmethod
+    def vector(value):
+        azimuth, elevation = (math.radians(angle) for angle in value)
+        return (math.cos(elevation) * math.cos(azimuth), math.cos(elevation) * math.sin(azimuth), math.sin(elevation))
+
+    def set(self, obj, value):
+        from mathutils import Vector
+        obj.rotation_euler = (-Vector(self.vector(value))).to_track_quat("-Z", "Y").to_euler()
+
+    def candidates(self, value):
+        azimuth, elevation = value
+        return [(azimuth + self.angle, elevation), (azimuth - self.angle, elevation), (azimuth, elevation + self.angle), (azimuth, elevation - self.angle)]
+
+    def store(self, item, value):
+        item["direction"] = [round(component, 4) for component in self.vector(value)]
+
+    def show(self, value):
+        return "(azimuth %.1f, elevation %.1f)" % value
+
+
+FIELDS = {"seed": Seed, "move": Move, "turn": Turn, "size": Size, "aim": Aim}
 
 
 def main(argv):
@@ -136,7 +231,8 @@ def main(argv):
 
     names = [name.strip() for name in argv[0].split(",") if name.strip()]
     kind = option("--field", "seed", str)
-    field = Field(kind, option("--tries", 6, int), option("--step", STEPS.get(kind, 0.0), float))
+    field_class = FIELDS[kind]
+    field = field_class(option("--tries", 6, int), option("--step", field_class.step, float))
     rounds = option("--rounds", 1, int)
     samples = option("--samples", 32, int)
     scale = option("--scale", 0.25, float)
@@ -180,10 +276,10 @@ def main(argv):
             print("%-26s %s %s -> %s   blurred %.4f, pixel %.4f" % ((name, kind, field.show(start), field.show(keep)) + best[1:]), flush=True)
     with open(SCENE_JSON, encoding="utf-8") as handle:
         data = json.load(handle)
-    for group in data["collections"].values():
-        for item in group:
-            if item["name"] in chosen:
-                field.store(item, chosen[item["name"]])
+    items = [item for group in data["collections"].values() for item in group] + data.get("lights", [])
+    for item in items:
+        if item["name"] in chosen:
+            field.store(item, chosen[item["name"]])
     jsonio.dump(data, SCENE_JSON)
     print("%d %s choices written to %s" % (len(chosen), kind, SCENE_JSON))
 

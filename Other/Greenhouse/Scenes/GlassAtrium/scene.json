@@ -1013,7 +1013,8 @@
           "Arch": 0.5,
           "Color A": "leaf_emerald",
           "Color B": "leaf_light"
-        }
+        },
+        "scale": 1.1
       },
       {
         "name": "Painted Banana",
@@ -1054,7 +1055,8 @@
           "Color B": "leaf_light",
           "Seed": 429
         },
-        "rot": [0.0, 0.0, 270.0]
+        "rot": [0.0, 0.0, 270.0],
+        "scale": 1.1
       },
       {
         "name": "Painted Monstera",
@@ -1093,7 +1095,8 @@
           "Leaf Width": 0.32,
           "Seed": 47
         },
-        "rot": [0.0, 0.0, 180.0]
+        "rot": [0.0, 0.0, 180.0],
+        "scale": 1.1
       },
       {
         "name": "Shade Tree 1",
@@ -1313,7 +1316,8 @@
           "Leaflet Jitter": 12,
           "Sector Center": 60,
           "Sector Width": 200
-        }
+        },
+        "scale": 0.9
       },
       {
         "name": "Areca Palm Second Stem",
@@ -1750,7 +1754,7 @@
       "power": 12.988,
       "color": [1.0, 0.9, 0.45],
       "angle": 0.53,
-      "direction": [0.497, 0.287, 0.819]
+      "direction": [0.4919, 0.2956, 0.8189]
     }
   ],
   "views": {
