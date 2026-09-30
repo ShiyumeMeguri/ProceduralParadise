@@ -5,12 +5,17 @@ The garden floor is divided into 0.5 m cells.  For every cell the plant
 heights ``HEIGHTS`` above the soil are projected through the solved camera
 into the figure-free painting: a cell may carry plants as tall as the
 highest of those points that all land on painted foliage (saturated
-yellow-green to teal, in blobs wider than the glazing bars) or outside the
+yellow-green through the teal shade to its blue depths, in blobs wider
+than the glazing bars) or outside the
 frame; a point landing on the pale floor, on the pink haze or on the sky
-caps the height below it, and a point hidden behind glassware (its boxes
-come from the scene) caps it at ``GROUND``, low enough not to show.  Cells
-the camera cannot see at all are planted by design, except the stair, the
-path and the court beside the stair.
+caps the height below it.  A point hidden behind glassware (its boxes come
+from the scene) tells nothing: a cell seen only through glassware takes
+the class most of its seen neighbours within ``NEIGHBOURHOOD`` cells have.
+Cells the camera cannot see at all are planted by design.  The foot of
+the stair and the court along the north wall (the pale floor seen through
+the balustrade, where the painted canopy behind is the trees outside) are
+kept clear, and so is the floor under the garden furniture of the scene
+(``FURNITURE_MARGIN`` round it).
 
     python Other/Greenhouse/Scenes/GlassAtrium/calibration/planting_plan.py
 
@@ -47,9 +52,11 @@ GROUND = 0.9
 UNDERSTORY = 1.8
 CELL = 0.5
 EXTENT = (-12.3, 13.3, -5.8, 15.8)
-KEEP_CLEAR = [(-4.62, -3.12, 0.32, 8.0), (-2.2, -0.4, 4.5, 15.8), (-6.0, -2.2, 4.5, 10.5)]
-BLOB = 21
+KEEP_CLEAR = [(-4.62, -3.12, 0.32, 8.0), (-9.5, 2.5, 9.5, 15.8)]
+FURNITURE_MARGIN = 0.15
+BLOB = 15
 WINDOW = 6
+NEIGHBOURHOOD = 3
 
 
 class Pinhole:
@@ -76,7 +83,7 @@ def foliage_mask(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hue, saturation, value = (hsv[..., k].astype(int) for k in range(3))
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (BLOB, BLOB))
-    foliage = (hue >= 25) & (hue <= 85) & (saturation >= 70) & (value >= 60)
+    foliage = (hue >= 20) & (hue <= 100) & (saturation >= 55) & (value >= 40)
     return cv2.morphologyEx(foliage.astype(np.uint8), cv2.MORPH_OPEN, kernel) > 0
 
 
@@ -129,6 +136,7 @@ def main():
     nx, ny = int(round((x1 - x0) / CELL)), int(round((y1 - y0) / CELL))
     allowed = np.full((nx, ny), np.inf)
     seen = np.zeros((nx, ny), bool)
+    behind_glass = np.zeros((nx, ny), bool)
     for i in range(nx):
         for j in range(ny):
             cx, cy = x0 + (i + 0.5) * CELL, y0 + (j + 0.5) * CELL
@@ -138,17 +146,30 @@ def main():
                 if d <= 0 or not (0 <= u < width and 0 <= v < height):
                     continue
                 u, v = int(u), int(v)
-                seen[i, j] = True
                 if window_mean(hidden_integral, u, v) > 0.5:
-                    allowed[i, j] = min(allowed[i, j], GROUND)
+                    behind_glass[i, j] = True
                     continue
+                seen[i, j] = True
                 if window_mean(integral, u, v) < 0.5:
                     allowed[i, j] = min(allowed[i, j], h - 0.3)
                     break
+    for i, j in zip(*np.nonzero(behind_glass & ~seen)):
+        window = (slice(max(i - NEIGHBOURHOOD, 0), i + NEIGHBOURHOOD + 1), slice(max(j - NEIGHBOURHOOD, 0), j + NEIGHBOURHOOD + 1))
+        known = seen[window]
+        if known.any():
+            heights = allowed[window][known]
+            seen[i, j] = True
+            allowed[i, j] = np.median(np.where(np.isinf(heights), HEIGHTS[-1], heights))
     centres_x = x0 + (np.arange(nx) + 0.5) * CELL
     centres_y = y0 + (np.arange(ny) + 0.5) * CELL
     clear = np.zeros((nx, ny), bool)
-    for left, right, bottom, top in KEEP_CLEAR:
+    boxes = list(KEEP_CLEAR)
+    for item in scene["collections"]["Garden"]:
+        if item.get("asset", "").startswith("GH.Furniture."):
+            x, y, _ = item["loc"]
+            reach = item["inputs"]["Radius"] + FURNITURE_MARGIN
+            boxes.append((x - reach, x + reach, y - reach, y + reach))
+    for left, right, bottom, top in boxes:
         clear |= ((centres_x[:, None] >= left) & (centres_x[:, None] <= right) & (centres_y[None, :] >= bottom) & (centres_y[None, :] <= top))
     visible = seen & ~clear
     ground = visible & (allowed >= 0.3) & (allowed < GROUND)

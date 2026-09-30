@@ -7,10 +7,11 @@ once with every source in its own Cycles light group: each lamp, the sky
 it scatters in).  Any balance is then sum_g w_g * I_g with a weight per
 group -- and, for the glowing smog, per channel, so one solve finds both
 how bright and what colour it is (it is the pink seen through the walls).
-The sun and the sky keep their colours -- warm white sunlight, a daylight
-dome blue overhead -- and only their strengths are solved: free to take
-any colour, they would tint every surface and every reflection to imitate
-the painting's colours instead of leaving them to the materials.  The weights are fitted so that this sum, after the
+The sun and the sky keep their colours (pink-white sunlight, the hazy
+dome) and only their strengths are solved: free to take any colour, they
+would tint every surface and every reflection to imitate the painting's
+colours instead of leaving them to the materials.  (``linked`` groups
+share one strength, for a balance fixed by hand.)  The weights are fitted so that this sum, after the
 Standard view transform (sRGB encoding, clipping at white), reproduces the
 painting with the figure removed: a robust (Charbonnier) error on
 downsampled, blurred display values, optimised over log-weights with
@@ -115,10 +116,11 @@ def srgb(linear):
     return np.where(linear <= 0.0031308, linear * 12.92, 1.055 * np.power(np.maximum(linear, 1e-8), 1.0 / 2.4) - 0.055)
 
 
-def fit(images, reference, tinted, size=(217, 300), blur=1.5, prior=0.002, iterations=400, grid=(3, 4), contrast=0.5):
+def fit(images, reference, tinted, linked=(), size=(217, 300), blur=1.5, prior=0.002, iterations=400, grid=(3, 4), contrast=0.5):
     """{group: RGB weights} minimising the display-space error.  Groups in
     ``tinted`` get a weight per channel (their colour is free); the others
-    one weight for all three (only their strength is).
+    one weight for all three (only their strength is); the groups in
+    ``linked`` share one weight (their balance stays as the scene sets it).
 
     A pixelwise error alone favours flat light -- where leaves and shadows
     do not line up leaf for leaf, averaging them scores best -- so a second,
@@ -135,7 +137,12 @@ def fit(images, reference, tinted, size=(217, 300), blur=1.5, prior=0.002, itera
     stack = np.stack([prepare(images[name]) for name in names], 0)
     target = prepare(reference)
     columns = []
+    shared = [(names.index(name), channel) for name in linked for channel in range(3)]
+    if shared:
+        columns.append(shared)
     for index, name in enumerate(names):
+        if name in linked:
+            continue
         columns += [[(index, channel) for channel in range(3)]] if name not in tinted else [[(index, channel)] for channel in range(3)]
     expand = np.zeros((len(columns), len(names) * 3))
     for column, cells in enumerate(columns):

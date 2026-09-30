@@ -14,6 +14,7 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset
+from Core.render import INK_QUIET
 from . import materials as M
 
 
@@ -21,7 +22,10 @@ from . import materials as M
 def paving():
     """Stone flags: every face of the mesh is cut into flags of ``Flag
     Size`` with ``Joint`` gaps, each flag ``Thickness`` thick with its own
-    ``flag_shade``."""
+    ``flag_shade``, bedded on grout (the mesh itself, a little below the
+    flags' tops) that shows in the joints.  The flags' edges and the grout
+    are quiet for the ink pass: a joint is a change of shade, not a drawn
+    line."""
     graph = GN("GH.Garden.Paving", paving.__doc__)
     area = graph.inp("Geometry", "GEOMETRY")
     size = graph.inp("Flag Size", default=0.6, subtype="DISTANCE")
@@ -44,7 +48,10 @@ def paving():
     flags = graph.n("GeometryNodeScaleElements", Geometry=flags, Scale=1.0 - joint / size, props={"domain": "FACE"}).o
     flags = graph.store(flags, "flag_shade", graph.random(0.0, 1.0, seed), "FLOAT", "FACE")
     slabs = graph.extrude(flags, thickness, individual=True)
-    graph.result(graph.mat(graph.move(slabs, z=thickness * -1.0), material))
+    slabs = graph.store(slabs, INK_QUIET, graph.switch(graph.compare(graph.abs(graph.normal().z), 0.5, "LESS_THAN"), 0.0, 1.0, "FLOAT"), "FLOAT", "FACE")
+    grout = graph.store(graph.move(area, z=-0.003), "flag_shade", 0.35, "FLOAT", "FACE")
+    grout = graph.store(grout, INK_QUIET, 1.0, "FLOAT", "FACE")
+    graph.result(graph.mat(graph.join(graph.move(slabs, z=thickness * -1.0), grout), material))
     return graph
 
 
