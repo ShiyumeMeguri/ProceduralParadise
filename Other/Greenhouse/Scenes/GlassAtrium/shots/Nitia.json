@@ -17,7 +17,9 @@
     "look": null,
     "exposure": 0.0,
     "cycles": {
-      "max_bounces": 24,
+      "max_bounces": 64,
+      "glossy_bounces": 64,
+      "transmission_bounces": 64,
       "clamp_indirect": 8.0
     }
   },

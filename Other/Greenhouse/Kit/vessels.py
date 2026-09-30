@@ -78,16 +78,16 @@ def open_sphere(graph, radius, opening, segments=72, rings=36):
 def orb():
     """Hanging glass terrarium: a blown sphere of ``Radius`` with a round
     opening of ``Opening`` (its angular radius) cut on the side facing
-    ``Facing``, a bed of white pebbles filled to ``Fill`` of the height,
-    and above it the glass loop and the wire it hangs from.  The origin is
-    the top of the wire; the sphere's centre is ``Drop`` below it."""
+    ``Facing``, a bed of white pebbles filled to ``Fill`` of the height --
+    as many pebbles of ``Pebble Size`` as cover the bed -- and above it the
+    glass loop and the wire it hangs from.  The origin is the top of the
+    wire; the sphere's centre is ``Drop`` below it."""
     graph = GN("GH.Vessel.Orb", orb.__doc__)
     radius = graph.inp("Radius", default=0.16, subtype="DISTANCE")
     wall = graph.inp("Wall", default=0.003, subtype="DISTANCE")
     opening = graph.inp("Opening", default=math.radians(40.0), subtype="ANGLE")
     facing = graph.inp("Facing", "VECTOR", default=(0.0, -1.0, 0.35))
     fill = graph.inp("Fill", default=0.3, min=0.0, max=0.9)
-    pebble_count = graph.inp("Pebbles", "INT", default=220, min=0)
     pebble_size = graph.inp("Pebble Size", default=0.006, subtype="DISTANCE")
     drop = graph.inp("Drop", default=1.0, subtype="DISTANCE")
     loop = graph.inp("Loop Radius", default=0.014, subtype="DISTANCE")
@@ -102,10 +102,9 @@ def orb():
 
     level = radius * (fill * 2.0 - 1.0)
     bed_radius = graph.math("SQRT", graph.max(radius * radius - level * level, 0.0)) - wall * 1.5
-    bed = graph.n("GeometryNodeMeshUVSphere", Segments=48, Rings=24, Radius=radius - wall * 1.2)["Mesh"]
-    _, _, bed_z = graph.sep(graph.position())
-    bed = graph.set_pos(bed, pos=graph.vec(graph.position().x, graph.position().y, graph.min(bed_z, level)))
-    bed = graph.mat(graph.store(graph.merge(bed, 0.0005), INK_QUIET, 1.0, "FLOAT", "FACE"), M.get("GH.Pebble"))
+    bed = cut_below(graph, sphere(graph, radius - wall * 1.2, 48, 24), level, radius * -2.0)
+    bed = graph.mat(graph.store(bed, INK_QUIET, 1.0, "FLOAT", "FACE"), M.get("GH.Pebble"))
+    pebble_count = graph.to_int(graph.math("POWER", bed_radius / graph.max(pebble_size * 0.8, 0.0001), 2.0), "CEILING")
     stones = pebbles(graph, pebble_count, bed_radius * 0.96, pebble_size, level, seed, dome=radius * 0.04)
 
     ring = graph.n("GeometryNodeCurvePrimitiveCircle", Resolution=24, Radius=loop).o

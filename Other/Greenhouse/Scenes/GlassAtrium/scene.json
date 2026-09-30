@@ -29,7 +29,7 @@
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.0019,
+    "smog_brightness": 1.0043,
     "leaf_sheen": 0.12,
     "air_density": 0.002,
     "air_anisotropy": 0.6,
@@ -38,8 +38,8 @@
     "water_turbidity": 0.0
   },
   "sky": {
-    "camera_strength": 3.0135,
-    "light_strength": 3.0135,
+    "camera_strength": 2.9457,
+    "light_strength": 2.9457,
     "haze_top": -0.1,
     "zenith_height": 0.7,
     "sun_ratio": 0.26
@@ -1743,7 +1743,7 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 11.5902,
+      "power": 11.3296,
       "color": [1.0, 0.9, 0.45],
       "angle": 0.53,
       "direction": [0.497, 0.287, 0.819]

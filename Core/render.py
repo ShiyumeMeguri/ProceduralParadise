@@ -33,7 +33,13 @@ _PNG_END = b"\x00\x00\x00\x00IEND\xaeB`\x82"
 
 
 def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_indirect=10.0,
-                 caustics=False, adaptive_threshold=0.02, light_tree=True):
+                 caustics=False, adaptive_threshold=0.02, light_tree=True, diffuse_bounces=4, glossy_bounces=4,
+                 transmission_bounces=8):
+    """Cycles with per-kind bounce limits.  Light carried inside thin glass
+    -- a blown shell, a pane's edge -- travels by total internal reflection,
+    and Cycles counts every such reflection as a glossy bounce: glass-heavy
+    shots need ``glossy_bounces`` and ``transmission_bounces`` in the tens,
+    or the paths are cut off and the glass edges render black."""
     sc = bpy.context.scene
     sc.render.engine = "CYCLES"
     cy = sc.cycles
@@ -47,9 +53,9 @@ def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_i
     except TypeError:
         pass
     cy.max_bounces = max_bounces
-    cy.diffuse_bounces = 4
-    cy.glossy_bounces = 4
-    cy.transmission_bounces = 8
+    cy.diffuse_bounces = diffuse_bounces
+    cy.glossy_bounces = glossy_bounces
+    cy.transmission_bounces = transmission_bounces
     cy.transparent_max_bounces = 16
     cy.sample_clamp_indirect = clamp_indirect
     cy.caustics_reflective = caustics
