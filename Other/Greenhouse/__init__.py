@@ -8,7 +8,8 @@ Kit      geometry-node assets: the steel-and-glass structure, furniture,
 Scenes   scene definitions (one folder per space) assembled from the kit
 
 ``GREENHOUSE`` is the design system loaded from ``Greenhouse.json``: the
-palette and the plant presets every scene of the family shares.
+palette, the glasses and the plant presets every scene of the family
+shares.
 """
 import os
 
@@ -19,4 +20,5 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 GREENHOUSE = jsonio.load(os.path.join(HERE, "Greenhouse.json"))
 
 PALETTE = {key: tuple(value) for key, value in GREENHOUSE["palette"].items()}
+GLASSES = GREENHOUSE["glasses"]
 PLANTS = GREENHOUSE["plants"]

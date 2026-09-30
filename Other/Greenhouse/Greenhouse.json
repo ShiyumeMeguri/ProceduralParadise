@@ -36,11 +36,64 @@
     "screen": [0.86, 0.9, 0.88],
     "bottle_glass": [0.2, 0.81, 0.3],
     "air": [1.0, 0.95, 0.85],
-    "water_tint": [0.35, 0.9, 0.55],
+    "water_tint": [0.2, 0.8, 0.65],
     "milk": [0.5, 0.7, 0.68],
     "bronze": [0.12, 0.1, 0.08],
-    "jade_stone": [0.15, 0.45, 0.4],
-    "leaf_emerald": [0.14, 0.62, 0.3]
+    "leaf_emerald": [0.14, 0.62, 0.3],
+    "jade_glass": [0.12, 0.69, 0.6]
+  },
+  "glasses": {
+    "GH.Glass": {
+      "notes": "Soda-lime float glass of the architecture -- floor panes, balustrade infill, curtain walls, roof: uncoated, so every pane mirrors the room at grazing angles; the iron in it turns every long path through the glass, the pane edges above all, the deep green of jade.",
+      "ior": 1.52,
+      "tint": "jade",
+      "density": 4.0,
+      "wall": 0.02
+    },
+    "GH.GlassReflective": {
+      "notes": "Reflective-coated guard glass of the balustrades: a metal-oxide coating reflects like a dielectric of ior 2.0, a tenth of the light off each face, so every guard doubles the room in faint mirror images over what is seen through it.",
+      "ior": 2.0,
+      "tint": "jade",
+      "density": 4.0,
+      "wall": 0.02
+    },
+    "GH.Jade": {
+      "notes": "Cast jade glass of the frame -- the beams, posts, mullions and rails, the table columns: glass tinted deep jade, so a bar is the room behind it seen green, dark along its edges and bright where it catches the light.",
+      "ior": 1.56,
+      "tint": "jade_glass",
+      "density": 60.0,
+      "wall": 0.02
+    },
+    "GH.GlassJade": {
+      "notes": "Jade crystal of the glassware and the glass furniture: lead crystal tinted jade, whose fire splits white light at every edge.",
+      "ior": 1.6,
+      "abbe": 35.0,
+      "tint": "jade",
+      "density": 120.0,
+      "wall": 0.012
+    },
+    "GH.GlassClear": {
+      "notes": "Thin jade crystal of the hanging orbs, the glass ball and the glass block: clear face on, jade along the rims.",
+      "ior": 1.6,
+      "abbe": 35.0,
+      "tint": "jade",
+      "density": 12.0,
+      "wall": 0.003
+    },
+    "GH.GlassBottle": {
+      "notes": "Green bottle glass of the tall bottle.",
+      "ior": 1.52,
+      "tint": "bottle_glass",
+      "density": 60.0,
+      "wall": 0.012
+    },
+    "GH.Water": {
+      "notes": "Water of the flask.",
+      "ior": 1.333,
+      "tint": "water_tint",
+      "density": 16.0,
+      "wall": 0.2
+    }
   },
   "plants": {
     "areca": {

@@ -23,23 +23,18 @@
     "City extent: the city ground and the haze reach 6 km out: the top row of the frame looks 6 degrees down, so its sight line meets the ground 1.2 km away -- inside the haze, where the ground has no edge to show."
   ],
   "materials": {
-    "glassware_density": 57.0,
-    "pane_density": 4.0,
     "leaf_translucency": 0.35,
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.1112,
+    "smog_brightness": 1.1536,
     "leaf_sheen": 0.12,
     "air_density": 0.01,
-    "air_anisotropy": 0.0,
-    "bottle_density": 60.0,
-    "water_density": 4.0,
-    "water_turbidity": 0.0
+    "air_anisotropy": 0.0
   },
   "sky": {
-    "camera_strength": 3.3769,
-    "light_strength": 3.3769,
+    "camera_strength": 3.108,
+    "light_strength": 3.108,
     "haze_top": -0.1,
     "zenith_height": 0.7,
     "sun_ratio": 0.26
@@ -441,7 +436,7 @@
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
-          "Thickness": 0.02,
+          "Thickness": 0.04,
           "Margin": 0.004
         }
       },
@@ -461,7 +456,9 @@
           "Rail Size": 0.028,
           "Top Rail Width": 0.034,
           "Top Rail Depth": 0.03,
-          "Glass Top": 0.9
+          "Glass Top": 0.9,
+          "Glass Thickness": 0.0215,
+          "Glass Material": "GH.GlassReflective"
         }
       },
       {
@@ -500,7 +497,9 @@
           "Rail Size": 0.028,
           "Top Rail Width": 0.034,
           "Top Rail Depth": 0.03,
-          "Glass Top": 0.9
+          "Glass Top": 0.9,
+          "Glass Thickness": 0.0215,
+          "Glass Material": "GH.GlassReflective"
         }
       },
       {
@@ -532,7 +531,8 @@
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
-          "Offset": -0.006
+          "Offset": -0.006,
+          "Material": "GH.GlassReflective"
         }
       },
       {
@@ -785,7 +785,8 @@
           "Rails": 0,
           "Top Rail Width": 0.022,
           "Top Rail Depth": 0.022,
-          "Post Size": 0.016
+          "Post Size": 0.016,
+          "Glass Material": "GH.GlassReflective"
         }
       },
       {
@@ -800,7 +801,8 @@
           "Rails": 0,
           "Top Rail Width": 0.022,
           "Top Rail Depth": 0.022,
-          "Post Size": 0.016
+          "Post Size": 0.016,
+          "Glass Material": "GH.GlassReflective"
         }
       },
       {
@@ -815,7 +817,8 @@
           "Rails": 0,
           "Top Rail Width": 0.022,
           "Top Rail Depth": 0.022,
-          "Post Size": 0.016
+          "Post Size": 0.016,
+          "Glass Material": "GH.GlassReflective"
         }
       },
       {
@@ -830,7 +833,8 @@
           "Rails": 0,
           "Top Rail Width": 0.022,
           "Top Rail Depth": 0.022,
-          "Post Size": 0.016
+          "Post Size": 0.016,
+          "Glass Material": "GH.GlassReflective"
         }
       }
     ],
@@ -1751,7 +1755,7 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 12.988,
+      "power": 11.9538,
       "color": [1.0, 0.9, 0.45],
       "angle": 0.53,
       "direction": [0.4919, 0.2956, 0.8189]

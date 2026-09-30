@@ -1,15 +1,17 @@
 """
 Greenhouse material library (``GH.*``), made for Cycles.
 
-All glass is one dielectric (IOR 1.5) with Beer-Lambert absorption inside
-towards ``jade`` (a Volume Absorption shader): seen face on, a pane or a
-bottle wall is nearly clear; seen through its edge, where light crosses
+Every glass -- the panes, the jade glass of the frame, the crystal of the
+glassware, the water in the flask -- is one row of the design system's
+``glasses`` (``Greenhouse.json``) built by one builder (:func:`dielectric`):
+a smooth dielectric of its ``ior`` that splits white light by its ``abbe``
+number (Cycles' dispersion) where it has one, filled with Beer-Lambert
+absorption towards a palette ``tint``.  Seen face on, a thin wall is nearly
+clear; along an edge or through a rod, where light crosses centimetres to
 decimetres of glass, it turns the deep blue-green of jade -- the colour the
-painting gives every glass edge.  Near the camera the floor is transparent,
-far off it mirrors the windows, because that is what Fresnel reflection of
-IOR 1.5 does at grazing angles.  Shadow rays see tinted transparency, so
-sunlight reaches the garden under the glass floor instead of being lost to
-caustics.
+painting gives every glass edge and every bar of the frame.  Shadow rays
+see tinted transparency, so sunlight reaches the garden under the glass
+floor instead of being lost to caustics.
 
 Organic surfaces read colours the kit stores on the geometry:
 ``leaf_color`` (per leaf), ``leaf_u`` (0 at the base, 1 at the tip) and
@@ -30,7 +32,7 @@ import bpy
 from Core import shaders as S
 from Core.nodes import Sock, Tree
 from Core.render import INK_SKIP
-from .. import PALETTE
+from .. import GLASSES, PALETTE
 
 LIBRARY = S.MaterialLibrary(PALETTE, "greenhouse_built")
 PARAMS = LIBRARY.params
@@ -89,85 +91,44 @@ def steel():
     return S.material("GH.Steel", build)
 
 
-FRESNEL_LOSS = 0.96
+def surface_transmittance(ior):
+    """Share of the light a surface of a dielectric of ``ior`` lets through
+    face on: one less the Fresnel reflectance ((n - 1) / (n + 1))^2."""
+    return 1.0 - ((ior - 1.0) / (ior + 1.0)) ** 2
 
 
-def dielectric(tree: Tree, density_key, density, wall, ior=1.5):
-    """Surface and volume of jade glass: a dielectric of ``ior`` filled with
-    absorption towards ``jade`` at ``density_key``.  A ray carrying light
-    crosses a surface and half a ``wall`` of glass per surface it meets, so
-    it is tinted by the Fresnel loss and the Beer-Lambert transmittance of
-    half a wall -- the light a pane really lets through."""
-    density = param(density_key, density)
-    surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=ior)["BSDF"]
-    volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("jade"), Density=density)["Volume"]
-    half_wall = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * wall * 0.5) for channel in color("jade")[:3])
-    return {"Surface": light_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
+def dielectric(name, spec):
+    """Builder of the glass ``name`` (a row ``spec`` of ``GLASSES``): a
+    smooth dielectric of ``ior`` -- dispersing by its ``abbe`` number where
+    the row gives one -- filled with absorption towards the palette colour
+    ``tint`` at ``density`` per metre and, with a ``scatter`` density, a
+    haze that lights the glass from within.  A ray carrying light crosses a
+    surface and half a ``wall`` of glass per surface it meets, so it is
+    tinted by the surface's Fresnel loss and the transmittance of half a
+    wall -- the light the glass really lets through.  A scene overrides a
+    field as ``"<name>.<field>"``."""
+    def field(key, default=None):
+        return param(f"{name}.{key}", spec.get(key, default))
 
-
-@register("GH.Glass")
-def glass():
-    """Architectural glass: floor panes, stair treads, balustrade infill,
-    curtain wall and roof (``pane_density``).  The panes are anti-reflection
-    coated: the coating's reflectance curve -- about 1 % face on, rising to
-    a mirror at grazing angles -- is that of an uncoated dielectric of
-    ``pane_ior`` (1.22), so the garden seen down through the floor is not
-    veiled by the bright conservatory it mirrors, and the floor turns pale
-    only far off, where it mirrors the pink walls."""
     def build(tree: Tree):
-        return dielectric(tree, "pane_density", 10.0, 0.02, param("pane_ior", 1.22))
-    return S.material("GH.Glass", build)
-
-
-@register("GH.Jade")
-def jade():
-    """Polished jade of the frame -- beams, posts, mullions, rails, table
-    columns: a translucent stone (light scatters a few millimetres into it
-    and comes back ``jade_stone``) under a clear polish, so a bar is a dark
-    green body with a bright edge where it catches the light."""
-    def build(tree: Tree):
-        return S.bsdf(tree, Base_Color=color("jade_stone"), Roughness=0.35, Subsurface_Weight=0.4,
-                      Subsurface_Radius=(0.05, 0.15, 0.12), Coat_Weight=1.0, Coat_Roughness=0.04)["BSDF"]
-    return S.material("GH.Jade", build)
-
-
-@register("GH.GlassJade")
-def glass_jade():
-    """Thick jade glass of the glassware and glass furniture
-    (``glassware_density``): pale where a wall is crossed face on, deep
-    blue-green along edges and in solid rods."""
-    def build(tree: Tree):
-        return dielectric(tree, "glassware_density", 60.0, 0.012)
-    return S.material("GH.GlassJade", build)
-
-
-@register("GH.GlassBottle")
-def glass_bottle():
-    """Green bottle glass of the tall bottle and the flask: absorbs red and
-    blue (``bottle_glass``, ``bottle_density``)."""
-    def build(tree: Tree):
-        density = param("bottle_density", 30.0)
-        surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.5)["BSDF"]
-        volume = tree.n("ShaderNodeVolumeAbsorption", Color=color("bottle_glass"), Density=density)["Volume"]
-        half_wall = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * 0.006) for channel in color("bottle_glass")[:3])
+        ior, density, tint = field("ior"), field("density"), color(field("tint"))
+        abbe = field("abbe")
+        dispersion = {"Transmission_Dispersion_Scale": 1.0, "Transmission_Dispersion_Abbe_Number": abbe} if abbe else {}
+        surface = S.bsdf(tree, Base_Color=(1.0, 1.0, 1.0, 1.0), Roughness=field("roughness", 0.0), IOR=ior,
+                         Transmission_Weight=1.0, **dispersion)["BSDF"]
+        volume = tree.n("ShaderNodeVolumeAbsorption", Color=tint, Density=density)["Volume"]
+        scatter = field("scatter", 0.0)
+        if scatter:
+            haze = tree.n("ShaderNodeVolumeScatter", Color=tint, Density=scatter, Anisotropy=field("anisotropy", 0.0))["Volume"]
+            volume = tree.n("ShaderNodeAddShader", volume, haze)["Shader"]
+        loss = surface_transmittance(ior)
+        half_wall = tuple(loss * math.exp(-(1.0 - channel) * density * field("wall") * 0.5) for channel in tint[:3])
         return {"Surface": light_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
-    return S.material("GH.GlassBottle", build)
+    return lambda: S.material(name, build)
 
 
-@register("GH.Water")
-def water():
-    """Water: an IOR 1.333 dielectric absorbing towards ``water_tint``
-    (``water_density``), faintly turbid (``water_turbidity``): the sunlight
-    it scatters lights the whole body of water teal."""
-    def build(tree: Tree):
-        density = param("water_density", 8.0)
-        surface = tree.n("ShaderNodeBsdfGlass", Color=(1.0, 1.0, 1.0, 1.0), Roughness=0.0, IOR=1.333)["BSDF"]
-        absorption = tree.n("ShaderNodeVolumeAbsorption", Color=color("water_tint"), Density=density)["Volume"]
-        scatter = tree.n("ShaderNodeVolumeScatter", Color=color("water_tint"), Density=param("water_turbidity", 2.0), Anisotropy=0.3)["Volume"]
-        volume = tree.n("ShaderNodeAddShader", absorption, scatter)["Shader"]
-        half = tuple(FRESNEL_LOSS * math.exp(-(1.0 - channel) * density * 0.1) for channel in color("water_tint")[:3])
-        return {"Surface": light_clear(tree, surface, (*half, 1.0)), "Volume": volume}
-    return S.material("GH.Water", build)
+for glass_name, glass_spec in GLASSES.items():
+    register(glass_name)(dielectric(glass_name, glass_spec))
 
 
 @register("GH.MilkGlass")
@@ -179,14 +140,6 @@ def milk_glass():
                       Subsurface_Weight=0.4, Subsurface_Radius=(0.05, 0.05, 0.05), Coat_Weight=0.5, Coat_Roughness=0.05)["BSDF"]
     return S.material("GH.MilkGlass", build)
 
-
-@register("GH.GlassClear")
-def glass_clear():
-    """Thin clear glassware -- terrarium orbs, the flask, the ball
-    (``clear_glass_density``)."""
-    def build(tree: Tree):
-        return dielectric(tree, "clear_glass_density", 3.0, 0.003)
-    return S.material("GH.GlassClear", build)
 
 
 @register("GH.Tread")
