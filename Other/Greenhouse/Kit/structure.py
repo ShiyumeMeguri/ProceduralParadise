@@ -37,15 +37,16 @@ def members():
     """Every edge of the mesh becomes a bar centred on it: a box ``Width``
     by ``Depth`` (``Round``: a tube of diameter ``Width``) running the edge's
     length plus ``Overrun`` at each end, so members meet without gaps.
-    ``See Through`` marks the bars as glass for the ink pass."""
+    ``See Through`` marks the bars as glass for the ink pass (for bars of a
+    glass ``Material``)."""
     graph = GN("GH.Structure.Members", members.__doc__)
     mesh = graph.inp("Geometry", "GEOMETRY")
     width = graph.inp("Width", default=0.06, min=0.0, subtype="DISTANCE")
     depth = graph.inp("Depth", default=0.06, min=0.0, subtype="DISTANCE")
     overrun = graph.inp("Overrun", default=0.0, subtype="DISTANCE")
     rounded = graph.inp("Round", "BOOL", default=False)
-    material = graph.inp("Material", "MATERIAL", default=M.get("GH.GlassJade"))
-    see_through = graph.inp("See Through", "BOOL", default=True)
+    material = graph.inp("Material", "MATERIAL", default=M.get("GH.Jade"))
+    see_through = graph.inp("See Through", "BOOL", default=False)
 
     ends = graph.n("GeometryNodeInputMeshEdgeVertices")
     mesh, fields = graph.capture(mesh, "EDGE", span=ends["Position 2"] - ends["Position 1"])
@@ -107,7 +108,7 @@ def balustrade():
     rail_size = graph.inp("Rail Size", default=0.012, subtype="DISTANCE")
     glass_on = graph.inp("Glass", "BOOL", default=True)
     glass_top = graph.inp("Glass Top", default=0.95, subtype="DISTANCE")
-    frame_material = graph.inp("Material", "MATERIAL", default=M.get("GH.GlassJade"))
+    frame_material = graph.inp("Material", "MATERIAL", default=M.get("GH.Jade"))
     glass_material = graph.inp("Glass Material", "MATERIAL", default=M.get("GH.Glass"))
 
     curve = graph.n("GeometryNodeMeshToCurve", path).o
@@ -132,7 +133,7 @@ def balustrade():
     set_mode(extrude, "EDGES")
     wall = graph.set_pos(extrude["Mesh"], offset=graph.vec(0.0, 0.0, 0.03))
     glass_panel = graph.switch(glass_on, None, graph.group(get_asset("GH.Structure.Panes"), Geometry=wall, Thickness=0.012, Offset=-0.006, Material=glass_material).o)
-    frame = M.glazed(graph, graph.realize(graph.join(posts, top, rail_mesh)), frame_material)
+    frame = graph.mat(graph.realize(graph.join(posts, top, rail_mesh)), frame_material)
     graph.result(graph.join(frame, glass_panel))
     return graph
 

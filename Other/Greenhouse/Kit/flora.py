@@ -32,6 +32,7 @@ from . import materials as M
 TAU = math.tau
 GOLDEN_ANGLE = math.pi * (3.0 - math.sqrt(5.0))
 UP = (0.0, 0.0, 1.0)
+FROND_VARIANTS = 3
 
 
 def blade(graph, length, width, cup, curl, fullness, taper, resolution=(5, 10)):
@@ -76,7 +77,9 @@ def pinnate():
     """Fronds of paired leaflets on arching rachises around a crown.  A frond
     rises at its elevation, arches (``Arch``) and droops towards the tip
     (``Droop``); leaflets leave the rachis at ``Leaflet Angle``, hang by
-    ``Leaflet Droop`` and are longest at mid-frond.  ``Stem`` lifts the
+    ``Leaflet Droop`` -- each leaflet off both by up to ``Leaflet Jitter``
+    -- and are longest at mid-frond.  Every frond is one of
+    ``FROND_VARIANTS`` frond shapes, picked at random.  ``Stem`` lifts the
     crown on a trunk (palms)."""
     graph = GN("GH.Flora.Pinnate", pinnate.__doc__)
     fronds = graph.inp("Fronds", "INT", default=14, min=1, max=200)
@@ -92,6 +95,7 @@ def pinnate():
     leaflet_width = graph.inp("Leaflet Width", default=0.03, subtype="DISTANCE")
     leaflet_angle = graph.inp("Leaflet Angle", default=math.radians(45.0), subtype="ANGLE")
     leaflet_droop = graph.inp("Leaflet Droop", default=math.radians(20.0), subtype="ANGLE")
+    leaflet_jitter = graph.inp("Leaflet Jitter", default=0.0, subtype="ANGLE")
     leaflet_curl = graph.inp("Leaflet Curl", default=0.15)
     leaflet_cup = graph.inp("Leaflet Cup", default=0.3)
     stem = graph.inp("Stem", default=0.0, subtype="DISTANCE")
@@ -102,34 +106,39 @@ def pinnate():
     leaf_material = graph.inp("Material", "MATERIAL", default=M.get("GH.Leaf"))
     stem_material = graph.inp("Stem Material", "MATERIAL", default=M.get("GH.Bark"))
 
-    steps = leaflets
-    line = graph.mesh_line(steps, (0.0, 0.0, 0.0), (1.0, 0.0, 0.0))
-    t = bare + (1.0 - bare) * graph.index() / graph.max(steps - 1, 1)
-    along = graph.vec(t, 0.0, arch * t - droop * t * t)
-    tangent = graph.vec(1.0, 0.0, arch - droop * 2.0 * t).normalized()
-    spine = graph.set_pos(line, pos=along)
-    spine, captured = graph.capture(spine, "POINT", tangent=tangent, t=t)
-    size = graph.math("POWER", graph.max(graph.sin(captured["t"] * math.pi), 0.05), 0.6)
     leaf = blade(graph, 1.0, 1.0, leaflet_cup, leaflet_curl, 0.8, 0.9, (3, 8))
 
-    def side(sign):
-        outward = graph.vec(0.0, sign, 0.0)
-        heading = graph.vec(0.0, 0.0, -1.0) * graph.sin(leaflet_droop) + (
-            captured["tangent"] * graph.cos(leaflet_angle) + outward * graph.sin(leaflet_angle)) * graph.cos(leaflet_droop)
-        rotation = graph.align_rotation(captured["tangent"] * -sign, rotation=graph.align_rotation(heading, axis="Z"), axis="X", pivot="Z")
-        scale = graph.vec(leaflet_width, leaflet_width, leaflet_length) * (size * graph.random(0.85, 1.1, seed + 7) / graph.max(length, 0.001))
-        return graph.iop(spine, leaf, rot=rotation, scale=scale)
+    def frond(variant):
+        line = graph.mesh_line(leaflets, (0.0, 0.0, 0.0), (1.0, 0.0, 0.0))
+        t = bare + (1.0 - bare) * graph.index() / graph.max(leaflets - 1, 1)
+        along = graph.vec(t, 0.0, arch * t - droop * t * t)
+        tangent = graph.vec(1.0, 0.0, arch - droop * 2.0 * t).normalized()
+        spine = graph.set_pos(line, pos=along)
+        spine, captured = graph.capture(spine, "POINT", tangent=tangent, t=t)
+        size = graph.math("POWER", graph.max(graph.sin(captured["t"] * math.pi), 0.05), 0.6)
 
-    frond = graph.realize(graph.join(side(1.0), side(-1.0)))
-    rachis_curve = graph.n("GeometryNodeMeshToCurve", spine).o
-    rachis = graph.sweep(rachis_curve, graph.circle(0.007 / graph.max(length, 0.001), 6), True)
-    rachis = graph.store(rachis, "leaf_u", 0.0)
-    frond = graph.join(frond, rachis)
+        def side(sign, side_seed):
+            outward = graph.vec(0.0, sign, 0.0)
+            angle = leaflet_angle + graph.random(-1.0, 1.0, side_seed) * leaflet_jitter
+            hang = leaflet_droop + graph.random(-1.0, 1.0, side_seed + 1) * leaflet_jitter
+            heading = graph.vec(0.0, 0.0, -1.0) * graph.sin(hang) + (
+                captured["tangent"] * graph.cos(angle) + outward * graph.sin(angle)) * graph.cos(hang)
+            rotation = graph.align_rotation(captured["tangent"] * -sign, rotation=graph.align_rotation(heading, axis="Z"), axis="X", pivot="Z")
+            scale = graph.vec(leaflet_width, leaflet_width, leaflet_length) * (size * graph.random(0.85, 1.1, side_seed + 2) / graph.max(length, 0.001))
+            return graph.iop(spine, leaf, rot=rotation, scale=scale)
 
+        variant_seed = seed + 7 + variant * 10
+        leaves = graph.realize(graph.join(side(1.0, variant_seed), side(-1.0, variant_seed + 5)))
+        rachis_curve = graph.n("GeometryNodeMeshToCurve", spine).o
+        rachis = graph.sweep(rachis_curve, graph.circle(0.007 / graph.max(length, 0.001), 6), True)
+        return graph.join(leaves, graph.store(rachis, "leaf_u", 0.0))
+
+    shapes = graph.join(*[graph.iop(graph.points(1, (0.0, 0.0, 0.0)), frond(variant)) for variant in range(FROND_VARIANTS)])
     points, azimuth, elevation = crown_points(graph, fronds, spread_low, spread_high, seed)
     points = graph.set_pos(points, offset=graph.vec(0.0, 0.0, stem))
     scale = length * graph.random(1.0 - length_jitter, 1.0, seed + 3)
-    crown = graph.iop(points, frond, rot=graph.vec(0.0, elevation * -1.0, azimuth), scale=scale)
+    shape_index = graph.random(0, FROND_VARIANTS - 1, seed + 4, dtype="INT")
+    crown = graph.iop(points, shapes, rot=graph.vec(0.0, elevation * -1.0, azimuth), scale=scale, pick=True, index=shape_index)
     crown = leaf_colors(graph, crown, first, second, seed + 5)
     plant = graph.mat(graph.realize(crown), leaf_material)
     trunk = graph.mat(graph.smooth(graph.cylinder(stem_radius, stem, 12)), stem_material)

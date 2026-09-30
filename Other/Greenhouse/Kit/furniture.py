@@ -24,7 +24,7 @@ def pedestal_table():
     column_radius = graph.inp("Column Radius", default=0.012, subtype="DISTANCE")
     foot_radius = graph.inp("Foot Radius", default=0.18, subtype="DISTANCE")
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassJade"))
-    metal = graph.inp("Metal", "MATERIAL", default=M.get("GH.GlassJade"))
+    metal = graph.inp("Metal", "MATERIAL", default=M.get("GH.Jade"))
 
     top = graph.cylinder(radius, top_thickness, 96)
     top = graph.smooth_by_angle(graph.move(top, z=height - top_thickness * 0.5), 0.8)

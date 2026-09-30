@@ -10,9 +10,14 @@ smog's pink: free, they would tint every surface and every reflection to
 imitate the painting's colours instead of leaving them to the materials.
 The strengths are fitted so that this sum, after the Standard view
 transform (sRGB encoding, clipping at white), reproduces the painting with
-the figure removed: a robust (Charbonnier) error on downsampled, blurred
-display values, optimised over log-strengths with L-BFGS, a weak prior
-keeping every strength near 1.
+the figure removed.  Leaves, flags and shadows cannot line up with the
+painted ones stroke for stroke, and where they do not, a pixelwise error
+is least for flat light -- so the fit also matches the spread of CIELAB
+colours (``QUANTILES``) in each horizontal band (``BANDS``): the band's
+darks, mid-tones and highlights and their hues, next to the error on
+blurred display values that keeps the layout of light and dark.  Powell's
+method from several starts (every strength 1, and each group in turn
+brighter) finds the lowest of the objective's valleys.
 
 Two steps, because Blender's Python has no SciPy::
 
@@ -42,6 +47,9 @@ SCENE_JSON = os.path.join(SCENE, "scene.json")
 REFERENCE = os.path.join(SCENE, "Reference", "Nitia_clean.webp")
 SKY = "sky"
 EMISSIVE = {"GH.Smog": "smog_brightness"}
+BANDS = (0.0, 0.2, 0.4, 0.7, 1.0)
+QUANTILES = np.linspace(5.0, 95.0, 10)
+LAB_RANGE = np.array([100.0, 60.0, 60.0])
 
 
 def emissive_material(obj):
@@ -111,62 +119,50 @@ def srgb(linear):
     return np.where(linear <= 0.0031308, linear * 12.92, 1.055 * np.power(np.maximum(linear, 1e-8), 1.0 / 2.4) - 0.055)
 
 
-def fit(images, reference, size=(217, 300), blur=1.5, prior=0.002, iterations=400, grid=(3, 4), contrast=0.5):
-    """{group: strength} minimising the display-space error.
+def band_quantiles(display):
+    """CIELAB ``QUANTILES`` of every horizontal band of a display image."""
+    import cv2
+    lab = cv2.cvtColor(display.astype(np.float32), cv2.COLOR_RGB2Lab)
+    height = display.shape[0]
+    return np.stack([np.percentile(lab[int(top * height):int(bottom * height)].reshape(-1, 3), QUANTILES, axis=0)
+                     for top, bottom in zip(BANDS[:-1], BANDS[1:])])
 
-    A pixelwise error alone favours flat light -- where leaves and shadows
-    do not line up leaf for leaf, averaging them scores best -- so a second,
-    derivative-free stage adds ``contrast`` times the mismatch of each
-    ``grid`` region's 5th, 50th and 95th luminance percentile: the light
-    must also give every region the painting's darks and highlights."""
+
+def fit(images, reference, blur_fraction=1.0 / 60.0, prior=0.002, iterations=3000, lift=2.0):
+    """{group: strength} minimising the band-quantile distance plus the
+    error on display values blurred by ``blur_fraction`` of the width."""
     import cv2
     from scipy.optimize import minimize
 
-    def prepare(image):
-        return cv2.GaussianBlur(cv2.resize(image.astype(np.float32), size, interpolation=cv2.INTER_AREA), (0, 0), blur)
-
     names = sorted(images)
-    stack = np.stack([prepare(images[name]) for name in names], 0)
-    target = prepare(reference)
+    height, width = reference.shape[:2]
+    size = (width // 2, height // 2)
+    stack = np.stack([cv2.resize(images[name].astype(np.float32), size, interpolation=cv2.INTER_AREA) for name in names], 0)
+    target_display = cv2.resize(reference.astype(np.float32), size, interpolation=cv2.INTER_AREA)
+    sigma = size[0] * blur_fraction
+    target_blurred = cv2.GaussianBlur(target_display, (0, 0), sigma)
+    target_bands = band_quantiles(target_display)
+
+    def display(log_weights):
+        light = np.maximum(np.einsum("ghwc,g->hwc", stack, np.exp(log_weights)), 0.0)
+        return np.minimum(srgb(light), 1.0).astype(np.float32)
+
+    def terms(log_weights):
+        image = display(log_weights)
+        layout = float(np.mean(np.abs(cv2.GaussianBlur(image, (0, 0), sigma) - target_blurred)))
+        bands = float(np.mean(np.abs(band_quantiles(image) - target_bands) / LAB_RANGE))
+        return layout, bands
 
     def objective(log_weights):
-        weights = np.exp(log_weights)
-        light = np.maximum(np.einsum("ghwc,g->hwc", stack, weights), 0.0)
-        display = np.minimum(srgb(light), 1.0)
-        residual = display - target
-        charbonnier = np.sqrt(residual * residual + 1e-4)
-        slope = np.where(light <= 0.0031308, 12.92, 1.055 / 2.4 * np.power(np.maximum(light, 1e-8), 1.0 / 2.4 - 1.0))
-        slope = np.where(display >= 1.0, 0.0, slope)
-        pixel_gradient = residual / charbonnier * slope / residual.size
-        gradient = np.einsum("ghwc,hwc->g", stack, pixel_gradient) * weights + 2.0 * prior * log_weights / log_weights.size
-        return charbonnier.mean() + prior * np.mean(log_weights ** 2), gradient
+        return sum(terms(log_weights)) + prior * float(np.mean(log_weights ** 2))
 
-    start = np.zeros(len(names))
-    bounds = [(-6.0, 4.0)] * len(names)
-    result = minimize(objective, start, jac=True, method="L-BFGS-B", bounds=bounds, options={"maxiter": iterations})
-    print("display error: before %.4f after %.4f" % (objective(start)[0], result.fun))
-
-    sharp = np.stack([cv2.resize(images[name].astype(np.float32), size, interpolation=cv2.INTER_AREA) for name in names], 0)
-    sharp_target = cv2.resize(reference.astype(np.float32), size, interpolation=cv2.INTER_AREA)
-    luma = np.array([0.2126, 0.7152, 0.0722])
-    rows, cols = grid
-    height, width = sharp_target.shape[:2]
-    cells = [(slice(r * height // rows, (r + 1) * height // rows), slice(c * width // cols, (c + 1) * width // cols)) for r in range(rows) for c in range(cols)]
-    quantiles = [5, 50, 95]
-    target_levels = np.array([np.percentile(sharp_target[cell] @ luma, quantiles) for cell in cells])
-
-    def levels(log_weights):
-        display = np.minimum(srgb(np.maximum(np.einsum("ghwc,g->hwc", sharp, np.exp(log_weights)), 0.0)), 1.0) @ luma
-        return np.array([np.percentile(display[cell], quantiles) for cell in cells])
-
-    def combined(log_weights):
-        return objective(log_weights)[0] + contrast * np.mean(np.abs(levels(log_weights) - target_levels))
-
-    second = minimize(combined, result.x, method="Powell", bounds=bounds, options={"maxiter": 4000, "xtol": 1e-3, "ftol": 1e-5})
-    best = second.x if second.fun < combined(result.x) else result.x
-    print("with contrast: %.4f (display %.4f, levels %.4f)"
-          % (combined(best), objective(best)[0], np.mean(np.abs(levels(best) - target_levels))))
-    return {name: float(np.exp(best[index])) for index, name in enumerate(names)}
+    starts = [np.zeros(len(names))] + [np.eye(len(names))[index] * lift for index in range(len(names))]
+    runs = [minimize(objective, start, method="Powell", bounds=[(-6.0, 5.0)] * len(names),
+                     options={"maxiter": iterations, "xtol": 1e-3, "ftol": 1e-6}) for start in starts]
+    best = min(runs, key=lambda run: run.fun)
+    for label, point in (("before", starts[0]), ("after", best.x)):
+        print("%s: layout %.4f, bands %.4f" % ((label,) + terms(point)))
+    return {name: float(np.exp(best.x[index])) for index, name in enumerate(names)}
 
 
 def apply(groups, weights):

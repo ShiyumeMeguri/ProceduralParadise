@@ -119,6 +119,18 @@ def glass():
     return S.material("GH.Glass", build)
 
 
+@register("GH.Jade")
+def jade():
+    """Polished jade of the frame -- beams, posts, mullions, rails, table
+    columns: a translucent stone (light scatters a few millimetres into it
+    and comes back ``jade_stone``) under a clear polish, so a bar is a dark
+    green body with a bright edge where it catches the light."""
+    def build(tree: Tree):
+        return S.bsdf(tree, Base_Color=color("jade_stone"), Roughness=0.35, Subsurface_Weight=0.4,
+                      Subsurface_Radius=(0.05, 0.15, 0.12), Coat_Weight=1.0, Coat_Roughness=0.04)["BSDF"]
+    return S.material("GH.Jade", build)
+
+
 @register("GH.GlassJade")
 def glass_jade():
     """Thick jade glass of the glassware and glass furniture
@@ -333,7 +345,7 @@ def leaf_shader(tree: Tree, sheen, translucency, roughness):
     base_shade = tree.map_range(along, 0.0, 0.35, 0.7, 1.0)
     shaded = tree.vmath("SCALE", tint, scale=rib * base_shade)
     surface = S.bsdf(tree, Base_Color=shaded, Roughness=roughness, Specular_IOR_Level=sheen)["BSDF"]
-    backlit = tree.n("ShaderNodeBsdfTranslucent", Color=tree.vmath("MULTIPLY", shaded, (1.5, 1.4, 0.45)))["BSDF"]
+    backlit = tree.n("ShaderNodeBsdfTranslucent", Color=tree.vmath("MULTIPLY", shaded, (1.2, 1.15, 0.7)))["BSDF"]
     return mix_shader(tree, translucency, surface, backlit)
 
 
@@ -398,12 +410,12 @@ def smog():
 # ------------------------------------------------------------------ backdrop
 @register("GH.TowerGlass")
 def tower_glass():
-    """Curtain-wall glass of a distant tower: reflective blue-grey panes,
-    each pane (``pane_shade``) catching the sky a little differently."""
+    """Curtain-wall glass of a distant tower: cyan-tinted panes, each pane
+    (``pane_shade``) catching the sky a little differently."""
     def build(tree: Tree):
         shade = attribute(tree, "pane_shade")
-        base = S.mix_rgb(tree, shade, scaled(color("tower_glass"), 0.7), scaled(color("tower_glass"), 1.3))
-        return S.bsdf(tree, Base_Color=base, Metallic=0.6, Roughness=0.08)["BSDF"]
+        base = S.mix_rgb(tree, shade, scaled(color("tower_glass"), 0.8), scaled(color("tower_glass"), 1.2))
+        return S.bsdf(tree, Base_Color=base, Metallic=0.3, Roughness=0.12)["BSDF"]
     return S.material("GH.TowerGlass", build)
 
 
