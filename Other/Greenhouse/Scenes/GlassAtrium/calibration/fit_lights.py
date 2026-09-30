@@ -5,8 +5,12 @@ Light transport is linear in the light sources, so the atrium is rendered
 once with every source in its own Cycles light group: each lamp, the sky
 (the world) and every emissive object (the city smog glows with the skylight
 it scatters in).  Any balance is then sum_g w_g * I_g with a weight per
-group *and channel*, so one solve finds both how bright and what colour
-every source is.  The weights are fitted so that this sum, after the
+group -- and, for the glowing smog, per channel, so one solve finds both
+how bright and what colour it is (it is the pink seen through the walls).
+The sun and the sky keep their colours -- warm white sunlight, a daylight
+dome blue overhead -- and only their strengths are solved: free to take
+any colour, they would tint every surface and every reflection to imitate
+the painting's colours instead of leaving them to the materials.  The weights are fitted so that this sum, after the
 Standard view transform (sRGB encoding, clipping at white), reproduces the
 painting with the figure removed: a robust (Charbonnier) error on
 downsampled, blurred display values, optimised over log-weights with
@@ -111,8 +115,16 @@ def srgb(linear):
     return np.where(linear <= 0.0031308, linear * 12.92, 1.055 * np.power(np.maximum(linear, 1e-8), 1.0 / 2.4) - 0.055)
 
 
-def fit(images, reference, size=(217, 300), blur=1.5, prior=0.002, iterations=400):
-    """{group: RGB weights} minimising the display-space error."""
+def fit(images, reference, tinted, size=(217, 300), blur=1.5, prior=0.002, iterations=400, grid=(3, 4), contrast=0.5):
+    """{group: RGB weights} minimising the display-space error.  Groups in
+    ``tinted`` get a weight per channel (their colour is free); the others
+    one weight for all three (only their strength is).
+
+    A pixelwise error alone favours flat light -- where leaves and shadows
+    do not line up leaf for leaf, averaging them scores best -- so a second,
+    derivative-free stage adds ``contrast`` times the mismatch of each
+    ``grid`` region's 5th, 50th and 95th luminance percentile: the light
+    must also give every region the painting's darks and highlights."""
     import cv2
     from scipy.optimize import minimize
 
@@ -122,8 +134,16 @@ def fit(images, reference, size=(217, 300), blur=1.5, prior=0.002, iterations=40
     names = sorted(images)
     stack = np.stack([prepare(images[name]) for name in names], 0)
     target = prepare(reference)
+    columns = []
+    for index, name in enumerate(names):
+        columns += [[(index, channel) for channel in range(3)]] if name not in tinted else [[(index, channel)] for channel in range(3)]
+    expand = np.zeros((len(columns), len(names) * 3))
+    for column, cells in enumerate(columns):
+        for index, channel in cells:
+            expand[column, index * 3 + channel] = 1.0
 
-    def objective(log_weights):
+    def objective(parameters):
+        log_weights = parameters @ expand
         weights = np.exp(log_weights).reshape(len(names), 3)
         light = np.maximum(np.einsum("ghwc,gc->hwc", stack, weights), 0.0)
         display = np.minimum(srgb(light), 1.0)
@@ -133,13 +153,35 @@ def fit(images, reference, size=(217, 300), blur=1.5, prior=0.002, iterations=40
         slope = np.where(display >= 1.0, 0.0, slope)
         pixel_gradient = residual / charbonnier * slope / residual.size
         gradient = np.einsum("ghwc,hwc->gc", stack, pixel_gradient) * weights
-        gradient = gradient.ravel() + 2.0 * prior * log_weights / log_weights.size
-        return charbonnier.mean() + prior * np.mean(log_weights ** 2), gradient
+        gradient = expand @ gradient.ravel() + 2.0 * prior * parameters / parameters.size
+        return charbonnier.mean() + prior * np.mean(parameters ** 2), gradient
 
-    result = minimize(objective, np.zeros(len(names) * 3), jac=True, method="L-BFGS-B",
-                      bounds=[(-6.0, 4.0)] * (len(names) * 3), options={"maxiter": iterations})
-    weights = np.exp(result.x).reshape(len(names), 3)
-    print("display error: before %.4f after %.4f" % (objective(np.zeros(len(names) * 3))[0], result.fun))
+    start = np.zeros(len(columns))
+    result = minimize(objective, start, jac=True, method="L-BFGS-B", bounds=[(-6.0, 4.0)] * len(columns), options={"maxiter": iterations})
+    print("display error: before %.4f after %.4f" % (objective(start)[0], result.fun))
+
+    sharp = np.stack([cv2.resize(images[name].astype(np.float32), size, interpolation=cv2.INTER_AREA) for name in names], 0)
+    sharp_target = cv2.resize(reference.astype(np.float32), size, interpolation=cv2.INTER_AREA)
+    luma = np.array([0.2126, 0.7152, 0.0722])
+    rows, cols = grid
+    height, width = sharp_target.shape[:2]
+    cells = [(slice(r * height // rows, (r + 1) * height // rows), slice(c * width // cols, (c + 1) * width // cols)) for r in range(rows) for c in range(cols)]
+    quantiles = [5, 50, 95]
+    target_levels = np.array([np.percentile(sharp_target[cell] @ luma, quantiles) for cell in cells])
+
+    def levels(parameters):
+        weights = np.exp(parameters @ expand).reshape(len(names), 3)
+        display = np.minimum(srgb(np.maximum(np.einsum("ghwc,gc->hwc", sharp, weights), 0.0)), 1.0) @ luma
+        return np.array([np.percentile(display[cell], quantiles) for cell in cells])
+
+    def combined(parameters):
+        return objective(parameters)[0] + contrast * np.mean(np.abs(levels(parameters) - target_levels))
+
+    before = combined(result.x)
+    second = minimize(combined, result.x, method="Powell", bounds=[(-6.0, 4.0)] * len(columns), options={"maxiter": 4000, "xtol": 1e-3, "ftol": 1e-5})
+    print("with contrast: before %.4f after %.4f (display %.4f, levels %.4f)"
+          % (before, second.fun, objective(second.x)[0], np.mean(np.abs(levels(second.x) - target_levels))))
+    weights = np.exp(second.x @ expand).reshape(len(names), 3)
     return {name: weights[index].tolist() for index, name in enumerate(names)}
 
 
@@ -200,7 +242,7 @@ def main(argv):
     height, width = next(iter(images.values())).shape[:2]
     reference = cv2.imread(REFERENCE)[:, :, ::-1].astype(np.float32) / 255.0
     reference = cv2.resize(reference, (width, height), interpolation=cv2.INTER_AREA)
-    weights = fit(images, reference)
+    weights = fit(images, reference, [name for name, info in groups.items() if info["kind"] == "emissive"])
     print(json.dumps({name: [round(value, 3) for value in rgb] for name, rgb in weights.items()}, indent=1))
     if "--apply" in argv:
         apply(groups, weights)

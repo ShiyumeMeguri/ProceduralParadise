@@ -149,6 +149,16 @@ def water():
     return S.material("GH.Water", build)
 
 
+@register("GH.MilkGlass")
+def milk_glass():
+    """Opal (milk) glass: a pale, softly glossy top that lets light through
+    diffusely (``milk``)."""
+    def build(tree: Tree):
+        return S.bsdf(tree, Base_Color=color("milk"), Roughness=0.3, Transmission_Weight=0.35, IOR=1.5,
+                      Subsurface_Weight=0.4, Subsurface_Radius=(0.05, 0.05, 0.05), Coat_Weight=0.5, Coat_Roughness=0.05)["BSDF"]
+    return S.material("GH.MilkGlass", build)
+
+
 @register("GH.GlassClear")
 def glass_clear():
     """Thin clear glassware -- terrarium orbs, the flask, the ball

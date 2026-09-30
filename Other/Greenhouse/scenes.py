@@ -26,6 +26,7 @@ A data mesh is written as any of::
     "polyline": [[x, y, z], ...]                                   (a chain of edges)
     "grid": {"plane": "XY" | "XZ" | "YZ", "u": [...], "v": [...], "w": w,
              "edges": true, "faces": true}                         (lines at the listed coordinates)
+    "file": "data/plan.json", "key": "beds"                        (vertices and faces from a data file of the scene)
 
 so a frame is a list of lines and a glazing grid a list of mullion
 positions.  With ``at`` -- ``[[x, y, z(, turn)], ...]`` -- an item is
@@ -112,11 +113,18 @@ def _grid(spec, vertices, edges, faces):
                   for j in range(len(vs) - 1) for i in range(len(us) - 1)]
 
 
-def data_mesh(name, spec):
-    """Mesh data-block from a data mesh ``spec`` (see the module notes)."""
+def data_mesh(name, spec, folder):
+    """Mesh data-block from a data mesh ``spec`` (see the module notes);
+    ``folder`` is the scene folder data files are read from."""
     vertices = [list(map(float, vertex)) for vertex in spec.get("vertices", [])]
     edges = [tuple(edge) for edge in spec.get("edges", [])]
     faces = [tuple(face) for face in spec.get("faces", [])]
+    if "file" in spec:
+        stored = jsonio.load(os.path.join(folder, spec["file"]))
+        stored = stored[spec["key"]] if "key" in spec else stored
+        start = len(vertices)
+        vertices += [list(map(float, vertex)) for vertex in stored["vertices"]]
+        faces += [tuple(start + index for index in face) for face in stored["faces"]]
     for first, second in spec.get("segments", []):
         edges.append((len(vertices), len(vertices) + 1))
         vertices += [list(map(float, first)), list(map(float, second))]
@@ -205,7 +213,7 @@ class SceneBuilder:
         generator = random.Random(f"{self.id}/{item['name']}")
         for index, (location, turn) in enumerate(spots):
             name = item["name"] if len(spots) == 1 else f"{item['name']}.{index:03d}"
-            mesh = data_mesh(name, item["mesh"]) if "mesh" in item else bpy.data.meshes.new(name)
+            mesh = data_mesh(name, item["mesh"], self.dir) if "mesh" in item else bpy.data.meshes.new(name)
             obj = _unique(bpy.data.objects.new(name, mesh), name)
             collection.objects.link(obj)
             obj.location = location

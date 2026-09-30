@@ -5,33 +5,71 @@
   "defaults": {
     "shot": "Nitia"
   },
-  "notes": ["Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the far curtain wall, +X along it, Z up; metres.", "Gallery: a glass floor (top at z = 0) on jade-glass beams over the garden, south of y = 4.18 and on the west wing; the stairwell (x -5.0..-2.16, y -1.6..4.18) and the atrium north of the edge are open.  The edge is guarded by a frameless glass balustrade whose top edge carries short jade stanchions between two rails (0.91 and 1.04 m) -- the painting draws the stanchions only between the rails.", "Through the atrium the view falls on the paved north end of the garden (1 m flags: their joints are the regular lines behind the railing) and, through the lower curtain wall, on the pink haze outside.", "Stair (dog-leg, glass treads): 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rise from the garden at y = 0.32 to a landing at z = -1.354, then 11 treads turn west up to the gallery floor at x = -9.383; solved from the painted nosings (16 px rms).", "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6 / 16, a glazed roof at z = 7.22; the conservatory crowns a 117 m tower: the frame's top row of image looks 6 degrees below the horizon, so the pink seen through the walls is the city haze far below, and the blue glass facade at the top left is a neighbouring skyscraper 50 m away (its edge solved from the painting).", "Garden specimens (\"Painted ...\"): each placed where its mass is in the painting -- the centre pixel of the mass back-projected through the solved camera at the height of its crown; the random understory fills the beds between them.", "Two trees in the north of the garden lift their crowns to the gallery level: the yellow-green canopies seen past the balustrade (positions back-projected from the painted canopies).", "Air: the sunlit air fills the conservatory 10 cm clear of the floor and roof -- a volume boundary must not coincide with another volume boundary (the glass posts end on those planes), or the volume stack at the camera breaks and every camera ray is absorbed."],
+  "notes": [
+    "Origin: the gallery floor directly below the painting's viewpoint; +Y runs across the gallery towards the far curtain wall, +X along it, Z up; metres.",
+    "Gallery: a glass floor (top at z = 0) on jade-glass beams over the garden, south of y = 4.18 and on the west wing; the stairwell (x -5.0..-2.16, y -1.6..4.18) and the atrium north of the edge are open.  The edge is guarded by a frameless glass balustrade whose top edge carries short jade stanchions between two rails (0.91 and 1.04 m) -- the painting draws the stanchions only between the rails.",
+    "Through the atrium the view falls on the paved north end of the garden (1 m flags: their joints are the regular lines behind the railing) and, through the lower curtain wall, on the pink haze outside.",
+    "Garden: planted cell by cell from a planting plan read off the painting (calibration/planting_plan.py -> data/planting.json): where the painting shows foliage below the gallery the cell is planted, where it shows the pale floor it stays paved, and cells the painting's camera cannot see are planted by design -- except the stair, the path north under the atrium (x -2.2..-0.4) and the court beside the stair.",
+    "Stair (dog-leg, glass treads): 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rise from the garden at y = 0.32 to a landing at z = -1.354, then 11 treads turn west up to the gallery floor at x = -9.383; solved from the painted nosings (16 px rms).",
+    "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6 / 16, a glazed roof at z = 7.22; the conservatory crowns a 117 m tower: the frame's top row of image looks 6 degrees below the horizon, so the pink seen through the walls is the city haze far below, and the blue glass facade at the top left is a neighbouring skyscraper 50 m away (its edge solved from the painting).",
+    "Garden specimens (\"Painted ...\"): each placed where its mass is in the painting -- the centre pixel of the mass back-projected through the solved camera at the height of its crown; the random understory fills the beds between them.",
+    "Two trees in the north of the garden lift their crowns to the gallery level: the yellow-green canopies seen past the balustrade (positions back-projected from the painted canopies).",
+    "Air: the sunlit air fills the conservatory 10 cm clear of the floor and roof -- a volume boundary must not coincide with another volume boundary (the glass posts end on those planes), or the volume stack at the camera breaks and every camera ray is absorbed.",
+    "Side table: the painting draws its top as an ellipse rounder (aspect 0.57) than a horizontal disc can project to at that place (every point on that view ray gives sin 26 deg = 0.44); the disc matches the painted width and centre, the objects on it their painted corners.",
+    "Sun: 55 deg high from azimuth 30 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do."
+  ],
   "materials": {
     "glassware_density": 57.0,
     "pane_density": 10.0,
-    "leaf_translucency": 0.45,
+    "leaf_translucency": 0.35,
     "smog_ground": -120.0,
     "smog_scale": 30.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.0105,
-    "color:smog": [0.9962, 0.7698, 0.868],
-    "color:sky_zenith": [0.6083, 0.9779, 0.965],
-    "color:sky_horizon": [0.621, 0.9779, 0.965],
-    "color:haze": [0.6147, 0.9779, 0.9491],
-    "leaf_sheen": 0.2,
+    "smog_brightness": 1.0165,
+    "leaf_sheen": 0.05,
     "air_density": 0.002,
     "air_anisotropy": 0.6,
-    "bottle_density": 30.0,
+    "bottle_density": 10.0,
     "water_density": 8.0,
-    "pane_ior": 1.22
+    "pane_ior": 1.22,
+    "color:sky_zenith": [0.12, 0.42, 0.95],
+    "color:sky_horizon": [0.72, 0.84, 1.0],
+    "color:haze": [0.97, 0.84, 0.9],
+    "color:smog": [0.9874, 0.7837, 0.8668]
   },
   "sky": {
-    "camera_strength": 4.6054,
-    "light_strength": 4.6054,
+    "camera_strength": 5.1671,
+    "light_strength": 5.1671,
     "haze_top": -0.1,
     "zenith_height": 0.7
   },
   "library": {
+    "Ground": [
+      {
+        "name": "Proto Low Boston Fern",
+        "asset": "GH.Flora.Pinnate",
+        "preset": "boston_fern",
+        "inputs": {
+          "Seed": 3
+        }
+      },
+      {
+        "name": "Proto Low Sword Fern",
+        "asset": "GH.Flora.Pinnate",
+        "preset": "sword_fern",
+        "inputs": {
+          "Seed": 5
+        }
+      },
+      {
+        "name": "Proto Low Philodendron",
+        "asset": "GH.Flora.Broadleaf",
+        "preset": "philodendron",
+        "inputs": {
+          "Seed": 7
+        }
+      }
+    ],
     "Understory": [
       {
         "name": "Proto Boston Fern",
@@ -170,9 +208,9 @@
         },
         "asset": "GH.Structure.Members",
         "inputs": {
-          "Width": 0.016,
-          "Depth": 0.05,
-          "Overrun": 0.008
+          "Width": 0.014,
+          "Depth": 0.02,
+          "Overrun": 0.007
         }
       },
       {
@@ -340,8 +378,8 @@
         },
         "asset": "GH.Structure.Members",
         "inputs": {
-          "Width": 0.025,
-          "Depth": 0.025
+          "Width": 0.02,
+          "Depth": 0.02
         }
       },
       {
@@ -817,167 +855,119 @@
     ],
     "Garden": [
       {
-        "name": "Bed West",
+        "name": "Planting Beds",
+        "loc": [0.0, 0.0, -3.2],
         "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-9.0, -4.8],
-            "v": [0.3, 15.0],
-            "w": -3.2,
-            "edges": false,
-            "faces": true
-          }
+          "file": "data/planting.json",
+          "key": "beds"
         },
         "asset": "GH.Garden.Bed",
         "inputs": {
           "Soil": 0.12,
-          "Mound": 0.15,
-          "Kerb": 0.14
+          "Mound": 0.0,
+          "Kerb": 0.0
         }
       },
       {
-        "name": "Understory West",
+        "name": "Ground Painted",
+        "loc": [0.0, 0.0, -3.08],
         "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-8.9, -4.8999999999999995],
-            "v": [0.4, 14.9],
-            "w": -3.08,
-            "edges": false,
-            "faces": true
-          }
+          "file": "data/planting.json",
+          "key": "ground"
         },
         "asset": "GH.Garden.Planting",
         "inputs": {
-          "Plants": "GlassAtrium.Understory",
-          "Density": 2.2,
-          "Spacing": 0.45,
-          "Scale Min": 1.0,
-          "Scale Max": 1.8,
+          "Plants": "GlassAtrium.Ground",
+          "Density": 4.0,
+          "Spacing": 0.3,
+          "Scale Min": 0.8,
+          "Scale Max": 1.2,
           "Seed": 2
         }
       },
       {
-        "name": "Bed Inner",
+        "name": "Understory Painted",
+        "loc": [0.0, 0.0, -3.08],
         "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-2.95, -1.0],
-            "v": [0.3, 8.0],
-            "w": -3.2,
-            "edges": false,
-            "faces": true
-          }
-        },
-        "asset": "GH.Garden.Bed",
-        "inputs": {
-          "Soil": 0.12,
-          "Mound": 0.15,
-          "Kerb": 0.14
-        }
-      },
-      {
-        "name": "Understory Inner",
-        "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-2.85, -1.1],
-            "v": [0.4, 7.9],
-            "w": -3.08,
-            "edges": false,
-            "faces": true
-          }
+          "file": "data/planting.json",
+          "key": "understory"
         },
         "asset": "GH.Garden.Planting",
         "inputs": {
           "Plants": "GlassAtrium.Understory",
-          "Density": 2.2,
-          "Spacing": 0.45,
-          "Scale Min": 1.0,
-          "Scale Max": 1.8,
+          "Density": 3.0,
+          "Spacing": 0.35,
+          "Scale Min": 0.9,
+          "Scale Max": 1.3,
+          "Seed": 3
+        }
+      },
+      {
+        "name": "Ground Under Shrubs",
+        "loc": [0.0, 0.0, -3.08],
+        "mesh": {
+          "file": "data/planting.json",
+          "key": "shrubs"
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Ground",
+          "Density": 3.0,
+          "Spacing": 0.35,
+          "Scale Min": 0.8,
+          "Scale Max": 1.2,
           "Seed": 4
         }
       },
       {
-        "name": "Bed Centre",
+        "name": "Shrubs Painted",
+        "loc": [0.0, 0.0, -3.08],
         "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-1.0, 0.5],
-            "v": [0.3, 5.0],
-            "w": -3.2,
-            "edges": false,
-            "faces": true
-          }
+          "file": "data/planting.json",
+          "key": "shrubs"
         },
-        "asset": "GH.Garden.Bed",
+        "asset": "GH.Garden.Planting",
         "inputs": {
-          "Soil": 0.12,
-          "Mound": 0.15,
-          "Kerb": 0.14
+          "Plants": "GlassAtrium.Shrubs",
+          "Density": 0.9,
+          "Spacing": 0.8,
+          "Scale Min": 1.0,
+          "Scale Max": 1.4,
+          "Seed": 5
         }
       },
       {
-        "name": "Understory Centre",
+        "name": "Understory Designed",
+        "loc": [0.0, 0.0, -3.08],
         "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [-0.9, 0.4],
-            "v": [0.4, 4.9],
-            "w": -3.08,
-            "edges": false,
-            "faces": true
-          }
+          "file": "data/planting.json",
+          "key": "designed"
         },
         "asset": "GH.Garden.Planting",
         "inputs": {
           "Plants": "GlassAtrium.Understory",
-          "Density": 2.2,
-          "Spacing": 0.45,
+          "Density": 2.5,
+          "Spacing": 0.4,
           "Scale Min": 1.0,
-          "Scale Max": 1.8,
+          "Scale Max": 1.6,
           "Seed": 6
         }
       },
       {
-        "name": "Bed East",
+        "name": "Shrubs Designed",
+        "loc": [0.0, 0.0, -3.08],
         "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [0.5, 8.0],
-            "v": [0.3, 8.0],
-            "w": -3.2,
-            "edges": false,
-            "faces": true
-          }
-        },
-        "asset": "GH.Garden.Bed",
-        "inputs": {
-          "Soil": 0.12,
-          "Mound": 0.15,
-          "Kerb": 0.14
-        }
-      },
-      {
-        "name": "Understory East",
-        "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [0.6, 7.9],
-            "v": [0.4, 7.9],
-            "w": -3.08,
-            "edges": false,
-            "faces": true
-          }
+          "file": "data/planting.json",
+          "key": "designed"
         },
         "asset": "GH.Garden.Planting",
         "inputs": {
-          "Plants": "GlassAtrium.Understory",
-          "Density": 2.2,
-          "Spacing": 0.45,
+          "Plants": "GlassAtrium.Shrubs",
+          "Density": 0.5,
+          "Spacing": 0.9,
           "Scale Min": 1.0,
-          "Scale Max": 1.8,
-          "Seed": 8
+          "Scale Max": 1.4,
+          "Seed": 7
         }
       },
       {
@@ -1132,10 +1122,10 @@
           "Stem": 0.9,
           "Crown Height": 2.6,
           "Crown Radius": 2.3,
-          "Leaves": 2600,
+          "Leaves": 900,
           "Clumps": 40,
           "Seed": 71,
-          "Clump Size": 0.2
+          "Clump Size": 0.18
         }
       },
       {
@@ -1147,51 +1137,53 @@
           "Stem": 1.5,
           "Crown Height": 2.6,
           "Crown Radius": 1.0,
-          "Leaves": 1100,
+          "Leaves": 450,
           "Clumps": 18,
           "Seed": 73,
-          "Clump Size": 0.25
+          "Clump Size": 0.22
         }
       }
     ],
     "Gallery": [
       {
         "name": "Tall Bottle",
-        "loc": [-1.451, 2.105, 0.0],
-        "rot": [0, 0, 89.1],
+        "loc": [-1.459, 2.11, 0.0],
+        "rot": [0, 0, 89.5],
         "asset": "GH.Vessel.SquareBottle",
         "inputs": {
-          "Width": 0.213,
-          "Depth": 0.098,
-          "Height": 1.833,
-          "Shoulder": 0.1,
+          "Width": 0.215,
+          "Depth": 0.095,
+          "Height": 1.829,
+          "Shoulder": 0.07,
           "Neck Radius": 0.034,
           "Neck Length": 0.04,
           "Bore": 0.025,
           "Bore Depth": 0.12,
           "Wall": 0.0,
-          "Squareness": 4.0,
-          "Glass": "GH.GlassJade"
+          "Squareness": 14.0,
+          "Glass": "GH.GlassBottle",
+          "Bevel": 0.01
         }
       },
       {
         "name": "Flask",
-        "loc": [-0.798, 1.52, 0.0],
+        "loc": [-0.812, 1.551, 0.0],
         "asset": "GH.Vessel.Flask",
         "inputs": {
-          "Radius": 0.146,
+          "Radius": 0.155,
           "Neck Radius": 0.034,
-          "Neck Length": 0.095,
+          "Neck Length": 0.1,
           "Glass": "GH.GlassClear",
-          "Fill": 0.62
+          "Fill": 0.62,
+          "Squash": 0.665
         }
       },
       {
         "name": "Side Table",
-        "loc": [-0.56, 3.9, 0.0],
+        "loc": [-0.526, 3.897, 0.0],
         "asset": "GH.Furniture.PedestalTable",
         "inputs": {
-          "Radius": 0.36,
+          "Radius": 0.296,
           "Height": 0.6,
           "Foot Radius": 0.16,
           "Metal": "GH.GlassJade",
@@ -1274,7 +1266,7 @@
       },
       {
         "name": "Palm Planter",
-        "loc": [0.95, 1.55, 0.0],
+        "loc": [1.0, 1.35, 0.0],
         "asset": "GH.Vessel.Planter",
         "inputs": {
           "Radius": 0.3,
@@ -1283,19 +1275,23 @@
       },
       {
         "name": "Kentia Palm",
-        "loc": [0.95, 1.55, 0.45],
+        "loc": [1.0, 1.35, 0.45],
         "asset": "GH.Flora.Pinnate",
         "preset": "areca",
         "inputs": {
-          "Stem": 0.35,
-          "Fronds": 20,
-          "Frond Length": 1.2,
+          "Stem": 0.3,
+          "Fronds": 18,
+          "Frond Length": 1.55,
           "Leaflets": 34,
           "Leaflet Length": 0.3,
-          "Leaflet Width": 0.02,
+          "Leaflet Width": 0.016,
           "Seed": 51,
-          "Spread Low": 10,
-          "Spread High": 70
+          "Spread Low": 5,
+          "Spread High": 65,
+          "Arch": 0.55,
+          "Droop": 0.7,
+          "Color A": "leaf_light",
+          "Color B": "leaf_yellow"
         }
       }
     ],
@@ -1460,10 +1456,10 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 2.5111,
-      "color": [1.0, 0.8678, 0.7212],
+      "power": 4.6245,
+      "color": [1.0, 0.93, 0.8],
       "angle": 1.5,
-      "direction": [-0.2, 0.6, 0.77]
+      "direction": [0.497, 0.287, 0.819]
     }
   ],
   "views": {

@@ -75,9 +75,10 @@ def deck():
 
 @asset("GH.Garden.Bed", "Garden")
 def bed():
-    """Planting bed over the faces of the mesh: soil filled to ``Soil``
+    """Planting bed over the faces of the mesh (coincident vertices are
+    merged, so a bed may be drawn cell by cell): soil filled to ``Soil``
     above the mesh, mounded by ``Mound`` towards the middle, edged by a low
-    steel kerb of ``Kerb`` height."""
+    steel kerb of ``Kerb`` height (none at 0)."""
     graph = GN("GH.Garden.Bed", bed.__doc__)
     area = graph.inp("Geometry", "GEOMETRY")
     soil_height = graph.inp("Soil", default=0.1, subtype="DISTANCE")
@@ -86,7 +87,8 @@ def bed():
     soil_material = graph.inp("Soil Material", "MATERIAL", default=M.get("GH.Soil"))
     kerb_material = graph.inp("Kerb Material", "MATERIAL", default=M.get("GH.Steel"))
 
-    surface = graph.subdiv(graph.merge(area, 0.0001), 3)
+    area = graph.merge(area, 0.001)
+    surface = graph.subdiv(area, 3)
     center = graph.bound_box(area)
     middle = (center["Min"] + center["Max"]) * 0.5
     reach = (center["Max"] - center["Min"]).length() * 0.5
@@ -96,7 +98,8 @@ def bed():
     boundary = graph.compare(graph.n("GeometryNodeInputMeshEdgeNeighbors")["Face Count"], 1, "EQUAL", "INT")
     edges = graph.n("GeometryNodeMeshToCurve", Mesh=area, Selection=boundary).o
     kerb_mesh = graph.flat_sweep(graph.move(edges, z=kerb * 0.5), 0.012, kerb)
-    graph.result(graph.join(soil, graph.mat(kerb_mesh, kerb_material)))
+    kerb_mesh = graph.switch(graph.compare(kerb, 0.001, "GREATER_THAN"), None, graph.mat(kerb_mesh, kerb_material))
+    graph.result(graph.join(soil, kerb_mesh))
     return graph
 
 

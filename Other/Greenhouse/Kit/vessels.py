@@ -201,15 +201,17 @@ def planter():
 
 @asset("GH.Vessel.Flask", "Vessels")
 def flask():
-    """Round-bottomed flask: a blown sphere of ``Radius`` with a straight
-    neck, lathed as a wall of constant thickness, standing on its curve;
-    filled with water to ``Fill`` of the sphere's height (the water stands
-    a fraction of a millimetre into the glass, so the two dielectrics meet
-    without a film of air)."""
+    """Round-bottomed flask: a blown spheroid of ``Radius`` across and
+    ``Squash`` times that in height (1 for a sphere, less for a flat onion
+    flask) with a straight neck, lathed as a wall of constant thickness,
+    standing on its curve; filled with water to ``Fill`` of the body's
+    height (the water stands a fraction of a millimetre into the glass, so
+    the two dielectrics meet without a film of air)."""
     graph = GN("GH.Vessel.Flask", flask.__doc__)
     radius = graph.inp("Radius", default=0.16, subtype="DISTANCE")
     neck_radius = graph.inp("Neck Radius", default=0.035, subtype="DISTANCE")
     neck_length = graph.inp("Neck Length", default=0.12, subtype="DISTANCE")
+    squash = graph.inp("Squash", default=1.0, min=0.2, max=2.0)
     fill = graph.inp("Fill", default=0.0, min=0.0, max=1.0)
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassClear"))
     liquid = graph.inp("Liquid", "MATERIAL", default=M.get("GH.Water"))
@@ -228,11 +230,12 @@ def flask():
     neck_scale = neck_radius / graph.max(radius * 0.22, 0.0001)
     above = graph.compare(z, top, "GREATER_THAN")
     widened = graph.switch(above, radius, radius * neck_scale, "FLOAT")
-    stretch = graph.switch(above, z * radius, top * radius + (z - top) * neck_length / 0.75, "FLOAT")
+    stretch = graph.switch(above, z * radius * squash, top * radius * squash + (z - top) * neck_length / 0.75, "FLOAT")
     body = graph.set_pos(body, pos=graph.vec(x * widened, y * widened, stretch))
     wall = 0.018 * radius
     water = graph.smooth(sphere(graph, radius - wall + 0.0004, 64, 32))
-    water = cut_below(graph, graph.move(water, z=radius), radius * 2.0 * fill, -1.0)
+    water = graph.transform(water, t=graph.vec(0.0, 0.0, radius * squash), s=graph.vec(1.0, 1.0, squash))
+    water = cut_below(graph, water, radius * squash * 2.0 * fill, -1.0)
     water = graph.switch(graph.compare(fill, 0.001, "GREATER_THAN"), None, M.glazed(graph, water, liquid))
     graph.result(graph.join(M.glazed(graph, graph.smooth_by_angle(body, 1.2), glass), water))
     return graph
