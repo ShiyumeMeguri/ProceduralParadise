@@ -18,7 +18,8 @@
     "Sun: 55 deg high from azimuth 30 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do.",
     "Shade trees: three umbrella trees in the unseen north-east of the garden (outside the painting frame) whose crowns stand between the sun and the paved court: their dappled shade is the green-and-pink mottling of the court floor seen through the balustrade, and the sun shafts come down between their leaves.",
     "North wall: structurally glazed -- its panes meet on silicone joints, so only the transoms and the corner mullions are frames (the painting shows the pink haze through it undivided but for two horizontal bars).  Posts that the painting shows only below the gallery floor stop under it.",
-    "Daylight: the sky's strength is 0.15 of the sun's power (sky.sun_ratio): a hazy sky giving some 30 % of the light on a level surface with the sun 55 degrees up (pi L = 0.3 / 0.7 * sin 55 E, for a dome averaging 0.7 of its strength); the fit scales both together."
+    "Daylight: the sky's strength is 0.15 of the sun's power (sky.sun_ratio): a hazy sky giving some 30 % of the light on a level surface with the sun 55 degrees up (pi L = 0.3 / 0.7 * sin 55 E, for a dome averaging 0.7 of its strength); the fit scales both together.",
+    "Vines: climbing plants trained along the roof frame, 6.3-6.6 m above the gallery, above every sight line of the painting's camera: they are seen only in their dappled shade -- the leaf-shaped sun patches on the court, the treads and the gallery -- and in the shafts of sun between them.  The sun is the real sun, half a degree across, so the patches keep sharp edges from nine metres up."
   ],
   "materials": {
     "glassware_density": 57.0,
@@ -27,7 +28,7 @@
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.0161,
+    "smog_brightness": 1.0052,
     "leaf_sheen": 0.12,
     "air_density": 0.002,
     "air_anisotropy": 0.6,
@@ -36,8 +37,8 @@
     "water_turbidity": 0.0
   },
   "sky": {
-    "camera_strength": 2.6848,
-    "light_strength": 2.6848,
+    "camera_strength": 1.9877,
+    "light_strength": 1.9877,
     "haze_top": -0.1,
     "zenith_height": 0.7,
     "sun_ratio": 0.15
@@ -680,6 +681,30 @@
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.02
+        }
+      }
+    ],
+    "Vines": [
+      {
+        "name": "Roof Vines",
+        "loc": [0.54, 5.0, 6.35],
+        "asset": "GH.Flora.Umbrella",
+        "inputs": {
+          "Stem": 0.0,
+          "Stems": 0,
+          "Crown Radius": 14.5,
+          "Crown Height": 0.5,
+          "Leaves": 3500,
+          "Leaflets": 1,
+          "Leaflet Length": 0.32,
+          "Leaflet Width": 0.2,
+          "Droop": 10,
+          "Clumps": 110,
+          "Clump Size": 0.075,
+          "Facing": 0.3,
+          "Color A": "leaf",
+          "Color B": "leaf_light",
+          "Seed": 101
         }
       }
     ],
@@ -1717,9 +1742,9 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 17.8987,
+      "power": 13.2513,
       "color": [1.0, 0.88, 0.7],
-      "angle": 10.0,
+      "angle": 0.53,
       "direction": [0.497, 0.287, 0.819]
     }
   ],

@@ -392,17 +392,16 @@ def smog():
     in closed form.  It thins with height, exp(-(z - ``smog_ground``) /
     ``smog_scale``) from ``smog_density`` at the ground: the streets far
     below vanish into pink while a neighbouring tower at the conservatory's
-    height stays clear.  The glow is skylight the haze sends towards the
-    eye, seen directly, in reflections and through glass; diffuse rays do
-    not see it -- the sky already lights the scene."""
+    height stays clear.  The haze surrounds the conservatory, so it is also
+    what the interior sees through every pane: its glow lights the rooms
+    as the pink ambient of a hazy afternoon, where the sky beyond it is
+    absorbed."""
     def build(tree: Tree):
         _, _, z = tree.sep(tree.n("ShaderNodeNewGeometry")["Position"])
         falloff = tree.math("EXPONENT", (z - param("smog_ground", -120.0)) * (-1.0 / param("smog_scale", 30.0)))
         density = tree.math("MULTIPLY", falloff, param("smog_density", 0.05))
         absorb = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=density)["Volume"]
-        seen = tree.math("SUBTRACT", 1.0, tree.n("ShaderNodeLightPath")["Is Diffuse Ray"])
-        glow = tree.n("ShaderNodeEmission", Color=color("smog"),
-                      Strength=tree.math("MULTIPLY", tree.math("MULTIPLY", density, param("smog_brightness", 1.0)), seen))["Emission"]
+        glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=tree.math("MULTIPLY", density, param("smog_brightness", 1.0)))["Emission"]
         return {"Volume": tree.n("ShaderNodeAddShader", absorb, glow)["Shader"]}
     return S.material("GH.Smog", build)
 
