@@ -29,6 +29,7 @@ INK_LAYER = "Ink"
 INK_SKIP = "ink_skip"
 INK_ID = "ink_id"
 INK_QUIET = "ink_quiet"
+SOBEL_WIDTH = 2.0
 _PNG_END = b"\x00\x00\x00\x00IEND\xaeB`\x82"
 
 
@@ -464,10 +465,19 @@ def ink_nodes(t, img, layer, cfg):
     steps and creases in depth remain), scaled by the depth to make the
     threshold relative.  Each passes a soft threshold (full ink at 1.5 x).
     No ink lies within ``quiet_margin`` px of a quiet surface (identity blue
-    1): plants cut the lines behind them and carry none."""
+    1): plants cut the lines behind them and carry none.
+
+    Widths are pixels of the frame at the scene's resolution, and a line
+    keeps its width on the frame whatever size is rendered: the size is read
+    from the rendered image itself, so a preview at any percentage, set
+    before or after this is built, gets the same lines.  The edge filters
+    draw a line ``SOBEL_WIDTH`` pixels wide; a line due fewer pixels is laid
+    at the fraction of them it covers, one due more is grown to it."""
     sc = bpy.context.scene
     rl = t.n("CompositorNodeRLayers")
     rl.n.layer = layer
+    rendered = t.n("ShaderNodeSeparateXYZ", t.n("CompositorNodeImageInfo", rl["Image"])["Dimensions"])["X"]
+    scale = t.math("DIVIDE", rendered, float(sc.render.resolution_x))
 
     def filtered(image, kind):
         node = t.n("CompositorNodeFilter")
@@ -490,7 +500,7 @@ def ink_nodes(t, img, layer, cfg):
     margin = t.n("CompositorNodeDilateErode")
     t.link(quiet, margin.n.inputs["Mask"])
     _set(margin, "Type", "Distance")
-    _set(margin, "Size", max(int(round(cfg.get("quiet_margin", 2) * sc.render.resolution_percentage / 100.0)), 1))
+    t.link(t.math("MAXIMUM", t.math("ROUND", t.math("MULTIPLY", scale, float(cfg.get("quiet_margin", 2)))), 1.0), margin.n.inputs["Size"])
     mask = t.math("MULTIPLY", mask, t.math("SUBTRACT", 1.0, margin.o, clamp=True))
     if cfg.get("depth"):
         depth = rl["Depth"]
@@ -498,14 +508,13 @@ def ink_nodes(t, img, layer, cfg):
         inverse_image = t.n("CompositorNodeCombineColor", inverse, inverse, inverse, 1.0).o
         jumps = t.math("MULTIPLY", strongest(filtered(inverse_image, "Laplace")), depth)
         mask = t.math("MAXIMUM", mask, over(jumps, cfg["depth"]))
-    width = int(round(cfg.get("width", 0.0) * sc.render.resolution_percentage / 100.0))
-    if width > 0:
-        grow = t.n("CompositorNodeDilateErode")
-        t.link(mask, grow.n.inputs["Mask"])
-        _set(grow, "Type", "Distance")
-        _set(grow, "Size", width)
-        mask = grow.o
-    factor = t.math("MULTIPLY", mask, cfg.get("alpha", 1.0), clamp=True)
+    due = t.math("MULTIPLY", scale, SOBEL_WIDTH + 2.0 * cfg.get("width", 0.0))
+    grow = t.n("CompositorNodeDilateErode")
+    t.link(mask, grow.n.inputs["Mask"])
+    _set(grow, "Type", "Distance")
+    t.link(t.math("ROUND", t.math("MULTIPLY", t.math("MAXIMUM", t.math("SUBTRACT", due, SOBEL_WIDTH), 0.0), 0.5)), grow.n.inputs["Size"])
+    coverage = t.math("MINIMUM", t.math("DIVIDE", due, SOBEL_WIDTH), 1.0)
+    factor = t.math("MULTIPLY", grow.o, t.math("MULTIPLY", coverage, cfg.get("alpha", 1.0)), clamp=True)
     line = tuple(cfg.get("color", (0.005, 0.03, 0.03))) + (1.0,)
     return t.mix(factor, img, line, data_type="RGBA")
 
