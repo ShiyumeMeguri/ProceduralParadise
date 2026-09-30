@@ -27,7 +27,7 @@
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.016,
+    "smog_brightness": 1.0161,
     "leaf_sheen": 0.12,
     "air_density": 0.002,
     "air_anisotropy": 0.6,
@@ -36,8 +36,8 @@
     "water_turbidity": 0.0
   },
   "sky": {
-    "camera_strength": 2.7526,
-    "light_strength": 2.7526,
+    "camera_strength": 2.6848,
+    "light_strength": 2.6848,
     "haze_top": -0.1,
     "zenith_height": 0.7,
     "sun_ratio": 0.15
@@ -978,7 +978,15 @@
         "inputs": {
           "Stem": 1.0,
           "Leaf Length": 0.8,
-          "Seed": 31
+          "Seed": 31,
+          "Leaves": 30,
+          "Leaf Width": 0.09,
+          "Fullness": 0.6,
+          "Spread Low": 20,
+          "Spread High": 75,
+          "Arch": 0.5,
+          "Color A": "leaf_emerald",
+          "Color B": "leaf_light"
         }
       },
       {
@@ -1255,16 +1263,16 @@
         "preset": "areca",
         "inputs": {
           "Stem": 0.2,
-          "Fronds": 12,
+          "Fronds": 8,
           "Frond Length": 1.3,
           "Leaflets": 18,
           "Leaflet Length": 0.45,
           "Leaflet Width": 0.045,
           "Seed": 55,
           "Spread Low": 5,
-          "Spread High": 42,
+          "Spread High": 30,
           "Arch": 0.55,
-          "Droop": 0.75,
+          "Droop": 0.9,
           "Color A": "leaf_yellow",
           "Color B": "leaf_light",
           "Leaflet Angle": 30,
@@ -1272,7 +1280,9 @@
           "Bare Base": 0.25,
           "Leaflet Curl": 0.4,
           "Leaflet Cup": 0.3,
-          "Leaflet Jitter": 12
+          "Leaflet Jitter": 12,
+          "Sector Center": 90,
+          "Sector Width": 240
         }
       },
       {
@@ -1282,16 +1292,16 @@
         "preset": "areca",
         "inputs": {
           "Stem": 0.0,
-          "Fronds": 9,
+          "Fronds": 6,
           "Frond Length": 1.15,
           "Leaflets": 18,
           "Leaflet Length": 0.4,
           "Leaflet Width": 0.04,
           "Seed": 61,
           "Spread Low": 5,
-          "Spread High": 42,
+          "Spread High": 30,
           "Arch": 0.55,
-          "Droop": 0.75,
+          "Droop": 0.9,
           "Color A": "leaf_yellow",
           "Color B": "leaf_light",
           "Leaflet Angle": 30,
@@ -1299,7 +1309,9 @@
           "Bare Base": 0.25,
           "Leaflet Curl": 0.4,
           "Leaflet Cup": 0.3,
-          "Leaflet Jitter": 12
+          "Leaflet Jitter": 12,
+          "Sector Center": 90,
+          "Sector Width": 240
         }
       }
     ],
@@ -1785,7 +1797,7 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 18.3509,
+      "power": 17.8987,
       "color": [1.0, 0.88, 0.7],
       "angle": 10.0,
       "direction": [0.497, 0.287, 0.819]

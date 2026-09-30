@@ -60,14 +60,17 @@ def leaf_colors(graph, geometry, first, second, seed, domain="INSTANCE"):
     return graph.store(geometry, INK_QUIET, 1.0, "FLOAT", domain)
 
 
-def crown_points(graph, count, spread_low, spread_high, seed):
+def crown_points(graph, count, spread_low, spread_high, seed, sector_center=0.0, sector_width=TAU):
     """``count`` points at the origin carrying ``azimuth`` (golden-angle
-    spiral) and ``elevation`` (from ``spread_high`` for the first, most
-    upright, to ``spread_low``); returns (points, azimuth, elevation)."""
+    spiral, folded into the sector ``sector_width`` wide about
+    ``sector_center``; the full circle by default) and ``elevation`` (from
+    ``spread_high`` for the first, most upright, to ``spread_low``);
+    returns (points, azimuth, elevation)."""
     points = graph.points(count, (0.0, 0.0, 0.0))
     index = graph.index()
     t = (index + 0.5) / graph.max(count, 1)
-    azimuth = index * GOLDEN_ANGLE + graph.random(-0.25, 0.25, seed)
+    turn = graph.math("FRACT", index * (GOLDEN_ANGLE / TAU) + 0.5) - 0.5
+    azimuth = sector_center + turn * sector_width + graph.random(-0.25, 0.25, seed)
     elevation = spread_high + (spread_low - spread_high) * t + graph.random(-0.08, 0.08, seed + 1)
     return points, azimuth, elevation
 
@@ -79,8 +82,10 @@ def pinnate():
     (``Droop``); leaflets leave the rachis at ``Leaflet Angle``, hang by
     ``Leaflet Droop`` -- each leaflet off both by up to ``Leaflet Jitter``
     -- and are longest at mid-frond.  Every frond is one of
-    ``FROND_VARIANTS`` frond shapes, picked at random.  ``Stem`` lifts the
-    crown on a trunk (palms)."""
+    ``FROND_VARIANTS`` frond shapes, picked at random.  The fronds fill the
+    sector ``Sector Width`` wide about the azimuth ``Sector Center`` (a palm
+    lit from one side grows its fronds towards the light).  ``Stem`` lifts
+    the crown on a trunk (palms)."""
     graph = GN("GH.Flora.Pinnate", pinnate.__doc__)
     fronds = graph.inp("Fronds", "INT", default=14, min=1, max=200)
     length = graph.inp("Frond Length", default=1.2, subtype="DISTANCE")
@@ -100,6 +105,8 @@ def pinnate():
     leaflet_cup = graph.inp("Leaflet Cup", default=0.3)
     stem = graph.inp("Stem", default=0.0, subtype="DISTANCE")
     stem_radius = graph.inp("Stem Radius", default=0.03, subtype="DISTANCE")
+    sector_center = graph.inp("Sector Center", default=0.0, subtype="ANGLE")
+    sector_width = graph.inp("Sector Width", default=TAU, subtype="ANGLE")
     first = graph.inp("Color A", "COLOR", default=M.color("leaf"))
     second = graph.inp("Color B", "COLOR", default=M.color("leaf_light"))
     seed = graph.inp("Seed", "INT", default=0)
@@ -134,7 +141,7 @@ def pinnate():
         return graph.join(leaves, graph.store(rachis, "leaf_u", 0.0))
 
     shapes = graph.join(*[graph.iop(graph.points(1, (0.0, 0.0, 0.0)), frond(variant)) for variant in range(FROND_VARIANTS)])
-    points, azimuth, elevation = crown_points(graph, fronds, spread_low, spread_high, seed)
+    points, azimuth, elevation = crown_points(graph, fronds, spread_low, spread_high, seed, sector_center, sector_width)
     points = graph.set_pos(points, offset=graph.vec(0.0, 0.0, stem))
     scale = length * graph.random(1.0 - length_jitter, 1.0, seed + 3)
     shape_index = graph.random(0, FROND_VARIANTS - 1, seed + 4, dtype="INT")
