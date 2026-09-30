@@ -19,7 +19,11 @@ that brings the render closest to the painting kept.  The fields
 * ``size`` -- its scale, larger and smaller by the fraction ``--step``
   (default 0.1);
 * ``aim`` -- a lamp's direction, its azimuth and its elevation turned by
-  ``--step`` degrees (default 2) either way.
+  ``--step`` degrees (default 2) either way;
+* ``input`` -- the geometry-nodes input named by ``--input`` (a leaflet's
+  width, a frond count), larger and smaller by the fraction ``--step``
+  (default 0.2): what the painting shows of a plant's make only to within
+  the width of a painted stroke.
 
 Closeness is the reported measure: the error of colours blurred by
 ``BLUR`` of the image width, plus ``PIXEL_WEIGHT`` of the error pixel by
@@ -30,7 +34,7 @@ whole garden better or worse, never be picked piecewise.
 One Blender session changes the objects in place and renders again, so a
 try costs one small render::
 
-    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm" [--field seed|move|turn|size|aim] [--tries 6] [--step S] [--rounds 1] [--samples 32] [--scale 0.25]
+    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm" [--field seed|move|turn|size|aim|input] [--input NAME] [--tries 6] [--step S] [--rounds 1] [--samples 32] [--scale 0.25]
 
 writes the chosen values into scene.json.  Run it last: lighting and
 material fits change what the best garden is.
@@ -87,10 +91,9 @@ def gaussian(image, sigma):
 
 class Seed:
     """The object's geometry-nodes ``Seed``."""
-    step = 0.0
 
-    def __init__(self, tries, step):
-        self.tries = tries
+    def __init__(self, option):
+        self.tries = option("--tries", 6, int)
 
     @staticmethod
     def modifier(obj):
@@ -116,10 +119,9 @@ class Seed:
 
 class Move:
     """The object's position on the floor."""
-    step = 0.2
 
-    def __init__(self, tries, step):
-        self.distance = step
+    def __init__(self, option):
+        self.distance = option("--step", 0.2, float)
 
     def get(self, obj):
         return (obj.location.x, obj.location.y)
@@ -140,10 +142,9 @@ class Move:
 
 class Turn:
     """The object's heading, degrees about Z."""
-    step = 45.0
 
-    def __init__(self, tries, step):
-        self.tries, self.angle = tries, step
+    def __init__(self, option):
+        self.tries, self.angle = option("--tries", 6, int), option("--step", 45.0, float)
 
     def get(self, obj):
         return math.degrees(obj.rotation_euler.z)
@@ -165,10 +166,9 @@ class Turn:
 
 class Size:
     """The object's uniform scale."""
-    step = 0.1
 
-    def __init__(self, tries, step):
-        self.fraction = step
+    def __init__(self, option):
+        self.fraction = option("--step", 0.1, float)
 
     def get(self, obj):
         return obj.scale.x
@@ -189,10 +189,9 @@ class Size:
 class Aim:
     """A lamp's direction (towards the light) as azimuth and elevation,
     degrees."""
-    step = 2.0
 
-    def __init__(self, tries, step):
-        self.angle = step
+    def __init__(self, option):
+        self.angle = option("--step", 2.0, float)
 
     def get(self, obj):
         from mathutils import Vector
@@ -219,7 +218,34 @@ class Aim:
         return "(azimuth %.1f, elevation %.1f)" % value
 
 
-FIELDS = {"seed": Seed, "move": Move, "turn": Turn, "size": Size, "aim": Aim}
+class Input:
+    """A numeric geometry-nodes input of the object (``--input``), larger
+    and smaller by the fraction ``--step``; whole numbers stay whole."""
+
+    def __init__(self, option):
+        self.name, self.fraction = option("--input", None, str), option("--step", 0.2, float)
+
+    def get(self, obj):
+        from Core import scene as SC
+        return SC.get_gn_input(Seed.modifier(obj), self.name)
+
+    def set(self, obj, value):
+        from Core import scene as SC
+        SC.set_gn_inputs(Seed.modifier(obj), {self.name: value})
+
+    def candidates(self, value):
+        if isinstance(value, int):
+            return sorted({max(value + delta, 1) for delta in (-max(round(value * self.fraction), 1), max(round(value * self.fraction), 1))} - {value})
+        return [value * (1.0 + self.fraction), value * (1.0 - self.fraction)]
+
+    def store(self, item, value):
+        item.setdefault("inputs", {})[self.name] = value if isinstance(value, int) else round(value, 4)
+
+    def show(self, value):
+        return "%s %s" % (self.name, value if isinstance(value, int) else "%.4f" % value)
+
+
+FIELDS = {"seed": Seed, "move": Move, "turn": Turn, "size": Size, "aim": Aim, "input": Input}
 
 
 def main(argv):
@@ -231,8 +257,7 @@ def main(argv):
 
     names = [name.strip() for name in argv[0].split(",") if name.strip()]
     kind = option("--field", "seed", str)
-    field_class = FIELDS[kind]
-    field = field_class(option("--tries", 6, int), option("--step", field_class.step, float))
+    field = FIELDS[kind](option)
     rounds = option("--rounds", 1, int)
     samples = option("--samples", 32, int)
     scale = option("--scale", 0.25, float)
