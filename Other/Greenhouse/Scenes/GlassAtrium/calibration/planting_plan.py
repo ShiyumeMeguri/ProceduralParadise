@@ -14,11 +14,12 @@ outside the frame; a point landing on the pale floor, on the pink haze or on the
 caps the height below it.  A point hidden behind glassware (its boxes come
 from the scene) tells nothing: a cell seen only through glassware takes
 the class most of its seen neighbours within ``NEIGHBOURHOOD`` cells have.
-Cells the camera cannot see at all are planted by design.  The foot of
-the stair and the court along the north wall (the pale floor seen through
-the balustrade, where the painted canopy behind is the trees outside) are
-kept clear, and so is the floor under the garden furniture of the scene
-(``FURNITURE_MARGIN`` round it).
+Cells the camera cannot see at all are planted by design.  The scene's
+``planting.keep_clear`` boxes stay clear -- the foot of the stair, the
+court along the north wall (the pale floor seen through the balustrade,
+where the painted canopy behind is the trees outside), the paths to the
+doorways of the wings -- and so does the floor under the garden furniture
+of the scene (``FURNITURE_MARGIN`` round it).
 
     python Other/Greenhouse/Scenes/GlassAtrium/calibration/planting_plan.py
 
@@ -55,7 +56,6 @@ GROUND = 0.9
 UNDERSTORY = 1.8
 CELL = 0.5
 EXTENT = (-12.3, 13.3, -5.8, 15.8)
-KEEP_CLEAR = [(-4.62, -3.12, 0.32, 8.0), (-9.5, 2.5, 9.5, 15.8)]
 FURNITURE_MARGIN = 0.15
 BLOB = 15
 WINDOW = 6
@@ -169,7 +169,7 @@ def main():
     centres_x = x0 + (np.arange(nx) + 0.5) * CELL
     centres_y = y0 + (np.arange(ny) + 0.5) * CELL
     clear = np.zeros((nx, ny), bool)
-    boxes = list(KEEP_CLEAR)
+    boxes = [tuple(zone["box"]) for zone in scene["planting"]["keep_clear"]]
     for item in scene["collections"]["Garden"]:
         if item.get("asset", "").startswith("GH.Furniture."):
             x, y, _ = item["loc"]

@@ -67,6 +67,18 @@ def light_clear(tree: Tree, shader, tint):
     return mix_shader(tree, carries_light, shader, transparent)
 
 
+def seen(tree: Tree):
+    """1 on the rays that carry the eye's own view of the sky -- camera
+    rays, straight or only refracted through glass -- and 0 once a path has
+    been mirrored (a pane's glint of the sky is painted at the sky's full
+    light, as the painting paints its glass) and on the rays that light the
+    scene, a leaf's translucency among them."""
+    path = tree.n("ShaderNodeLightPath")
+    refracted = tree.math("MULTIPLY", path["Is Transmission Ray"], tree.math("SUBTRACT", 1.0, path["Is Diffuse Ray"]))
+    unmirrored = tree.math("LESS_THAN", path["Glossy Depth"], 0.5)
+    return tree.math("MAXIMUM", path["Is Camera Ray"], tree.math("MULTIPLY", refracted, unmirrored))
+
+
 def scaled(rgba, factor):
     return tuple(channel * factor for channel in rgba[:3]) + (1.0,)
 
@@ -139,7 +151,8 @@ def dielectric(name, spec):
     smooth dielectric of ``ior`` -- dispersing by its ``abbe`` number where
     the row gives one -- filled with absorption towards the palette colour
     ``tint`` at ``density`` per metre and, with a ``scatter`` density, a
-    haze that lights the glass from within.  Painted glassware mirrors the
+    haze that lights the glass from within (no ``volume`` for an open sheet
+    such as a pool's surface).  Painted glassware mirrors the
     room far more than real glass does, and mirrors it as the painter sees
     it -- bright panes over a clear body, not the even glare the room really
     sheds on a sphere -- so a ``reflection`` gain above 1 adds that many
@@ -173,7 +186,7 @@ def dielectric(name, spec):
             volume = tree.n("ShaderNodeAddShader", volume, haze)["Shader"]
         loss = surface_transmittance(ior)
         half_wall = tuple(loss * math.exp(-(1.0 - channel) * density * field("wall") * 0.5) for channel in tint[:3])
-        return {"Surface": light_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume}
+        return {"Surface": light_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume if field("volume", True) else None}
     return lambda: S.material(name, build)
 
 
@@ -203,6 +216,44 @@ def tread():
     return S.material("GH.Tread", build)
 
 
+@register("GH.Stone")
+def stone():
+    """Honed pale stone of the copings, the steps and the retaining walls'
+    caps: ``stone`` clouded a little lighter and darker."""
+    def build(tree: Tree):
+        cloud = S.noise(tree, S.tex_coord(tree), 3.0, 6.0, 0.6)["Fac"]
+        base = S.mix_rgb(tree, tree.map_range(cloud, 0.35, 0.65, 0.0, 1.0), scaled(color("stone"), 0.9), scaled(color("stone"), 1.06))
+        return S.bsdf(tree, Base_Color=base, Roughness=0.55)["BSDF"]
+    return S.material("GH.Stone", build)
+
+
+@register("GH.Cliff")
+def cliff():
+    """The faces of the hill's terraces: dressed stone (``stone_dark``)
+    overgrown in patches by moss and ivy (``moss``), thickest towards the
+    top where the terrace above drips water down it."""
+    def build(tree: Tree):
+        coordinates = S.tex_coord(tree)
+        _, _, height = tree.sep(coordinates)
+        patches = S.noise(tree, tree.vmath("MULTIPLY", coordinates, (1.0, 1.0, 0.35)), 0.25, 5.0, 0.65)["Fac"]
+        grit = S.noise(tree, coordinates, 30.0, 4.0)["Fac"]
+        overgrown = tree.map_range(patches, 0.42, 0.58, 0.0, 1.0)
+        base = S.mix_rgb(tree, overgrown, S.mix_rgb(tree, grit, scaled(color("stone_dark"), 0.85), scaled(color("stone_dark"), 1.1)), color("moss"))
+        return S.bsdf(tree, Base_Color=base, Roughness=0.9, Normal=bump(tree, grit, 0.3))["BSDF"]
+    return S.material("GH.Cliff", build)
+
+
+@register("GH.PoolTile")
+def pool_tile():
+    """Glazed tile lining a pool's basin (``pool_tile``), seen through the
+    water."""
+    def build(tree: Tree):
+        speckle = S.noise(tree, S.tex_coord(tree), 12.0, 3.0)["Fac"]
+        base = S.mix_rgb(tree, tree.map_range(speckle, 0.35, 0.65, 0.0, 1.0), scaled(color("pool_tile"), 0.85), scaled(color("pool_tile"), 1.1))
+        return S.bsdf(tree, Base_Color=base, Roughness=0.3)["BSDF"]
+    return S.material("GH.PoolTile", build)
+
+
 @register("GH.Paving")
 def paving():
     """Stone paving of the garden floor; the flags carry ``flag_shade``
@@ -230,12 +281,15 @@ def deck():
 
 @register("GH.Lawn")
 def lawn():
-    """Mown grass seen from afar: mottled greens with a fine blade bump."""
+    """Mown grass in the open sun: mottled between ``grass`` and
+    ``grass_light`` -- the albedo of real turf, a tenth to a third of the
+    light, not the painted colours of the leaves under glass -- with a fine
+    blade bump."""
     def build(tree: Tree):
         coordinates = S.tex_coord(tree)
         mottle = S.noise(tree, coordinates, 0.4, 6.0, 0.6)["Fac"]
         blades = S.noise(tree, coordinates, 300.0, 2.0)["Fac"]
-        base = S.mix_rgb(tree, tree.map_range(mottle, 0.3, 0.7, 0.0, 1.0), color("leaf"), color("leaf_light"))
+        base = S.mix_rgb(tree, tree.map_range(mottle, 0.3, 0.7, 0.0, 1.0), color("grass"), color("grass_light"))
         return S.bsdf(tree, Base_Color=base, Roughness=0.9, Normal=bump(tree, blades, 0.3))["BSDF"]
     return S.material("GH.Lawn", build)
 
@@ -390,20 +444,26 @@ def air():
 
 @register("GH.Smog")
 def smog():
-    """The city haze below the tower: an absorbing medium that glows with
-    the skylight it scatters in, so along a path of transmittance T the view
-    becomes L * T + smog * brightness * (1 - T) -- single-scattered skylight
-    in closed form.  It thins with height, exp(-(z - ``smog_ground``) /
-    ``smog_scale``) from ``smog_density`` at the ground: the streets far
-    below vanish into pink while a neighbouring tower at the conservatory's
-    height stays clear.  The haze surrounds the conservatory, so it is also
-    what the interior sees through every pane: its glow lights the rooms
-    as the pink ambient of a hazy afternoon, where the sky beyond it is
-    absorbed."""
+    """The city haze in the valley below the conservatory: an absorbing
+    medium that glows with the skylight it scatters in, so along a path of
+    transmittance T the view becomes L * T + smog * brightness * (1 - T) --
+    single-scattered skylight in closed form.  It thins with height,
+    exp(-(z - ``smog_ground``) / ``smog_scale``) from ``smog_density`` at
+    the ground: the streets far below vanish into pink while a neighbouring
+    tower at the conservatory's height stays clear.  To the eye
+    (:func:`seen`) an inversion holds it in the valley: above ``smog_top``
+    it fades over ``smog_top_fade`` to the share ``smog_above`` of itself,
+    so a view down from the hill dissolves into pink while the sky above
+    the hill stays blue.  The light and the glints keep the whole column --
+    the painting's light rig was fitted with the haze dimming the low sky
+    to deep shadows and its glass mirroring pink haze."""
     def build(tree: Tree):
         _, _, z = tree.sep(tree.n("ShaderNodeNewGeometry")["Position"])
         falloff = tree.math("EXPONENT", (z - param("smog_ground", -120.0)) * (-1.0 / param("smog_scale", 30.0)))
-        density = tree.math("MULTIPLY", falloff, param("smog_density", 0.05))
+        top = param("smog_top", 0.0)
+        thinned = tree.map_range(z, top, top + param("smog_top_fade", 1.0), 0.0, 1.0 - param("smog_above", 1.0))
+        inversion = tree.math("SUBTRACT", 1.0, tree.math("MULTIPLY", thinned, seen(tree)))
+        density = tree.math("MULTIPLY", tree.math("MULTIPLY", falloff, inversion), param("smog_density", 0.05))
         absorb = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=density)["Volume"]
         glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=tree.math("MULTIPLY", density, param("smog_brightness", 1.0)))["Emission"]
         return {"Volume": tree.n("ShaderNodeAddShader", absorb, glow)["Shader"]}
@@ -435,8 +495,13 @@ def names():
 
 def world(config):
     """Hazy daylight sky: a gradient from the pink-white haze at and below
-    the horizon to a pale blue zenith.  Camera rays may see the sky at a
-    different strength than the light it sheds."""
+    the horizon to a pale blue zenith, with ``clouds`` -- banks of ``cloud``
+    colour covering the share ``cover`` of the sky, ``scale`` of them across
+    it, flattened ``flatten`` times, edges ``softness`` soft -- that thin out
+    towards the horizon and the zenith.  The sky sheds light at
+    ``light_strength`` (the light fit's); the eye sees it at ``seen_ratio``
+    of that -- adapted to a sunlit park, where the sky is bright but not
+    blinding -- straight up or through the glass (:func:`seen`)."""
     world_block = S.new_world("GH.Sky")
     tree = Tree.wrap(world_block.node_tree, clear=True)
     out = tree.n("ShaderNodeOutputWorld")
@@ -444,8 +509,15 @@ def world(config):
     _, _, height = tree.sep(direction)
     sky = S.ramp(tree, tree.map_range(height, config.get("haze_top", -0.1), config.get("zenith_height", 0.6), 0.0, 1.0),
                  [(0.0, color("haze")), (0.35, color("sky_horizon")), (1.0, color("sky_zenith"))])["Color"]
-    camera = tree.n("ShaderNodeLightPath")["Is Camera Ray"]
-    strength = config["light_strength"] + (config["camera_strength"] - config["light_strength"]) * camera
+    clouds = config.get("clouds")
+    if clouds:
+        flattened = tree.vmath("MULTIPLY", direction, (1.0, 1.0, clouds["flatten"]))
+        billows = S.noise(tree, flattened, clouds["scale"], 6.0, 0.55)["Fac"]
+        threshold = 1.0 - clouds["cover"]
+        cover = tree.map_range(billows, threshold, threshold + clouds["softness"], 0.0, 1.0)
+        band = tree.math("MULTIPLY", tree.map_range(height, 0.0, 0.08, 0.0, 1.0), tree.map_range(height, 0.45, 0.85, 1.0, 0.0))
+        sky = S.mix_rgb(tree, tree.math("MULTIPLY", cover, band), sky, color(clouds["color"]))
+    strength = config["light_strength"] * (1.0 + (config.get("seen_ratio", 1.0) - 1.0) * seen(tree))
     tree.link(tree.n("ShaderNodeBackground", sky, strength)["Background"], out.n.inputs["Surface"])
     tree.layout()
     bpy.context.scene.world = world_block

@@ -40,7 +40,16 @@
     "bronze": [0.12, 0.1, 0.08],
     "leaf_emerald": [0.14, 0.62, 0.3],
     "jade_glass": [0.12, 0.69, 0.6],
-    "bottle_glass": [0.2, 0.81, 0.3]
+    "bottle_glass": [0.2, 0.81, 0.3],
+    "stone": [0.74, 0.7, 0.68],
+    "stone_dark": [0.36, 0.38, 0.37],
+    "moss": [0.16, 0.3, 0.16],
+    "pool_tile": [0.16, 0.4, 0.44],
+    "cloud": [1.0, 0.93, 0.96],
+    "grass": [0.06, 0.15, 0.035],
+    "grass_light": [0.15, 0.3, 0.06],
+    "tree_leaf": [0.03, 0.2, 0.12],
+    "tree_leaf_light": [0.46, 0.56, 0.09]
   },
   "glasses": {
     "GH.Glass": {
@@ -109,6 +118,14 @@
       "tint": "water_tint",
       "density": 16.0,
       "wall": 0.2
+    },
+    "GH.PoolWater": {
+      "notes": "Still water of the reflecting pools: an open sheet over a tiled basin, so it has no volume -- the basin's tiles colour it.",
+      "ior": 1.333,
+      "tint": "water_tint",
+      "density": 0.0,
+      "wall": 0.0,
+      "volume": false
     }
   },
   "reflection_room": {

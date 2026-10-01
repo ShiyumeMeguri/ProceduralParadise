@@ -134,6 +134,53 @@ def planting():
     return graph
 
 
+@asset("GH.Env.Ground", "Environment")
+def ground():
+    """Ground from a solid of the mesh (a plinth, a terrace): the faces
+    turned up more than ``Slope`` (the up component of their normal) are its
+    ``Top`` -- lawn, paving -- the rest its ``Sides``, the face of a
+    retaining wall or a cliff."""
+    graph = GN("GH.Env.Ground", ground.__doc__)
+    mesh = graph.inp("Geometry", "GEOMETRY")
+    slope = graph.inp("Slope", default=0.7, min=0.0, max=1.0)
+    top = graph.inp("Top", "MATERIAL", default=M.get("GH.Lawn"))
+    sides = graph.inp("Sides", "MATERIAL", default=M.get("GH.Cliff"))
+    _, _, up = graph.sep(graph.normal())
+    graph.result(graph.mat(graph.mat(mesh, sides), top, sel=graph.compare(up, slope, "GREATER_THAN")))
+    return graph
+
+
+@asset("GH.Env.Pool", "Environment")
+def pool():
+    """Raised reflecting pool ``Length`` (along X) by ``Width``, centred on
+    the origin on the ground: stone walls ``Coping`` thick rising ``Height``
+    round a basin lined with ``Basin``, filled with ``Water`` to
+    ``Freeboard`` below their top."""
+    graph = GN("GH.Env.Pool", pool.__doc__)
+    length = graph.inp("Length", default=12.0, subtype="DISTANCE")
+    width = graph.inp("Width", default=4.0, subtype="DISTANCE")
+    height = graph.inp("Height", default=0.45, subtype="DISTANCE")
+    coping = graph.inp("Coping", default=0.4, subtype="DISTANCE")
+    freeboard = graph.inp("Freeboard", default=0.06, subtype="DISTANCE")
+    stone = graph.inp("Stone", "MATERIAL", default=M.get("GH.Stone"))
+    basin = graph.inp("Basin", "MATERIAL", default=M.get("GH.PoolTile"))
+    water = graph.inp("Water", "MATERIAL", default=M.get("GH.PoolWater"))
+
+    outer_x = length * 0.5 + coping
+    outer_y = width * 0.5 + coping
+    walls = graph.join(
+        graph.box(outer_x * -1.0, width * 0.5, 0.0, outer_x, outer_y, height),
+        graph.box(outer_x * -1.0, outer_y * -1.0, 0.0, outer_x, width * -0.5, height),
+        graph.box(outer_x * -1.0, width * -0.5, 0.0, length * -0.5, width * 0.5, height),
+        graph.box(length * 0.5, width * -0.5, 0.0, outer_x, width * 0.5, height))
+    shell = graph.box(length * -0.5, width * -0.5, 0.02, length * 0.5, width * 0.5, height)
+    _, _, up = graph.sep(graph.normal())
+    shell = graph.delete(shell, graph.compare(up, 0.5, "GREATER_THAN"), "FACE")
+    surface = graph.transform(graph.grid(1.0, 1.0, 2, 2), t=graph.vec(0.0, 0.0, height - freeboard), s=graph.vec(length, width, 1.0))
+    graph.result(graph.join(graph.mat(walls, stone), graph.mat(shell, basin), M.glazed(graph, surface, water)))
+    return graph
+
+
 @asset("GH.Env.Tower", "Environment")
 def tower():
     """Office tower of ``Width`` x ``Depth`` x ``Height``: a curtain wall of

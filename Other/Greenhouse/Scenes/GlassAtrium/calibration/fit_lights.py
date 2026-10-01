@@ -198,7 +198,7 @@ def apply(groups, weights):
             for sun in suns:
                 sun["power"] = round(sun["power"] * strength, 4)
             sky = scene["sky"]
-            sky["camera_strength"] = sky["light_strength"] = round(sky["sun_ratio"] * max(sun["power"] for sun in suns), 4)
+            sky["light_strength"] = round(sky["sun_ratio"] * max(sun["power"] for sun in suns), 4)
         elif info["kind"] == "lamp":
             lamp = next(item for item in scene["lights"] if item["name"] == name)
             lamp["power"] = round(lamp["power"] * strength, 4)

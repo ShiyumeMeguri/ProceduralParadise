@@ -10,34 +10,46 @@
     "Gallery: a glass floor (top at z = 0) on polished jade beams over the garden, south of y = 4.18 and on the west wing; the stairwell (x -5.0..-2.16, y -1.6..4.18) and the atrium north of the edge are open.  The edge is guarded by a frameless glass balustrade whose top edge carries short jade stanchions between two rails (0.91 and 1.04 m) -- the painting draws the stanchions only between the rails.",
     "Through the atrium the view falls on the paved north end of the garden (1 m flags: their joints are the regular lines behind the railing) and, through the lower curtain wall, on the pink haze outside.",
     "Garden: planted cell by cell from a planting plan read off the painting (calibration/planting_plan.py -> data/planting.json): where the painting shows foliage up to a height above a cell, the cell carries plants that tall (ground cover, understory or shrubs); where it shows the pale floor it stays paved; cells seen only through glassware take their neighbours' class; cells the painting's camera cannot see are planted by design -- except the foot of the stair, the court along the north wall and the floor under the garden furniture.",
-    "Stair (dog-leg, glass treads): 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rise from the garden at y = 0.32 to a landing at z = -1.354, then 11 treads turn west up to the gallery floor at x = -9.383; solved from the painted nosings (16 px rms).",
-    "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6 / 16, a glazed roof at z = 7.22; the conservatory crowns a 117 m tower: the frame's top row of image looks 6 degrees below the horizon, so the pink seen through the walls is the sunlit city haze far below, not sky.  North of the tower a podium rises to 16 m below the garden, reaching 33 m out -- just short of where its roof would rise above the sight line past the foot of the north wall, so the roof itself is never seen and the view beyond it falls into the haze; the trees on its roof terrace, 30-45 m away, are the pale canopies seen through the north wall down to its foot (their tops placed on the painted canopy outline, their trunks and the terrace below every sight line through the wall), veiled by the haze between.  The faint tree further off stands on a lower roof 84 m north (a crown 6.3 m wide, sized on its painted silhouette); that roof, too, ends before it would rise above the sight line past the wall foot.",
+    "Stair (dog-leg, solid stone treads): 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rise from the garden at y = 0.32 to a landing at z = -1.354, then 11 treads turn west up to the gallery floor at x = -9.383; solved from the painted nosings (16 px rms).",
+    "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6 / 16, the roof's tie grid at z = 7.22 under a glass gable (volumes.Hall); the conservatory crowns a hilltop park whose north edge is its north wall: the frame's top row of image looks 6 degrees below the horizon, so the pink seen through the walls is the sunlit city haze in the valley below, not sky.  North of the wall a lower terrace of the hill lies 16 m below the gallery, reaching 33 m out -- just short of where its ground would rise above the sight line past the foot of the north wall, so the ground itself is never seen and the view beyond it falls into the haze; the trees on it, 30-45 m away, are the pale canopies seen through the north wall down to its foot (their tops placed on the painted canopy outline, their trunks and the terrace below every sight line through the wall), veiled by the haze between.  The faint tree further off stands on a lower terrace 84 m north (a crown 6.3 m wide, sized on its painted silhouette); that terrace, too, ends before it would rise above the sight line past the wall foot.",
     "Garden specimens (\"Painted ...\"): each placed where its mass is in the painting -- the centre pixel of the mass back-projected through the solved camera at the height of its crown -- then shifted by whole 0.2 m steps where the rendered view then matches the painting better (calibration/layout_search.py); the random understory fills the beds between them.",
     "Air: the sunlit air fills the conservatory 10 cm clear of the floor and roof -- a volume boundary must not coincide with another volume boundary (the glass posts end on those planes), or the volume stack at the camera breaks and every camera ray is absorbed.",
     "Side table: the painting draws its top as an ellipse rounder (aspect 0.57) than a horizontal disc can project to at that place (every point on that view ray gives sin 26 deg = 0.44); the disc matches the painted width and centre, the objects on it their painted corners.",
-    "Sun: 55 deg high from azimuth 30 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do.  It shines through the city smog, which scatters the blue out of it: golden light (1.0, 0.9, 0.45) -- the painted sun patches on the pale pink floor are orange-yellow, not pink-white.",
+    "Sun: 55 deg high from azimuth 31 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do.  It shines through the city smog, which scatters the blue out of it: golden light (1, 0.85, 0.32) -- the painted sun patches on the pale pink floor are orange-yellow, not pink-white.",
     "Shade trees: three umbrella trees in the unseen north-east of the garden (outside the painting frame) whose crowns stand between the sun and the paved court: their dappled shade is the green-and-pink mottling of the court floor seen through the balustrade, and the sun shafts come down between their leaves.",
     "North wall: structurally glazed -- its panes meet on silicone joints, so only the transoms and the corner mullions are frames (the painting shows the pink haze through it undivided but for two horizontal bars).  Posts that the painting shows only below the gallery floor stop under it.",
     "Daylight: the sky's strength is 0.26 of the sun's power (sky.sun_ratio): a hazy sky giving some 40 % of the light on a level surface with the sun 55 degrees up (pi * 0.26 * 0.7 against sin 55, for a dome averaging 0.7 of its strength); the fit scales both together.",
     "Vines: climbing plants trained along the roof frame, 6.3-6.6 m above the gallery, above every sight line of the painting's camera: they are seen only in their dappled shade -- the leaf-shaped sun patches on the court, the treads and the gallery -- and in the shafts of sun between them.  The sun is the real sun, half a degree across, so the patches keep sharp edges from nine metres up.",
-    "City extent: the city ground and the haze reach 6 km out: the top row of the frame looks 6 degrees down, so its sight line meets the ground 1.2 km away -- inside the haze, where the ground has no edge to show."
+    "City extent: the city ground and the haze reach 6 km out: the top row of the frame looks 6 degrees down, so its sight line meets the ground 1.2 km away -- inside the haze, where the ground has no edge to show.",
+    "Sky and haze as seen: a pale blue zenith and banks of pink-white cloud over a pink-white horizon (sky.clouds); the eye sees the sky at sky.seen_ratio of the light it sheds, straight up or through the glass, and sees the valley haze thin out above the hilltop (materials.smog_top, smog_top_fade, smog_above).  The light rays and the glints of the glass keep the full haze and the sky's full light: the light fit was made with them.",
+    "Whole conservatory (volumes, collections Wings, Upper Floor, Conservatory Decor, Site, Wing Gardens): a fern house west, a palm house with a planted roof and a lantern east (the front door), a terrace house south under a planted roof terrace (the south door on the canal's axis), a glass stair tower to a belvedere at the south-east corner, a third-floor gallery round the atrium; all of it outside the painting's frame and away from its shadows, each step checked on the painting's probe."
   ],
   "materials": {
     "leaf_translucency": 0.35,
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.1571,
+    "smog_brightness": 1.165,
+    "smog_top": -3.25,
+    "smog_top_fade": 12.0,
+    "smog_above": 0.08,
     "leaf_sheen": 0.12,
     "air_density": 0.01,
     "air_anisotropy": 0.0
   },
   "sky": {
-    "camera_strength": 2.4565,
-    "light_strength": 2.4565,
+    "light_strength": 2.6399,
+    "seen_ratio": 0.35,
     "haze_top": -0.1,
-    "zenith_height": 0.7,
-    "sun_ratio": 0.26
+    "zenith_height": 0.45,
+    "sun_ratio": 0.26,
+    "clouds": {
+      "cover": 0.5,
+      "scale": 2.2,
+      "flatten": 3.0,
+      "softness": 0.18,
+      "color": "cloud"
+    }
   },
   "library": {
     "Ground": [
@@ -47,8 +59,8 @@
         "preset": "boston_fern",
         "inputs": {
           "Seed": 3,
-          "Color A": [0.501, 0.735, 0.274],
-          "Color B": [0.681, 0.773, 0.226]
+          "Color A": [0.523, 0.731, 0.248],
+          "Color B": [0.71, 0.767, 0.205]
         }
       },
       {
@@ -56,7 +68,9 @@
         "asset": "GH.Flora.Pinnate",
         "preset": "sword_fern",
         "inputs": {
-          "Seed": 5
+          "Seed": 5,
+          "Color A": [0.05, 0.351, 0.461],
+          "Color B": [0.341, 0.751, 0.584]
         }
       },
       {
@@ -65,8 +79,8 @@
         "preset": "philodendron",
         "inputs": {
           "Seed": 7,
-          "Color A": [0.021, 0.157, 0.09],
-          "Color B": [0.041, 0.232, 0.17]
+          "Color A": [0.021, 0.158, 0.077],
+          "Color B": [0.041, 0.235, 0.147]
         }
       }
     ],
@@ -92,7 +106,9 @@
         "asset": "GH.Flora.Broadleaf",
         "preset": "philodendron",
         "inputs": {
-          "Seed": 7
+          "Seed": 7,
+          "Color A": [0.048, 0.152, 0.058],
+          "Color B": [0.095, 0.223, 0.109]
         }
       },
       {
@@ -104,8 +120,8 @@
           "Leaf Length": 0.4,
           "Leaf Width": 0.28,
           "Seed": 15,
-          "Color A": [0.079, 0.364, 0.242],
-          "Color B": [0.508, 0.731, 0.288]
+          "Color A": [0.053, 0.363, 0.322],
+          "Color B": [0.358, 0.764, 0.401]
         }
       }
     ],
@@ -118,8 +134,8 @@
           "Seed": 23,
           "Leaf Length": 0.45,
           "Leaf Width": 0.4,
-          "Color A": [0.021, 0.155, 0.102],
-          "Color B": [0.063, 0.372, 0.215]
+          "Color A": [0.021, 0.157, 0.089],
+          "Color B": [0.063, 0.375, 0.186]
         }
       },
       {
@@ -131,8 +147,111 @@
           "Leaf Length": 0.5,
           "Leaf Width": 0.36,
           "Petiole": 0.8,
-          "Color A": [0.114, 0.365, 0.131],
-          "Color B": [0.688, 0.691, 0.148]
+          "Color A": [0.185, 0.346, 0.103],
+          "Color B": [0.95, 0.598, 0.106]
+        }
+      }
+    ],
+    "Terrace Plants": [
+      {
+        "name": "Proto Trailing Fern",
+        "asset": "GH.Flora.Pinnate",
+        "preset": "boston_fern",
+        "inputs": {
+          "Seed": 41,
+          "Fronds": 40,
+          "Frond Length": 1.0,
+          "Spread Low": -70,
+          "Spread High": 25,
+          "Droop": 1.0,
+          "Color A": "leaf_light",
+          "Color B": "leaf_yellow"
+        }
+      },
+      {
+        "name": "Proto Terrace Shrub",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "shrub",
+        "inputs": {
+          "Seed": 43,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
+        }
+      },
+      {
+        "name": "Proto Trailing Spider",
+        "asset": "GH.Flora.Rosette",
+        "preset": "spider",
+        "inputs": {
+          "Seed": 47,
+          "Leaf Length": 0.6,
+          "Spread Low": -40
+        }
+      }
+    ],
+    "Trees": [
+      {
+        "name": "Proto Park Tree",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "tree",
+        "inputs": {
+          "Seed": 11,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
+        }
+      },
+      {
+        "name": "Proto Park Tree Round",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "tree",
+        "inputs": {
+          "Seed": 23,
+          "Crown Radius": 2.1,
+          "Crown Height": 2.6,
+          "Stem": 1.3,
+          "Leaves": 2800,
+          "Clumps": 40,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
+        }
+      },
+      {
+        "name": "Proto Park Tree Slender",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "tree",
+        "inputs": {
+          "Seed": 37,
+          "Crown Radius": 1.2,
+          "Crown Height": 3.2,
+          "Stem": 1.6,
+          "Leaves": 1800,
+          "Clumps": 26,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
+        }
+      }
+    ],
+    "Hedges": [
+      {
+        "name": "Proto Hedge",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "shrub",
+        "inputs": {
+          "Seed": 7,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
+        }
+      },
+      {
+        "name": "Proto Hedge Low",
+        "asset": "GH.Flora.Umbrella",
+        "preset": "shrub",
+        "inputs": {
+          "Seed": 19,
+          "Crown Radius": 0.45,
+          "Crown Height": 0.5,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
         }
       }
     ]
@@ -369,6 +488,19 @@
           "Width": 0.03,
           "Depth": 0.03
         }
+      },
+      {
+        "name": "Hall Frame",
+        "mesh": {
+          "volume": "Hall",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.04,
+          "Depth": 0.12,
+          "Overrun": 0.02
+        }
       }
     ],
     "Glazing": [
@@ -596,7 +728,8 @@
               "v": [-3.2, -0.58, 3.32, 7.22],
               "w": -6.0,
               "edges": false,
-              "faces": true
+              "faces": true,
+              "skip": [[6, 0], [7, 0], [6, 2], [7, 2]]
             },
             {
               "plane": "YZ",
@@ -617,7 +750,8 @@
               "v": [-3.2, -0.58, 3.32, 7.22],
               "w": -12.46,
               "edges": false,
-              "faces": true
+              "faces": true,
+              "skip": [[5, 0], [6, 0]]
             },
             {
               "plane": "YZ",
@@ -638,7 +772,8 @@
               "v": [-3.2, -0.58, 3.32, 7.22],
               "w": 13.54,
               "edges": false,
-              "faces": true
+              "faces": true,
+              "skip": [[6, 0], [7, 0], [0, 1], [0, 2]]
             }
           ]
         },
@@ -649,45 +784,10 @@
         }
       },
       {
-        "name": "Roof Glass",
+        "name": "Hall Glass",
         "mesh": {
-          "grid": {
-            "plane": "XY",
-            "u": [
-              -12.46,
-              -10.46,
-              -8.46,
-              -6.46,
-              -4.46,
-              -2.46,
-              -0.46,
-              1.54,
-              3.54,
-              5.54,
-              7.54,
-              9.54,
-              11.54,
-              13.54,
-              13.54
-            ],
-            "v": [
-              -6.0,
-              -4.0,
-              -2.0,
-              0.0,
-              2.0,
-              4.0,
-              6.0,
-              8.0,
-              10.0,
-              12.0,
-              14.0,
-              16.0
-            ],
-            "w": 7.319999999999999,
-            "edges": false,
-            "faces": true
-          }
+          "volume": "Hall",
+          "faces": true
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -1006,8 +1106,8 @@
           "Crown Radius": 0.65,
           "Leaves": 420,
           "Clumps": 18,
-          "Color A": [0.564, 0.719, 0.244],
-          "Color B": [0.762, 0.752, 0.199],
+          "Color A": [0.58, 0.717, 0.217],
+          "Color B": [0.782, 0.749, 0.177],
           "Seed": 1003
         }
       },
@@ -1026,8 +1126,8 @@
           "Spread Low": 20,
           "Spread High": 75,
           "Arch": 0.5,
-          "Color A": [0.132, 0.608, 0.436],
-          "Color B": [0.378, 0.738, 0.61]
+          "Color A": [0.139, 0.606, 0.43],
+          "Color B": [0.396, 0.734, 0.6]
         },
         "scale": 1.1
       },
@@ -1042,8 +1142,8 @@
           "Seed": 433,
           "Leaves": 4,
           "Leaf Width": 0.35,
-          "Color A": [0.088, 0.374, 0.123],
-          "Color B": [0.549, 0.733, 0.143]
+          "Color A": [0.134, 0.363, 0.102],
+          "Color B": [0.784, 0.666, 0.111]
         }
       },
       {
@@ -1056,8 +1156,8 @@
           "Petiole": 1.0,
           "Leaf Length": 0.55,
           "Leaf Width": 0.4,
-          "Color A": [0.093, 0.366, 0.175],
-          "Color B": [0.586, 0.716, 0.203],
+          "Color A": [0.109, 0.362, 0.17],
+          "Color B": [0.668, 0.692, 0.192],
           "Seed": 136
         }
       },
@@ -1085,8 +1185,8 @@
           "Leaf Length": 0.7,
           "Leaf Width": 0.62,
           "Seed": 328,
-          "Color A": [0.028, 0.147, 0.161],
-          "Color B": [0.085, 0.352, 0.341]
+          "Color A": [0.032, 0.146, 0.167],
+          "Color B": [0.096, 0.348, 0.352]
         },
         "rot": [0.0, 0.0, 270.0]
       },
@@ -1113,8 +1213,8 @@
           "Leaf Length": 0.45,
           "Leaf Width": 0.32,
           "Seed": 47,
-          "Color A": [0.032, 0.155, 0.078],
-          "Color B": [0.064, 0.229, 0.146]
+          "Color A": [0.035, 0.155, 0.067],
+          "Color B": [0.07, 0.229, 0.126]
         },
         "rot": [0.0, 0.0, 180.0],
         "scale": 1.1
@@ -1329,8 +1429,8 @@
           "Spread High": 30,
           "Arch": 0.55,
           "Droop": 0.9,
-          "Color A": [0.739, 0.76, 0.185],
-          "Color B": [0.547, 0.726, 0.225],
+          "Color A": [0.766, 0.754, 0.167],
+          "Color B": [0.568, 0.721, 0.204],
           "Leaflet Angle": 30,
           "Leaflet Droop": 40,
           "Bare Base": 0.25,
@@ -1359,8 +1459,8 @@
           "Spread High": 30,
           "Arch": 0.55,
           "Droop": 0.9,
-          "Color A": [0.751, 0.757, 0.181],
-          "Color B": [0.556, 0.723, 0.222],
+          "Color A": [0.805, 0.743, 0.161],
+          "Color B": [0.599, 0.713, 0.199],
           "Leaflet Angle": 30,
           "Leaflet Droop": 40,
           "Bare Base": 0.25,
@@ -1449,8 +1549,8 @@
         "preset": "echeveria",
         "inputs": {
           "Seed": 550,
-          "Color A": [0.358, 0.432, 0.082],
-          "Color B": [0.575, 0.725, 0.158]
+          "Color A": [0.409, 0.42, 0.056],
+          "Color B": [0.658, 0.705, 0.109]
         }
       },
       {
@@ -1465,16 +1565,51 @@
     ],
     "Outside": [
       {
-        "name": "Host Tower",
-        "loc": [0.54, 5.0, -120.0],
-        "asset": "GH.Env.Tower",
+        "name": "Plateau",
+        "mesh": {
+          "plinth": {
+            "outline": [[-55.0, -48.0], [-40.0, -63.0], [48.0, -63.0], [63.0, -48.0], [63.0, 2.0], [49.0, 16.0], [-44.0, 16.0], [-55.0, 5.0]],
+            "top": -3.25,
+            "bottom": -125.0,
+            "batter": 0.35
+          }
+        },
+        "asset": "GH.Env.Ground",
         "inputs": {
-          "Width": 26.0,
-          "Depth": 22.0,
-          "Height": 116.2,
-          "Bay": 2.0,
-          "Floor": 4.0,
-          "Seed": 3
+          "Top": "GH.Lawn",
+          "Sides": "GH.Cliff"
+        }
+      },
+      {
+        "name": "Lower Terrace",
+        "mesh": {
+          "plinth": {
+            "outline": [[-40.0, 16.0], [20.0, 16.0], [20.0, 49.0], [-40.0, 49.0]],
+            "top": -16.0,
+            "bottom": -125.0,
+            "batter": 0.35
+          }
+        },
+        "asset": "GH.Env.Ground",
+        "inputs": {
+          "Top": "GH.Lawn",
+          "Sides": "GH.Cliff"
+        }
+      },
+      {
+        "name": "Lowest Terrace",
+        "mesh": {
+          "plinth": {
+            "outline": [[-29.464, 67.031], [14.108, 73.154], [11.464, 91.969], [-32.108, 85.846]],
+            "top": -30.6,
+            "bottom": -125.0,
+            "batter": 0.35
+          }
+        },
+        "asset": "GH.Env.Ground",
+        "inputs": {
+          "Top": "GH.Lawn",
+          "Sides": "GH.Cliff"
         }
       },
       {
@@ -1485,7 +1620,7 @@
         "inputs": {
           "Width": 24.0,
           "Depth": 24.0,
-          "Height": 330.0,
+          "Height": 118.0,
           "Bay": 1.5,
           "Floor": 1.8,
           "Seed": 199
@@ -1511,20 +1646,6 @@
         }
       },
       {
-        "name": "Lower Roof",
-        "loc": [-9.0, 79.5, -120.0],
-        "rot": [0, 0, 8.0],
-        "asset": "GH.Env.Tower",
-        "inputs": {
-          "Width": 44.0,
-          "Depth": 19.0,
-          "Height": 89.4,
-          "Bay": 2.0,
-          "Floor": 3.6,
-          "Seed": 9
-        }
-      },
-      {
         "name": "Lower Roof Tree",
         "loc": [-12.01, 83.8, -30.0],
         "rot": [0, 0, 0],
@@ -1542,19 +1663,6 @@
           "Leaflet Length": 0.2,
           "Leaflet Width": 0.1,
           "Seed": 515
-        }
-      },
-      {
-        "name": "Podium",
-        "loc": [-10.0, 32.5, -120.0],
-        "asset": "GH.Env.Tower",
-        "inputs": {
-          "Width": 60.0,
-          "Depth": 33.0,
-          "Height": 104.0,
-          "Bay": 2.0,
-          "Floor": 4.0,
-          "Seed": 7
         }
       },
       {
@@ -1576,8 +1684,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 284,
-          "Color A": [0.317, 0.866, 0.379],
-          "Color B": [0.317, 0.866, 0.379],
+          "Color A": [0.294, 0.869, 0.419],
+          "Color B": [0.294, 0.869, 0.419],
           "Facing": 0.85
         }
       },
@@ -1624,8 +1732,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 286,
-          "Color A": [0.608, 0.8, 0.176],
-          "Color B": [0.608, 0.8, 0.176],
+          "Color A": [0.629, 0.799, 0.12],
+          "Color B": [0.629, 0.799, 0.12],
           "Facing": 0.85
         }
       },
@@ -1648,8 +1756,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 578,
-          "Color A": [0.704, 0.771, 0.187],
-          "Color B": [0.704, 0.771, 0.187],
+          "Color A": [0.731, 0.77, 0.126],
+          "Color B": [0.731, 0.77, 0.126],
           "Facing": 0.85
         }
       },
@@ -1672,8 +1780,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 96,
-          "Color A": [0.521, 0.827, 0.165],
-          "Color B": [0.521, 0.827, 0.165],
+          "Color A": [0.528, 0.832, 0.093],
+          "Color B": [0.528, 0.832, 0.093],
           "Facing": 0.85
         }
       },
@@ -1748,6 +1856,197 @@
           "Color B": "leaf_yellow",
           "Facing": 0.85
         }
+      },
+      {
+        "name": "Skyline Tower 1",
+        "loc": [460.0, 660.0, -120.0],
+        "rot": [0.0, 0.0, 0.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 34.0,
+          "Depth": 27.200000000000003,
+          "Height": 250.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 300
+        }
+      },
+      {
+        "name": "Skyline Tower 2",
+        "loc": [840.0, 80.0, -120.0],
+        "rot": [0.0, 0.0, 23.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 40.0,
+          "Depth": 32.0,
+          "Height": 210.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 301
+        }
+      },
+      {
+        "name": "Skyline Tower 3",
+        "loc": [600.0, -560.0, -120.0],
+        "rot": [0.0, 0.0, 46.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 30.0,
+          "Depth": 24.0,
+          "Height": 180.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 302
+        }
+      },
+      {
+        "name": "Skyline Tower 4",
+        "loc": [-120.0, -1040.0, -120.0],
+        "rot": [0.0, 0.0, 69.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 38.0,
+          "Depth": 30.400000000000002,
+          "Height": 240.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 303
+        }
+      },
+      {
+        "name": "Skyline Tower 5",
+        "loc": [-720.0, -600.0, -120.0],
+        "rot": [0.0, 0.0, 2.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 32.0,
+          "Depth": 25.6,
+          "Height": 200.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 304
+        }
+      },
+      {
+        "name": "Skyline Tower 6",
+        "loc": [-960.0, 40.0, -120.0],
+        "rot": [0.0, 0.0, 25.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 44.0,
+          "Depth": 35.2,
+          "Height": 270.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 305
+        }
+      },
+      {
+        "name": "Skyline Tower 7",
+        "loc": [-840.0, 500.0, -120.0],
+        "rot": [0.0, 0.0, 48.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 36.0,
+          "Depth": 28.8,
+          "Height": 230.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 306
+        }
+      },
+      {
+        "name": "Skyline Tower 8",
+        "loc": [760.0, 420.0, -120.0],
+        "rot": [0.0, 0.0, 71.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 28.0,
+          "Depth": 22.400000000000002,
+          "Height": 190.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 307
+        }
+      },
+      {
+        "name": "Skyline Tower 9",
+        "loc": [520.0, -220.0, -120.0],
+        "rot": [0.0, 0.0, 4.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 26.0,
+          "Depth": 20.8,
+          "Height": 150.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 308
+        }
+      },
+      {
+        "name": "Skyline Tower 10",
+        "loc": [-400.0, -840.0, -120.0],
+        "rot": [0.0, 0.0, 27.0],
+        "asset": "GH.Env.Tower",
+        "inputs": {
+          "Width": 30.0,
+          "Depth": 24.0,
+          "Height": 170.0,
+          "Bay": 2.0,
+          "Floor": 4.0,
+          "Seed": 309
+        }
+      },
+      {
+        "name": "Neighbour Roof Garden",
+        "loc": [-40.891, 48.124, -1.4],
+        "rot": [0, 0, 29.4],
+        "mesh": {
+          "vertices": [[-10.5, -10.5, 0.0], [10.5, -10.5, 0.0], [10.5, 10.5, 0.0], [-10.5, 10.5, 0.0]],
+          "faces": [[0, 1, 2, 3]]
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.45,
+          "Mound": 0.25,
+          "Kerb": 0.55
+        }
+      },
+      {
+        "name": "Neighbour Roof Trees",
+        "loc": [-40.891, 48.124, -1.4],
+        "rot": [0, 0, 29.4],
+        "mesh": {
+          "vertices": [[-8.5, -8.5, 0.45], [8.5, -8.5, 0.45], [8.5, 8.5, 0.45], [-8.5, 8.5, 0.45]],
+          "faces": [[0, 1, 2, 3]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Trees",
+          "Density": 0.03,
+          "Spacing": 4.0,
+          "Scale Min": 1.2,
+          "Scale Max": 1.8,
+          "Seed": 77
+        }
+      },
+      {
+        "name": "Neighbour Roof Hedges",
+        "loc": [-40.891, 48.124, -1.4],
+        "rot": [0, 0, 29.4],
+        "mesh": {
+          "vertices": [[-10.0, -10.0, 0.45], [10.0, -10.0, 0.45], [10.0, 10.0, 0.45], [-10.0, 10.0, 0.45]],
+          "faces": [[0, 1, 2, 3]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Hedges",
+          "Density": 0.6,
+          "Spacing": 0.8,
+          "Scale Min": 1.0,
+          "Scale Max": 1.5,
+          "Seed": 79
+        }
       }
     ],
     "Atmosphere": [
@@ -1757,8 +2056,8 @@
         "inputs": {
           "Min": [-6000.0, -6000.0, -120.0],
           "Max": [6000.0, 6000.0, 320.0],
-          "Hole Min": [-12.62, -6.16, -3.85],
-          "Hole Max": [13.7, 16.16, 7.5]
+          "Hole Min": [-150.0, -150.0, -3.85],
+          "Hole Max": [150.0, 16.16, 150.0]
         },
         "visible": {
           "diffuse": false
@@ -1773,13 +2072,1513 @@
           "Material": "GH.Air"
         }
       }
+    ],
+    "Wings": [
+      {
+        "name": "Fern House Frame",
+        "mesh": {
+          "volume": "Fern House",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.05,
+          "Depth": 0.1,
+          "Overrun": 0.025
+        }
+      },
+      {
+        "name": "Fern House Glass",
+        "mesh": {
+          "volume": "Fern House",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002
+        }
+      },
+      {
+        "name": "Palm House Frame",
+        "mesh": {
+          "volume": "Palm House",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.05,
+          "Depth": 0.1,
+          "Overrun": 0.025
+        }
+      },
+      {
+        "name": "Palm House Glass",
+        "mesh": {
+          "volume": "Palm House",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002
+        }
+      },
+      {
+        "name": "Palm Lantern Frame",
+        "mesh": {
+          "volume": "Palm Lantern",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.05,
+          "Depth": 0.1,
+          "Overrun": 0.025
+        }
+      },
+      {
+        "name": "Palm Lantern Glass",
+        "mesh": {
+          "volume": "Palm Lantern",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002
+        }
+      },
+      {
+        "name": "Terrace House Frame",
+        "mesh": {
+          "volume": "Terrace House",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.05,
+          "Depth": 0.1,
+          "Overrun": 0.025
+        }
+      },
+      {
+        "name": "Terrace House Glass",
+        "mesh": {
+          "volume": "Terrace House",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002
+        }
+      },
+      {
+        "name": "Stair Tower Frame",
+        "mesh": {
+          "volume": "Stair Tower",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.05,
+          "Depth": 0.1,
+          "Overrun": 0.025
+        }
+      },
+      {
+        "name": "Stair Tower Glass",
+        "mesh": {
+          "volume": "Stair Tower",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002
+        }
+      },
+      {
+        "name": "Terrace Frame",
+        "mesh": {
+          "volume": "Terrace",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.06,
+          "Depth": 0.16,
+          "Overrun": 0.03
+        }
+      },
+      {
+        "name": "Terrace Glass",
+        "mesh": {
+          "volume": "Terrace",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.04,
+          "Margin": 0.004,
+          "Material": "GH.GlassCoated"
+        }
+      },
+      {
+        "name": "Canopy Frame",
+        "mesh": {
+          "volume": "Canopy",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.06,
+          "Depth": 0.14,
+          "Overrun": 0.03
+        }
+      },
+      {
+        "name": "Canopy Glass",
+        "mesh": {
+          "volume": "Canopy",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.004
+        }
+      },
+      {
+        "name": "Entrance Canopy Frame",
+        "mesh": {
+          "volume": "Entrance Canopy",
+          "edges": true
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.06,
+          "Depth": 0.14,
+          "Overrun": 0.03
+        }
+      },
+      {
+        "name": "Entrance Canopy Glass",
+        "mesh": {
+          "volume": "Entrance Canopy",
+          "faces": true
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.02,
+          "Margin": 0.004
+        }
+      },
+      {
+        "name": "Canopy Columns",
+        "mesh": {
+          "segments": [
+            [[34.3, 5.1, -3.25], [34.3, 5.1, 0.2]],
+            [[34.3, 10.9, -3.25], [34.3, 10.9, 0.2]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.12,
+          "Depth": 0.12
+        }
+      },
+      {
+        "name": "Entrance Canopy Columns",
+        "mesh": {
+          "segments": [
+            [[-0.94, -17.14, -3.25], [-0.94, -17.14, 0.2]],
+            [[2.94, -17.14, -3.25], [2.94, -17.14, 0.2]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.12,
+          "Depth": 0.12
+        }
+      },
+      {
+        "name": "Palm House Roof",
+        "mesh": {
+          "grid": {
+            "plane": "XY",
+            "u": [
+              13.6,
+              15.6,
+              17.6,
+              19.6,
+              21.6,
+              23.6,
+              25.6,
+              27.6,
+              29.6
+            ],
+            "v": [1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0],
+            "w": 3.84,
+            "edges": false,
+            "faces": true,
+            "skip": [
+              [1, 1],
+              [1, 2],
+              [1, 3],
+              [1, 4],
+              [1, 5],
+              [2, 1],
+              [2, 2],
+              [2, 3],
+              [2, 4],
+              [2, 5],
+              [3, 1],
+              [3, 2],
+              [3, 3],
+              [3, 4],
+              [3, 5],
+              [4, 1],
+              [4, 2],
+              [4, 3],
+              [4, 4],
+              [4, 5],
+              [5, 1],
+              [5, 2],
+              [5, 3],
+              [5, 4],
+              [5, 5],
+              [6, 1],
+              [6, 2],
+              [6, 3],
+              [6, 4],
+              [6, 5]
+            ]
+          }
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.3,
+          "Material": "GH.Stone",
+          "See Through": false
+        }
+      },
+      {
+        "name": "Terrace Guard",
+        "mesh": {
+          "polyline": [[-7.1, -6.1, 3.84], [-7.1, -13.1, 3.84], [9.1, -13.1, 3.84], [9.1, -6.1, 3.84]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 1.04,
+          "Post Spacing": 1.0,
+          "Post Size": 0.03,
+          "Post Bottom": 0.74,
+          "Rails": 1,
+          "Rail Bottom": 0.91,
+          "Rail Size": 0.028,
+          "Top Rail Width": 0.034,
+          "Top Rail Depth": 0.03,
+          "Glass Top": 0.9,
+          "Glass Thickness": 0.0215,
+          "Glass Material": "GH.GlassReflective"
+        }
+      },
+      {
+        "name": "Terrace Planters",
+        "mesh": {
+          "vertices": [[-8.0, -14.0, 3.84], [10.0, -14.0, 3.84], [10.0, -13.2, 3.84], [-8.0, -13.2, 3.84], [-8.0, -13.2, 3.84], [-7.2, -13.2, 3.84], [-7.2, -6.1, 3.84], [-8.0, -6.1, 3.84], [9.2, -13.2, 3.84], [10.0, -13.2, 3.84], [10.0, -6.1, 3.84], [9.2, -6.1, 3.84]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.5,
+          "Material": "GH.Stone",
+          "See Through": false
+        }
+      },
+      {
+        "name": "Terrace Soil",
+        "mesh": {
+          "vertices": [[-8.0, -14.0, 4.29], [10.0, -14.0, 4.29], [10.0, -13.2, 4.29], [-8.0, -13.2, 4.29], [-8.0, -13.2, 4.29], [-7.2, -13.2, 4.29], [-7.2, -6.1, 4.29], [-8.0, -6.1, 4.29], [9.2, -13.2, 4.29], [10.0, -13.2, 4.29], [10.0, -6.1, 4.29], [9.2, -6.1, 4.29]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.03,
+          "Mound": 0.05,
+          "Kerb": 0.0
+        }
+      },
+      {
+        "name": "Terrace Plants",
+        "mesh": {
+          "vertices": [[-8.0, -14.0, 4.32], [10.0, -14.0, 4.32], [10.0, -13.2, 4.32], [-8.0, -13.2, 4.32], [-8.0, -13.2, 4.32], [-7.2, -13.2, 4.32], [-7.2, -6.1, 4.32], [-8.0, -6.1, 4.32], [9.2, -13.2, 4.32], [10.0, -13.2, 4.32], [10.0, -6.1, 4.32], [9.2, -6.1, 4.32]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Terrace Plants",
+          "Density": 3.0,
+          "Spacing": 0.42,
+          "Scale Min": 0.9,
+          "Scale Max": 1.3,
+          "Seed": 7
+        }
+      },
+      {
+        "name": "Palm Roof Planters",
+        "mesh": {
+          "vertices": [[13.6, 14.2, 4.14], [29.6, 14.2, 4.14], [29.6, 15.0, 4.14], [13.6, 15.0, 4.14], [13.6, 1.0, 4.14], [29.6, 1.0, 4.14], [29.6, 1.8, 4.14], [13.6, 1.8, 4.14], [28.8, 1.8, 4.14], [29.6, 1.8, 4.14], [29.6, 14.2, 4.14], [28.8, 14.2, 4.14]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.5,
+          "Material": "GH.Stone",
+          "See Through": false
+        }
+      },
+      {
+        "name": "Palm Roof Soil",
+        "mesh": {
+          "vertices": [[13.6, 14.2, 4.59], [29.6, 14.2, 4.59], [29.6, 15.0, 4.59], [13.6, 15.0, 4.59], [13.6, 1.0, 4.59], [29.6, 1.0, 4.59], [29.6, 1.8, 4.59], [13.6, 1.8, 4.59], [28.8, 1.8, 4.59], [29.6, 1.8, 4.59], [29.6, 14.2, 4.59], [28.8, 14.2, 4.59]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.03,
+          "Mound": 0.05,
+          "Kerb": 0.0
+        }
+      },
+      {
+        "name": "Palm Roof Plants",
+        "mesh": {
+          "vertices": [[13.6, 14.2, 4.62], [29.6, 14.2, 4.62], [29.6, 15.0, 4.62], [13.6, 15.0, 4.62], [13.6, 1.0, 4.62], [29.6, 1.0, 4.62], [29.6, 1.8, 4.62], [13.6, 1.8, 4.62], [28.8, 1.8, 4.62], [29.6, 1.8, 4.62], [29.6, 14.2, 4.62], [28.8, 14.2, 4.62]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Terrace Plants",
+          "Density": 3.0,
+          "Spacing": 0.42,
+          "Scale Min": 0.9,
+          "Scale Max": 1.3,
+          "Seed": 9
+        }
+      }
+    ],
+    "Upper Floor": [
+      {
+        "name": "Third Floor Beams",
+        "mesh": {
+          "segments": [
+            [[10.6, -3.6, 3.78], [10.6, 16.0, 3.78]],
+            [[-12.46, -3.6, 3.78], [10.6, -3.6, 3.78]],
+            [[10.6, -1.2, 3.78], [13.54, -1.2, 3.78]],
+            [[10.6, 1.2, 3.78], [13.54, 1.2, 3.78]],
+            [[10.6, 3.6, 3.78], [13.54, 3.6, 3.78]],
+            [[10.6, 6.0, 3.78], [13.54, 6.0, 3.78]],
+            [[10.6, 8.4, 3.78], [13.54, 8.4, 3.78]],
+            [[10.6, 10.8, 3.78], [13.54, 10.8, 3.78]],
+            [[10.6, 13.2, 3.78], [13.54, 13.2, 3.78]],
+            [[-10.46, -6.0, 3.78], [-10.46, -3.6, 3.78]],
+            [[-8.46, -6.0, 3.78], [-8.46, -3.6, 3.78]],
+            [[-6.46, -6.0, 3.78], [-6.46, -3.6, 3.78]],
+            [[-4.46, -6.0, 3.78], [-4.46, -3.6, 3.78]],
+            [[-2.46, -6.0, 3.78], [-2.46, -3.6, 3.78]],
+            [[-0.46, -6.0, 3.78], [-0.46, -3.6, 3.78]],
+            [[1.54, -6.0, 3.78], [1.54, -3.6, 3.78]],
+            [[3.54, -6.0, 3.78], [3.54, -3.6, 3.78]],
+            [[5.54, -6.0, 3.78], [5.54, -3.6, 3.78]],
+            [[7.54, -6.0, 3.78], [7.54, -3.6, 3.78]],
+            [[9.54, -6.0, 3.78], [9.54, -3.6, 3.78]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.03,
+          "Depth": 0.06,
+          "Overrun": 0.015
+        }
+      },
+      {
+        "name": "Third Floor Posts",
+        "mesh": {
+          "segments": [
+            [[10.6, -3.6, -3.2], [10.6, -3.6, 3.76]],
+            [[10.6, 1.2, -3.2], [10.6, 1.2, 3.76]],
+            [[10.6, 6.0, -3.2], [10.6, 6.0, 3.76]],
+            [[10.6, 10.8, -3.2], [10.6, 10.8, 3.76]],
+            [[10.6, 15.4, -3.2], [10.6, 15.4, 3.76]],
+            [[-10.46, -3.6, -3.2], [-10.46, -3.6, 3.76]],
+            [[-4.46, -3.6, -3.2], [-4.46, -3.6, 3.76]],
+            [[1.54, -3.6, -3.2], [1.54, -3.6, 3.76]],
+            [[7.54, -3.6, -3.2], [7.54, -3.6, 3.76]]
+          ]
+        },
+        "asset": "GH.Structure.Members",
+        "inputs": {
+          "Width": 0.03,
+          "Depth": 0.03
+        }
+      },
+      {
+        "name": "Third Floor Glass",
+        "mesh": {
+          "grids": [
+            {
+              "plane": "XY",
+              "u": [10.6, 12.07, 13.54],
+              "v": [
+                -3.6,
+                -1.2,
+                1.2,
+                3.6,
+                6.0,
+                8.4,
+                10.8,
+                13.2,
+                16.0
+              ],
+              "w": 3.8,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [
+                -12.46,
+                -10.46,
+                -8.46,
+                -6.46,
+                -4.46,
+                -2.46,
+                -0.46,
+                1.54,
+                3.54,
+                5.54,
+                7.54,
+                9.54,
+                10.6,
+                13.54
+              ],
+              "v": [-6.0, -3.6],
+              "w": 3.8,
+              "edges": false,
+              "faces": true
+            }
+          ]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.04,
+          "Margin": 0.004,
+          "Material": "GH.GlassCoated"
+        }
+      },
+      {
+        "name": "Third Floor Guard",
+        "mesh": {
+          "polyline": [[10.6, 15.95, 3.84], [10.6, -3.6, 3.84], [-12.4, -3.6, 3.84]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 1.04,
+          "Post Spacing": 0.7,
+          "Post Size": 0.03,
+          "Post Bottom": 0.74,
+          "Rails": 1,
+          "Rail Bottom": 0.91,
+          "Rail Size": 0.028,
+          "Top Rail Width": 0.034,
+          "Top Rail Depth": 0.03,
+          "Glass Top": 0.9,
+          "Glass Thickness": 0.0215,
+          "Glass Material": "GH.GlassReflective"
+        }
+      },
+      {
+        "name": "Gallery Pots",
+        "at": [[12.9, -1.0, 3.84], [12.9, 4.0, 3.84], [12.9, 9.0, 3.84], [12.9, 14.0, 3.84]],
+        "asset": "GH.Vessel.Planter",
+        "inputs": {
+          "Radius": 0.3,
+          "Height": 0.45
+        }
+      },
+      {
+        "name": "Gallery Scheffleras",
+        "at": [[12.9, -1.0, 4.24, 313.0], [12.9, 4.0, 4.24, 188.0], [12.9, 9.0, 4.24, 63.0], [12.9, 14.0, 4.24, 298.0]],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "schefflera",
+        "size": [0.9, 1.15],
+        "inputs": {
+          "Seed": 131
+        }
+      },
+      {
+        "name": "Tower Flight 1",
+        "loc": [14.4, -4.4, -3.2],
+        "rot": [0.0, 0.0, 0.0],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Tread Thickness": 0.05,
+          "Stringer Height": 0.26,
+          "Glass Treads": true,
+          "Tread Material": "GH.Glass",
+          "Rise": 0.16,
+          "Going": 0.26,
+          "Width": 1.2,
+          "Steps": 10
+        }
+      },
+      {
+        "name": "Tower Flight 2",
+        "loc": [18.2, -1.8000000000000003, -1.6],
+        "rot": [0.0, 0.0, 180.0],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Tread Thickness": 0.05,
+          "Stringer Height": 0.26,
+          "Glass Treads": true,
+          "Tread Material": "GH.Glass",
+          "Rise": 0.16,
+          "Going": 0.26,
+          "Width": 1.2,
+          "Steps": 10
+        }
+      },
+      {
+        "name": "Tower Flight 3",
+        "loc": [14.4, -4.4, 0.0],
+        "rot": [0.0, 0.0, 0.0],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Tread Thickness": 0.05,
+          "Stringer Height": 0.26,
+          "Glass Treads": true,
+          "Tread Material": "GH.Glass",
+          "Rise": 0.16,
+          "Going": 0.26,
+          "Width": 1.2,
+          "Steps": 12
+        }
+      },
+      {
+        "name": "Tower Flight 4",
+        "loc": [18.2, -1.2800000000000002, 1.92],
+        "rot": [0.0, 0.0, 180.0],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Tread Thickness": 0.05,
+          "Stringer Height": 0.26,
+          "Glass Treads": true,
+          "Tread Material": "GH.Glass",
+          "Rise": 0.16,
+          "Going": 0.26,
+          "Width": 1.2,
+          "Steps": 12
+        }
+      },
+      {
+        "name": "Tower Flight 5",
+        "loc": [14.4, -4.4, 3.84],
+        "rot": [0.0, 0.0, 0.0],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Tread Thickness": 0.05,
+          "Stringer Height": 0.26,
+          "Glass Treads": true,
+          "Tread Material": "GH.Glass",
+          "Rise": 0.16,
+          "Going": 0.26,
+          "Width": 1.2,
+          "Steps": 12
+        }
+      },
+      {
+        "name": "Tower Flight 6",
+        "loc": [18.2, -1.2800000000000002, 5.76],
+        "rot": [0.0, 0.0, 180.0],
+        "asset": "GH.Structure.Stair",
+        "inputs": {
+          "Tread Thickness": 0.05,
+          "Stringer Height": 0.26,
+          "Glass Treads": true,
+          "Tread Material": "GH.Glass",
+          "Rise": 0.16,
+          "Going": 0.26,
+          "Width": 1.2,
+          "Steps": 12
+        }
+      },
+      {
+        "name": "Tower Landings",
+        "mesh": {
+          "grids": [
+            {
+              "plane": "XY",
+              "u": [13.75, 18.85],
+              "v": [-1.8000000000000003, 0.25],
+              "w": -1.6600000000000001,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [13.75, 18.85],
+              "v": [-5.85, -4.4],
+              "w": -0.06,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [13.75, 18.85],
+              "v": [-1.2800000000000002, 0.25],
+              "w": 1.8599999999999999,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [13.75, 18.85],
+              "v": [-5.85, -4.4],
+              "w": 3.78,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [13.75, 18.85],
+              "v": [-1.2800000000000002, 0.25],
+              "w": 5.7,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [13.75, 18.85],
+              "v": [-5.85, -4.4],
+              "w": 7.62,
+              "edges": false,
+              "faces": true
+            },
+            {
+              "plane": "XY",
+              "u": [15.05, 17.55],
+              "v": [-4.4, -1.5],
+              "w": 7.62,
+              "edges": false,
+              "faces": true
+            }
+          ]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.06,
+          "Material": "GH.GlassCoated"
+        }
+      },
+      {
+        "name": "Belvedere Guard",
+        "mesh": {
+          "polyline": [[13.75, -4.4, 7.68], [15.05, -4.4, 7.68], [15.05, -1.5, 7.68], [17.55, -1.5, 7.68], [17.55, -4.4, 7.68]]
+        },
+        "asset": "GH.Structure.Balustrade",
+        "inputs": {
+          "Height": 1.04,
+          "Post Spacing": 1.0,
+          "Post Size": 0.03,
+          "Post Bottom": 0.74,
+          "Rails": 1,
+          "Rail Bottom": 0.91,
+          "Rail Size": 0.028,
+          "Top Rail Width": 0.034,
+          "Top Rail Depth": 0.03,
+          "Glass Top": 0.9,
+          "Glass Thickness": 0.0215,
+          "Glass Material": "GH.GlassReflective"
+        }
+      }
+    ],
+    "Conservatory Decor": [
+      {
+        "name": "Hanging Terrarium 1",
+        "loc": [6.5, 9.5, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.22,
+          "Drop": 4.2,
+          "Facing": [-0.94, -0.342, 0.1],
+          "Seed": 40
+        }
+      },
+      {
+        "name": "Hanging Terrarium 1 Plant",
+        "loc": [6.5, 9.5, 2.912],
+        "scale": 1.833,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 500
+        }
+      },
+      {
+        "name": "Hanging Terrarium 2",
+        "loc": [9.0, 12.5, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.16,
+          "Drop": 3.6,
+          "Facing": [-0.391, -0.921, 0.1],
+          "Seed": 57
+        }
+      },
+      {
+        "name": "Hanging Terrarium 2 Plant",
+        "loc": [9.0, 12.5, 3.536],
+        "scale": 1.067,
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 531
+        }
+      },
+      {
+        "name": "Hanging Terrarium 3",
+        "loc": [4.5, 13.5, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.18,
+          "Drop": 4.8,
+          "Facing": [0.407, -0.914, 0.1],
+          "Seed": 74
+        }
+      },
+      {
+        "name": "Hanging Terrarium 3 Plant",
+        "loc": [4.5, 13.5, 2.328],
+        "scale": 1.5,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 562
+        }
+      },
+      {
+        "name": "Hanging Terrarium 4",
+        "loc": [9.6, 5.6, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.2,
+          "Drop": 3.0,
+          "Facing": [0.946, -0.326, 0.1],
+          "Seed": 91
+        }
+      },
+      {
+        "name": "Hanging Terrarium 4 Plant",
+        "loc": [9.6, 5.6, 4.12],
+        "scale": 1.333,
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 593
+        }
+      },
+      {
+        "name": "Hanging Terrarium 5",
+        "loc": [8.2, -1.8, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.24,
+          "Drop": 3.0,
+          "Facing": [0.883, 0.469, 0.1],
+          "Seed": 108
+        }
+      },
+      {
+        "name": "Hanging Terrarium 5 Plant",
+        "loc": [8.2, -1.8, 4.104],
+        "scale": 2.0,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 624
+        }
+      },
+      {
+        "name": "Hanging Terrarium 6",
+        "loc": [7.0, 2.6, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.18,
+          "Drop": 4.4,
+          "Facing": [0.259, 0.966, 0.1],
+          "Seed": 125
+        }
+      },
+      {
+        "name": "Hanging Terrarium 6 Plant",
+        "loc": [7.0, 2.6, 2.728],
+        "scale": 1.2,
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 655
+        }
+      },
+      {
+        "name": "Hanging Terrarium 7",
+        "loc": [9.4, 9.0, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.3,
+          "Drop": 5.4,
+          "Facing": [-0.53, 0.848, 0.1],
+          "Seed": 142
+        }
+      },
+      {
+        "name": "Hanging Terrarium 7 Plant",
+        "loc": [9.4, 9.0, 1.68],
+        "scale": 2.5,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 686
+        }
+      },
+      {
+        "name": "Hanging Terrarium 8",
+        "loc": [7.6, 15.2, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.2,
+          "Drop": 2.6,
+          "Facing": [-0.982, 0.191, 0.1],
+          "Seed": 159
+        }
+      },
+      {
+        "name": "Hanging Terrarium 8 Plant",
+        "loc": [7.6, 15.2, 4.52],
+        "scale": 1.333,
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 717
+        }
+      },
+      {
+        "name": "Hanging Terrarium 9",
+        "loc": [6.4, 11.4, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.16,
+          "Drop": 2.2,
+          "Facing": [-0.809, -0.588, 0.1],
+          "Seed": 176
+        }
+      },
+      {
+        "name": "Hanging Terrarium 9 Plant",
+        "loc": [6.4, 11.4, 4.936],
+        "scale": 1.333,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 748
+        }
+      },
+      {
+        "name": "Hanging Terrarium 10",
+        "loc": [10.0, 14.0, 7.2],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.26,
+          "Drop": 4.6,
+          "Facing": [-0.122, -0.993, 0.1],
+          "Seed": 193
+        }
+      },
+      {
+        "name": "Hanging Terrarium 10 Plant",
+        "loc": [10.0, 14.0, 2.496],
+        "scale": 1.733,
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 779
+        }
+      },
+      {
+        "name": "Hanging Terrarium 11",
+        "loc": [-21.0, 5.0, 6.641],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.2,
+          "Drop": 2.6,
+          "Facing": [0.643, -0.766, 0.1],
+          "Seed": 210
+        }
+      },
+      {
+        "name": "Hanging Terrarium 11 Plant",
+        "loc": [-21.0, 5.0, 3.961],
+        "scale": 1.667,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 810
+        }
+      },
+      {
+        "name": "Hanging Terrarium 12",
+        "loc": [-25.0, 7.33, 5.296],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.16,
+          "Drop": 2.0,
+          "Facing": [0.999, -0.052, 0.1],
+          "Seed": 227
+        }
+      },
+      {
+        "name": "Hanging Terrarium 12 Plant",
+        "loc": [-25.0, 7.33, 3.232],
+        "scale": 1.067,
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 841
+        }
+      },
+      {
+        "name": "Hanging Terrarium 13",
+        "loc": [21.0, 8.0, 8.227],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.22,
+          "Drop": 3.4,
+          "Facing": [0.719, 0.695, 0.1],
+          "Seed": 244
+        }
+      },
+      {
+        "name": "Hanging Terrarium 13 Plant",
+        "loc": [21.0, 8.0, 4.739],
+        "scale": 1.833,
+        "asset": "GH.Flora.Succulent",
+        "preset": "echeveria",
+        "inputs": {
+          "Seed": 872
+        }
+      },
+      {
+        "name": "Hanging Terrarium 14",
+        "loc": [25.0, 4.67, 6.304],
+        "asset": "GH.Vessel.Orb",
+        "inputs": {
+          "Radius": 0.16,
+          "Drop": 2.2,
+          "Facing": [-0.017, 1.0, 0.1],
+          "Seed": 261
+        }
+      },
+      {
+        "name": "Hanging Terrarium 14 Plant",
+        "loc": [25.0, 4.67, 4.04],
+        "scale": 1.067,
+        "asset": "GH.Flora.Succulent",
+        "preset": "aloe",
+        "inputs": {
+          "Seed": 903
+        }
+      },
+      {
+        "name": "Jade Column 1",
+        "loc": [9.4, -4.8, 0.0],
+        "rot": [0.0, 0.0, 0.0],
+        "asset": "GH.Vessel.SquareBottle",
+        "inputs": {
+          "Width": 0.34,
+          "Depth": 0.34,
+          "Height": 3.4,
+          "Shoulder": 0.05,
+          "Neck Radius": 0.06,
+          "Neck Length": 0.05,
+          "Bore": 0.04,
+          "Bore Depth": 0.15,
+          "Wall": 0.014,
+          "Base": 0.06,
+          "Squareness": 10.0,
+          "Glass": "GH.GlassBottle",
+          "Bevel": 0.01
+        }
+      },
+      {
+        "name": "Jade Column 2",
+        "loc": [12.2, 2.4, 0.0],
+        "rot": [0.0, 0.0, 15.0],
+        "asset": "GH.Vessel.SquareBottle",
+        "inputs": {
+          "Width": 0.34,
+          "Depth": 0.34,
+          "Height": 3.4,
+          "Shoulder": 0.05,
+          "Neck Radius": 0.06,
+          "Neck Length": 0.05,
+          "Bore": 0.04,
+          "Bore Depth": 0.15,
+          "Wall": 0.014,
+          "Base": 0.06,
+          "Squareness": 10.0,
+          "Glass": "GH.GlassBottle",
+          "Bevel": 0.01
+        }
+      }
+    ],
+    "Site": [
+      {
+        "name": "Forecourt Paving",
+        "mesh": {
+          "vertices": [
+            [-34.0, -17.5, -3.2],
+            [23.0, -17.5, -3.2],
+            [23.0, -14.0, -3.2],
+            [-34.0, -14.0, -3.2],
+            [13.6, -14.0, -3.2],
+            [23.0, -14.0, -3.2],
+            [23.0, -6.0, -3.2],
+            [13.6, -6.0, -3.2],
+            [19.0, -6.0, -3.2],
+            [38.0, -6.0, -3.2],
+            [38.0, 1.0, -3.2],
+            [19.0, 1.0, -3.2],
+            [-34.0, -14.0, -3.2],
+            [-30.52, -14.0, -3.2],
+            [-30.52, 15.5, -3.2],
+            [-34.0, 15.5, -3.2],
+            [-30.52, -5.0, -3.2],
+            [-12.5, -5.0, -3.2],
+            [-12.5, -2.0, -3.2],
+            [-30.52, -2.0, -3.2],
+            [-30.52, 12.0, -3.2],
+            [-12.5, 12.0, -3.2],
+            [-12.5, 15.5, -3.2],
+            [-30.52, 15.5, -3.2],
+            [-12.46, -14.0, -3.2],
+            [-8.0, -14.0, -3.2],
+            [-8.0, -6.0, -3.2],
+            [-12.46, -6.0, -3.2],
+            [10.0, -14.0, -3.2],
+            [13.6, -14.0, -3.2],
+            [13.6, -6.0, -3.2],
+            [10.0, -6.0, -3.2],
+            [29.6, 1.0, -3.2],
+            [38.0, 1.0, -3.2],
+            [38.0, 15.5, -3.2],
+            [29.6, 15.5, -3.2],
+            [38.0, 5.5, -3.2],
+            [61.0, 5.5, -3.2],
+            [61.0, 10.5, -3.2],
+            [38.0, 10.5, -3.2],
+            [-6.0, -57.0, -3.2],
+            [-3.0, -57.0, -3.2],
+            [-3.0, -17.5, -3.2],
+            [-6.0, -17.5, -3.2],
+            [5.0, -57.0, -3.2],
+            [8.0, -57.0, -3.2],
+            [8.0, -17.5, -3.2],
+            [5.0, -17.5, -3.2],
+            [-6.0, -60.0, -3.2],
+            [8.0, -60.0, -3.2],
+            [8.0, -57.0, -3.2],
+            [-6.0, -57.0, -3.2]
+          ],
+          "faces": [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [8, 9, 10, 11],
+            [12, 13, 14, 15],
+            [16, 17, 18, 19],
+            [20, 21, 22, 23],
+            [24, 25, 26, 27],
+            [28, 29, 30, 31],
+            [32, 33, 34, 35],
+            [36, 37, 38, 39],
+            [40, 41, 42, 43],
+            [44, 45, 46, 47],
+            [48, 49, 50, 51]
+          ]
+        },
+        "asset": "GH.Garden.Paving",
+        "inputs": {
+          "Flag Size": 1.2,
+          "Joint": 0.012,
+          "Seed": 31
+        }
+      },
+      {
+        "name": "East Pool",
+        "loc": [53.5, -1.0, -3.25],
+        "asset": "GH.Env.Pool",
+        "inputs": {
+          "Length": 15.0,
+          "Width": 8.0
+        }
+      },
+      {
+        "name": "East Rill",
+        "loc": [53.5, 13.0, -3.25],
+        "asset": "GH.Env.Pool",
+        "inputs": {
+          "Length": 15.0,
+          "Width": 1.6
+        }
+      },
+      {
+        "name": "South Canal",
+        "loc": [1.0, -37.5, -3.25],
+        "rot": [0.0, 0.0, 90.0],
+        "asset": "GH.Env.Pool",
+        "inputs": {
+          "Length": 36.0,
+          "Width": 6.0
+        }
+      },
+      {
+        "name": "Park Trees",
+        "mesh": {
+          "vertices": [
+            [-52.0, -44.0, -3.25],
+            [-38.0, -44.0, -3.25],
+            [-38.0, 7.0, -3.25],
+            [-52.0, 7.0, -3.25],
+            [-44.0, -58.0, -3.25],
+            [-10.0, -58.0, -3.25],
+            [-10.0, -33.0, -3.25],
+            [-44.0, -33.0, -3.25],
+            [12.0, -60.0, -3.25],
+            [50.0, -60.0, -3.25],
+            [50.0, -33.0, -3.25],
+            [12.0, -33.0, -3.25],
+            [44.0, -32.0, -3.25],
+            [60.0, -32.0, -3.25],
+            [60.0, -10.0, -3.25],
+            [44.0, -10.0, -3.25]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Trees",
+          "Density": 0.016,
+          "Spacing": 6.0,
+          "Scale Min": 1.7,
+          "Scale Max": 2.6,
+          "Seed": 3
+        }
+      },
+      {
+        "name": "Grove Trees",
+        "mesh": {
+          "vertices": [[-34.0, -32.0, -3.25], [-10.0, -32.0, -3.25], [-10.0, -20.0, -3.25], [-34.0, -20.0, -3.25], [12.0, -32.0, -3.25], [34.0, -32.0, -3.25], [34.0, -20.0, -3.25], [12.0, -20.0, -3.25], [24.0, -18.0, -3.25], [44.0, -18.0, -3.25], [44.0, -8.0, -3.25], [24.0, -8.0, -3.25]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Trees",
+          "Density": 0.035,
+          "Spacing": 4.5,
+          "Scale Min": 2.0,
+          "Scale Max": 3.0,
+          "Seed": 29
+        }
+      },
+      {
+        "name": "Front Beds",
+        "mesh": {
+          "vertices": [[-7.8, -15.6, -3.2], [-1.6, -15.6, -3.2], [-1.6, -14.15, -3.2], [-7.8, -14.15, -3.2], [3.6, -15.6, -3.2], [9.8, -15.6, -3.2], [9.8, -14.15, -3.2], [3.6, -14.15, -3.2]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7]]
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.3,
+          "Mound": 0.1,
+          "Kerb": 0.35
+        }
+      },
+      {
+        "name": "Front Bed Shrubs",
+        "mesh": {
+          "vertices": [[-7.8, -15.6, -2.9], [-1.6, -15.6, -2.9], [-1.6, -14.15, -2.9], [-7.8, -14.15, -2.9], [3.6, -15.6, -2.9], [9.8, -15.6, -2.9], [9.8, -14.15, -2.9], [3.6, -14.15, -2.9]],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Hedges",
+          "Density": 1.4,
+          "Spacing": 0.6,
+          "Scale Min": 1.0,
+          "Scale Max": 1.4,
+          "Seed": 37
+        }
+      },
+      {
+        "name": "Avenue Trees",
+        "at": [[42.0, 4.0, -3.25, 114.0], [42.0, 12.0, -3.25, 114.0], [50.0, 4.0, -3.25, 50.0], [50.0, 12.0, -3.25, 50.0], [58.0, 4.0, -3.25, 346.0], [58.0, 12.0, -3.25, 346.0]],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "tree",
+        "size": [1.35, 1.55],
+        "inputs": {
+          "Seed": 51,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
+        }
+      },
+      {
+        "name": "Allee Trees",
+        "at": [[-8.6, -23.0, -3.25, 53.0], [-8.6, -30.5, -3.25, 195.5], [-8.6, -38.0, -3.25, 338.0], [-8.6, -45.5, -3.25, 120.5], [-8.6, -53.0, -3.25, 263.0], [10.6, -23.0, -3.25, 53.0], [10.6, -30.5, -3.25, 195.5], [10.6, -38.0, -3.25, 338.0], [10.6, -45.5, -3.25, 120.5], [10.6, -53.0, -3.25, 263.0]],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "tree",
+        "size": [1.3, 1.5],
+        "inputs": {
+          "Seed": 63,
+          "Crown Radius": 1.3,
+          "Crown Height": 2.8,
+          "Stem": 1.5,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light"
+        }
+      },
+      {
+        "name": "Park Hedges",
+        "mesh": {
+          "vertices": [
+            [46.0, 4.4, -3.25],
+            [61.0, 4.4, -3.25],
+            [61.0, 5.2, -3.25],
+            [46.0, 5.2, -3.25],
+            [46.0, 10.8, -3.25],
+            [61.0, 10.8, -3.25],
+            [61.0, 11.6, -3.25],
+            [46.0, 11.6, -3.25],
+            [-7.0, -56.0, -3.25],
+            [-6.2, -56.0, -3.25],
+            [-6.2, -19.0, -3.25],
+            [-7.0, -19.0, -3.25],
+            [8.2, -56.0, -3.25],
+            [9.0, -56.0, -3.25],
+            [9.0, -19.0, -3.25],
+            [8.2, -19.0, -3.25]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Hedges",
+          "Density": 1.6,
+          "Spacing": 0.55,
+          "Scale Min": 1.1,
+          "Scale Max": 1.5,
+          "Seed": 9
+        }
+      }
+    ],
+    "Wing Gardens": [
+      {
+        "name": "Wing Paving",
+        "mesh": {
+          "vertices": [
+            [-30.42, -1.9, -3.2],
+            [-12.62, -1.9, -3.2],
+            [-12.62, 11.9, -3.2],
+            [-30.42, 11.9, -3.2],
+            [13.7, 1.1, -3.2],
+            [29.5, 1.1, -3.2],
+            [29.5, 14.9, -3.2],
+            [13.7, 14.9, -3.2],
+            [-7.9, -13.9, -3.2],
+            [9.9, -13.9, -3.2],
+            [9.9, -6.16, -3.2],
+            [-7.9, -6.16, -3.2],
+            [13.7, -5.9, -3.2],
+            [18.9, -5.9, -3.2],
+            [18.9, 0.3, -3.2],
+            [13.7, 0.3, -3.2]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+        },
+        "asset": "GH.Garden.Paving",
+        "inputs": {
+          "Flag Size": 1.0,
+          "Joint": 0.012,
+          "Seed": 71
+        }
+      },
+      {
+        "name": "Wing Beds",
+        "mesh": {
+          "vertices": [
+            [-27.5, 1.0, -3.2],
+            [-15.5, 1.0, -3.2],
+            [-15.5, 9.0, -3.2],
+            [-27.5, 9.0, -3.2],
+            [16.0, 2.4, -3.2],
+            [28.0, 2.4, -3.2],
+            [28.0, 6.2, -3.2],
+            [16.0, 6.2, -3.2],
+            [16.0, 9.8, -3.2],
+            [28.0, 9.8, -3.2],
+            [28.0, 13.6, -3.2],
+            [16.0, 13.6, -3.2],
+            [-7.0, -13.4, -3.2],
+            [-0.6, -13.4, -3.2],
+            [-0.6, -11.6, -3.2],
+            [-7.0, -11.6, -3.2],
+            [2.6, -13.4, -3.2],
+            [9.0, -13.4, -3.2],
+            [9.0, -11.6, -3.2],
+            [2.6, -11.6, -3.2]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15], [16, 17, 18, 19]]
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.14,
+          "Mound": 0.12,
+          "Kerb": 0.18
+        }
+      },
+      {
+        "name": "Wing Understory",
+        "loc": [0.0, 0.0, 0.12],
+        "mesh": {
+          "vertices": [
+            [-27.5, 1.0, -3.2],
+            [-15.5, 1.0, -3.2],
+            [-15.5, 9.0, -3.2],
+            [-27.5, 9.0, -3.2],
+            [16.0, 2.4, -3.2],
+            [28.0, 2.4, -3.2],
+            [28.0, 6.2, -3.2],
+            [16.0, 6.2, -3.2],
+            [16.0, 9.8, -3.2],
+            [28.0, 9.8, -3.2],
+            [28.0, 13.6, -3.2],
+            [16.0, 13.6, -3.2],
+            [-7.0, -13.4, -3.2],
+            [-0.6, -13.4, -3.2],
+            [-0.6, -11.6, -3.2],
+            [-7.0, -11.6, -3.2],
+            [2.6, -13.4, -3.2],
+            [9.0, -13.4, -3.2],
+            [9.0, -11.6, -3.2],
+            [2.6, -11.6, -3.2]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15], [16, 17, 18, 19]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Understory",
+          "Density": 2.0,
+          "Spacing": 0.35,
+          "Scale Min": 0.9,
+          "Scale Max": 1.3,
+          "Seed": 13
+        }
+      },
+      {
+        "name": "Wing Shrubs",
+        "loc": [0.0, 0.0, 0.12],
+        "mesh": {
+          "vertices": [
+            [-27.5, 1.0, -3.2],
+            [-15.5, 1.0, -3.2],
+            [-15.5, 9.0, -3.2],
+            [-27.5, 9.0, -3.2],
+            [16.0, 2.4, -3.2],
+            [28.0, 2.4, -3.2],
+            [28.0, 6.2, -3.2],
+            [16.0, 6.2, -3.2],
+            [16.0, 9.8, -3.2],
+            [28.0, 9.8, -3.2],
+            [28.0, 13.6, -3.2],
+            [16.0, 13.6, -3.2],
+            [-7.0, -13.4, -3.2],
+            [-0.6, -13.4, -3.2],
+            [-0.6, -11.6, -3.2],
+            [-7.0, -11.6, -3.2],
+            [2.6, -13.4, -3.2],
+            [9.0, -13.4, -3.2],
+            [9.0, -11.6, -3.2],
+            [2.6, -11.6, -3.2]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15], [16, 17, 18, 19]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Shrubs",
+          "Density": 0.3,
+          "Spacing": 0.9,
+          "Scale Min": 0.9,
+          "Scale Max": 1.2,
+          "Seed": 17
+        }
+      },
+      {
+        "name": "Tree Ferns",
+        "at": [[-24.5, 3.0, -3.06, 20.0], [-19.0, 7.0, -3.06, 140.0], [-22.0, 8.2, -3.06, 260.0]],
+        "asset": "GH.Flora.Pinnate",
+        "preset": "areca",
+        "size": [0.9, 1.1],
+        "inputs": {
+          "Stem": 2.2,
+          "Fronds": 14,
+          "Frond Length": 1.6,
+          "Leaflets": 40,
+          "Leaflet Length": 0.22,
+          "Leaflet Width": 0.03,
+          "Spread Low": -10,
+          "Spread High": 35,
+          "Color A": "leaf",
+          "Color B": "leaf_light",
+          "Seed": 61
+        }
+      },
+      {
+        "name": "Palm House Palms",
+        "at": [[18.0, 4.3, -3.06, 10.0], [25.0, 4.3, -3.06, 100.0], [18.5, 11.7, -3.06, 200.0], [25.5, 11.7, -3.06, 300.0]],
+        "asset": "GH.Flora.Pinnate",
+        "preset": "areca",
+        "size": [1.25, 1.5],
+        "inputs": {
+          "Stem": 3.2,
+          "Fronds": 14,
+          "Frond Length": 1.8,
+          "Leaflets": 34,
+          "Leaflet Length": 0.42,
+          "Leaflet Width": 0.045,
+          "Spread Low": 0,
+          "Spread High": 45,
+          "Color A": "leaf_light",
+          "Color B": "leaf_yellow",
+          "Seed": 81
+        }
+      }
     ]
   },
   "lights": [
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 9.448,
+      "power": 10.1536,
       "color": [1.0, 0.85, 0.32],
       "angle": 0.53,
       "direction": [0.4919, 0.2956, 0.8189]
@@ -1821,6 +3620,238 @@
       "target": [-1.4, 3.2, -3.0],
       "lens": 24.0,
       "resolution": [1600, 1000]
+    },
+    "front": {
+      "location": [1.0, -62.0, -1.0],
+      "target": [1.0, 0.0, 5.0],
+      "lens": 26.0,
+      "resolution": [1920, 1080]
+    },
+    "entrance": {
+      "location": [66.0, 8.0, -1.0],
+      "target": [20.0, 8.0, 4.0],
+      "lens": 24.0,
+      "resolution": [1920, 1080]
+    },
+    "aerial": {
+      "location": [46.0, -56.0, 54.0],
+      "target": [6.0, -12.0, -3.0],
+      "lens": 30.0,
+      "resolution": [1920, 1080]
+    },
+    "aerial_west": {
+      "location": [-44.0, -58.0, 50.0],
+      "target": [2.0, -8.0, -3.0],
+      "lens": 30.0,
+      "resolution": [1920, 1080]
+    },
+    "plan": {
+      "location": [4.0, -23.0, 300.0],
+      "target": [4.0, -22.999, 0.0],
+      "ortho": 125.0,
+      "resolution": [1500, 1000]
+    },
+    "tower": {
+      "location": [40.0, -30.0, -1.5],
+      "target": [16.0, -3.0, 5.0],
+      "lens": 28.0,
+      "resolution": [1920, 1080]
+    },
+    "atrium_up": {
+      "location": [-3.0, 13.5, -1.6],
+      "target": [2.5, 0.0, 5.0],
+      "lens": 15.0,
+      "resolution": [1080, 1350]
+    },
+    "palm_house": {
+      "location": [33.5, 8.0, -1.3],
+      "target": [14.0, 8.0, 0.2],
+      "lens": 20.0,
+      "resolution": [1920, 1080]
+    },
+    "fern_house": {
+      "location": [-29.0, -0.8, -1.4],
+      "target": [-14.0, 7.0, -0.6],
+      "lens": 18.0,
+      "resolution": [1920, 1080]
+    },
+    "stair_tower": {
+      "location": [16.3, -3.0, -2.5],
+      "target": [16.3, -2.95, 8.0],
+      "lens": 12.0,
+      "resolution": [1200, 1200]
+    },
+    "roof_terrace": {
+      "location": [-6.4, -12.4, 5.5],
+      "target": [10.0, 0.0, 6.5],
+      "lens": 20.0,
+      "resolution": [1920, 1080]
+    },
+    "third_floor": {
+      "location": [12.1, -4.6, 5.5],
+      "target": [-4.0, 10.0, 0.8],
+      "lens": 18.0,
+      "resolution": [1920, 1080]
     }
+  },
+  "volumes": {
+    "Hall": {
+      "notes": "The gable over the painted hall, on its curtain walls (built as grids): ridge north-south at 14.7 m, the gable ends filled.",
+      "x": [-12.46, 13.54],
+      "y": [-6.0, 16.0],
+      "z": [-3.2, 7.22],
+      "xs": [
+        -12.46,
+        -10.46,
+        -8.46,
+        -6.46,
+        -4.46,
+        -2.46,
+        -0.46,
+        1.54,
+        3.54,
+        5.54,
+        7.54,
+        9.54,
+        11.54,
+        13.54
+      ],
+      "ys": [
+        -6.0,
+        -4.0,
+        -2.0,
+        0.0,
+        2.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ],
+      "pitch": 30.0,
+      "ridge": "y",
+      "purlins": 5,
+      "walls": [],
+      "gables": ["north", "south"],
+      "eaves": false
+    },
+    "Fern House": {
+      "notes": "West wing: a gabled fern and tree-fern house whose ridge runs east-west, its east end open into the hall.",
+      "x": [-30.52, -12.52],
+      "y": [-2.0, 12.0],
+      "z": [-3.2, 2.6],
+      "bay": 2.0,
+      "transoms": [0.2],
+      "pitch": 30.0,
+      "ridge": "x",
+      "purlins": 3,
+      "walls": ["north", "south", "west"],
+      "gables": ["west"]
+    },
+    "Palm House": {
+      "notes": "East wing and front door: a palm house glazed up to the third floor, its flat roof a planted ring round the lantern its palms grow up into.",
+      "x": [13.6, 29.6],
+      "y": [1.0, 15.0],
+      "z": [-3.2, 3.84],
+      "bay": 2.0,
+      "transoms": [0.2],
+      "walls": ["north", "south", "east"],
+      "roof": false,
+      "openings": {
+        "east": [[3, 0]]
+      }
+    },
+    "Palm Lantern": {
+      "notes": "Clerestory and gable over the middle of the palm house, standing on its roof slab.",
+      "x": [15.6, 27.6],
+      "y": [3.0, 13.0],
+      "z": [4.14, 5.34],
+      "bay": 2.0,
+      "pitch": 30.0,
+      "ridge": "x",
+      "purlins": 3
+    },
+    "Terrace House": {
+      "notes": "South wing under the roof terrace: glass walls on three sides, its north side the hall; the south door ends the canal's axis.",
+      "x": [-8.0, 10.0],
+      "y": [-14.0, -6.06],
+      "z": [-3.2, 3.8],
+      "bay": 2.0,
+      "transoms": [0.2],
+      "walls": ["south", "east", "west"],
+      "roof": false,
+      "openings": {
+        "south": [[4, 0]]
+      }
+    },
+    "Terrace": {
+      "notes": "The walkable glass roof of the south wing at the hall's third floor.",
+      "x": [-8.0, 10.0],
+      "y": [-14.0, -6.06],
+      "z": [3.8, 3.8],
+      "bay": 2.0,
+      "walls": [],
+      "eaves": false
+    },
+    "Stair Tower": {
+      "notes": "Glass stair tower at the hall's south-east corner, the conservatory's landmark: its flights climb past the hall's second and third floors to a belvedere under its own gable.",
+      "x": [13.6, 19.0],
+      "y": [-6.0, 0.4],
+      "z": [-3.2, 10.6],
+      "bay": 1.8,
+      "transoms": [0.0, 3.84, 7.68],
+      "pitch": 30.0,
+      "ridge": "y",
+      "purlins": 2,
+      "openings": {
+        "east": [[2, 0]],
+        "west": [[0, 1], [0, 2]]
+      }
+    },
+    "Canopy": {
+      "notes": "Flat glass canopy over the front door in the palm house's east wall.",
+      "x": [29.66, 34.4],
+      "y": [5.0, 11.0],
+      "z": [0.2, 0.2],
+      "bay": 1.6,
+      "walls": []
+    },
+    "Entrance Canopy": {
+      "notes": "Glass gable over the south door, where the canal's axis meets the conservatory.",
+      "x": [-1.0, 3.0],
+      "y": [-17.2, -14.0],
+      "z": [0.2, 0.2],
+      "bay": 1.0,
+      "pitch": 15.0,
+      "ridge": "y",
+      "purlins": 2,
+      "walls": []
+    }
+  },
+  "planting": {
+    "keep_clear": [
+      {
+        "notes": "The foot of the stair.",
+        "box": [-4.62, -3.12, 0.32, 8.0]
+      },
+      {
+        "notes": "The paved court along the north wall.",
+        "box": [-9.5, 2.5, 9.5, 15.8]
+      },
+      {
+        "notes": "The path to the palm house's doorway in the hall's east wall.",
+        "box": [9.0, 13.54, 6.0, 10.0]
+      },
+      {
+        "notes": "The path to the fern house's doorway in the hall's west wall.",
+        "box": [-12.46, -9.0, 4.0, 8.0]
+      },
+      {
+        "notes": "The path to the terrace house's doorway in the hall's south wall.",
+        "box": [-0.5, 3.6, -6.0, -2.0]
+      }
+    ]
   }
 }
