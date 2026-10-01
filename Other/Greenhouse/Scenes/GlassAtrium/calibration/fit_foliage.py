@@ -71,10 +71,10 @@ def id_color(index):
 
 
 def render(work, samples, scale):
-    """The shot without its look, then the object-ID render.  The ID colours
-    are object properties set before the first render: Cycles keeps the
-    scene it synced between renders, and a property set later never reaches
-    it."""
+    """The shot without its look, then the object-ID render: every object
+    an emission of its ``id_color`` (glass that the ink pass sees through
+    left clear), one sample, no pixel filter, so a pixel holds one object's
+    colour exactly."""
     import bpy
     ns = {}
     exec(compile(open(os.path.join(ROOT, "Other", "build.py"), encoding="utf-8").read(), "build.py", "exec"), ns)
@@ -107,7 +107,6 @@ def render(work, samples, scale):
     tree.links.new(emission.outputs["Emission"], mix.inputs[1])
     tree.links.new(clear.outputs["BSDF"], mix.inputs[2])
     tree.links.new(mix.outputs["Shader"], output.inputs["Surface"])
-    scene.cycles.transparent_max_bounces = 64
     for layer in scene.view_layers:
         layer.material_override = material
     for obj in scene.objects:
@@ -118,10 +117,8 @@ def render(work, samples, scale):
     scene.view_settings.view_transform = "Standard"
     scene.view_settings.look = "None"
     scene.view_settings.exposure = 0.0
-    scene.cycles.samples = 4
-    scene.cycles.use_denoising = False
-    scene.cycles.pixel_filter_type = "BOX"
-    scene.cycles.filter_width = 1.0
+    scene.eevee.taa_render_samples = 1
+    scene.render.filter_size = 0.0
     scene.render.filepath = os.path.join(work, "ids.png")
     bpy.ops.render.render(write_still=True)
     with open(os.path.join(work, "ids.json"), "w", encoding="utf-8") as handle:

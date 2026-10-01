@@ -1,17 +1,20 @@
 """
-Greenhouse material library (``GH.*``), made for Cycles.
+Greenhouse material library (``GH.*``), made for EEVEE.
 
 Every glass -- the panes, the jade glass of the frame, the crystal of the
-glassware, the water in the flask -- is one row of the design system's
-``glasses`` (``Greenhouse.json``) built by one builder (:func:`dielectric`):
-a smooth dielectric of its ``ior`` that splits white light by its ``abbe``
-number (Cycles' dispersion) where it has one, filled with Beer-Lambert
-absorption towards a palette ``tint``.  Seen face on, a thin wall is nearly
-clear; along an edge or through a rod, where light crosses centimetres to
-decimetres of glass, it turns the deep blue-green of jade -- the colour the
-painting gives every glass edge and every bar of the frame.  Shadow rays
-see tinted transparency, so sunlight reaches the garden under the glass
-floor instead of being lost to caustics.
+glassware, the water in the flask and in the pools -- is one row of the
+design system's ``glasses`` (``Greenhouse.json``) built by one builder
+(:func:`dielectric`): a smooth dielectric of its ``ior`` -- a thin pane
+seen through straight, a thick body refracted by EEVEE's ray tracing --
+tinted by Beer-Lambert absorption towards a palette ``tint`` over the path
+light takes inside it: the ``thickness`` every glazed body carries
+(:func:`glazed`), stretched by the slant of the refracted ray.  Seen face
+on, a thin wall is nearly clear; along an edge or through a rod, where
+light crosses centimetres to decimetres of glass, it turns the deep
+blue-green of jade -- the colour the painting gives every glass edge and
+every bar of the frame.  Shadows see the glass as
+transparent as its mean transmittance, so sunlight reaches the garden under
+the glass floor.
 
 Organic surfaces read colours the kit stores on the geometry:
 ``leaf_color`` (per leaf), ``leaf_u`` (0 at the base, 1 at the tip) and
@@ -30,6 +33,7 @@ import math
 import bpy
 
 from Core import shaders as S
+from Core.gn import get_asset
 from Core.nodes import Sock, Tree
 from Core.render import INK_SKIP
 from .. import GLASSES, PALETTE, ROOM
@@ -40,6 +44,7 @@ register = LIBRARY.register
 get = LIBRARY.get
 color = LIBRARY.color
 param = LIBRARY.param
+GLAZED_DEPTH = 3.0
 
 
 def attribute(tree: Tree, name, output="Fac", kind="GEOMETRY"):
@@ -54,41 +59,20 @@ def mix_shader(tree: Tree, factor, first, second):
     return tree.n("ShaderNodeMixShader", factor, first, second)["Shader"]
 
 
-def light_clear(tree: Tree, shader, tint):
-    """``shader`` for camera and glossy rays; for the rays that carry light
-    to a surface -- shadow rays and rays scattered off a diffuse surface --
-    a tinted transparent surface.  Light reaches the garden through glass;
-    refracted, it would be a caustic path, which the render does not trace,
-    and the sky would light the conservatory only through its sampled
-    shadow rays, a fraction of its light."""
-    path = tree.n("ShaderNodeLightPath")
-    carries_light = tree.math("MAXIMUM", path["Is Shadow Ray"], path["Is Diffuse Ray"])
-    transparent = tree.n("ShaderNodeBsdfTransparent", Color=tint)["BSDF"]
-    return mix_shader(tree, carries_light, shader, transparent)
-
-
-def seen(tree: Tree):
-    """1 on the rays that carry the eye's own view of the sky -- camera
-    rays, straight or only refracted through glass -- and 0 once a path has
-    been mirrored (a pane's glint of the sky is painted at the sky's full
-    light, as the painting paints its glass) and on the rays that light the
-    scene, a leaf's translucency among them."""
-    path = tree.n("ShaderNodeLightPath")
-    refracted = tree.math("MULTIPLY", path["Is Transmission Ray"], tree.math("SUBTRACT", 1.0, path["Is Diffuse Ray"]))
-    unmirrored = tree.math("LESS_THAN", path["Glossy Depth"], 0.5)
-    return tree.math("MAXIMUM", path["Is Camera Ray"], tree.math("MULTIPLY", refracted, unmirrored))
-
-
 def scaled(rgba, factor):
     return tuple(channel * factor for channel in rgba[:3]) + (1.0,)
 
 
 def glazed(graph, geometry, material, see_through=True):
-    """``geometry`` in ``material``, marked as glass for the ink pass
+    """``geometry`` in ``material``, carrying the ``thickness`` its glass
+    reads (``Shading.Thickness``: how far light travels through the body
+    along the normal, at most ``GLAZED_DEPTH`` -- through the edge of a pane,
+    the pane's width) and marked as glass for the ink pass
     (``Core.render.INK_SKIP``): lines of what lies behind it are drawn
     through it.  ``see_through`` is a constant or an asset's switch."""
     skip = graph.switch(see_through, 0.0, 1.0, "FLOAT") if isinstance(see_through, Sock) else float(see_through)
-    return graph.mat(graph.store(geometry, INK_SKIP, skip, "FLOAT", "FACE"), material)
+    measured = graph.group(get_asset("Shading.Thickness"), Mesh=geometry, Max_Thickness=GLAZED_DEPTH).o
+    return graph.mat(graph.store(measured, INK_SKIP, skip, "FLOAT", "FACE"), material)
 
 
 # ------------------------------------------------------------------ structure
@@ -101,12 +85,6 @@ def steel():
         return S.bsdf(tree, Base_Color=base, Roughness=param("steel_roughness", 0.32), Coat_Weight=0.4,
                       Coat_Roughness=0.08, Specular_IOR_Level=0.5)["BSDF"]
     return S.material("GH.Steel", build)
-
-
-def surface_transmittance(ior):
-    """Share of the light a surface of a dielectric of ``ior`` lets through
-    face on: one less the Fresnel reflectance ((n - 1) / (n + 1))^2."""
-    return 1.0 - ((ior - 1.0) / (ior + 1.0)) ** 2
 
 
 def reflection_room(tree: Tree):
@@ -146,48 +124,67 @@ def reflection_room(tree: Tree):
     return tree.vmath("SCALE", color(ROOM["sky"])[:3], scale=tree.math("MULTIPLY", inside, lit))
 
 
+def slant_path(tree: Tree, thickness, ior):
+    """Path light refracted into a body ``thickness`` thick along its normal
+    takes across it: ``thickness`` / cos(theta_t), the ray bent from the line
+    of sight by Snell's law at ``ior``."""
+    geometry = tree.n("ShaderNodeNewGeometry")
+    facing = tree.math("ABSOLUTE", tree.vmath("DOT_PRODUCT", geometry["Normal"], geometry["Incoming"]))
+    bent = tree.math("DIVIDE", tree.math("SUBTRACT", 1.0, tree.math("MULTIPLY", facing, facing)), ior * ior)
+    return tree.math("DIVIDE", thickness, tree.math("SQRT", tree.math("SUBTRACT", 1.0, bent)))
+
+
 def dielectric(name, spec):
     """Builder of the glass ``name`` (a row ``spec`` of ``GLASSES``): a
-    smooth dielectric of ``ior`` -- dispersing by its ``abbe`` number where
-    the row gives one -- filled with absorption towards the palette colour
-    ``tint`` at ``density`` per metre and, with a ``scatter`` density, a
-    haze that lights the glass from within (no ``volume`` for an open sheet
-    such as a pool's surface).  Painted glassware mirrors the
-    room far more than real glass does, and mirrors it as the painter sees
-    it -- bright panes over a clear body, not the even glare the room really
-    sheds on a sphere -- so a ``reflection`` gain above 1 adds that many
-    times the glass's own reflectance more (never past a mirror) of the room
+    smooth dielectric of ``ior`` absorbing towards the palette colour
+    ``tint`` at ``density`` per metre over the slanted path through it
+    (:func:`slant_path`).  Its ``body`` says how light crosses it: a
+    ``pane`` -- millimetres of flat glass, which shifts nothing it shows --
+    lets the scene behind through straight, tinted by half its path at each
+    of its two faces, and mirrors the room by its Fresnel reflectance, so
+    everything behind it, the haze outside too, is seen exactly (the sun's
+    shadow sees only the tint: it has no eye to take a Fresnel angle from);
+    a ``slab`` or a ``sphere`` -- a bar, solid glass, a body of water -- is
+    refracted by EEVEE's ray tracing as that shape.
+    Painted glassware mirrors the room far more than real glass does, and
+    mirrors it as the painter sees it -- bright panes over a clear body,
+    not the even glare the room really sheds on a sphere -- so a
+    ``reflection`` gain above 1 adds that many times the glass's own
+    reflectance more (never past a mirror) of the room
     (:func:`reflection_room`, a probe of the conservatory that holds for
     every camera) at ``ROOM["brightness"]``: the reflections only ever
-    brighten what is seen through the glass.  A ray carrying light crosses a surface and
-    half a ``wall`` of glass per surface it meets, so it is tinted by the
-    surface's Fresnel loss and the transmittance of half a wall -- the light
-    the glass really lets through.  A scene overrides a field as
+    brighten what is seen through the glass.  A scene overrides a field as
     ``"<name>.<field>"``."""
     def field(key, default=None):
         return param(f"{name}.{key}", spec.get(key, default))
 
     def build(tree: Tree):
         ior, density, tint = field("ior"), field("density"), color(field("tint"))
-        abbe = field("abbe")
-        dispersion = {"Transmission_Dispersion_Scale": 1.0, "Transmission_Dispersion_Abbe_Number": abbe} if abbe else {}
-        surface = S.bsdf(tree, Base_Color=(1.0, 1.0, 1.0, 1.0), Roughness=field("roughness", 0.0), IOR=ior,
-                         Transmission_Weight=1.0, **dispersion)["BSDF"]
+        thickness = attribute(tree, S.THICKNESS_ATTRIBUTE)
+        pane = field("body") == "pane"
+        path = slant_path(tree, thickness, ior)
+        transmittance = S.beer_lambert(tree, tint[:3], density, tree.math("MULTIPLY", path, 0.5) if pane else path)
+        if pane:
+            clear = tree.n("ShaderNodeBsdfTransparent", Color=transmittance)["BSDF"]
+            mirror = tree.n("ShaderNodeBsdfGlossy", Color=(1.0, 1.0, 1.0, 1.0), Roughness=field("roughness", 0.0))["BSDF"]
+            surface = mix_shader(tree, tree.n("ShaderNodeFresnel", IOR=ior)["Fac"], clear, mirror)
+        else:
+            surface = S.bsdf(tree, Base_Color=transmittance, Roughness=field("roughness", 0.0), IOR=ior, Transmission_Weight=1.0)["BSDF"]
         gain = field("reflection", 1.0)
         if gain > 1.0:
             facing = tree.n("ShaderNodeFresnel", IOR=ior)["Fac"]
             share = tree.math("MULTIPLY", facing, gain - 1.0, clamp=True)
             glint = tree.n("ShaderNodeEmission", reflection_room(tree), tree.math("MULTIPLY", share, ROOM["brightness"]))["Emission"]
             surface = tree.n("ShaderNodeAddShader", surface, glint)["Shader"]
-        volume = tree.n("ShaderNodeVolumeAbsorption", Color=tint, Density=density)["Volume"]
-        scatter = field("scatter", 0.0)
-        if scatter:
-            haze = tree.n("ShaderNodeVolumeScatter", Color=tint, Density=scatter, Anisotropy=field("anisotropy", 0.0))["Volume"]
-            volume = tree.n("ShaderNodeAddShader", volume, haze)["Shader"]
-        loss = surface_transmittance(ior)
-        half_wall = tuple(loss * math.exp(-(1.0 - channel) * density * field("wall") * 0.5) for channel in tint[:3])
-        return {"Surface": light_clear(tree, surface, (*half_wall, 1.0)), "Volume": volume if field("volume", True) else None}
-    return lambda: S.material(name, build)
+        if pane:
+            return mix_shader(tree, tree.n("ShaderNodeLightPath")["Is Shadow Ray"], surface, clear)
+        return S.eevee_refraction(tree, surface, transmittance, thickness)
+
+    def settings():
+        if field("body") == "pane":
+            return {"surface_render_method": "DITHERED", "use_transparent_shadow": True}
+        return {**S.EEVEE_REFRACTION, "thickness_mode": field("body").upper()}
+    return lambda: S.material(name, build, settings=settings())
 
 
 for glass_name, glass_spec in GLASSES.items():
@@ -406,11 +403,20 @@ def leaf_shader(tree: Tree, sheen, translucency, roughness):
     return mix_shader(tree, translucency, surface, backlit)
 
 
+def sheet(tree: Tree):
+    """Thickness output of a sheet -- a leaf, a blade -- for EEVEE: none, so
+    the light through it crosses the blade instead of a body as deep as the
+    object is wide (with ``thickness_mode`` "SLAB")."""
+    zero = tree.n("ShaderNodeValue")
+    zero.n.outputs[0].default_value = 0.0
+    return zero.o
+
+
 @register("GH.Leaf")
 def leaf():
     def build(tree: Tree):
-        return leaf_shader(tree, param("leaf_sheen", 0.45), param("leaf_translucency", 0.3), 0.42)
-    return S.material("GH.Leaf", build)
+        return {"Surface": leaf_shader(tree, param("leaf_sheen", 0.45), param("leaf_translucency", 0.3), 0.42), "Thickness": sheet(tree)}
+    return S.material("GH.Leaf", build, settings={"thickness_mode": "SLAB"})
 
 
 @register("GH.Succulent")
@@ -450,20 +456,23 @@ def smog():
     single-scattered skylight in closed form.  It thins with height,
     exp(-(z - ``smog_ground``) / ``smog_scale``) from ``smog_density`` at
     the ground: the streets far below vanish into pink while a neighbouring
-    tower at the conservatory's height stays clear.  To the eye
-    (:func:`seen`) an inversion holds it in the valley: above ``smog_top``
-    it fades over ``smog_top_fade`` to the share ``smog_above`` of itself,
-    so a view down from the hill dissolves into pink while the sky above
-    the hill stays blue.  The light and the glints keep the whole column --
-    the painting's light rig was fitted with the haze dimming the low sky
-    to deep shadows and its glass mirroring pink haze."""
+    tower at the conservatory's height stays clear.  An inversion holds it
+    in the valley: above ``smog_top`` it fades over ``smog_top_fade`` to the
+    share ``smog_above`` of itself, so a view down from the hill dissolves
+    into pink while the sky above the hill stays blue; and the hilltop
+    itself, the box from ``smog_clear_min`` to ``smog_clear_max``, is clear
+    air.  It is seen, it lights nothing."""
     def build(tree: Tree):
-        _, _, z = tree.sep(tree.n("ShaderNodeNewGeometry")["Position"])
+        x, y, z = tree.sep(tree.n("ShaderNodeNewGeometry")["Position"])
         falloff = tree.math("EXPONENT", (z - param("smog_ground", -120.0)) * (-1.0 / param("smog_scale", 30.0)))
         top = param("smog_top", 0.0)
-        thinned = tree.map_range(z, top, top + param("smog_top_fade", 1.0), 0.0, 1.0 - param("smog_above", 1.0))
-        inversion = tree.math("SUBTRACT", 1.0, tree.math("MULTIPLY", thinned, seen(tree)))
-        density = tree.math("MULTIPLY", tree.math("MULTIPLY", falloff, inversion), param("smog_density", 0.05))
+        inversion = tree.map_range(z, top, top + param("smog_top_fade", 1.0), 1.0, param("smog_above", 1.0))
+        inside = None
+        for axis, low, high in zip((x, y, z), param("smog_clear_min", (0.0, 0.0, 0.0)), param("smog_clear_max", (0.0, 0.0, 0.0))):
+            within = tree.math("MULTIPLY", tree.math("GREATER_THAN", axis, low), tree.math("LESS_THAN", axis, high))
+            inside = within if inside is None else tree.math("MULTIPLY", inside, within)
+        outside = tree.math("SUBTRACT", 1.0, inside)
+        density = tree.math("MULTIPLY", tree.math("MULTIPLY", tree.math("MULTIPLY", falloff, inversion), outside), param("smog_density", 0.05))
         absorb = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=density)["Volume"]
         glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=tree.math("MULTIPLY", density, param("smog_brightness", 1.0)))["Emission"]
         return {"Volume": tree.n("ShaderNodeAddShader", absorb, glow)["Shader"]}
@@ -499,9 +508,11 @@ def world(config):
     colour covering the share ``cover`` of the sky, ``scale`` of them across
     it, flattened ``flatten`` times, edges ``softness`` soft -- that thin out
     towards the horizon and the zenith.  The sky sheds light at
-    ``light_strength`` (the light fit's); the eye sees it at ``seen_ratio``
-    of that -- adapted to a sunlit park, where the sky is bright but not
-    blinding -- straight up or through the glass (:func:`seen`)."""
+    ``light_strength`` (the light fit's) and fills every reflection and
+    refraction that leaves the frame at that; the camera looking at it sees
+    it at ``seen_strength`` -- the eye adapted to a sunlit park, where the
+    sky is bright but not blinding, whatever share of the light the haze
+    lets the sky shed."""
     world_block = S.new_world("GH.Sky")
     tree = Tree.wrap(world_block.node_tree, clear=True)
     out = tree.n("ShaderNodeOutputWorld")
@@ -517,7 +528,8 @@ def world(config):
         cover = tree.map_range(billows, threshold, threshold + clouds["softness"], 0.0, 1.0)
         band = tree.math("MULTIPLY", tree.map_range(height, 0.0, 0.08, 0.0, 1.0), tree.map_range(height, 0.45, 0.85, 1.0, 0.0))
         sky = S.mix_rgb(tree, tree.math("MULTIPLY", cover, band), sky, color(clouds["color"]))
-    strength = config["light_strength"] * (1.0 + (config.get("seen_ratio", 1.0) - 1.0) * seen(tree))
+    camera = tree.n("ShaderNodeLightPath")["Is Camera Ray"]
+    strength = tree.mix(camera, config["light_strength"], config["seen_strength"])
     tree.link(tree.n("ShaderNodeBackground", sky, strength)["Background"], out.n.inputs["Surface"])
     tree.layout()
     bpy.context.scene.world = world_block

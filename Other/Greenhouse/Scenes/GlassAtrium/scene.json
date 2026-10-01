@@ -13,15 +13,15 @@
     "Stair (dog-leg, solid stone treads): 14 treads (0.12308 m risers, 0.433 m goings) along x = -4.62..-3.12 rise from the garden at y = 0.32 to a landing at z = -1.354, then 11 treads turn west up to the gallery floor at x = -9.383; solved from the painted nosings (16 px rms).",
     "Envelope: curtain walls on a 2 m module at x = -12.46 / 13.54 and y = -6 / 16, the roof's tie grid at z = 7.22 under a glass gable (volumes.Hall); the conservatory crowns a hilltop park whose north edge is its north wall: the frame's top row of image looks 6 degrees below the horizon, so the pink seen through the walls is the sunlit city haze in the valley below, not sky.  North of the wall a lower terrace of the hill lies 16 m below the gallery, reaching 33 m out -- just short of where its ground would rise above the sight line past the foot of the north wall, so the ground itself is never seen and the view beyond it falls into the haze; the trees on it, 30-45 m away, are the pale canopies seen through the north wall down to its foot (their tops placed on the painted canopy outline, their trunks and the terrace below every sight line through the wall), veiled by the haze between.  The faint tree further off stands on a lower terrace 84 m north (a crown 6.3 m wide, sized on its painted silhouette); that terrace, too, ends before it would rise above the sight line past the wall foot.",
     "Garden specimens (\"Painted ...\"): each placed where its mass is in the painting -- the centre pixel of the mass back-projected through the solved camera at the height of its crown -- then shifted by whole 0.2 m steps where the rendered view then matches the painting better (calibration/layout_search.py); the random understory fills the beds between them.",
-    "Air: the sunlit air fills the conservatory 10 cm clear of the floor and roof -- a volume boundary must not coincide with another volume boundary (the glass posts end on those planes), or the volume stack at the camera breaks and every camera ray is absorbed.",
+    "Air: the sunlit air fills the conservatory 10 cm clear of the floor and roof.",
     "Side table: the painting draws its top as an ellipse rounder (aspect 0.57) than a horizontal disc can project to at that place (every point on that view ray gives sin 26 deg = 0.44); the disc matches the painted width and centre, the objects on it their painted corners.",
     "Sun: 55 deg high from azimuth 31 deg (to the right of and behind the atrium), so its shafts run down and to the left through the air as the painted ones do.  It shines through the city smog, which scatters the blue out of it: golden light (1, 0.85, 0.32) -- the painted sun patches on the pale pink floor are orange-yellow, not pink-white.",
     "Shade trees: three umbrella trees in the unseen north-east of the garden (outside the painting frame) whose crowns stand between the sun and the paved court: their dappled shade is the green-and-pink mottling of the court floor seen through the balustrade, and the sun shafts come down between their leaves.",
     "North wall: structurally glazed -- its panes meet on silicone joints, so only the transoms and the corner mullions are frames (the painting shows the pink haze through it undivided but for two horizontal bars).  Posts that the painting shows only below the gallery floor stop under it.",
-    "Daylight: the sky's strength is 0.26 of the sun's power (sky.sun_ratio): a hazy sky giving some 40 % of the light on a level surface with the sun 55 degrees up (pi * 0.26 * 0.7 against sin 55, for a dome averaging 0.7 of its strength); the fit scales both together.",
+    "Daylight: the sky's light is 0.09 of the sun's power (sky.sun_ratio), the ratio that fits the painting best (a light fit at each of 0.03-0.26): the valley haze the light crosses dims the sky's share to that, and the painting's shadows are deep.  The fit scales both together.",
     "Vines: climbing plants trained along the roof frame, 6.3-6.6 m above the gallery, above every sight line of the painting's camera: they are seen only in their dappled shade -- the leaf-shaped sun patches on the court, the treads and the gallery -- and in the shafts of sun between them.  The sun is the real sun, half a degree across, so the patches keep sharp edges from nine metres up.",
     "City extent: the city ground and the haze reach 6 km out: the top row of the frame looks 6 degrees down, so its sight line meets the ground 1.2 km away -- inside the haze, where the ground has no edge to show.",
-    "Sky and haze as seen: a pale blue zenith and banks of pink-white cloud over a pink-white horizon (sky.clouds); the eye sees the sky at sky.seen_ratio of the light it sheds, straight up or through the glass, and sees the valley haze thin out above the hilltop (materials.smog_top, smog_top_fade, smog_above).  The light rays and the glints of the glass keep the full haze and the sky's full light: the light fit was made with them.",
+    "Sky and haze as seen: a pale blue zenith and banks of pink-white cloud over a pink-white horizon (sky.clouds), seen by the camera at sky.seen_strength whatever share of the light the sky sheds; the valley haze thins out above the hilltop (materials.smog_top, smog_top_fade, smog_above) and the hilltop itself is clear air (smog_clear_min, smog_clear_max).  A sphere probe in every glass room (probes) lets its glass mirror the room, not the open sky.",
     "Whole conservatory (volumes, collections Wings, Upper Floor, Conservatory Decor, Site, Wing Gardens): a fern house west, a palm house with a planted roof and a lantern east (the front door), a terrace house south under a planted roof terrace (the south door on the canal's axis), a glass stair tower to a belvedere at the south-east corner, a third-floor gallery round the atrium; all of it outside the painting's frame and away from its shadows, each step checked on the painting's probe."
   ],
   "materials": {
@@ -29,20 +29,22 @@
     "smog_ground": -120.0,
     "smog_scale": 80.0,
     "smog_density": 0.05,
-    "smog_brightness": 1.165,
+    "smog_brightness": 1.0855,
     "smog_top": -3.25,
     "smog_top_fade": 12.0,
     "smog_above": 0.08,
+    "smog_clear_min": [-150.0, -150.0, -3.85],
+    "smog_clear_max": [150.0, 16.16, 150.0],
     "leaf_sheen": 0.12,
     "air_density": 0.01,
     "air_anisotropy": 0.0
   },
   "sky": {
-    "light_strength": 2.6399,
-    "seen_ratio": 0.35,
+    "light_strength": 0.5366,
+    "seen_strength": 0.86,
     "haze_top": -0.1,
     "zenith_height": 0.45,
-    "sun_ratio": 0.26,
+    "sun_ratio": 0.09,
     "clouds": {
       "cover": 0.5,
       "scale": 2.2,
@@ -59,8 +61,8 @@
         "preset": "boston_fern",
         "inputs": {
           "Seed": 3,
-          "Color A": [0.523, 0.731, 0.248],
-          "Color B": [0.71, 0.767, 0.205]
+          "Color A": [0.298, 0.8, 0.228],
+          "Color B": [0.413, 0.857, 0.192]
         }
       },
       {
@@ -69,8 +71,8 @@
         "preset": "sword_fern",
         "inputs": {
           "Seed": 5,
-          "Color A": [0.05, 0.351, 0.461],
-          "Color B": [0.341, 0.751, 0.584]
+          "Color A": [0.014, 0.366, 0.423],
+          "Color B": [0.103, 0.824, 0.565]
         }
       },
       {
@@ -79,8 +81,8 @@
         "preset": "philodendron",
         "inputs": {
           "Seed": 7,
-          "Color A": [0.021, 0.158, 0.077],
-          "Color B": [0.041, 0.235, 0.147]
+          "Color A": [0.013, 0.16, 0.085],
+          "Color B": [0.025, 0.238, 0.164]
         }
       }
     ],
@@ -107,8 +109,8 @@
         "preset": "philodendron",
         "inputs": {
           "Seed": 7,
-          "Color A": [0.048, 0.152, 0.058],
-          "Color B": [0.095, 0.223, 0.109]
+          "Color A": [0.035, 0.155, 0.063],
+          "Color B": [0.07, 0.23, 0.119]
         }
       },
       {
@@ -120,8 +122,8 @@
           "Leaf Length": 0.4,
           "Leaf Width": 0.28,
           "Seed": 15,
-          "Color A": [0.053, 0.363, 0.322],
-          "Color B": [0.358, 0.764, 0.401]
+          "Color A": [0.029, 0.366, 0.358],
+          "Color B": [0.206, 0.803, 0.464]
         }
       }
     ],
@@ -134,8 +136,8 @@
           "Seed": 23,
           "Leaf Length": 0.45,
           "Leaf Width": 0.4,
-          "Color A": [0.021, 0.157, 0.089],
-          "Color B": [0.063, 0.375, 0.186]
+          "Color A": [0.006, 0.165, 0.049],
+          "Color B": [0.017, 0.397, 0.103]
         }
       },
       {
@@ -147,8 +149,8 @@
           "Leaf Length": 0.5,
           "Leaf Width": 0.36,
           "Petiole": 0.8,
-          "Color A": [0.185, 0.346, 0.103],
-          "Color B": [0.95, 0.598, 0.106]
+          "Color A": [0.125, 0.363, 0.117],
+          "Color B": [0.69, 0.673, 0.129]
         }
       }
     ],
@@ -1106,8 +1108,8 @@
           "Crown Radius": 0.65,
           "Leaves": 420,
           "Clumps": 18,
-          "Color A": [0.58, 0.717, 0.217],
-          "Color B": [0.782, 0.749, 0.177],
+          "Color A": [0.342, 0.803, 0.066],
+          "Color B": [0.47, 0.854, 0.055],
           "Seed": 1003
         }
       },
@@ -1126,8 +1128,8 @@
           "Spread Low": 20,
           "Spread High": 75,
           "Arch": 0.5,
-          "Color A": [0.139, 0.606, 0.43],
-          "Color B": [0.396, 0.734, 0.6]
+          "Color A": [0.043, 0.642, 0.353],
+          "Color B": [0.13, 0.821, 0.52]
         },
         "scale": 1.1
       },
@@ -1142,8 +1144,8 @@
           "Seed": 433,
           "Leaves": 4,
           "Leaf Width": 0.35,
-          "Color A": [0.134, 0.363, 0.102],
-          "Color B": [0.784, 0.666, 0.111]
+          "Color A": [0.129, 0.364, 0.108],
+          "Color B": [0.765, 0.671, 0.118]
         }
       },
       {
@@ -1156,8 +1158,8 @@
           "Petiole": 1.0,
           "Leaf Length": 0.55,
           "Leaf Width": 0.4,
-          "Color A": [0.109, 0.362, 0.17],
-          "Color B": [0.668, 0.692, 0.192],
+          "Color A": [0.069, 0.371, 0.199],
+          "Color B": [0.449, 0.753, 0.238],
           "Seed": 136
         }
       },
@@ -1185,8 +1187,8 @@
           "Leaf Length": 0.7,
           "Leaf Width": 0.62,
           "Seed": 328,
-          "Color A": [0.032, 0.146, 0.167],
-          "Color B": [0.096, 0.348, 0.352]
+          "Color A": [0.022, 0.146, 0.193],
+          "Color B": [0.066, 0.351, 0.409]
         },
         "rot": [0.0, 0.0, 270.0]
       },
@@ -1213,8 +1215,8 @@
           "Leaf Length": 0.45,
           "Leaf Width": 0.32,
           "Seed": 47,
-          "Color A": [0.035, 0.155, 0.067],
-          "Color B": [0.07, 0.229, 0.126]
+          "Color A": [0.02, 0.159, 0.063],
+          "Color B": [0.041, 0.238, 0.118]
         },
         "rot": [0.0, 0.0, 180.0],
         "scale": 1.1
@@ -1429,8 +1431,8 @@
           "Spread High": 30,
           "Arch": 0.55,
           "Droop": 0.9,
-          "Color A": [0.766, 0.754, 0.167],
-          "Color B": [0.568, 0.721, 0.204],
+          "Color A": [0.526, 0.83, 0.123],
+          "Color B": [0.385, 0.781, 0.148],
           "Leaflet Angle": 30,
           "Leaflet Droop": 40,
           "Bare Base": 0.25,
@@ -1459,8 +1461,8 @@
           "Spread High": 30,
           "Arch": 0.55,
           "Droop": 0.9,
-          "Color A": [0.805, 0.743, 0.161],
-          "Color B": [0.599, 0.713, 0.199],
+          "Color A": [0.513, 0.832, 0.13],
+          "Color B": [0.375, 0.784, 0.157],
           "Leaflet Angle": 30,
           "Leaflet Droop": 40,
           "Bare Base": 0.25,
@@ -1549,8 +1551,8 @@
         "preset": "echeveria",
         "inputs": {
           "Seed": 550,
-          "Color A": [0.409, 0.42, 0.056],
-          "Color B": [0.658, 0.705, 0.109]
+          "Color A": [0.329, 0.445, 0.042],
+          "Color B": [0.53, 0.747, 0.08]
         }
       },
       {
@@ -1684,8 +1686,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 284,
-          "Color A": [0.294, 0.869, 0.419],
-          "Color B": [0.294, 0.869, 0.419],
+          "Color A": [0.172, 0.907, 0.397],
+          "Color B": [0.172, 0.907, 0.397],
           "Facing": 0.85
         }
       },
@@ -1732,8 +1734,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 286,
-          "Color A": [0.629, 0.799, 0.12],
-          "Color B": [0.629, 0.799, 0.12],
+          "Color A": [0.489, 0.844, 0.091],
+          "Color B": [0.489, 0.844, 0.091],
           "Facing": 0.85
         }
       },
@@ -1756,8 +1758,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 578,
-          "Color A": [0.731, 0.77, 0.126],
-          "Color B": [0.731, 0.77, 0.126],
+          "Color A": [0.607, 0.81, 0.096],
+          "Color B": [0.607, 0.81, 0.096],
           "Facing": 0.85
         }
       },
@@ -1780,8 +1782,8 @@
           "Stems": 6,
           "Stem Radius": 0.25,
           "Seed": 96,
-          "Color A": [0.528, 0.832, 0.093],
-          "Color B": [0.528, 0.832, 0.093],
+          "Color A": [0.338, 0.893, 0.054],
+          "Color B": [0.338, 0.893, 0.054],
           "Facing": 0.85
         }
       },
@@ -2055,9 +2057,7 @@
         "asset": "GH.Env.Haze",
         "inputs": {
           "Min": [-6000.0, -6000.0, -120.0],
-          "Max": [6000.0, 6000.0, 320.0],
-          "Hole Min": [-150.0, -150.0, -3.85],
-          "Hole Max": [150.0, 16.16, 150.0]
+          "Max": [6000.0, 6000.0, 320.0]
         },
         "visible": {
           "diffuse": false
@@ -3578,7 +3578,7 @@
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 10.1536,
+      "power": 5.9624,
       "color": [1.0, 0.85, 0.32],
       "angle": 0.53,
       "direction": [0.4919, 0.2956, 0.8189]
@@ -3853,5 +3853,37 @@
         "box": [-0.5, 3.6, -6.0, -2.0]
       }
     ]
-  }
+  },
+  "probes": [
+    {
+      "name": "Atrium Probe",
+      "probe": "SPHERE",
+      "loc": [0.54, 5.0, 5.77],
+      "influence": 20.2
+    },
+    {
+      "name": "Fern House Probe",
+      "probe": "SPHERE",
+      "loc": [-21.52, 5.0, 1.72],
+      "influence": 13.4
+    },
+    {
+      "name": "Palm House Probe",
+      "probe": "SPHERE",
+      "loc": [21.6, 8.0, 2.52],
+      "influence": 13.1
+    },
+    {
+      "name": "Terrace House Probe",
+      "probe": "SPHERE",
+      "loc": [1.0, -10.03, 0.85],
+      "influence": 11.6
+    },
+    {
+      "name": "Stair Tower Probe",
+      "probe": "SPHERE",
+      "loc": [16.3, -2.8, 4.48],
+      "influence": 9.7
+    }
+  ]
 }

@@ -11,7 +11,8 @@ lamps; it knows no particular asset.  The file is pure data::
      "library": {"Shrubs": [item, ...], ...},          (prototypes: built, never rendered)
      "volumes": {"Hall": {...}, ...},                  (glasshouse volumes the meshes of items refer to)
      "collections": {"Frame": [item, ...], ...},
-     "lights": [lamp, ...]}
+     "lights": [lamp, ...],
+     "probes": [probe, ...]}
 
 An item is one object: ``name``, ``loc``, ``rot`` (degrees) or ``aim``
 (the direction its +Z points), ``scale``, an optional data ``mesh`` the
@@ -60,7 +61,11 @@ excluded from the view layer, so only its instances are seen.
 
 A lamp is ``{"name", "light": "SUN" | "AREA" | "POINT" | "SPOT", "power",
 "color", "angle" (sun disc, degrees), "size", "loc", and its aim: "target"
-(a point), "direction" (towards the light) or "rot"; "hidden"}``.
+(a point), "direction" (towards the light) or "rot"; "hidden"}``.  A probe
+is an EEVEE light probe ``{"name", "probe": "SPHERE" | "PLANE" | "VOLUME",
+"loc", "influence"}``: a sphere probe captures the room round ``loc`` for
+the reflections within ``influence`` metres of it, where a reflection
+leaving the frame would otherwise fall back to the open sky.
 """
 from __future__ import annotations
 
@@ -353,6 +358,8 @@ class SceneBuilder:
         lights = SC.collection(f"{self.id}.Lights", parent=root)
         for item in self.data.get("lights", []):
             self.lamp(item, lights)
+        for item in self.data.get("probes", []):
+            self.probe(item, lights)
         self.connect()
         return self
 
@@ -456,6 +463,15 @@ class SceneBuilder:
         if item.get("hidden"):
             for ray in ("camera", "glossy", "transmission"):
                 setattr(obj, f"visible_{ray}", False)
+        return obj
+
+    @staticmethod
+    def probe(item, collection):
+        data = bpy.data.lightprobes.new(item["name"], item["probe"])
+        data.influence_distance = item["influence"]
+        obj = _unique(bpy.data.objects.new(item["name"], data), item["name"])
+        collection.objects.link(obj)
+        obj.location = _vector(item.get("loc"))
         return obj
 
 

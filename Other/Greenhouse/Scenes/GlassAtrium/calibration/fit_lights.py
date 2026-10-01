@@ -2,12 +2,13 @@
 Light balancing as an inverse problem.
 
 Light transport is linear in the light sources, so the atrium is rendered
-once with every source in its own Cycles light group: the daylight (the
-sun lamps and the sky, the world -- skylight is sunlight scattered by the
-air, so the two keep the balance the scene gives them: ``sky`` strengths
-at ``sun_ratio`` of the sun's power), every other lamp, and every emissive
-object (the city smog glows with the skylight it scatters in).  Any balance
-is then sum_g w_g * I_g with one strength per group.  The colours are the
+once per group of sources, every other source dark: the daylight (the sun
+lamps and the sky, the world -- skylight is sunlight scattered by the air,
+so the two keep the balance the scene gives them: ``sky`` strengths at
+``sun_ratio`` of the sun's power), every other lamp, and every glowing
+material (the city smog glows with the skylight it scatters in; dark, it
+still absorbs).  Any balance is then sum_g w_g * I_g with one strength per
+group.  The colours are the
 scene's -- the sun's, the hazy dome's, the smog's pink: free, they would
 tint every surface and every reflection to imitate the painting's colours
 instead of leaving them to the materials; and a sky free of the sun is
@@ -59,16 +60,16 @@ QUANTILES = np.linspace(5.0, 95.0, 10)
 LAB_RANGE = np.array([100.0, 60.0, 60.0])
 
 
-def emissive_material(obj):
-    """Name of the library material with emission an object renders with."""
-    evaluated = obj.evaluated_get(__import__("bpy").context.evaluated_depsgraph_get())
-    for slot in evaluated.material_slots:
-        if slot.material is not None and slot.material.name in EMISSIVE:
-            return slot.material.name
-    return None
+def glows(material):
+    """The Emission nodes of ``material`` with the colours they glow."""
+    return [(node, tuple(node.inputs["Color"].default_value)) for node in material.node_tree.nodes if node.type == "EMISSION"]
 
 
 def render_groups(out, samples, scale):
+    """Renders the shot once per group -- the daylight, each other lamp,
+    each glowing material -- with every other source dark: lamps hidden,
+    the sky a black world, the other glows black (their media still
+    absorb)."""
     import bpy
     import tempfile
     ns = {}
@@ -78,47 +79,33 @@ def render_groups(out, samples, scale):
     driver.activate_still(context)
     scene = bpy.context.scene
     scene.render.resolution_percentage = int(round(scale * 100))
-    layer = scene.view_layers[0]
+    scene.render.use_compositing = False
+    scene.render.image_settings.file_format = "OPEN_EXR"
+    scene.render.image_settings.color_depth = "32"
+    sky = scene.world
+    dark = bpy.data.worlds.new("__dark")
+    lamps = [obj for obj in scene.objects if obj.type == "LIGHT"]
     groups = {DAYLIGHT: {"kind": "daylight"}}
-    scene.world.lightgroup = DAYLIGHT
-    for obj in scene.objects:
-        if obj.type == "LIGHT" and obj.data.type == "SUN":
-            obj.lightgroup = DAYLIGHT
-        elif obj.type == "LIGHT":
-            groups[obj.name] = {"kind": "lamp"}
-            obj.lightgroup = obj.name
-        elif obj.type == "MESH" and emissive_material(obj):
-            groups[obj.name] = {"kind": "emissive", "material": emissive_material(obj)}
-            obj.lightgroup = obj.name
-    for name in groups:
-        layer.lightgroups.add(name=name)
+    groups.update({lamp.name: {"kind": "lamp"} for lamp in lamps if lamp.data.type != "SUN"})
+    emissive = {name: glows(bpy.data.materials[name]) for name in EMISSIVE if name in bpy.data.materials}
+    groups.update({name: {"kind": "emissive", "material": name} for name in emissive})
     folder = tempfile.mkdtemp(prefix="gh_lightgroups_")
-    tree = bpy.data.node_groups.new("LightGroups", "CompositorNodeTree")
-    scene.compositing_node_group = tree
-    layers = tree.nodes.new("CompositorNodeRLayers")
-    output = tree.nodes.new("CompositorNodeOutputFile")
-    output.directory = folder
-    output.file_name = ""
-    output.format.media_type = "IMAGE"
-    output.format.file_format = "OPEN_EXR"
-    output.format.color_depth = "32"
-    for name in groups:
-        output.file_output_items.new("RGBA", name)
-        source = next(socket for socket in layers.outputs if socket.name.endswith(name) and socket.enabled)
-        tree.links.new(source, output.inputs[name])
-    scene.render.use_compositing = True
-    scene.render.filepath = os.path.join(folder, "combined.png")
-    bpy.ops.render.render(write_still=True)
     images = {}
-    for file in os.listdir(folder):
-        for name in groups:
-            if file.startswith(name) and file.endswith(".exr"):
-                image = bpy.data.images.load(os.path.join(folder, file), check_existing=False)
-                width, height = image.size
-                pixels = np.empty(width * height * 4, np.float32)
-                image.pixels.foreach_get(pixels)
-                bpy.data.images.remove(image)
-                images[name] = pixels.reshape(height, width, 4)[::-1, :, :3]
+    for name, info in groups.items():
+        scene.world = sky if info["kind"] == "daylight" else dark
+        for lamp in lamps:
+            lamp.hide_render = not (lamp.name == name or (info["kind"] == "daylight" and lamp.data.type == "SUN"))
+        for material, nodes in emissive.items():
+            for node, colour in nodes:
+                node.inputs["Color"].default_value = colour if material == name else (0.0, 0.0, 0.0, 1.0)
+        scene.render.filepath = os.path.join(folder, name + ".exr")
+        bpy.ops.render.render(write_still=True)
+        image = bpy.data.images.load(scene.render.filepath, check_existing=False)
+        width, height = image.size
+        pixels = np.empty(width * height * 4, np.float32)
+        image.pixels.foreach_get(pixels)
+        bpy.data.images.remove(image)
+        images[name] = pixels.reshape(height, width, 4)[::-1, :, :3]
     np.savez_compressed(out, groups=json.dumps(groups), **{f"image:{name}": image for name, image in images.items()})
     print("groups ->", out, sorted(images))
 

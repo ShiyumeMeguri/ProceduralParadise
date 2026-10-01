@@ -154,8 +154,8 @@ def ground():
 def pool():
     """Raised reflecting pool ``Length`` (along X) by ``Width``, centred on
     the origin on the ground: stone walls ``Coping`` thick rising ``Height``
-    round a basin lined with ``Basin``, filled with ``Water`` to
-    ``Freeboard`` below their top."""
+    round a basin lined with ``Basin``, filled with a body of ``Water`` to
+    ``Freeboard`` below their top, a hair clear of the basin's faces."""
     graph = GN("GH.Env.Pool", pool.__doc__)
     length = graph.inp("Length", default=12.0, subtype="DISTANCE")
     width = graph.inp("Width", default=4.0, subtype="DISTANCE")
@@ -176,8 +176,10 @@ def pool():
     shell = graph.box(length * -0.5, width * -0.5, 0.02, length * 0.5, width * 0.5, height)
     _, _, up = graph.sep(graph.normal())
     shell = graph.delete(shell, graph.compare(up, 0.5, "GREATER_THAN"), "FACE")
-    surface = graph.transform(graph.grid(1.0, 1.0, 2, 2), t=graph.vec(0.0, 0.0, height - freeboard), s=graph.vec(length, width, 1.0))
-    graph.result(graph.join(graph.mat(walls, stone), graph.mat(shell, basin), M.glazed(graph, surface, water)))
+    clearance = 0.002
+    body = graph.box(length * -0.5 + clearance, width * -0.5 + clearance, 0.02 + clearance, length * 0.5 - clearance, width * 0.5 - clearance,
+                     height - freeboard)
+    graph.result(graph.join(graph.mat(walls, stone), graph.mat(shell, basin), M.glazed(graph, body, water)))
     return graph
 
 
@@ -213,18 +215,12 @@ def tower():
 @asset("GH.Env.Haze", "Environment")
 def haze():
     """Box of air between the corners ``Min`` and ``Max`` (in the object's
-    space), filled with the smog volume, less the box between ``Hole Min``
-    and ``Hole Max`` when that is not empty: a building the haze surrounds
-    but does not fill (its faces turned inwards, so a ray leaving the hole
-    enters the haze)."""
+    space), filled with a volume (``Material``): the smog of the city, the
+    air of a room.  Where the air is clear inside the box is the volume's
+    own business (``GH.Smog``'s clear hilltop)."""
     graph = GN("GH.Env.Haze", haze.__doc__)
     low = graph.inp("Min", "VECTOR", default=(-5.0, -5.0, 0.0))
     high = graph.inp("Max", "VECTOR", default=(5.0, 5.0, 5.0))
-    hole_low = graph.inp("Hole Min", "VECTOR", default=(0.0, 0.0, 0.0))
-    hole_high = graph.inp("Hole Max", "VECTOR", default=(0.0, 0.0, 0.0))
     material = graph.inp("Material", "MATERIAL", default=M.get("GH.Smog"))
-    outer = graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(low + high) * 0.5, s=high - low)
-    hole = graph.n("GeometryNodeFlipFaces", graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(hole_low + hole_high) * 0.5, s=hole_high - hole_low)).o
-    has_hole = graph.compare((hole_high - hole_low).length(), 0.0001, "GREATER_THAN")
-    graph.result(graph.mat(graph.join(outer, graph.switch(has_hole, None, hole)), material))
+    graph.result(graph.mat(graph.transform(graph.cube((1.0, 1.0, 1.0)), t=(low + high) * 0.5, s=high - low), material))
     return graph
