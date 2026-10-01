@@ -94,15 +94,28 @@ def glazed(graph, geometry, material, see_through=True, body="pane"):
 
 
 # ------------------------------------------------------------------ structure
-@register("GH.Steel")
-def steel():
-    """Green-painted steel: a satin enamel over the metal."""
+def enamel(name, key):
+    """Painted steel ``name``: a satin enamel of the palette colour ``key``
+    over the metal, mottled up to a quarter lighter."""
     def build(tree: Tree):
         grain = S.noise(tree, S.tex_coord(tree), 60.0, 4.0)["Fac"]
-        base = S.mix_rgb(tree, tree.map_range(grain, 0.35, 0.65, 0.0, 1.0), color("steel"), scaled(color("steel"), 1.25))
+        base = S.mix_rgb(tree, tree.map_range(grain, 0.35, 0.65, 0.0, 1.0), color(key), scaled(color(key), 1.25))
         return S.bsdf(tree, Base_Color=base, Roughness=param("steel_roughness", 0.32), Coat_Weight=0.4,
                       Coat_Roughness=0.08, Specular_IOR_Level=0.5)["BSDF"]
-    return S.material("GH.Steel", build)
+    return S.material(name, build)
+
+
+@register("GH.Steel")
+def steel():
+    """Green-painted steel of the atrium's fittings (``steel``)."""
+    return enamel("GH.Steel", "steel")
+
+
+@register("GH.FrameSteel")
+def frame_steel():
+    """Teal-painted steel of the conservatory's frame (``frame``), a lighter,
+    bluer green than the atrium's fittings."""
+    return enamel("GH.FrameSteel", "frame")
 
 
 def reflection_room(tree: Tree):
@@ -281,17 +294,31 @@ def pool_tile():
     return S.material("GH.PoolTile", build)
 
 
-@register("GH.Paving")
-def paving():
-    """Stone paving of the garden floor; the flags carry ``flag_shade``
-    (0..1, one value per flag) so every flag has its own tone."""
+def flagstones(name, dark, light):
+    """Stone paving ``name``: the flags carry ``flag_shade`` (0..1, one value
+    per flag), so every flag has its own tone between the palette colours
+    ``dark`` and ``light``."""
     def build(tree: Tree):
         shade = attribute(tree, "flag_shade")
-        base = S.mix_rgb(tree, shade, color("paving"), color("paving_light"))
+        base = S.mix_rgb(tree, shade, color(dark), color(light))
         grit = S.noise(tree, S.tex_coord(tree), 40.0, 5.0)["Fac"]
         return S.bsdf(tree, Base_Color=base, Roughness=tree.map_range(grit, 0.3, 0.7, 0.55, 0.8),
                       Normal=bump(tree, grit, 0.15))["BSDF"]
-    return S.material("GH.Paving", build)
+    return S.material(name, build)
+
+
+@register("GH.Paving")
+def paving():
+    """Stone paving of the garden floor under the glass (``paving``)."""
+    return flagstones("GH.Paving", "paving", "paving_light")
+
+
+@register("GH.PlazaPaving")
+def plaza_paving():
+    """Granite paving out in the sun, the conservatory's plaza and roof
+    terraces (``plaza``): a darker stone than the polished floor under the
+    glass."""
+    return flagstones("GH.PlazaPaving", "plaza", "plaza_light")
 
 
 @register("GH.Deck")
@@ -491,12 +518,17 @@ def smog():
     share ``smog_above`` of itself, so a view down from the hill dissolves
     into pink while the sky above the hill stays blue; and the hilltop
     itself, the box from ``smog_clear_min`` to ``smog_clear_max``, is clear
-    air.  It is seen, it lights nothing."""
+    air.  What is left above the inversion is the clean air's own haze: it
+    glows with the blue skylight it scatters (``clear_air``), turning from
+    the smog's pink over ``smog_air_fade`` above the inversion's top.  It is
+    seen, it lights nothing."""
     def build(tree: Tree):
         x, y, z = tree.sep(tree.n("ShaderNodeNewGeometry")["Position"])
         falloff = tree.math("EXPONENT", (z - param("smog_ground", -120.0)) * (-1.0 / param("smog_scale", 30.0)))
         top = param("smog_top", 0.0)
-        inversion = tree.map_range(z, top, top + param("smog_top_fade", 1.0), 1.0, param("smog_above", 1.0))
+        clean = top + param("smog_top_fade", 1.0)
+        inversion = tree.map_range(z, top, clean, 1.0, param("smog_above", 1.0))
+        tint = S.mix_rgb(tree, tree.map_range(z, clean, clean + param("smog_air_fade", 1.0), 0.0, 1.0), color("smog"), color("clear_air"))
         inside = None
         for axis, low, high in zip((x, y, z), param("smog_clear_min", (0.0, 0.0, 0.0)), param("smog_clear_max", (0.0, 0.0, 0.0))):
             within = tree.math("MULTIPLY", tree.math("GREATER_THAN", axis, low), tree.math("LESS_THAN", axis, high))
@@ -504,7 +536,7 @@ def smog():
         outside = tree.math("SUBTRACT", 1.0, inside)
         density = tree.math("MULTIPLY", tree.math("MULTIPLY", tree.math("MULTIPLY", falloff, inversion), outside), param("smog_density", 0.05))
         absorb = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=density)["Volume"]
-        glow = tree.n("ShaderNodeEmission", Color=color("smog"), Strength=tree.math("MULTIPLY", density, param("smog_brightness", 1.0)))["Emission"]
+        glow = tree.n("ShaderNodeEmission", Color=tint, Strength=tree.math("MULTIPLY", density, param("smog_brightness", 1.0)))["Emission"]
         return {"Volume": tree.n("ShaderNodeAddShader", absorb, glow)["Shader"]}
     return S.material("GH.Smog", build)
 
@@ -554,40 +586,52 @@ def haze_transmittance(tree: Tree, direction, origin):
     return tree.math("MULTIPLY", tree.math("EXPONENT", tree.math("MULTIPLY", depth, -1.0)), tree.math("GREATER_THAN", rise, 0.0))
 
 
+def sky_colour(tree: Tree, direction, height, haze_top, zenith_height, clouds):
+    """The sky's colour towards ``direction`` (``height`` its up component):
+    the gradient from the haze below ``haze_top`` through ``sky_horizon``
+    to ``sky_zenith`` at ``zenith_height``, under the ``clouds`` -- banks of
+    their ``color`` covering the share ``cover`` of the sky, ``scale`` of
+    them across it, flattened ``flatten`` times, edges ``softness`` soft,
+    fading in over the heights ``band[0]..band[1]`` and out over
+    ``band[2]..band[3]``."""
+    sky = S.ramp(tree, tree.map_range(height, haze_top, zenith_height, 0.0, 1.0),
+                 [(0.0, color("haze")), (0.35, color("sky_horizon")), (1.0, color("sky_zenith"))])["Color"]
+    flattened = tree.vmath("MULTIPLY", direction, (1.0, 1.0, clouds["flatten"]))
+    billows = S.noise(tree, flattened, clouds["scale"], 6.0, 0.55)["Fac"]
+    threshold = 1.0 - clouds["cover"]
+    cover = tree.map_range(billows, threshold, threshold + clouds["softness"], 0.0, 1.0)
+    rising, full, thinning, gone = clouds["band"]
+    band = tree.math("MULTIPLY", tree.map_range(height, rising, full, 0.0, 1.0), tree.map_range(height, thinning, gone, 1.0, 0.0))
+    return S.mix_rgb(tree, tree.math("MULTIPLY", cover, band), sky, color(clouds["color"]))
+
+
 def world(config):
     """Hazy daylight sky: a gradient from the pink-white haze at and below
-    the horizon to a pale blue zenith, with ``clouds`` -- banks of ``cloud``
-    colour covering the share ``cover`` of the sky, ``scale`` of them across
-    it, flattened ``flatten`` times, edges ``softness`` soft -- that thin out
-    towards the horizon and the zenith.  The sky sheds ``light_strength``
-    (the light fit's), and every ray reaches it the way it does through the
-    city haze from ``light_origin`` (:func:`haze_transmittance`, T): the
-    light falling on a surface is the sky dimmed to T; a reflection sees the
-    sky dimmed to T and the haze's own glow, smog * ``smog_brightness`` *
-    (1 - T); the camera sees the sky at ``seen_strength`` -- the eye
+    the horizon to a pale blue zenith, under clouds (:func:`sky_colour`).
+    The sky sheds ``light_strength`` (the light fit's), and every ray
+    reaches it the way it does through the city haze from ``light_origin``
+    (:func:`haze_transmittance`, T): the light falling on a surface is the
+    sky dimmed to T; a reflection sees the sky dimmed to T and the haze's
+    own glow, smog * ``smog_brightness`` * (1 - T) -- both the sky the light
+    fit was made with, its blue reaching down to ``zenith_height`` under the
+    ``clouds``.  The camera sees the sky at ``seen_strength`` -- the eye
     adapted to a sunlit park, where the sky is bright but not blinding --
-    with the haze between drawn by the haze's own volume."""
+    with the haze between drawn by the haze's own volume, its blue reaching
+    down to ``seen_zenith_height`` under the ``seen_clouds`` (below
+    ``haze_top`` both are the haze)."""
     world_block = S.new_world("GH.Sky")
     tree = Tree.wrap(world_block.node_tree, clear=True)
     out = tree.n("ShaderNodeOutputWorld")
     direction = tree.vmath("NORMALIZE", tree.n("ShaderNodeTexCoord")["Generated"])
     _, _, height = tree.sep(direction)
-    sky = S.ramp(tree, tree.map_range(height, config.get("haze_top", -0.1), config.get("zenith_height", 0.6), 0.0, 1.0),
-                 [(0.0, color("haze")), (0.35, color("sky_horizon")), (1.0, color("sky_zenith"))])["Color"]
-    clouds = config.get("clouds")
-    if clouds:
-        flattened = tree.vmath("MULTIPLY", direction, (1.0, 1.0, clouds["flatten"]))
-        billows = S.noise(tree, flattened, clouds["scale"], 6.0, 0.55)["Fac"]
-        threshold = 1.0 - clouds["cover"]
-        cover = tree.map_range(billows, threshold, threshold + clouds["softness"], 0.0, 1.0)
-        band = tree.math("MULTIPLY", tree.map_range(height, 0.0, 0.08, 0.0, 1.0), tree.map_range(height, 0.45, 0.85, 1.0, 0.0))
-        sky = S.mix_rgb(tree, tree.math("MULTIPLY", cover, band), sky, color(clouds["color"]))
+    sky = sky_colour(tree, direction, height, config["haze_top"], config["zenith_height"], config["clouds"])
+    seen_sky = sky_colour(tree, direction, height, config["haze_top"], config["seen_zenith_height"], config["seen_clouds"])
     path = tree.n("ShaderNodeLightPath")
     through = haze_transmittance(tree, direction, config["light_origin"])
     lit = tree.vmath("SCALE", sky, scale=tree.math("MULTIPLY", through, config["light_strength"]))
     glow = tree.vmath("SCALE", color("smog")[:3], scale=tree.math("MULTIPLY", tree.math("SUBTRACT", 1.0, through), param("smog_brightness", 1.0)))
     reflected = tree.mix(path["Is Glossy Ray"], lit, tree.vmath("ADD", lit, glow), data_type="RGBA")
-    seen = tree.vmath("SCALE", sky, scale=config["seen_strength"])
+    seen = tree.vmath("SCALE", seen_sky, scale=config["seen_strength"])
     radiance = tree.mix(path["Is Camera Ray"], reflected, seen, data_type="RGBA")
     tree.link(tree.n("ShaderNodeBackground", radiance, 1.0)["Background"], out.n.inputs["Surface"])
     tree.layout()
