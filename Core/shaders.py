@@ -122,19 +122,21 @@ def eevee_refraction(t: Tree, surface, transmittance, thickness):
 
 @asset("Shading.Thickness", "Shading")
 def thickness_asset():
-    """Per-vertex ``thickness`` for EEVEE refraction and Beer-Lambert
-    absorption: from a point just inside the surface a ray runs against the
-    normal to the mesh's far side; the hit distance is how far light travels
-    through the body along the normal.  Without it EEVEE assumes a thickness
-    of the object's size and thin films refract to black.  The mesh must be
-    closed with outward normals."""
+    """Per-face ``thickness`` for EEVEE refraction and Beer-Lambert
+    absorption: from just inside the face's centre a ray runs against the
+    face's normal to the mesh's far side; the hit distance is how far light
+    travels through the body there.  Per face, not per vertex: a corner's
+    normal averages the faces meeting there, and on a slab the ray along it
+    crosses the whole pane diagonally instead of its thickness.  Without it
+    EEVEE assumes a thickness of the object's size and thin films refract to
+    black.  The mesh must be closed with outward normals."""
     graph = GN("Shading.Thickness", thickness_asset.__doc__)
     mesh = graph.inp("Mesh", "GEOMETRY")
     longest = graph.inp("Max Thickness", default=0.2, min=0.0, desc="m; used where a ray finds no far side")
     normal = graph.normal()
     hit = graph.raycast(mesh, graph.position() - normal * THICKNESS_START, normal * -1.0, longest)
     thickness = graph.switch(hit["Is Hit"], longest, hit["Hit Distance"] + THICKNESS_START, "FLOAT")
-    graph.result(graph.store(mesh, THICKNESS_ATTRIBUTE, thickness))
+    graph.result(graph.store(mesh, THICKNESS_ATTRIBUTE, thickness, "FLOAT", "FACE"))
     return graph
 
 

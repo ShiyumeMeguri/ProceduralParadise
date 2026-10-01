@@ -70,9 +70,15 @@ def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_i
 
 
 def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resolution="1", trace_quality=0.75,
-                trace_max_roughness=0.5, fast_gi=True):
+                trace_max_roughness=0.5, fast_gi=True, volume_range=None, volume_tile="8", volume_samples=64,
+                volume_distribution=0.8, volume_shadows=False):
     """EEVEE with screen-space ray tracing (reflections and refraction) at
-    full resolution and fast global illumination."""
+    full resolution and fast global illumination.  Volumes are evaluated on
+    froxels from the camera out to ``volume_range`` ([start, end] metres;
+    the camera's clip range without one), ``volume_tile`` pixels wide,
+    ``volume_samples`` slices spread towards the camera by
+    ``volume_distribution``; ``volume_shadows`` lets the lights cast shadows
+    inside them (sun shafts through the leaves)."""
     sc = bpy.context.scene
     sc.render.engine = "BLENDER_EEVEE"
     ee = sc.eevee
@@ -87,6 +93,13 @@ def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resoluti
     ee.use_shadows = True
     ee.use_fast_gi = fast_gi
     ee.fast_gi_method = "GLOBAL_ILLUMINATION"
+    ee.use_volume_custom_range = volume_range is not None
+    if volume_range is not None:
+        ee.volumetric_start, ee.volumetric_end = volume_range
+    ee.volumetric_tile_size = volume_tile
+    ee.volumetric_samples = volume_samples
+    ee.volumetric_sample_distribution = volume_distribution
+    ee.use_volumetric_shadows = volume_shadows
     return sc
 
 
