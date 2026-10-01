@@ -18,7 +18,7 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset, get_asset, remembered_items
-from Core.physics import fluid, liquid
+from Core.physics import liquid
 from . import liquids, materials as M
 
 X_AXIS = (1.0, 0.0, 0.0)
@@ -215,12 +215,12 @@ def simulation():
 
     zone = graph.simulation([("Liquid", "GEOMETRY"), ("Remainder", "FLOAT"), ("PreviousWand", "MATRIX"), ("PreviousPlacements", "GEOMETRY"),
                              ("Angle", "FLOAT"), ("Momentum", "FLOAT"), ("HeldVolume", "FLOAT"), ("Substeps", "INT"), ("Residual", "FLOAT"),
-                             ("Pressure", "GEOMETRY"), ("Iterations", "INT"),
+                             ("Iterations", "INT"),
                              *remembered_items("Shape", 4, [("Tube", "GEOMETRY"), ("Stand", "GEOMETRY"), ("Mass", "FLOAT"), ("Center", "VECTOR"),
                                                             ("Inertia", "FLOAT"), ("Cavity", "GEOMETRY"), ("Solid", "GEOMETRY")]),
                              *remembered_items("Scene", 2, [("Solid", "GEOMETRY"), ("Moving", "BOOLEAN")])])
     starting = graph.group(get_asset("Physics.Fluid.CollectionMesh"), Collection=solids)["Placements"]
-    for name, value in (("PreviousWand", wand_now), ("PreviousPlacements", starting), ("Angle", rest_angle), ("Pressure", fluid.pressure_volume(graph))):
+    for name, value in (("PreviousWand", wand_now), ("PreviousPlacements", starting), ("Angle", rest_angle)):
         zone.initial(name, value)
     delta_time = zone.delta_time
 
@@ -256,7 +256,7 @@ def simulation():
     emitted = graph.group(get_asset("Props.Spray.Nozzle"), Transform=wand_now, Spraying=spraying, Flow=flow, Spread=spread, Remainder=zone.state("Remainder"), **{
         "Previous Transform": zone.state("PreviousWand"), "Nozzle Radius": nozzle_radius, "Particle Volume": particle_volume,
         "Particle Radius": radius, "Frame Time": delta_time, "Liquid Type": chosen})
-    stepped = graph.group(get_asset("Physics.Fluid.Frame"), Points=hinge["Particles"], Spawned=emitted["Points"], Pressure=zone.state("Pressure"), Voxel=voxel, CFL=cfl,
+    stepped = graph.group(get_asset("Physics.Fluid.Frame"), Points=hinge["Particles"], Spawned=emitted["Points"], Voxel=voxel, CFL=cfl,
                           Rigid=shape["Solid"], Deforming=scene["Solid"], **{
                               "Frame Time": delta_time, "Max Substeps": maximum_substeps, "Rest Density": per_cell,
                               "Ground Height": floor["Height"], "Has Rigid": True, "Rigid Transform": hinge["Transform"],
@@ -265,7 +265,7 @@ def simulation():
     for name, value in (("Liquid", drained), ("Remainder", emitted["Remainder"]), ("PreviousWand", wand_now),
                         ("PreviousPlacements", scene_mesh["Placements"]), ("Angle", hinge["Angle"]), ("Momentum", hinge["Angular Momentum"]),
                         ("HeldVolume", hinge["Held Volume"]), ("Substeps", stepped["Substeps"]), ("Residual", stepped["Pressure Residual"]),
-                        ("Pressure", stepped["Pressure"]), ("Iterations", stepped["Pressure Iterations"])):
+                        ("Iterations", stepped["Pressure Iterations"])):
         zone.set(name, value)
 
     particles = zone.result("Liquid")

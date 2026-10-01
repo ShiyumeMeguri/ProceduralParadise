@@ -101,16 +101,7 @@ def field_to_grids(g, topology, items, topology_type="FLOAT"):
     return {name: node[name] for name, _kind, _value in items}
 
 
-def pressure_volume(g, grid=None):
-    """A volume holding the grid ``pressure`` (zeros when ``grid`` is None):
-    how a pressure travels from substep to substep and frame to frame as the
-    next solve's starting guess."""
-    if grid is None:
-        grid = named_grid(g, g.n("GeometryNodeVolumeCube", Density=0.0, Resolution_X=2, Resolution_Y=2, Resolution_Z=2).o, "density")
-    return store_grid(g, empty_volume(g), "pressure", grid)
-
-
-def pressure(g, liquid_cells, rhs, walled, voxel, iterations, tolerance, minimum_island, guess):
+def pressure(g, liquid_cells, rhs, walled, voxel, iterations, tolerance, minimum_island):
     """Pressure on the liquid cells (the active voxels of ``liquid_cells``)
     for the right-hand side field ``rhs``, zero towards air and no flux
     through the ``walled`` sides (a field counting each cell's solid
@@ -123,8 +114,9 @@ def pressure(g, liquid_cells, rhs, walled, voxel, iterations, tolerance, minimum
     neighbours, and every side is a neighbour, a wall or air, so the diagonal
     is 6 minus the walls.
 
-    Jacobi-preconditioned conjugate gradient starts from ``guess`` (the last
-    solve's pressure grid) and iterates until the residual's Jacobi-weighted
+    Jacobi-preconditioned conjugate gradient starts from zero (starting from
+    the last solve's pressure was measured to save nothing: every substep's
+    right-hand side is new) and iterates until the residual's Jacobi-weighted
     norm is ``tolerance`` times the right-hand side's, at most ``iterations``
     times.  An iteration is four nodes -- a capture of A p, the two inner
     products, one store of the packed state (x, r, p) -- and once converged
@@ -156,9 +148,7 @@ def pressure(g, liquid_cells, rhs, walled, voxel, iterations, tolerance, minimum
     def safe(numerator, denominator):
         return g.switch(g.compare(g.abs(denominator), 1e-30, "GREATER_THAN"), 0.0, numerator / denominator, "FLOAT")
 
-    guessed = sample_grid(g, guess, g.position(), interpolation="Nearest Neighbor")
-    start_residual = b - apply(guessed)
-    cells = g.store(cells, "pressure:state", g.vec(guessed, start_residual, start_residual / diagonal), "FLOAT_VECTOR")
+    cells = g.store(cells, "pressure:state", g.vec(0.0, b, b / diagonal), "FLOAT_VECTOR")
     x, r, p = g.sep(g.named("pressure:state", "FLOAT_VECTOR"))
     count = g.domain_size(cells, "MESH")["Point Count"]
     enough = g.statistic(cells, b * b / diagonal)["Sum"] * (tolerance * tolerance)
@@ -316,7 +306,10 @@ def substep():
     correction) -> Poisson pressure (air Dirichlet, solid Neumann; see
     :func:`pressure`) -> projection -> masked, normalised interpolation
     back to the particles (PIC/FLIP) -> RK2 advection -> collision,
-    friction, adhesion.
+    friction, adhesion.  Over-dense cells relax towards the rest density
+    with the time constant ``Density Relaxation``, whatever the substep,
+    so the substep count does not change how much the liquid gives under
+    its weight.
 
     Viscosity spreads momentum into a Gaussian of variance 2 nu dt per
     substep, assembled exactly from box means: ceil(passes) passes (for the
@@ -344,7 +337,7 @@ def substep():
     delta_time = g.inp("Substep Time", default=1.0 / 240.0, min=1e-6)
     gravity = g.inp("Gravity", "VECTOR", default=GRAVITY)
     rest_density = g.inp("Rest Density", default=8.0, min=0.01, desc="Rasterized weight of a full cell = particles per cell")
-    density_correction = g.inp("Density Correction", default=0.3, min=0.0, desc="How strongly over-dense regions are pushed apart, so the volume does not drain away")
+    density_relaxation = g.inp("Density Relaxation", default=0.0234, min=1e-4, desc="s; time constant with which over-dense regions are pushed back to the rest density, so the volume does not drain away")
     fluid_threshold = g.inp("Fluid Threshold", default=0.3, min=0.0, max=1.0, desc="A cell joins the pressure solve when its weight exceeds rest density x this")
     radius = g.inp("Particle Radius", default=0.003, min=0.0)
     adhesion_range = g.inp("Adhesion Range", default=0.004, min=0.0)
@@ -352,13 +345,11 @@ def substep():
     pressure_iterations = g.inp("Pressure Iterations", "INT", default=100, min=1, desc="Most conjugate gradient iterations of a pressure solve")
     pressure_tolerance = g.inp("Pressure Tolerance", default=1e-3, min=1e-9, desc="The solve stops once its residual is this share of the right-hand side (Jacobi-weighted norms)")
     minimum_island = g.inp("Min Island", "INT", default=27, min=1, desc="Liquid islands of fewer cells (splashes, drops on a rim) stay out of the pressure solve and move freely")
-    guess = named_grid(g, g.inp("Pressure", "GEOMETRY", desc="Volume with the grid pressure the solve starts from (pressure_volume)"), "pressure")
     solids = solid_inputs(g)
     solids["Rigid Transform"] = g.inp("Rigid Transform", "MATRIX")
     solids["Rigid Previous"] = g.inp("Rigid Previous", "MATRIX")
     g.out("Points", "GEOMETRY")
     g.out("Pressure Residual", "FLOAT", desc="Largest residual of the pressure solve relative to its right-hand side")
-    g.out("Pressure", "GEOMETRY", desc="The solved pressure, the next solve's starting guess")
     g.out("Pressure Iterations", "INT", desc="Conjugate gradient iterations the pressure solve took")
     pic = liquid.read(g, "pic")
     friction = liquid.read(g, "friction")
@@ -463,9 +454,9 @@ def substep():
         walled = sides if walled is None else walled + sides
     divergence = divergence * inverse_voxel
     crowding = g.max(nearest(weight, position) / rest_density - 1.0, 0.0)
-    correction = crowding * density_correction / delta_time
+    correction = crowding * (1.0 - g.math("EXPONENT", delta_time / density_relaxation * -1.0)) / delta_time
     solved_pressure, pressure_residual, pressure_used = pressure(g, liquid_cells, (divergence - correction) / delta_time, walled, voxel,
-                                                                 pressure_iterations, pressure_tolerance, minimum_island, guess)
+                                                                 pressure_iterations, pressure_tolerance, minimum_island)
 
     projected = []
     for axis_index in range(3):
@@ -532,7 +523,7 @@ def substep():
     pulled = g.switch(near, rubbed, rubbed - normal * (adhesion * delta_time), "VECTOR")
     collided = g.store(moved, "velocity", pulled + solid_velocity, "FLOAT_VECTOR")
     collided = g.store(collided, SOLID_DISTANCE, distance)
-    g.result(g.set_pos(collided, pos=pushed), pressure_residual, pressure_volume(g, solved_pressure), pressure_used)
+    g.result(g.set_pos(collided, pos=pushed), pressure_residual, pressure_used)
     return g
 
 
@@ -542,19 +533,16 @@ def step():
     transform is interpolated between substeps (location linear, rotation
     spherical).  Liquid materials are per-particle attributes
     (Core.physics.liquid).  The particles come out with ``fluid:solid_distance``
-    (distance to the nearest solid before the last substep's push-out).
-    Every substep's pressure solve starts from the pressure before it; the
-    last one comes out as ``Pressure`` for the next frame."""
+    (distance to the nearest solid before the last substep's push-out)."""
     g = GN("Physics.Fluid.Step", step.__doc__)
     points = g.inp("Points", "GEOMETRY", desc="Particles: velocity plus every liquid material attribute")
-    guess = g.inp("Pressure", "GEOMETRY", desc="Pressure output of the previous frame, or pressure_volume() to start")
     delta_time = g.inp("Frame Time", default=1.0 / 24.0)
     voxel = g.inp("Voxel", default=0.01, min=0.0005)
     cfl = g.inp("CFL", default=1.0, min=0.05, desc="Cells a particle may cross per substep")
     minimum_substeps = g.inp("Min Substeps", "INT", default=2, min=1)
     maximum_substeps = g.inp("Max Substeps", "INT", default=24, min=1)
     passthrough = {}
-    for name, stype, default in (("Gravity", "VECTOR", GRAVITY), ("Rest Density", "FLOAT", 8.0), ("Density Correction", "FLOAT", 0.3),
+    for name, stype, default in (("Gravity", "VECTOR", GRAVITY), ("Rest Density", "FLOAT", 8.0), ("Density Relaxation", "FLOAT", 0.0234),
                                  ("Fluid Threshold", "FLOAT", 0.3), ("Particle Radius", "FLOAT", 0.003), ("Adhesion Range", "FLOAT", 0.004),
                                  ("Viscosity Width", "INT", 2), ("Pressure Iterations", "INT", 100), ("Pressure Tolerance", "FLOAT", 1e-3),
                                  ("Min Island", "INT", 27), *SOLID_INPUTS):
@@ -564,24 +552,22 @@ def step():
     g.out("Points", "GEOMETRY")
     g.out("Substeps", "INT")
     g.out("Pressure Residual", "FLOAT", desc="Largest over the substeps")
-    g.out("Pressure", "GEOMETRY", desc="The last substep's pressure")
     g.out("Pressure Iterations", "INT", desc="Most conjugate gradient iterations of a substep's pressure solve")
     speed = g.statistic(points, g.named("velocity", "FLOAT_VECTOR").length())["Max"]
     travel = speed * delta_time / (voxel * cfl)
     count = g.min(g.max(g.math("CEIL", travel), minimum_substeps), maximum_substeps)
     active = g.switch(g.compare(delta_time, 0.0, "GREATER_THAN"), 0, g.to_int(count, "ROUND"), "INT")
     sub_time = delta_time / count
-    zone = g.repeat(active, [("Points", "GEOMETRY", points), ("Residual", "FLOAT", 0.0), ("Pressure", "GEOMETRY", guess), ("Iterations", "INT", 0)])
+    zone = g.repeat(active, [("Points", "GEOMETRY", points), ("Residual", "FLOAT", 0.0), ("Iterations", "INT", 0)])
     begin = zone.iteration / count
     end = (zone.iteration + 1.0) / count
-    stepped = g.group(get_asset("Physics.Fluid.Substep"), Points=zone.state("Points"), Voxel=voxel, Pressure=zone.state("Pressure"), **{
+    stepped = g.group(get_asset("Physics.Fluid.Substep"), Points=zone.state("Points"), Voxel=voxel, **{
         "Substep Time": sub_time, "Rigid Transform": interpolate_transform(g, rigid_previous, rigid_transform, end),
         "Rigid Previous": interpolate_transform(g, rigid_previous, rigid_transform, begin), **passthrough})
     zone.set("Points", stepped["Points"])
     zone.set("Residual", g.max(zone.state("Residual"), stepped["Pressure Residual"]))
-    zone.set("Pressure", stepped["Pressure"])
     zone.set("Iterations", g.max(zone.state("Iterations"), stepped["Pressure Iterations"]))
-    g.result(zone.result("Points"), active, zone.result("Residual"), zone.result("Pressure"), zone.result("Iterations"))
+    g.result(zone.result("Points"), active, zone.result("Residual"), zone.result("Iterations"))
     return g
 
 
@@ -725,18 +711,16 @@ def frame():
     the grid.  Free-falling liquid carries no pressure, so the parabola is the
     exact solution, and the grid's substeps are set only by liquid that has
     landed.  The liquid material (stored by the caller on the particles on
-    the grid) is removed again.  ``Pressure`` carries the grid's pressure to
-    the next frame, where the pressure solves start from it."""
+    the grid) is removed again."""
     g = GN("Physics.Fluid.Frame", frame.__doc__)
     points = g.inp("Points", "GEOMETRY", desc="Particles: velocity, airborne; those on the grid carry the liquid material (Core.physics.liquid)")
-    guess = g.inp("Pressure", "GEOMETRY", desc="Pressure output of the previous frame, or pressure_volume() to start")
     spawned = g.inp("Spawned", "GEOMETRY", desc="Particles entering airborne this frame: velocity, fluid:flight_time (how long they fly this frame)")
     delta_time = g.inp("Frame Time", default=1.0 / 24.0)
     voxel = g.inp("Voxel", default=0.004, min=0.0005)
     cfl = g.inp("CFL", default=3.0, min=0.05, desc="Cells a particle on the grid may cross per substep")
     maximum_substeps = g.inp("Max Substeps", "INT", default=16, min=1, desc="Safety limit; the CFL condition sets the count.  A limit below what the CFL asks for lets particles cross several cells per substep, pass through thin walls and run away")
     rest_density = g.inp("Rest Density", default=8.0, min=0.01, desc="Particles per cell")
-    density_correction = g.inp("Density Correction", default=0.3, min=0.0)
+    density_relaxation = g.inp("Density Relaxation", default=0.0234, min=1e-4, desc="s; time constant of pushing over-dense regions back to the rest density")
     fluid_threshold = g.inp("Fluid Threshold", default=0.3, min=0.0, max=1.0)
     landing_share = g.inp("Landing Share", default=0.3, min=0.0, desc="A flight lands in a cell holding more than rest density x this")
     gravity = g.inp("Gravity", "VECTOR", default=GRAVITY)
@@ -746,15 +730,14 @@ def frame():
     g.out("Points", "GEOMETRY")
     g.out("Substeps", "INT")
     g.out("Pressure Residual", "FLOAT", desc="Largest residual of the pressure solves relative to their right-hand sides")
-    g.out("Pressure", "GEOMETRY")
     g.out("Pressure Iterations", "INT", desc="Most conjugate gradient iterations of a pressure solve")
     radius = voxel * 0.5
     velocity = g.named("velocity", "FLOAT_VECTOR")
     airborne = g.named("airborne", "BOOLEAN")
     bound = g.store(g.delete(points, airborne), VELOCITY_START, velocity, "FLOAT_VECTOR")
-    solved = g.group(get_asset("Physics.Fluid.Step"), Points=bound, Pressure=guess, Voxel=voxel, CFL=cfl, Gravity=gravity, **solids, **{
+    solved = g.group(get_asset("Physics.Fluid.Step"), Points=bound, Voxel=voxel, CFL=cfl, Gravity=gravity, **solids, **{
         "Frame Time": delta_time, "Min Substeps": 1, "Max Substeps": maximum_substeps, "Rest Density": rest_density,
-        "Density Correction": density_correction, "Fluid Threshold": fluid_threshold, "Particle Radius": radius, "Adhesion Range": voxel})
+        "Density Relaxation": density_relaxation, "Fluid Threshold": fluid_threshold, "Particle Radius": radius, "Adhesion Range": voxel})
     has_bound = g.compare(g.domain_size(bound, "POINTCLOUD")["Point Count"], 0, "GREATER_THAN", "INT")
     stepped = g.switch(has_bound, bound, solved["Points"])
     substeps = g.switch(has_bound, 0, solved["Substeps"], "INT")
@@ -767,7 +750,7 @@ def frame():
                     Gravity=gravity, **solids, **{"Frame Time": delta_time, "Particle Radius": radius,
                                                   "Landing Count": rest_density * landing_share})["Points"]
     g.result(forget(g, g.join(stepped, flown)), substeps, g.switch(has_bound, 0.0, solved["Pressure Residual"], "FLOAT"),
-             g.switch(has_bound, guess, solved["Pressure"]), g.switch(has_bound, 0, solved["Pressure Iterations"], "INT"))
+             g.switch(has_bound, 0, solved["Pressure Iterations"], "INT"))
     return g
 
 

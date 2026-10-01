@@ -158,11 +158,9 @@ def simulation():
         ("Body", "GEOMETRY"), ("Pressure", "FLOAT"), ("TargetVolume", "FLOAT"), ("Goo", "GEOMETRY"),
         ("Health", "FLOAT"), ("HurtTime", "FLOAT"), ("Dead", "BOOLEAN"), ("DeathTime", "FLOAT"),
         ("Wound", "INT"), ("Remainder", "FLOAT"), ("PreviousColliders", "GEOMETRY"), ("PreviousStick", "MATRIX"), ("Force", "FLOAT"),
-        ("GooPressure", "GEOMETRY"),
     ])
     for name, value in (("Body", prepared), ("Pressure", pressure), ("TargetVolume", rest_volume), ("Health", health), ("HurtTime", 1000.0),
-                        ("PreviousColliders", graph.collection_info(colliders)), ("PreviousStick", graph.object_info(stick)["Transform"]),
-                        ("GooPressure", fluid.pressure_volume(graph))):
+                        ("PreviousColliders", graph.collection_info(colliders)), ("PreviousStick", graph.object_info(stick)["Transform"])):
         zone.initial(name, value)
     delta_time = zone.delta_time
     dead = zone.state("Dead")
@@ -218,20 +216,17 @@ def simulation():
     stick_info = graph.object_info(stick)
     stick_solid = graph.group(get_asset("Physics.Fluid.RigidSolid"), Geometry=stick_info["Geometry"], Voxel=voxel * 0.66)["Solid"]
     body_solid = graph.group(get_asset("Physics.Fluid.DeformingSolid"), Mesh=body, Voxel=voxel)
-    flowed = graph.group(get_asset("Physics.Fluid.Step"), Points=liquid.store(graph, goo_points, liquid.particle_values(graph, goo)),
-                         Pressure=zone.state("GooPressure"), Voxel=voxel,
+    flowed = graph.group(get_asset("Physics.Fluid.Step"), Points=liquid.store(graph, goo_points, liquid.particle_values(graph, goo)), Voxel=voxel,
                          CFL=goo_cfl, Rigid=stick_solid, Deforming=body_solid["Solid"], **{
                              "Frame Time": delta_time, "Min Substeps": 2, "Max Substeps": 16, "Rest Density": per_cell,
-                             "Density Correction": 0.3, "Fluid Threshold": 0.3, "Particle Radius": voxel * 0.5, "Adhesion Range": voxel,
+                             "Density Relaxation": 0.0234, "Fluid Threshold": 0.3, "Particle Radius": voxel * 0.5, "Adhesion Range": voxel,
                              "Ground Height": floor["Height"], "Has Rigid": True, "Rigid Transform": stick_info["Transform"],
                              "Rigid Previous": zone.state("PreviousStick"), "Has Deforming": True, "Deforming Moves": body_solid["Moving"]})
     has_goo = graph.compare(graph.domain_size(goo_points, "POINTCLOUD")["Point Count"], 0, "GREATER_THAN")
     goo_after = fluid.forget(graph, graph.switch(has_goo, goo_points, flowed["Points"]))
-    goo_pressure = graph.switch(has_goo, zone.state("GooPressure"), flowed["Pressure"])
     for name, value in (("Body", body), ("Pressure", step["Pressure"]), ("TargetVolume", zone.state("TargetVolume") - released), ("Goo", goo_after),
                         ("Health", health_after), ("HurtTime", hurt_time), ("Dead", dead_after), ("DeathTime", death_time), ("Wound", wound),
-                        ("Remainder", owed - count), ("PreviousColliders", current_colliders), ("PreviousStick", stick_info["Transform"]), ("Force", force),
-                        ("GooPressure", goo_pressure)):
+                        ("Remainder", owed - count), ("PreviousColliders", current_colliders), ("PreviousStick", stick_info["Transform"]), ("Force", force)):
         zone.set(name, value)
 
     inverse = graph.invert(self_transform)
