@@ -58,7 +58,7 @@ def members():
     tube = graph.smooth(graph.cylinder(0.5, 1.0, 16))
     bar = graph.switch(rounded, box, tube)
     bars = graph.iop(points, bar, rot=member_rotation(graph, span), scale=graph.vec(width, graph.switch(rounded, depth, width, "FLOAT"), length))
-    graph.result(M.glazed(graph, graph.realize(bars), material, see_through))
+    graph.result(M.glazed(graph, graph.realize(bars), material, see_through, body="slab"))
     return graph
 
 
@@ -144,7 +144,7 @@ def balustrade():
     set_mode(extrude, "EDGES")
     wall = graph.set_pos(extrude["Mesh"], offset=graph.vec(0.0, 0.0, 0.03))
     glass_panel = graph.switch(glass_on, None, graph.group(get_asset("GH.Structure.Panes"), Geometry=wall, Thickness=glass_thickness, Offset=glass_thickness * -0.5, Material=glass_material).o)
-    frame = graph.mat(graph.realize(graph.join(posts, top, rail_mesh)), frame_material)
+    frame = M.glazed(graph, graph.realize(graph.join(posts, top, rail_mesh)), frame_material, False, body="slab")
     graph.result(graph.join(frame, glass_panel))
     return graph
 
@@ -168,7 +168,7 @@ def stair():
 
     stations = graph.mesh_line(steps, graph.vec(0.0, going * 0.5, rise - thickness * 0.5), graph.vec(0.0, going, rise))
     tread = graph.cube(graph.vec(width, going + 0.02, thickness))
-    treads = M.glazed(graph, graph.realize(graph.iop(graph.mesh_to_points(stations), tread)), tread_material, glass_treads)
+    treads = M.glazed(graph, graph.realize(graph.iop(graph.mesh_to_points(stations), tread)), tread_material, glass_treads, body="slab")
 
     run = going * steps
     total = rise * steps
@@ -180,5 +180,5 @@ def stair():
     center_z = total * 0.5 - stringer * 0.35
     left = graph.transform(plate, t=graph.vec(width * -0.5 + stringer_thickness * 0.5, center_y, center_z))
     right = graph.transform(plate, t=graph.vec(width * 0.5 - stringer_thickness * 0.5, center_y, center_z))
-    graph.result(graph.join(treads, M.glazed(graph, graph.join(left, right), glass_material)))
+    graph.result(graph.join(treads, M.glazed(graph, graph.join(left, right), glass_material, body="slab")))
     return graph

@@ -56,72 +56,62 @@
       "notes": "Soda-lime float glass of the architecture -- floor panes, balustrade infill, curtain walls, roof: uncoated, so every pane mirrors the room at grazing angles; the iron in it turns every long path through the glass, the pane edges above all, the deep green of jade.",
       "ior": 1.52,
       "tint": "jade",
-      "density": 4.0,
-      "body": "pane"
+      "density": 4.0
     },
     "GH.GlassCoated": {
       "notes": "Anti-reflection coated float glass of the gallery floor: the coating's reflectance curve -- about 1 % face on, a mirror at grazing angles -- is that of an uncoated dielectric of ior 1.22, so the garden seen down through the floor is not veiled by the bright conservatory it mirrors, and the floor turns glassy only far off.",
       "ior": 1.22,
       "tint": "jade",
-      "density": 4.0,
-      "body": "pane"
+      "density": 4.0
     },
     "GH.GlassReflective": {
       "notes": "Reflective-coated guard glass of the balustrades: a metal-oxide coating reflects like a dielectric of ior 2.0, a tenth of the light off each face, so every guard doubles the room in faint mirror images over what is seen through it.",
       "ior": 2.0,
       "tint": "jade",
-      "density": 4.0,
-      "body": "pane"
+      "density": 4.0
     },
     "GH.Jade": {
       "notes": "Cast jade glass of the frame -- the beams, posts, mullions and rails, the table columns: glass tinted deep jade, so a bar is the room behind it seen green, dark along its edges and bright where it catches the light.",
       "ior": 1.56,
       "tint": "jade_glass",
-      "density": 60.0,
-      "body": "sphere"
+      "density": 60.0
     },
     "GH.GlassJade": {
       "notes": "Jade crystal of the glass furniture -- the table tops and columns, the stair stringers: lead crystal tinted jade, solid, so it bends what lies behind it.",
       "ior": 1.6,
       "tint": "jade",
-      "density": 57.0,
-      "body": "sphere"
+      "density": 57.0
     },
     "GH.GlassLustre": {
       "notes": "Lustred jade crystal of the flask and the glass ball: a metal-oxide lustre on the crystal mirrors the room twelve times as brightly as plain crystal -- the bright panes the painted glassware shows over its clear body.",
       "ior": 1.6,
       "tint": "jade",
       "density": 57.0,
-      "reflection": 12.0,
-      "body": "pane"
+      "reflection": 12.0
     },
     "GH.GlassBottle": {
       "notes": "Thick green bottle glass of the tall bottle: yellow-green, deep along its walls and in its foot.",
       "ior": 1.52,
       "tint": "bottle_glass",
-      "density": 30.0,
-      "body": "pane"
+      "density": 30.0
     },
     "GH.GlassClear": {
       "notes": "Thin jade crystal of the hanging orbs and the glass block: clear face on, jade along the rims.",
       "ior": 1.6,
       "tint": "jade",
-      "density": 12.0,
-      "body": "pane"
+      "density": 12.0
     },
     "GH.Water": {
       "notes": "Water of the flask.",
       "ior": 1.333,
       "tint": "water_tint",
-      "density": 16.0,
-      "body": "sphere"
+      "density": 16.0
     },
     "GH.PoolWater": {
       "notes": "Still water of the reflecting pools: a clear body over a tiled basin, so the basin's tiles colour it.",
       "ior": 1.333,
       "tint": "water_tint",
-      "density": 0.0,
-      "body": "slab"
+      "density": 0.0
     }
   },
   "reflection_room": {

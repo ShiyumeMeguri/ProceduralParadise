@@ -30,7 +30,7 @@ def pedestal_table():
     top = graph.smooth_by_angle(graph.move(top, z=height - top_thickness * 0.5), 0.8)
     column = graph.smooth(graph.move(graph.cylinder(column_radius, height - top_thickness, 16), z=(height - top_thickness) * 0.5))
     foot = graph.smooth_by_angle(graph.move(graph.cylinder(foot_radius, 0.01, 64), z=0.005), 0.8)
-    graph.result(graph.join(M.glazed(graph, top, glass), graph.mat(graph.join(column, foot), metal)))
+    graph.result(graph.join(M.glazed(graph, top, glass, body="slab"), M.glazed(graph, graph.join(column, foot), metal, False, body="slab")))
     return graph
 
 
@@ -57,6 +57,6 @@ def glass_table():
     angle = graph.index() * (math.tau / graph.max(legs, 1))
     stations = graph.set_pos(stations, pos=graph.vec(graph.cos(angle) * radius * inset, graph.sin(angle) * radius * inset, 0.0))
     leg = graph.smooth(graph.move(graph.cylinder(leg_radius, height - top_thickness, 16), z=(height - top_thickness) * 0.5))
-    top = graph.mat(graph.move(graph.cylinder(radius - 0.012, top_thickness * 0.6, 128), z=height - top_thickness * 0.5), top_material)
-    graph.result(graph.join(top, M.glazed(graph, graph.join(edge, graph.realize(graph.iop(stations, leg))), glass)))
+    top = M.glazed(graph, graph.move(graph.cylinder(radius - 0.012, top_thickness * 0.6, 128), z=height - top_thickness * 0.5), top_material, False, body="slab")
+    graph.result(graph.join(top, M.glazed(graph, graph.join(edge, graph.realize(graph.iop(stations, leg))), glass, body="slab")))
     return graph

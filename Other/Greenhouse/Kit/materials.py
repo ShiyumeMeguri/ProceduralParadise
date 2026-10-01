@@ -45,6 +45,7 @@ get = LIBRARY.get
 color = LIBRARY.color
 param = LIBRARY.param
 GLAZED_DEPTH = 3.0
+BODIES = ("pane", "slab", "sphere")
 
 
 def attribute(tree: Tree, name, output="Fac", kind="GEOMETRY"):
@@ -63,16 +64,31 @@ def scaled(rgba, factor):
     return tuple(channel * factor for channel in rgba[:3]) + (1.0,)
 
 
-def glazed(graph, geometry, material, see_through=True):
+def bodied(name, body):
+    """Name of the material of the glass ``name`` built for a ``body`` of
+    that kind (:data:`BODIES`, :func:`dielectric`): the glass's own name for
+    a pane."""
+    return name if body == "pane" else f"{name}.{body.title()}"
+
+
+def glazed(graph, geometry, material, see_through=True, body="pane"):
     """``geometry`` in ``material``, carrying the ``thickness`` its glass
     reads (``Shading.Thickness``: how far light travels through the body
     along the normal, at most ``GLAZED_DEPTH`` -- through the edge of a pane,
     the pane's width) and marked as glass for the ink pass
     (``Core.render.INK_SKIP``): lines of what lies behind it are drawn
-    through it.  ``see_through`` is a constant or an asset's switch."""
+    through it.  ``see_through`` is a constant or an asset's switch.  The
+    geometry says what ``body`` of glass it is -- a ``pane`` of a few
+    millimetres, a solid ``slab`` (a bar, a plate, a block) or a solid
+    ``sphere`` (a ball, a body of water) -- and a glass of ``GLASSES`` is
+    made that body (:func:`bodied`); any other material is kept."""
     skip = graph.switch(see_through, 0.0, 1.0, "FLOAT") if isinstance(see_through, Sock) else float(see_through)
     measured = graph.group(get_asset("Shading.Thickness"), Mesh=geometry, Max_Thickness=GLAZED_DEPTH).o
-    return graph.mat(graph.store(measured, INK_SKIP, skip, "FLOAT", "FACE"), material)
+    result = graph.mat(graph.store(measured, INK_SKIP, skip, "FLOAT", "FACE"), material)
+    if body != "pane":
+        for name in GLASSES:
+            result = graph.n("GeometryNodeReplaceMaterial", Geometry=result, Old=get(name), New=get(bodied(name, body))).o
+    return result
 
 
 # ------------------------------------------------------------------ structure
@@ -134,12 +150,13 @@ def slant_path(tree: Tree, thickness, ior):
     return tree.math("DIVIDE", thickness, tree.math("SQRT", tree.math("SUBTRACT", 1.0, bent)))
 
 
-def dielectric(name, spec):
-    """Builder of the glass ``name`` (a row ``spec`` of ``GLASSES``): a
-    smooth dielectric of ``ior`` absorbing towards the palette colour
-    ``tint`` at ``density`` per metre over the slanted path through it
-    (:func:`slant_path`).  Its ``body`` says how light crosses it: a
-    ``pane`` -- millimetres of flat glass, which shifts nothing it shows --
+def dielectric(name, spec, body):
+    """Builder of the glass ``name`` (a row ``spec`` of ``GLASSES``) for a
+    ``body`` of that kind (:func:`glazed`): a smooth dielectric of ``ior``
+    absorbing towards the palette colour ``tint`` at ``density`` per metre
+    over the slanted path through it (:func:`slant_path`).  The body says
+    how light crosses it: a ``pane`` -- millimetres of flat glass, which
+    shifts nothing it shows --
     lets the scene behind through straight, tinted by half its path at each
     of its two faces, and mirrors the room by its Fresnel reflectance, so
     everything behind it, the haze outside too, is seen exactly (the sun's
@@ -161,7 +178,7 @@ def dielectric(name, spec):
     def build(tree: Tree):
         ior, density, tint = field("ior"), field("density"), color(field("tint"))
         thickness = attribute(tree, S.THICKNESS_ATTRIBUTE)
-        pane = field("body") == "pane"
+        pane = body == "pane"
         path = slant_path(tree, thickness, ior)
         transmittance = S.beer_lambert(tree, tint[:3], density, tree.math("MULTIPLY", path, 0.5) if pane else path)
         if pane:
@@ -180,15 +197,16 @@ def dielectric(name, spec):
             return mix_shader(tree, tree.n("ShaderNodeLightPath")["Is Shadow Ray"], surface, clear)
         return S.eevee_refraction(tree, surface, transmittance, thickness)
 
-    def settings():
-        if field("body") == "pane":
-            return {"surface_render_method": "DITHERED", "use_transparent_shadow": True}
-        return {**S.EEVEE_REFRACTION, "thickness_mode": field("body").upper()}
-    return lambda: S.material(name, build, settings=settings())
+    if body == "pane":
+        settings = {"surface_render_method": "DITHERED", "use_transparent_shadow": True}
+    else:
+        settings = {**S.EEVEE_REFRACTION, "thickness_mode": body.upper()}
+    return lambda: S.material(bodied(name, body), build, settings=settings)
 
 
 for glass_name, glass_spec in GLASSES.items():
-    register(glass_name)(dielectric(glass_name, glass_spec))
+    for glass_body in BODIES:
+        register(bodied(glass_name, glass_body))(dielectric(glass_name, glass_spec, glass_body))
 
 
 @register("GH.MilkGlass")
@@ -502,17 +520,41 @@ def names():
     return LIBRARY.names()
 
 
+def haze_transmittance(tree: Tree, direction, origin):
+    """Share of the light coming from ``direction`` that reaches ``origin``
+    through the city haze (:func:`smog`, without its inversion: the light
+    crosses the whole column): clear air out to the face of the box
+    ``smog_clear_min`` -- ``smog_clear_max`` the light enters it by, beyond
+    it the exponential column of ``smog_density`` at ``smog_ground`` thinning
+    over ``smog_scale``, whose optical depth along the rest of the way up is
+    density * scale / sin(elevation) * exp(-(z_exit - ground) / scale).  No
+    sky light comes from below the horizon: it crosses the whole valley."""
+    scale, ground = param("smog_scale", 30.0), param("smog_ground", -120.0)
+    exits = []
+    for axis, start, low, high in zip(tree.sep(direction), origin, param("smog_clear_min", (0.0,) * 3), param("smog_clear_max", (0.0,) * 3)):
+        face = tree.mix(tree.math("GREATER_THAN", axis, 0.0), low - start, high - start)
+        exits.append(tree.math("DIVIDE", tree.math("ABSOLUTE", face), tree.math("MAXIMUM", tree.math("ABSOLUTE", axis), 1e-6)))
+    _, _, rise = tree.sep(direction)
+    leave = tree.math("MINIMUM", tree.math("MINIMUM", exits[0], exits[1]), exits[2])
+    exit_height = tree.math("ADD", tree.math("MULTIPLY", leave, rise), origin[2])
+    column = tree.math("EXPONENT", tree.math("MULTIPLY", tree.math("SUBTRACT", exit_height, ground), -1.0 / scale))
+    depth = tree.math("MULTIPLY", tree.math("DIVIDE", param("smog_density", 0.05) * scale, tree.math("MAXIMUM", rise, 1e-3)), column)
+    return tree.math("MULTIPLY", tree.math("EXPONENT", tree.math("MULTIPLY", depth, -1.0)), tree.math("GREATER_THAN", rise, 0.0))
+
+
 def world(config):
     """Hazy daylight sky: a gradient from the pink-white haze at and below
     the horizon to a pale blue zenith, with ``clouds`` -- banks of ``cloud``
     colour covering the share ``cover`` of the sky, ``scale`` of them across
     it, flattened ``flatten`` times, edges ``softness`` soft -- that thin out
-    towards the horizon and the zenith.  The sky sheds light at
-    ``light_strength`` (the light fit's) and fills every reflection and
-    refraction that leaves the frame at that; the camera looking at it sees
-    it at ``seen_strength`` -- the eye adapted to a sunlit park, where the
-    sky is bright but not blinding, whatever share of the light the haze
-    lets the sky shed."""
+    towards the horizon and the zenith.  The sky sheds ``light_strength``
+    (the light fit's), and every ray reaches it the way it does through the
+    city haze from ``light_origin`` (:func:`haze_transmittance`, T): the
+    light falling on a surface is the sky dimmed to T; a reflection sees the
+    sky dimmed to T and the haze's own glow, smog * ``smog_brightness`` *
+    (1 - T); the camera sees the sky at ``seen_strength`` -- the eye
+    adapted to a sunlit park, where the sky is bright but not blinding --
+    with the haze between drawn by the haze's own volume."""
     world_block = S.new_world("GH.Sky")
     tree = Tree.wrap(world_block.node_tree, clear=True)
     out = tree.n("ShaderNodeOutputWorld")
@@ -528,9 +570,14 @@ def world(config):
         cover = tree.map_range(billows, threshold, threshold + clouds["softness"], 0.0, 1.0)
         band = tree.math("MULTIPLY", tree.map_range(height, 0.0, 0.08, 0.0, 1.0), tree.map_range(height, 0.45, 0.85, 1.0, 0.0))
         sky = S.mix_rgb(tree, tree.math("MULTIPLY", cover, band), sky, color(clouds["color"]))
-    camera = tree.n("ShaderNodeLightPath")["Is Camera Ray"]
-    strength = tree.mix(camera, config["light_strength"], config["seen_strength"])
-    tree.link(tree.n("ShaderNodeBackground", sky, strength)["Background"], out.n.inputs["Surface"])
+    path = tree.n("ShaderNodeLightPath")
+    through = haze_transmittance(tree, direction, config["light_origin"])
+    lit = tree.vmath("SCALE", sky, scale=tree.math("MULTIPLY", through, config["light_strength"]))
+    glow = tree.vmath("SCALE", color("smog")[:3], scale=tree.math("MULTIPLY", tree.math("SUBTRACT", 1.0, through), param("smog_brightness", 1.0)))
+    reflected = tree.mix(path["Is Glossy Ray"], lit, tree.vmath("ADD", lit, glow), data_type="RGBA")
+    seen = tree.vmath("SCALE", sky, scale=config["seen_strength"])
+    radiance = tree.mix(path["Is Camera Ray"], reflected, seen, data_type="RGBA")
+    tree.link(tree.n("ShaderNodeBackground", radiance, 1.0)["Background"], out.n.inputs["Surface"])
     tree.layout()
     bpy.context.scene.world = world_block
     return world_block

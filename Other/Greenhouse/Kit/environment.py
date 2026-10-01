@@ -179,7 +179,7 @@ def pool():
     clearance = 0.002
     body = graph.box(length * -0.5 + clearance, width * -0.5 + clearance, 0.02 + clearance, length * 0.5 - clearance, width * 0.5 - clearance,
                      height - freeboard)
-    graph.result(graph.join(graph.mat(walls, stone), graph.mat(shell, basin), M.glazed(graph, body, water)))
+    graph.result(graph.join(graph.mat(walls, stone), graph.mat(shell, basin), M.glazed(graph, body, water, body="slab")))
     return graph
 
 

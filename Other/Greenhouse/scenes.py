@@ -62,10 +62,12 @@ excluded from the view layer, so only its instances are seen.
 A lamp is ``{"name", "light": "SUN" | "AREA" | "POINT" | "SPOT", "power",
 "color", "angle" (sun disc, degrees), "size", "loc", and its aim: "target"
 (a point), "direction" (towards the light) or "rot"; "hidden"}``.  A probe
-is an EEVEE light probe ``{"name", "probe": "SPHERE" | "PLANE" | "VOLUME",
-"loc", "influence"}``: a sphere probe captures the room round ``loc`` for
-the reflections within ``influence`` metres of it, where a reflection
-leaving the frame would otherwise fall back to the open sky.
+is an EEVEE reflection probe of a glass room ``{"name", "volumes": [...],
+"falloff"}``: a box-projected sphere probe filling the box round the named
+glasshouse volumes (up to their ridges), so a reflection leaving the frame
+finds the room's own walls, floor and roof where they are -- not the open
+sky, and not the room as seen from one point, bent round the glass that
+mirrors it.  It fades in over the share ``falloff`` of the box.
 """
 from __future__ import annotations
 
@@ -78,7 +80,8 @@ from mathutils import Vector
 
 from Core import jsonio, scene as SC, values as V
 from Core.gn import get_asset
-from . import PALETTE, PLANTS
+from Core.shaders import THICKNESS_ATTRIBUTE
+from . import GLASSES, PALETTE, PLANTS
 from .Kit import materials as M
 
 __all__ = ["load_scene", "build_scene", "data_mesh"]
@@ -216,6 +219,20 @@ def _volume(spec, with_edges, with_faces):
             return abs(z - eaves) < 1e-5 and (min(abs(x - x0), abs(x - x1)) < 1e-5 or min(abs(y - y0), abs(y - y1)) < 1e-5)
         edges = [edge for edge in edges if not (on_eaves(edge[0]) and on_eaves(edge[1]))]
     return vertices, edges, faces
+
+
+def _bounds(specs):
+    """Corners of the box round glasshouse volumes, each up to its ridge."""
+    low, high = Vector((math.inf,) * 3), Vector((-math.inf,) * 3)
+    for spec in specs:
+        x0, x1 = spec["x"]
+        y0, y1 = spec["y"]
+        foot, eaves = spec["z"]
+        span = (x1 - x0) if spec.get("ridge", "y") == "y" else (y1 - y0)
+        top = eaves + math.tan(math.radians(spec.get("pitch", 0.0))) * span * 0.5
+        low = Vector(map(min, low, (x0, y0, foot)))
+        high = Vector(map(max, high, (x1, y1, top)))
+    return low, high
 
 
 def _merged(vertices, edges, faces):
@@ -361,7 +378,23 @@ class SceneBuilder:
         for item in self.data.get("probes", []):
             self.probe(item, lights)
         self.connect()
+        self.check_glass()
         return self
+
+    @staticmethod
+    def check_glass():
+        """Refuse a scene with glass that does not carry the thickness its
+        absorption is measured over: a glass surface built without
+        ``Kit.materials.glazed`` renders clear, whatever its tint."""
+        glass = {M.bodied(name, body) for name in GLASSES for body in M.BODIES}
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        for obj in bpy.context.scene.objects:
+            if obj.type != "MESH":
+                continue
+            evaluated = obj.evaluated_get(depsgraph)
+            if any(slot.material and slot.material.name in glass for slot in evaluated.material_slots) \
+                    and THICKNESS_ATTRIBUTE not in evaluated.data.attributes:
+                raise ValueError(f"{obj.name}: glass without '{THICKNESS_ATTRIBUTE}' -- build it through Kit.materials.glazed")
 
     @staticmethod
     def exclude(collection):
@@ -465,13 +498,16 @@ class SceneBuilder:
                 setattr(obj, f"visible_{ray}", False)
         return obj
 
-    @staticmethod
-    def probe(item, collection):
-        data = bpy.data.lightprobes.new(item["name"], item["probe"])
-        data.influence_distance = item["influence"]
+    def probe(self, item, collection):
+        low, high = _bounds([self.data["volumes"][name] for name in item["volumes"]])
+        data = bpy.data.lightprobes.new(item["name"], "SPHERE")
+        data.influence_type = "BOX"
+        data.influence_distance = 1.0
+        data.falloff = item["falloff"]
         obj = _unique(bpy.data.objects.new(item["name"], data), item["name"])
         collection.objects.link(obj)
-        obj.location = _vector(item.get("loc"))
+        obj.location = (low + high) * 0.5
+        obj.scale = (high - low) * 0.5
         return obj
 
 

@@ -112,7 +112,7 @@ def orb():
     ring = graph.smooth(graph.sweep(ring, graph.circle(0.0025, 8), False))
     wire_length = drop - radius - loop * 2.0
     wire = graph.rod(graph.vec(0.0, 0.0, radius + loop * 2.0), graph.vec(0.0, 0.0, radius + loop * 2.0 + wire_length), 0.0008, 6)
-    hanging = graph.join(M.glazed(graph, ring, glass), graph.mat(wire, wire_material))
+    hanging = graph.join(M.glazed(graph, ring, glass, body="slab"), graph.mat(wire, wire_material))
     graph.result(graph.move(graph.join(body, bed, stones, hanging), z=drop * -1.0))
     return graph
 
@@ -192,12 +192,12 @@ def square_bottle():
     cavity = squircle_body(graph, width - wall * 2.0, depth - wall * 2.0, height - base, bore, shoulder, 0.0, power)
     cavity = graph.switch(hollow, None, graph.move(cavity, z=base))
     graph.assign(graph._in_socket(bored.n, "Mesh 2"), [hole, cavity])
-    body_glass = M.glazed(graph, graph.smooth_by_angle(bored["Mesh"], 0.9), glass)
+    body_glass = M.glazed(graph, graph.smooth_by_angle(bored["Mesh"], 0.9), glass, body="slab")
     overlap = 0.0004
     contents = squircle_body(graph, width - wall * 2.0 + overlap * 2.0, depth - wall * 2.0 + overlap * 2.0, height - base + overlap, bore, shoulder, 0.0, power)
     contents = cut_below(graph, graph.move(contents, z=base - overlap), height * fill, -1.0)
     filled = graph.bool_and(hollow, graph.compare(fill, 0.001, "GREATER_THAN"))
-    contents = graph.switch(filled, None, M.glazed(graph, contents, liquid))
+    contents = graph.switch(filled, None, M.glazed(graph, contents, liquid, body="slab"))
     graph.result(graph.join(body_glass, contents))
     return graph
 
@@ -257,7 +257,7 @@ def flask():
     water = graph.smooth(sphere(graph, radius - wall + 0.0004, 64, 32))
     water = graph.transform(water, t=graph.vec(0.0, 0.0, radius * squash), s=graph.vec(1.0, 1.0, squash))
     water = cut_below(graph, water, radius * squash * 2.0 * fill, -1.0)
-    water = graph.switch(graph.compare(fill, 0.001, "GREATER_THAN"), None, M.glazed(graph, water, liquid))
+    water = graph.switch(graph.compare(fill, 0.001, "GREATER_THAN"), None, M.glazed(graph, water, liquid, body="sphere"))
     graph.result(graph.join(M.glazed(graph, graph.smooth_by_angle(body, 1.2), glass), water))
     return graph
 
@@ -286,7 +286,7 @@ def ball():
     graph = GN("GH.Vessel.Ball", ball.__doc__)
     radius = graph.inp("Radius", default=0.035, subtype="DISTANCE")
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassClear"))
-    graph.result(M.glazed(graph, graph.smooth(graph.move(sphere(graph, radius, 48, 24), z=radius)), glass))
+    graph.result(M.glazed(graph, graph.smooth(graph.move(sphere(graph, radius, 48, 24), z=radius)), glass, body="sphere"))
     return graph
 
 
