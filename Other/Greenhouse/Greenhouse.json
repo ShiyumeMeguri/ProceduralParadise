@@ -48,8 +48,15 @@
     "cloud": [1.0, 0.93, 0.96],
     "grass": [0.06, 0.15, 0.035],
     "grass_light": [0.15, 0.3, 0.06],
-    "tree_leaf": [0.03, 0.2, 0.12],
-    "tree_leaf_light": [0.46, 0.56, 0.09]
+    "tree_leaf": [0.11, 0.32, 0.07],
+    "tree_leaf_light": [0.55, 0.72, 0.12],
+    "frame": [0.045, 0.3, 0.24],
+    "glass_aqua": [0.55, 0.9, 0.92],
+    "conifer": [0.025, 0.12, 0.075],
+    "conifer_light": [0.12, 0.3, 0.12],
+    "plaza": [0.34, 0.31, 0.36],
+    "plaza_light": [0.42, 0.39, 0.44],
+    "clear_air": [0.7, 0.82, 1.0]
   },
   "glasses": {
     "GH.Glass": {
@@ -112,6 +119,12 @@
       "ior": 1.333,
       "tint": "water_tint",
       "density": 0.0
+    },
+    "GH.GlassConservatory": {
+      "notes": "Solar-control float glass of the conservatory's walls and roofs, low in iron, with a faint cool body: its coating mirrors about a tenth of the light face on (the reflectance of a dielectric of ior 1.85), so the roofs carry the bright sky the way the glasshouse's drawings show them; seen through, it is nearly clear, through two walls and along a pane's edge a pale aqua -- each glass volume reads as light, its gardens green inside.",
+      "ior": 1.85,
+      "tint": "glass_aqua",
+      "density": 22.0
     }
   },
   "reflection_room": {
