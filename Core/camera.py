@@ -83,14 +83,20 @@ def camera_from_solve(name, solve, parent_matrix=None, collection=None, set_acti
 
 
 def look_camera(name, location, target, lens=28.0, collection=None, shift=(0.0, 0.0),
-                set_active=False):
-    """Free camera looking at ``target`` (for alternate views / validation)."""
+                set_active=False, ortho=None, clip=0.05):
+    """Free camera looking at ``target`` (for alternate views / validation):
+    perspective through ``lens``, or orthographic ``ortho`` metres wide (a
+    plan or an elevation); nothing nearer than ``clip`` is drawn (a section
+    cuts the building at that distance)."""
     cam = bpy.data.cameras.new(name)
     cam.lens = lens
+    if ortho:
+        cam.type = "ORTHO"
+        cam.ortho_scale = ortho
     cam.sensor_fit = "HORIZONTAL"
     cam.sensor_width = 36.0
     cam.shift_x, cam.shift_y = shift
-    cam.clip_start, cam.clip_end = 0.05, 20000.0
+    cam.clip_start, cam.clip_end = clip, 20000.0
     ob = bpy.data.objects.new(name, cam)
     (collection or bpy.context.scene.collection).objects.link(ob)
     ob.location = Vector(location)

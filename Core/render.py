@@ -399,7 +399,8 @@ def ink(cfg: dict | None):
 
     cfg = {"color": [r,g,b], "alpha": a, "width": px at 100 %,
            "id": threshold, "normal": threshold, "depth": threshold (optional),
-           "rim": facing, "samples": n, "exclude": [collection names]}
+           "rim": facing, "samples": n, "exclude": [collection names],
+           "fade": [near, far] (optional, metres)}
 
     A view layer of its own renders every surface of the main layer (minus
     ``exclude``, e.g. volumes) with one override material: an emission of
@@ -411,8 +412,12 @@ def ink(cfg: dict | None):
     Surfaces marked ``ink_quiet`` (foliage) share one identity and are never
     inked: the painter draws line art on the architecture and the
     glassware, and lets plants cut those lines without outlining them.
-    :func:`compositor` turns the layer's colour, normal and depth images
-    into lines.  Returns the layer name (None without ink)."""
+    With a ``fade`` the line art keeps to the aerial perspective: lines
+    thin out from ``near`` to ``far`` away from the camera (the layer's mist
+    pass, through glass as the lines are), so a skyline dissolving into the
+    haze is not outlined against the sky.  :func:`compositor` turns the
+    layer's colour, normal, depth and mist images into lines.  Returns the
+    layer name (None without ink)."""
     sc = bpy.context.scene
     if not cfg:
         return None
@@ -434,6 +439,11 @@ def ink(cfg: dict | None):
     layer.samples = cfg.get("samples", 4)
     layer.use_freestyle = False
     layer.material_override = _ink_material(cfg.get("rim", 0.82))
+    fade = cfg.get("fade")
+    if fade:
+        layer.use_pass_mist = True
+        mist = sc.world.mist_settings
+        mist.start, mist.depth, mist.falloff = fade[0], fade[1] - fade[0], "LINEAR"
     return layer.name
 
 
@@ -515,6 +525,8 @@ def ink_nodes(t, img, layer, cfg):
     t.link(t.math("ROUND", t.math("MULTIPLY", t.math("MAXIMUM", t.math("SUBTRACT", due, SOBEL_WIDTH), 0.0), 0.5)), grow.n.inputs["Size"])
     coverage = t.math("MINIMUM", t.math("DIVIDE", due, SOBEL_WIDTH), 1.0)
     factor = t.math("MULTIPLY", grow.o, t.math("MULTIPLY", coverage, cfg.get("alpha", 1.0)), clamp=True)
+    if cfg.get("fade"):
+        factor = t.math("MULTIPLY", factor, t.math("SUBTRACT", 1.0, rl["Mist"], clamp=True))
     line = tuple(cfg.get("color", (0.005, 0.03, 0.03))) + (1.0,)
     return t.mix(factor, img, line, data_type="RGBA")
 

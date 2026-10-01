@@ -119,7 +119,8 @@ def shot_cameras(shot, matrix):
     for name, view in (shot.get("views") or {}).items():
         location = matrix @ Vector(view["location"])
         target = matrix @ Vector(view["target"])
-        CAM.look_camera(f"VIEW_{name}", location, target, lens=view.get("lens", 24.0))
+        CAM.look_camera(f"VIEW_{name}", location, target, lens=view.get("lens", 24.0),
+                        ortho=view.get("ortho"), clip=view.get("clip", 0.05))
     return camera
 
 
