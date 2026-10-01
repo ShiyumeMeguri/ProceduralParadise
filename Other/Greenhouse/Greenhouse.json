@@ -34,13 +34,13 @@
     "ink": [0.009, 0.046, 0.023],
     "phone": [0.02, 0.12, 0.11],
     "screen": [0.86, 0.9, 0.88],
-    "bottle_glass": [0.2, 0.81, 0.3],
     "air": [1.0, 0.95, 0.85],
     "water_tint": [0.2, 0.8, 0.65],
     "milk": [0.5, 0.7, 0.68],
     "bronze": [0.12, 0.1, 0.08],
     "leaf_emerald": [0.14, 0.62, 0.3],
-    "jade_glass": [0.12, 0.69, 0.6]
+    "jade_glass": [0.12, 0.69, 0.6],
+    "bottle_glass": [0.2, 0.81, 0.3]
   },
   "glasses": {
     "GH.Glass": {
@@ -49,6 +49,13 @@
       "tint": "jade",
       "density": 4.0,
       "wall": 0.02
+    },
+    "GH.GlassCoated": {
+      "notes": "Anti-reflection coated float glass of the gallery floor: the coating's reflectance curve -- about 1 % face on, a mirror at grazing angles -- is that of an uncoated dielectric of ior 1.22, so the garden seen down through the floor is not veiled by the bright conservatory it mirrors, and the floor turns glassy only far off.",
+      "ior": 1.22,
+      "tint": "jade",
+      "density": 4.0,
+      "wall": 0.04
     },
     "GH.GlassReflective": {
       "notes": "Reflective-coated guard glass of the balustrades: a metal-oxide coating reflects like a dielectric of ior 2.0, a tenth of the light off each face, so every guard doubles the room in faint mirror images over what is seen through it.",
@@ -65,27 +72,36 @@
       "wall": 0.02
     },
     "GH.GlassJade": {
-      "notes": "Jade crystal of the glassware and the glass furniture: lead crystal tinted jade, whose fire splits white light at every edge.",
+      "notes": "Jade crystal of the glass furniture -- the table tops and columns, the stair stringers: lead crystal tinted jade, whose fire splits white light at every edge.",
       "ior": 1.6,
       "abbe": 35.0,
       "tint": "jade",
-      "density": 120.0,
+      "density": 57.0,
+      "wall": 0.012
+    },
+    "GH.GlassLustre": {
+      "notes": "Lustred jade crystal of the flask and the glass ball: a metal-oxide lustre on the crystal mirrors the room twelve times as brightly as plain crystal -- the bright panes the painted glassware shows over its clear body.",
+      "ior": 1.6,
+      "abbe": 35.0,
+      "tint": "jade",
+      "density": 57.0,
+      "wall": 0.004,
+      "reflection": 12.0
+    },
+    "GH.GlassBottle": {
+      "notes": "Thick green bottle glass of the tall bottle: yellow-green, deep along its walls and in its foot.",
+      "ior": 1.52,
+      "tint": "bottle_glass",
+      "density": 30.0,
       "wall": 0.012
     },
     "GH.GlassClear": {
-      "notes": "Thin jade crystal of the hanging orbs, the glass ball and the glass block: clear face on, jade along the rims.",
+      "notes": "Thin jade crystal of the hanging orbs, the glass ball and the glass block: clear face on, jade along the rims, mirroring the room four times as brightly as real crystal.",
       "ior": 1.6,
       "abbe": 35.0,
       "tint": "jade",
       "density": 12.0,
       "wall": 0.003
-    },
-    "GH.GlassBottle": {
-      "notes": "Green bottle glass of the tall bottle.",
-      "ior": 1.52,
-      "tint": "bottle_glass",
-      "density": 60.0,
-      "wall": 0.012
     },
     "GH.Water": {
       "notes": "Water of the flask.",
@@ -94,6 +110,16 @@
       "density": 16.0,
       "wall": 0.2
     }
+  },
+  "reflection_room": {
+    "notes": "The panes of the conservatory that glassware with a reflection gain mirrors (Kit/materials.reflection_room): the pink haze in the panes of the curtain walls, between the mullions and transoms of the frame, some panes screened by the vines and the plants outside; frame, garden and roof add nothing, so the glass shows its own clear body there.",
+    "sky": "haze",
+    "bays": 8,
+    "gap": 0.3,
+    "rows": [-16.0, 4.0, 22.0, 40.0],
+    "transom": 4.0,
+    "brightness": 0.9,
+    "screened": 0.5
   },
   "plants": {
     "areca": {

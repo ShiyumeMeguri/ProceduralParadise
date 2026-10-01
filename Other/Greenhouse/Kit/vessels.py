@@ -154,10 +154,10 @@ def square_bottle():
     rounding over the top ``Shoulder`` into a neck of ``Neck Radius`` and
     ``Neck Length`` with a lip; a bore of ``Bore`` radius and ``Bore Depth``
     is drilled down from the top.  With a ``Wall`` the body is blown hollow:
-    a cavity that thick inside every face, opening into the bore, filled
-    with ``Liquid`` to ``Fill`` of the body's height (the liquid stands a
-    fraction of a millimetre into the glass, so the two dielectrics meet
-    without a film of air)."""
+    a cavity that thick inside every side, on a ``Base`` that thick, opening
+    into the bore, filled with ``Liquid`` to ``Fill`` of the body's height
+    (the liquid stands a fraction of a millimetre into the glass, so the two
+    dielectrics meet without a film of air)."""
     graph = GN("GH.Vessel.SquareBottle", square_bottle.__doc__)
     width = graph.inp("Width", default=0.2, subtype="DISTANCE")
     depth = graph.inp("Depth", default=0.2, subtype="DISTANCE")
@@ -170,6 +170,7 @@ def square_bottle():
     bevel = graph.inp("Bevel", default=0.02, subtype="DISTANCE")
     power = graph.inp("Squareness", default=6.0, min=2.0)
     wall = graph.inp("Wall", default=0.0, min=0.0, subtype="DISTANCE")
+    base = graph.inp("Base", default=0.01, min=0.0, subtype="DISTANCE")
     fill = graph.inp("Fill", default=0.0, min=0.0, max=1.0)
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassJade"))
     liquid = graph.inp("Liquid", "MATERIAL", default=M.get("GH.Water"))
@@ -188,13 +189,13 @@ def square_bottle():
     graph.assign(graph._in_socket(solid.n, "Mesh 2"), [body, neck])
     bored = graph.n("GeometryNodeMeshBoolean", Mesh_1=solid["Mesh"], props={"operation": "DIFFERENCE", "solver": "MANIFOLD"})
     hollow = graph.compare(wall, 0.0001, "GREATER_THAN")
-    cavity = squircle_body(graph, width - wall * 2.0, depth - wall * 2.0, height - wall, bore, shoulder, 0.0, power)
-    cavity = graph.switch(hollow, None, graph.move(cavity, z=wall))
+    cavity = squircle_body(graph, width - wall * 2.0, depth - wall * 2.0, height - base, bore, shoulder, 0.0, power)
+    cavity = graph.switch(hollow, None, graph.move(cavity, z=base))
     graph.assign(graph._in_socket(bored.n, "Mesh 2"), [hole, cavity])
     body_glass = M.glazed(graph, graph.smooth_by_angle(bored["Mesh"], 0.9), glass)
     overlap = 0.0004
-    contents = squircle_body(graph, width - wall * 2.0 + overlap * 2.0, depth - wall * 2.0 + overlap * 2.0, height - wall + overlap, bore, shoulder, 0.0, power)
-    contents = cut_below(graph, graph.move(contents, z=wall - overlap), height * fill, -1.0)
+    contents = squircle_body(graph, width - wall * 2.0 + overlap * 2.0, depth - wall * 2.0 + overlap * 2.0, height - base + overlap, bore, shoulder, 0.0, power)
+    contents = cut_below(graph, graph.move(contents, z=base - overlap), height * fill, -1.0)
     filled = graph.bool_and(hollow, graph.compare(fill, 0.001, "GREATER_THAN"))
     contents = graph.switch(filled, None, M.glazed(graph, contents, liquid))
     graph.result(graph.join(body_glass, contents))

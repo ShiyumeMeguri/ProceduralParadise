@@ -32,7 +32,7 @@ import bpy
 from Core import shaders as S
 from Core.nodes import Sock, Tree
 from Core.render import INK_SKIP
-from .. import GLASSES, PALETTE
+from .. import GLASSES, PALETTE, ROOM
 
 LIBRARY = S.MaterialLibrary(PALETTE, "greenhouse_built")
 PARAMS = LIBRARY.params
@@ -97,16 +97,60 @@ def surface_transmittance(ior):
     return 1.0 - ((ior - 1.0) / (ior + 1.0)) ** 2
 
 
+def reflection_room(tree: Tree):
+    """The panes of the conservatory a reflected ray looks into -- a
+    reflection probe of the room in closed form (``ROOM``), the same from
+    every camera: ``bays`` bays round the horizon, each split by a mullion
+    taking the share ``gap`` of it, and ``rows`` of panes (the elevations,
+    degrees, of the sill, the transoms and the eaves) with transoms
+    ``transom`` degrees deep; a pane shows the ``sky`` (the haze beyond the
+    glass) unless it is one of the share ``screened`` of the panes, picked
+    at random pane by pane, that the vines and the plants outside screen;
+    everything else -- frame, screened panes, garden, roof -- shows nothing,
+    so the glass shows its own clear body there."""
+    x, y, z = tree.sep(tree.vmath("NORMALIZE", tree.n("ShaderNodeTexCoord")["Reflection"]))
+    soft = math.radians(0.5)
+    bay = math.tau / ROOM["bays"]
+    bays_round = tree.math("DIVIDE", tree.math("ARCTAN2", y, x), bay)
+    turn = tree.math("FRACT", bays_round)
+    from_mullion = tree.math("MULTIPLY", tree.math("MINIMUM", turn, tree.math("SUBTRACT", 1.0, turn)), bay)
+    half_mullion = bay * ROOM["gap"] * 0.5
+    between_mullions = tree.map_range(from_mullion, half_mullion - soft, half_mullion + soft, 0.0, 1.0)
+    elevation = tree.math("ARCSINE", z)
+    half_transom = math.radians(ROOM["transom"]) * 0.5
+    in_row = None
+    row = None
+    for low, high in zip(ROOM["rows"][:-1], ROOM["rows"][1:]):
+        above = tree.map_range(elevation, math.radians(low) + half_transom - soft, math.radians(low) + half_transom + soft, 0.0, 1.0)
+        below = tree.map_range(elevation, math.radians(high) - half_transom - soft, math.radians(high) - half_transom + soft, 1.0, 0.0)
+        band = tree.math("MULTIPLY", above, below)
+        numbered = tree.math("GREATER_THAN", elevation, math.radians(low))
+        in_row = band if in_row is None else tree.math("ADD", in_row, band)
+        row = numbered if row is None else tree.math("ADD", row, numbered)
+    pane = tree.n("ShaderNodeCombineXYZ", tree.math("FLOOR", bays_round), row, 0.0).o
+    draw = tree.n("ShaderNodeTexWhiteNoise", tree.vmath("ADD", pane, (0.5, 0.5, 0.5)), props={"noise_dimensions": "3D"})["Value"]
+    lit = tree.math("GREATER_THAN", draw, ROOM["screened"])
+    inside = tree.math("MULTIPLY", between_mullions, in_row)
+    return tree.vmath("SCALE", color(ROOM["sky"])[:3], scale=tree.math("MULTIPLY", inside, lit))
+
+
 def dielectric(name, spec):
     """Builder of the glass ``name`` (a row ``spec`` of ``GLASSES``): a
     smooth dielectric of ``ior`` -- dispersing by its ``abbe`` number where
     the row gives one -- filled with absorption towards the palette colour
     ``tint`` at ``density`` per metre and, with a ``scatter`` density, a
-    haze that lights the glass from within.  A ray carrying light crosses a
-    surface and half a ``wall`` of glass per surface it meets, so it is
-    tinted by the surface's Fresnel loss and the transmittance of half a
-    wall -- the light the glass really lets through.  A scene overrides a
-    field as ``"<name>.<field>"``."""
+    haze that lights the glass from within.  Painted glassware mirrors the
+    room far more than real glass does, and mirrors it as the painter sees
+    it -- bright panes over a clear body, not the even glare the room really
+    sheds on a sphere -- so a ``reflection`` gain above 1 adds that many
+    times the glass's own reflectance more (never past a mirror) of the room
+    (:func:`reflection_room`, a probe of the conservatory that holds for
+    every camera) at ``ROOM["brightness"]``: the reflections only ever
+    brighten what is seen through the glass.  A ray carrying light crosses a surface and
+    half a ``wall`` of glass per surface it meets, so it is tinted by the
+    surface's Fresnel loss and the transmittance of half a wall -- the light
+    the glass really lets through.  A scene overrides a field as
+    ``"<name>.<field>"``."""
     def field(key, default=None):
         return param(f"{name}.{key}", spec.get(key, default))
 
@@ -116,6 +160,12 @@ def dielectric(name, spec):
         dispersion = {"Transmission_Dispersion_Scale": 1.0, "Transmission_Dispersion_Abbe_Number": abbe} if abbe else {}
         surface = S.bsdf(tree, Base_Color=(1.0, 1.0, 1.0, 1.0), Roughness=field("roughness", 0.0), IOR=ior,
                          Transmission_Weight=1.0, **dispersion)["BSDF"]
+        gain = field("reflection", 1.0)
+        if gain > 1.0:
+            facing = tree.n("ShaderNodeFresnel", IOR=ior)["Fac"]
+            share = tree.math("MULTIPLY", facing, gain - 1.0, clamp=True)
+            glint = tree.n("ShaderNodeEmission", reflection_room(tree), tree.math("MULTIPLY", share, ROOM["brightness"]))["Emission"]
+            surface = tree.n("ShaderNodeAddShader", surface, glint)["Shader"]
         volume = tree.n("ShaderNodeVolumeAbsorption", Color=tint, Density=density)["Volume"]
         scatter = field("scatter", 0.0)
         if scatter:

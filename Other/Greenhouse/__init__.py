@@ -21,4 +21,5 @@ GREENHOUSE = jsonio.load(os.path.join(HERE, "Greenhouse.json"))
 
 PALETTE = {key: tuple(value) for key, value in GREENHOUSE["palette"].items()}
 GLASSES = GREENHOUSE["glasses"]
+ROOM = GREENHOUSE["reflection_room"]
 PLANTS = GREENHOUSE["plants"]
