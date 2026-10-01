@@ -1355,7 +1355,8 @@
           "Bore Depth": 0.12,
           "Squareness": 14.0,
           "Bevel": 0.004,
-          "Glass": "GH.GlassClear"
+          "Glass": "GH.GlassClear",
+          "Over Glass": true
         }
       },
       {

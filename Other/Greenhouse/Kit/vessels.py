@@ -157,7 +157,9 @@ def square_bottle():
     a cavity that thick inside every side, on a ``Base`` that thick, opening
     into the bore, filled with ``Liquid`` to ``Fill`` of the body's height
     (the liquid stands a fraction of a millimetre into the glass, so the two
-    dielectrics meet without a film of air)."""
+    dielectrics meet without a film of air).  ``Over Glass``: it stands in
+    front of other glass -- on a glass table -- and its glass is drawn over
+    it (``Kit.materials.glazed``)."""
     graph = GN("GH.Vessel.SquareBottle", square_bottle.__doc__)
     width = graph.inp("Width", default=0.2, subtype="DISTANCE")
     depth = graph.inp("Depth", default=0.2, subtype="DISTANCE")
@@ -174,6 +176,7 @@ def square_bottle():
     fill = graph.inp("Fill", default=0.0, min=0.0, max=1.0)
     glass = graph.inp("Glass", "MATERIAL", default=M.get("GH.GlassJade"))
     liquid = graph.inp("Liquid", "MATERIAL", default=M.get("GH.Water"))
+    over_glass = graph.inp("Over Glass", "BOOL", default=False)
 
     body = squircle_body(graph, width, depth, height, neck_radius, shoulder, bevel, power)
     neck = graph.n("GeometryNodeMeshCylinder", Vertices=48, Side_Segments=1, Radius=1.0, Depth=1.0, props={"fill_type": "NGON"})["Mesh"]
@@ -192,7 +195,8 @@ def square_bottle():
     cavity = squircle_body(graph, width - wall * 2.0, depth - wall * 2.0, height - base, bore, shoulder, 0.0, power)
     cavity = graph.switch(hollow, None, graph.move(cavity, z=base))
     graph.assign(graph._in_socket(bored.n, "Mesh 2"), [hole, cavity])
-    body_glass = M.glazed(graph, graph.smooth_by_angle(bored["Mesh"], 0.9), glass, body="slab")
+    walls = graph.smooth_by_angle(bored["Mesh"], 0.9)
+    body_glass = graph.switch(over_glass, M.glazed(graph, walls, glass, body="slab"), M.glazed(graph, walls, glass, body="over"))
     overlap = 0.0004
     contents = squircle_body(graph, width - wall * 2.0 + overlap * 2.0, depth - wall * 2.0 + overlap * 2.0, height - base + overlap, bore, shoulder, 0.0, power)
     contents = cut_below(graph, graph.move(contents, z=base - overlap), height * fill, -1.0)

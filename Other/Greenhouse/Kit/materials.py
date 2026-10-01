@@ -45,7 +45,8 @@ get = LIBRARY.get
 color = LIBRARY.color
 param = LIBRARY.param
 GLAZED_DEPTH = 3.0
-BODIES = ("pane", "slab", "sphere")
+BODIES = ("pane", "slab", "sphere", "over")
+STRAIGHT_BODIES = ("pane", "over")
 
 
 def attribute(tree: Tree, name, output="Fac", kind="GEOMETRY"):
@@ -79,8 +80,9 @@ def glazed(graph, geometry, material, see_through=True, body="pane"):
     (``Core.render.INK_SKIP``): lines of what lies behind it are drawn
     through it.  ``see_through`` is a constant or an asset's switch.  The
     geometry says what ``body`` of glass it is -- a ``pane`` of a few
-    millimetres, a solid ``slab`` (a bar, a plate, a block) or a solid
-    ``sphere`` (a ball, a body of water) -- and a glass of ``GLASSES`` is
+    millimetres, a solid ``slab`` (a bar, a plate, a block), a solid
+    ``sphere`` (a ball, a body of water), or a flat solid standing ``over``
+    other glass (a block on a glass table) -- and a glass of ``GLASSES`` is
     made that body (:func:`bodied`); any other material is kept."""
     skip = graph.switch(see_through, 0.0, 1.0, "FLOAT") if isinstance(see_through, Sock) else float(see_through)
     measured = graph.group(get_asset("Shading.Thickness"), Mesh=geometry, Max_Thickness=GLAZED_DEPTH).o
@@ -155,14 +157,21 @@ def dielectric(name, spec, body):
     ``body`` of that kind (:func:`glazed`): a smooth dielectric of ``ior``
     absorbing towards the palette colour ``tint`` at ``density`` per metre
     over the slanted path through it (:func:`slant_path`).  The body says
-    how light crosses it: a ``pane`` -- millimetres of flat glass, which
-    shifts nothing it shows --
-    lets the scene behind through straight, tinted by half its path at each
-    of its two faces, and mirrors the room by its Fresnel reflectance, so
-    everything behind it, the haze outside too, is seen exactly (the sun's
-    shadow sees only the tint: it has no eye to take a Fresnel angle from);
-    a ``slab`` or a ``sphere`` -- a bar, solid glass, a body of water -- is
-    refracted by EEVEE's ray tracing as that shape.
+    how light crosses it.  A ``slab`` (a bar, a table top, a body of water)
+    and a ``sphere`` (a ball, the water in a flask) are refracted by EEVEE's
+    ray tracing as that shape.  A ``pane`` of a few millimetres does not
+    bend what is seen through it, so it lets the scene behind through
+    straight, tinted by half its path at each of its two faces, and mirrors
+    the room by its Fresnel reflectance (the sun's shadow sees only the
+    tint: it has no eye to take a Fresnel angle from); it is dithered, part
+    of the scene the other glass refracts.  EEVEE refracts through one layer
+    of glass only: a solid standing in front of other refracting glass -- a
+    block on a glass table -- refracted, shows the bare floor beyond both,
+    pale where the accepted render shows it jade.  Such a solid is ``over``
+    the other glass: between parallel faces it only shifts what it shows
+    aside, so it is drawn like a pane but blended over the finished scene,
+    the glass behind it showing through it, its back faces its inner
+    reflections.
     Painted glassware mirrors the room far more than real glass does, and
     mirrors it as the painter sees it -- bright panes over a clear body,
     not the even glare the room really sheds on a sphere -- so a
@@ -178,10 +187,10 @@ def dielectric(name, spec, body):
     def build(tree: Tree):
         ior, density, tint = field("ior"), field("density"), color(field("tint"))
         thickness = attribute(tree, S.THICKNESS_ATTRIBUTE)
-        pane = body == "pane"
+        straight = body in STRAIGHT_BODIES
         path = slant_path(tree, thickness, ior)
-        transmittance = S.beer_lambert(tree, tint[:3], density, tree.math("MULTIPLY", path, 0.5) if pane else path)
-        if pane:
+        transmittance = S.beer_lambert(tree, tint[:3], density, tree.math("MULTIPLY", path, 0.5) if straight else path)
+        if straight:
             clear = tree.n("ShaderNodeBsdfTransparent", Color=transmittance)["BSDF"]
             mirror = tree.n("ShaderNodeBsdfGlossy", Color=(1.0, 1.0, 1.0, 1.0), Roughness=field("roughness", 0.0))["BSDF"]
             surface = mix_shader(tree, tree.n("ShaderNodeFresnel", IOR=ior)["Fac"], clear, mirror)
@@ -193,12 +202,15 @@ def dielectric(name, spec, body):
             share = tree.math("MULTIPLY", facing, gain - 1.0, clamp=True)
             glint = tree.n("ShaderNodeEmission", reflection_room(tree), tree.math("MULTIPLY", share, ROOM["brightness"]))["Emission"]
             surface = tree.n("ShaderNodeAddShader", surface, glint)["Shader"]
-        if pane:
+        if straight:
             return mix_shader(tree, tree.n("ShaderNodeLightPath")["Is Shadow Ray"], surface, clear)
         return S.eevee_refraction(tree, surface, transmittance, thickness)
 
     if body == "pane":
         settings = {"surface_render_method": "DITHERED", "use_transparent_shadow": True}
+    elif body == "over":
+        settings = {"surface_render_method": "BLENDED", "use_transparent_shadow": True, "show_transparent_back": True,
+                    "use_transparency_overlap": True}
     else:
         settings = {**S.EEVEE_REFRACTION, "thickness_mode": body.upper()}
     return lambda: S.material(bodied(name, body), build, settings=settings)
