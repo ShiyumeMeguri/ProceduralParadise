@@ -48,7 +48,9 @@ from the foot) and ``gables`` the ends whose triangles it fills; a roof set
 on walls built otherwise leaves out its eaves (``"eaves": false``), the
 top rail of those walls.  Its frame
 (``"edges"``) and its glazing (``"faces"``) are two items built from the
-one volume, every bar and pane once; with ``bars`` = [across, up] a third,
+one volume, every bar and pane once (``"parts"``: only its ``"walls"``,
+gables included, or only its ``"roof"`` -- each glazed its own way); with
+``bars`` = [across, up] a third,
 its glazing bars (``"bars"``), splits every pane but the doorways into
 that many lights, light members inside the heavy frame.  A plinth's sides lean out by
 ``batter`` metres a metre of height, its outline convex.  With ``at`` -- ``[[x, y, z(, turn)], ...]`` -- an item is
@@ -196,9 +198,10 @@ def _bars(rows, divisions, skip, vertices, edges):
                 vertices += [start, end]
 
 
-def _volume(spec, with_edges, with_faces, with_bars=False):
-    """Vertices, edges and faces of a glasshouse volume (see the module
-    notes), every coincident point and edge once."""
+def _volume(spec, with_edges, with_faces, with_bars=False, parts=("walls", "roof")):
+    """Vertices, edges and faces of a glasshouse volume's ``parts`` -- its
+    ``"walls"`` (with the gables) and its ``"roof"`` (see the module notes),
+    every coincident point and edge once."""
     x0, x1 = spec["x"]
     y0, y1 = spec["y"]
     foot, eaves = spec["z"]
@@ -233,23 +236,23 @@ def _volume(spec, with_edges, with_faces, with_bars=False):
     openings = spec.get("openings", {})
     for wall in walls:
         axis, stations, at = sides[wall]
-        patches.append(([[point(axis, along, at, z) for along in stations] for z in heights], openings.get(wall, ())))
+        patches.append(("walls", [[point(axis, along, at, z) for along in stations] for z in heights], openings.get(wall, ())))
     for wall in gables:
         axis, stations, at = sides[wall]
         across = sorted(set(stations) | {middle} | (set(slopes) if vault else set()))
-        patches.append(([[point(axis, along, at, eaves) for along in across],
-                         [point(axis, along, at, roof(along)) for along in across]], ()))
+        patches.append(("walls", [[point(axis, along, at, eaves) for along in across],
+                                  [point(axis, along, at, roof(along)) for along in across]], ()))
     if rise > 0.0:
         for edge in (x0, x1) if ridge == "y" else (y0, y1):
             positions = [edge + (middle - edge) * row / rows for row in range(rows + 1)]
             if ridge == "y":
-                patches.append(([[(position, along, roof(position)) for along in ys] for position in positions], ()))
+                patches.append(("roof", [[(position, along, roof(position)) for along in ys] for position in positions], ()))
             else:
-                patches.append(([[(along, position, roof(position)) for along in xs] for position in positions], ()))
+                patches.append(("roof", [[(along, position, roof(position)) for along in xs] for position in positions], ()))
     elif spec.get("roof", True):
-        patches.append(([[(x, y, eaves) for x in xs] for y in ys], ()))
+        patches.append(("roof", [[(x, y, eaves) for x in xs] for y in ys], ()))
     vertices, edges, faces = [], [], []
-    for rows_of_points, skip in patches:
+    for _, rows_of_points, skip in [patch for patch in patches if patch[0] in parts]:
         if with_bars:
             _bars(rows_of_points, spec["bars"], skip, vertices, edges)
         else:
@@ -341,7 +344,7 @@ def data_mesh(name, spec, folder, volumes=None):
     edges = [tuple(edge) for edge in spec.get("edges", [])] if isinstance(spec.get("edges"), list) else []
     faces = [tuple(face) for face in spec.get("faces", [])] if isinstance(spec.get("faces"), list) else []
     for kind, built in (("volume", lambda: _volume(volumes[spec["volume"]], spec.get("edges") is True, spec.get("faces") is True,
-                                                   spec.get("bars") is True)),
+                                                   spec.get("bars") is True, spec.get("parts", ("walls", "roof")))),
                         ("plinth", lambda: _plinth(spec["plinth"]))):
         if kind in spec:
             extra_vertices, extra_edges, extra_faces = built()

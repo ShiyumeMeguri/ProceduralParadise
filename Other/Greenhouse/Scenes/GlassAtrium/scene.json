@@ -2553,13 +2553,28 @@
         "name": "Front Hall Glass",
         "mesh": {
           "volume": "Front Hall",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
           "Material": "GH.GlassConservatory"
+        }
+      },
+      {
+        "name": "Front Hall Roof Glass",
+        "mesh": {
+          "volume": "Front Hall",
+          "faces": true,
+          "parts": ["roof"]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002,
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -2722,7 +2737,8 @@
         "name": "West Tower Glass",
         "mesh": {
           "volume": "West Tower",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -2762,7 +2778,8 @@
         "name": "East Tower Glass",
         "mesh": {
           "volume": "East Tower",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -2802,7 +2819,8 @@
         "name": "North West Tower Glass",
         "mesh": {
           "volume": "North West Tower",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -2842,7 +2860,8 @@
         "name": "West Wing Glass",
         "mesh": {
           "volume": "West Wing",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -2882,7 +2901,8 @@
         "name": "East Wing Glass",
         "mesh": {
           "volume": "East Wing",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -2922,13 +2942,28 @@
         "name": "West Gallery Glass",
         "mesh": {
           "volume": "West Gallery",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
           "Material": "GH.GlassConservatory"
+        }
+      },
+      {
+        "name": "West Gallery Roof Glass",
+        "mesh": {
+          "volume": "West Gallery",
+          "faces": true,
+          "parts": ["roof"]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002,
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -2962,13 +2997,28 @@
         "name": "West Hall Glass",
         "mesh": {
           "volume": "West Hall",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
           "Material": "GH.GlassConservatory"
+        }
+      },
+      {
+        "name": "West Hall Roof Glass",
+        "mesh": {
+          "volume": "West Hall",
+          "faces": true,
+          "parts": ["roof"]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002,
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -3002,13 +3052,28 @@
         "name": "East Hall Glass",
         "mesh": {
           "volume": "East Hall",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
           "Material": "GH.GlassConservatory"
+        }
+      },
+      {
+        "name": "East Hall Roof Glass",
+        "mesh": {
+          "volume": "East Hall",
+          "faces": true,
+          "parts": ["roof"]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002,
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -3042,7 +3107,8 @@
         "name": "Fern Court Glass",
         "mesh": {
           "volume": "Fern Court",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -3082,7 +3148,8 @@
         "name": "East Link Glass",
         "mesh": {
           "volume": "East Link",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
@@ -3122,13 +3189,28 @@
         "name": "East Pavilion Glass",
         "mesh": {
           "volume": "East Pavilion",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
           "Material": "GH.GlassConservatory"
+        }
+      },
+      {
+        "name": "East Pavilion Roof Glass",
+        "mesh": {
+          "volume": "East Pavilion",
+          "faces": true,
+          "parts": ["roof"]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002,
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -3162,13 +3244,28 @@
         "name": "West Pavilion Glass",
         "mesh": {
           "volume": "West Pavilion",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
           "Material": "GH.GlassConservatory"
+        }
+      },
+      {
+        "name": "West Pavilion Roof Glass",
+        "mesh": {
+          "volume": "West Pavilion",
+          "faces": true,
+          "parts": ["roof"]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002,
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -3202,13 +3299,28 @@
         "name": "East Box Glass",
         "mesh": {
           "volume": "East Box",
-          "faces": true
+          "faces": true,
+          "parts": ["walls"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
           "Material": "GH.GlassConservatory"
+        }
+      },
+      {
+        "name": "East Box Roof Glass",
+        "mesh": {
+          "volume": "East Box",
+          "faces": true,
+          "parts": ["roof"]
+        },
+        "asset": "GH.Structure.Panes",
+        "inputs": {
+          "Thickness": 0.012,
+          "Margin": 0.002,
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -3239,16 +3351,17 @@
         }
       },
       {
-        "name": "Pergola Glass",
+        "name": "Pergola Roof Glass",
         "mesh": {
           "volume": "Pergola",
-          "faces": true
+          "faces": true,
+          "parts": ["roof"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
-          "Material": "GH.GlassConservatory"
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -3279,16 +3392,17 @@
         }
       },
       {
-        "name": "Entrance Vault Glass",
+        "name": "Entrance Vault Roof Glass",
         "mesh": {
           "volume": "Entrance Vault",
-          "faces": true
+          "faces": true,
+          "parts": ["roof"]
         },
         "asset": "GH.Structure.Panes",
         "inputs": {
           "Thickness": 0.012,
           "Margin": 0.002,
-          "Material": "GH.GlassConservatory"
+          "Material": "GH.GlassRoof"
         }
       },
       {
@@ -8465,6 +8579,125 @@
         }
       },
       {
+        "name": "Forecourt Trees",
+        "at": [[-36.46, -78.0, -2.35, 312.98], [-36.46, -62.0, -2.35, 128.98000000000002], [-8.46, -78.0, -2.35, 268.98], [-8.46, -62.0, -2.35, 84.98000000000002], [9.54, -78.0, -2.35, 214.97999999999996], [9.54, -62.0, -2.35, 30.97999999999996], [37.54, -78.0, -2.35, 170.98000000000002], [37.54, -62.0, -2.35, 346.98]],
+        "asset": "GH.Flora.Umbrella",
+        "preset": "tree",
+        "size": [0.9, 1.1],
+        "inputs": {
+          "Seed": 407,
+          "Color A": "tree_leaf",
+          "Color B": "tree_leaf_light",
+          "Leaves": 3600,
+          "Leaflets": 4,
+          "Leaflet Length": 0.2,
+          "Leaflet Width": 0.1,
+          "Clumps": 60,
+          "Clump Size": 0.3,
+          "Stem": 1.2,
+          "Crown Radius": 1.6,
+          "Crown Height": 2.4
+        }
+      },
+      {
+        "name": "Forecourt Beds Beds",
+        "mesh": {
+          "vertices": [
+            [-34.46, -57.7, -3.2],
+            [-10.46, -57.7, -3.2],
+            [-10.46, -56.2, -3.2],
+            [-34.46, -56.2, -3.2],
+            [11.54, -57.7, -3.2],
+            [35.54, -57.7, -3.2],
+            [35.54, -56.2, -3.2],
+            [11.54, -56.2, -3.2],
+            [-34.46, -73.7, -3.2],
+            [-10.46, -73.7, -3.2],
+            [-10.46, -72.2, -3.2],
+            [-34.46, -72.2, -3.2],
+            [11.54, -73.7, -3.2],
+            [35.54, -73.7, -3.2],
+            [35.54, -72.2, -3.2],
+            [11.54, -72.2, -3.2]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+        },
+        "asset": "GH.Garden.Bed",
+        "inputs": {
+          "Soil": 0.14,
+          "Mound": 0.12,
+          "Kerb": 0.18
+        }
+      },
+      {
+        "name": "Forecourt Beds Understory",
+        "loc": [0.0, 0.0, 0.12],
+        "mesh": {
+          "vertices": [
+            [-34.46, -57.7, -3.2],
+            [-10.46, -57.7, -3.2],
+            [-10.46, -56.2, -3.2],
+            [-34.46, -56.2, -3.2],
+            [11.54, -57.7, -3.2],
+            [35.54, -57.7, -3.2],
+            [35.54, -56.2, -3.2],
+            [11.54, -56.2, -3.2],
+            [-34.46, -73.7, -3.2],
+            [-10.46, -73.7, -3.2],
+            [-10.46, -72.2, -3.2],
+            [-34.46, -72.2, -3.2],
+            [11.54, -73.7, -3.2],
+            [35.54, -73.7, -3.2],
+            [35.54, -72.2, -3.2],
+            [11.54, -72.2, -3.2]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Conservatory Understory",
+          "Density": 2.2,
+          "Spacing": 0.32,
+          "Scale Min": 0.9,
+          "Scale Max": 1.4,
+          "Seed": 409
+        }
+      },
+      {
+        "name": "Forecourt Beds Shrubs",
+        "loc": [0.0, 0.0, 0.12],
+        "mesh": {
+          "vertices": [
+            [-34.46, -57.7, -3.2],
+            [-10.46, -57.7, -3.2],
+            [-10.46, -56.2, -3.2],
+            [-34.46, -56.2, -3.2],
+            [11.54, -57.7, -3.2],
+            [35.54, -57.7, -3.2],
+            [35.54, -56.2, -3.2],
+            [11.54, -56.2, -3.2],
+            [-34.46, -73.7, -3.2],
+            [-10.46, -73.7, -3.2],
+            [-10.46, -72.2, -3.2],
+            [-34.46, -72.2, -3.2],
+            [11.54, -73.7, -3.2],
+            [35.54, -73.7, -3.2],
+            [35.54, -72.2, -3.2],
+            [11.54, -72.2, -3.2]
+          ],
+          "faces": [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+        },
+        "asset": "GH.Garden.Planting",
+        "inputs": {
+          "Plants": "GlassAtrium.Conservatory Shrubs",
+          "Density": 0.6,
+          "Spacing": 0.8,
+          "Scale Min": 1.0,
+          "Scale Max": 1.5,
+          "Seed": 410
+        }
+      },
+      {
         "name": "Plaza Trees",
         "at": [
           [-60.0, -87.0, -3.25, 63.0],
@@ -8827,6 +9060,26 @@
           "Color A": "leaf_light",
           "Color B": "leaf_yellow",
           "Seed": 131
+        }
+      },
+      {
+        "name": "Front Hall Front Palms",
+        "at": [[-9.0, -47.6, -3.06, 269.79999999999995], [-5.5, -47.6, -3.06, 95.29999999999995], [6.5, -47.6, -3.06, 11.300000000000011], [10.0, -47.6, -3.06, 196.8]],
+        "asset": "GH.Flora.Pinnate",
+        "preset": "areca",
+        "size": [1.2, 1.4],
+        "inputs": {
+          "Stem": 3.0,
+          "Fronds": 16,
+          "Frond Length": 2.0,
+          "Leaflets": 36,
+          "Leaflet Length": 0.45,
+          "Leaflet Width": 0.05,
+          "Spread Low": 0,
+          "Spread High": 45,
+          "Color A": "leaf_light",
+          "Color B": "leaf_yellow",
+          "Seed": 133
         }
       },
       {

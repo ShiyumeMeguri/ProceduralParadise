@@ -121,7 +121,13 @@
       "density": 0.0
     },
     "GH.GlassConservatory": {
-      "notes": "Solar-control float glass of the conservatory's walls and roofs, low in iron, with a faint cool body: its coating mirrors about a tenth of the light face on (the reflectance of a dielectric of ior 1.85), so the roofs carry the bright sky the way the glasshouse's drawings show them; seen through, it is nearly clear, through two walls and along a pane's edge a pale aqua -- each glass volume reads as light, its gardens green inside.",
+      "notes": "Clear float glass of the conservatory's walls, low in iron, with a faint cool body: face on it is nearly clear, through two walls and along a pane's edge a pale aqua -- each glass volume reads as light, its gardens green inside.",
+      "ior": 1.52,
+      "tint": "glass_aqua",
+      "density": 22.0
+    },
+    "GH.GlassRoof": {
+      "notes": "Solar-control glass of the conservatory's roofs, the walls' glass with a coating that mirrors about a tenth of the light face on (the reflectance of a dielectric of ior 1.85): the roofs carry the bright sky the way the glasshouse's drawings show them.",
       "ior": 1.85,
       "tint": "glass_aqua",
       "density": 22.0
