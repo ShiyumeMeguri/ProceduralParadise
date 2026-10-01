@@ -134,6 +134,21 @@ def planting():
     return graph
 
 
+@asset("GH.Garden.Specimens", "Garden")
+def specimens():
+    """The objects of ``Specimens`` (as one instance) on every vertex of the
+    mesh, each turned by the vertex's ``specimen_rotation`` (Euler angles)
+    and scaled by its ``specimen_scale``: one built copy in memory however
+    many places it stands."""
+    graph = GN("GH.Garden.Specimens", specimens.__doc__)
+    spots = graph.inp("Geometry", "GEOMETRY")
+    collection = graph.inp("Specimens", "COLLECTION")
+    prototype = graph.collection_info(collection, False, False)
+    graph.result(graph.iop(graph.mesh_to_points(spots), prototype, rot=graph.named("specimen_rotation", "FLOAT_VECTOR"),
+                           scale=graph.named("specimen_scale", "FLOAT_VECTOR")))
+    return graph
+
+
 @asset("GH.Env.Ground", "Environment")
 def ground():
     """Ground from a solid of the mesh (a plinth, a terrace): the faces

@@ -37,9 +37,10 @@ so a frame is a list of lines and a glazing grid a list of mullion
 positions.  A glasshouse volume (``"volumes"``) is a box of glass on
 ``x`` x ``y`` from ``z[0]`` (its foot) to ``z[1]`` (its eaves): mullions
 at ``xs`` / ``ys`` (or every ``bay``), transoms at ``transoms``, a roof
-either flat (no ``pitch``) or a gable of ``pitch`` degrees whose ridge runs
-along ``ridge`` ("x" or "y") with ``purlins`` rows of glazing bars a slope,
-and the gable ends filled up to the roof; ``walls`` names the sides it has
+either flat (no ``pitch``), a gable of ``pitch`` degrees or a barrel
+``vault`` rising that many metres in a circular arc, its ridge along
+``ridge`` ("x" or "y") with ``purlins`` rows of glazing bars a side, and
+the ends filled up to the roof; ``walls`` names the sides it has
 ("north", "south", "east", "west" -- a side against another volume is
 left out), ``openings`` the doorways in them (``{"east": [[bay, row], ...]}``:
 the glazing left out of those cells, counted from the south or west end and
@@ -47,11 +48,15 @@ from the foot) and ``gables`` the ends whose triangles it fills; a roof set
 on walls built otherwise leaves out its eaves (``"eaves": false``), the
 top rail of those walls.  Its frame
 (``"edges"``) and its glazing (``"faces"``) are two items built from the
-one volume, every bar and pane once.  A plinth's sides lean out by
+one volume, every bar and pane once; with ``bars`` = [across, up] a third,
+its glazing bars (``"bars"``), splits every pane but the doorways into
+that many lights, light members inside the heavy frame.  A plinth's sides lean out by
 ``batter`` metres a metre of height, its outline convex.  With ``at`` -- ``[[x, y, z(, turn)], ...]`` -- an item is
 copied to every spot; ``vary`` gives per-copy inputs (``[low, high]``
 uniform, ``{"pick": [...]}``, ``{"cycle": [...]}`` or ``"index"``) and
 ``turn`` / ``size`` vary the placement the same way, seeded by the name.
+Copies without ``vary`` are the same object: it is built once and
+instanced at every spot (``GH.Garden.Specimens``).
 
 Inputs are written as data: degrees for angles, palette names for colours,
 library names for materials, object and collection names for objects and
@@ -63,11 +68,14 @@ A lamp is ``{"name", "light": "SUN" | "AREA" | "POINT" | "SPOT", "power",
 "color", "angle" (sun disc, degrees), "size", "loc", and its aim: "target"
 (a point), "direction" (towards the light) or "rot"; "hidden"}``.  A probe
 is an EEVEE reflection probe of a glass room ``{"name", "volumes": [...],
-"falloff"}``: a box-projected sphere probe filling the box round the named
-glasshouse volumes (up to their ridges), so a reflection leaving the frame
-finds the room's own walls, floor and roof where they are -- not the open
-sky, and not the room as seen from one point, bent round the glass that
-mirrors it.  It fades in over the share ``falloff`` of the box.
+"up_to", "falloff"}``: a box-projected sphere probe filling the box round
+the named glasshouse volumes, so a reflection leaving the frame finds the
+room's own walls, floor and roof where they are -- not the open sky, and
+not the room as seen from one point, bent round the glass that mirrors it.
+The box reaches ``up_to`` the volumes' ``"ridge"`` for a room seen from
+inside, whose roof mirrors the room, or their ``"eaves"`` for a room seen
+from outside: its sloping roof lies outside the box and mirrors the sky.
+It fades in over the share ``falloff`` of the box.
 """
 from __future__ import annotations
 
@@ -161,7 +169,34 @@ def _stations(low, high, spec, key, bay):
     return [low + (high - low) * index / count for index in range(count + 1)]
 
 
-def _volume(spec, with_edges, with_faces):
+def _rise(spec, half):
+    """Height of a volume's roof above its eaves at the middle: a
+    ``vault``'s own rise, or a gable's of ``pitch`` over the half span."""
+    return spec.get("vault", 0.0) or math.tan(math.radians(spec.get("pitch", 0.0))) * half
+
+
+def _bars(rows, divisions, skip, vertices, edges):
+    """Glazing bars splitting every cell of the sheet ``rows`` (but the
+    ``skip`` cells) into ``divisions`` = [across, up] panes."""
+    across, up = divisions
+    skipped = {tuple(cell) for cell in skip}
+
+    def lerp(first, second, share):
+        return [a + (b - a) * share for a, b in zip(first, second)]
+
+    for j in range(len(rows) - 1):
+        for i in range(len(rows[0]) - 1):
+            if (i, j) in skipped:
+                continue
+            low_left, low_right, high_left, high_right = rows[j][i], rows[j][i + 1], rows[j + 1][i], rows[j + 1][i + 1]
+            lines = [(lerp(low_left, low_right, k / across), lerp(high_left, high_right, k / across)) for k in range(1, across)]
+            lines += [(lerp(low_left, high_left, k / up), lerp(low_right, high_right, k / up)) for k in range(1, up)]
+            for start, end in lines:
+                edges.append((len(vertices), len(vertices) + 1))
+                vertices += [start, end]
+
+
+def _volume(spec, with_edges, with_faces, with_bars=False):
     """Vertices, edges and faces of a glasshouse volume (see the module
     notes), every coincident point and edge once."""
     x0, x1 = spec["x"]
@@ -171,23 +206,29 @@ def _volume(spec, with_edges, with_faces):
     xs = _stations(x0, x1, spec, "xs", bay)
     ys = _stations(y0, y1, spec, "ys", bay)
     heights = [foot] + [float(z) for z in spec.get("transoms", [])] + [eaves]
-    pitch = math.radians(spec.get("pitch", 0.0))
     ridge = spec.get("ridge", "y")
     walls = spec.get("walls", ["north", "south", "east", "west"])
     ends = ("north", "south") if ridge == "y" else ("east", "west")
-    gables = spec.get("gables", [wall for wall in walls if wall in ends]) if pitch > 0.0 else []
     middle = (x0 + x1) * 0.5 if ridge == "y" else (y0 + y1) * 0.5
     half = (x1 - x0) * 0.5 if ridge == "y" else (y1 - y0) * 0.5
-    rise = math.tan(pitch) * half
+    rise = _rise(spec, half)
+    vault = spec.get("vault", 0.0)
+    radius = (half * half + vault * vault) / (2.0 * vault) if vault else 0.0
+    gables = spec.get("gables", [wall for wall in walls if wall in ends]) if rise > 0.0 else []
+    rows = spec.get("purlins", 4)
 
     def roof(across):
-        return eaves + rise * (1.0 - abs(across - middle) / half)
+        inset = half - abs(across - middle)
+        if vault:
+            return eaves + math.sqrt(max(radius * radius - (half - inset) ** 2, 0.0)) - (radius - vault)
+        return eaves + rise * inset / half
 
     sides = {"south": ("x", xs, y0), "north": ("x", xs, y1), "west": ("y", ys, x0), "east": ("y", ys, x1)}
 
     def point(axis, along, at, z):
         return (along, at, z) if axis == "x" else (at, along, z)
 
+    slopes = [edge + (middle - edge) * row / rows for edge in ((x0, x1) if ridge == "y" else (y0, y1)) for row in range(rows + 1)]
     patches = []
     openings = spec.get("openings", {})
     for wall in walls:
@@ -195,24 +236,27 @@ def _volume(spec, with_edges, with_faces):
         patches.append(([[point(axis, along, at, z) for along in stations] for z in heights], openings.get(wall, ())))
     for wall in gables:
         axis, stations, at = sides[wall]
-        across = sorted(set(stations) | {middle})
+        across = sorted(set(stations) | {middle} | (set(slopes) if vault else set()))
         patches.append(([[point(axis, along, at, eaves) for along in across],
                          [point(axis, along, at, roof(along)) for along in across]], ()))
-    rows = spec.get("purlins", 4)
-    if pitch > 0.0:
+    if rise > 0.0:
         for edge in (x0, x1) if ridge == "y" else (y0, y1):
+            positions = [edge + (middle - edge) * row / rows for row in range(rows + 1)]
             if ridge == "y":
-                patches.append(([[(edge + (middle - edge) * row / rows, along, eaves + rise * row / rows) for along in ys]
-                                 for row in range(rows + 1)], ()))
+                patches.append(([[(position, along, roof(position)) for along in ys] for position in positions], ()))
             else:
-                patches.append(([[(along, edge + (middle - edge) * row / rows, eaves + rise * row / rows) for along in xs]
-                                 for row in range(rows + 1)], ()))
+                patches.append(([[(along, position, roof(position)) for along in xs] for position in positions], ()))
     elif spec.get("roof", True):
         patches.append(([[(x, y, eaves) for x in xs] for y in ys], ()))
     vertices, edges, faces = [], [], []
     for rows_of_points, skip in patches:
-        _patch(rows_of_points, vertices, edges, faces, with_edges, with_faces, skip)
+        if with_bars:
+            _bars(rows_of_points, spec["bars"], skip, vertices, edges)
+        else:
+            _patch(rows_of_points, vertices, edges, faces, with_edges, with_faces, skip)
     vertices, edges, faces = _merged(vertices, edges, faces)
+    if with_bars:
+        return vertices, edges, faces
     if not spec.get("eaves", True):
         def on_eaves(index):
             x, y, z = vertices[index]
@@ -221,15 +265,16 @@ def _volume(spec, with_edges, with_faces):
     return vertices, edges, faces
 
 
-def _bounds(specs):
-    """Corners of the box round glasshouse volumes, each up to its ridge."""
+def _bounds(specs, up_to):
+    """Corners of the box round glasshouse volumes, each up to its ``ridge``
+    or its ``eaves``."""
     low, high = Vector((math.inf,) * 3), Vector((-math.inf,) * 3)
     for spec in specs:
         x0, x1 = spec["x"]
         y0, y1 = spec["y"]
         foot, eaves = spec["z"]
         span = (x1 - x0) if spec.get("ridge", "y") == "y" else (y1 - y0)
-        top = eaves + math.tan(math.radians(spec.get("pitch", 0.0))) * span * 0.5
+        top = eaves + {"ridge": _rise(spec, span * 0.5), "eaves": 0.0}[up_to]
         low = Vector(map(min, low, (x0, y0, foot)))
         high = Vector(map(max, high, (x1, y1, top)))
     return low, high
@@ -295,7 +340,8 @@ def data_mesh(name, spec, folder, volumes=None):
     vertices = [list(map(float, vertex)) for vertex in spec.get("vertices", [])]
     edges = [tuple(edge) for edge in spec.get("edges", [])] if isinstance(spec.get("edges"), list) else []
     faces = [tuple(face) for face in spec.get("faces", [])] if isinstance(spec.get("faces"), list) else []
-    for kind, built in (("volume", lambda: _volume(volumes[spec["volume"]], spec.get("edges") is True, spec.get("faces") is True)),
+    for kind, built in (("volume", lambda: _volume(volumes[spec["volume"]], spec.get("edges") is True, spec.get("faces") is True,
+                                                   spec.get("bars") is True)),
                         ("plinth", lambda: _plinth(spec["plinth"]))):
         if kind in spec:
             extra_vertices, extra_edges, extra_faces = built()
@@ -362,7 +408,7 @@ class SceneBuilder:
         scene.render.fps = self.data.get("fps", 24)
         scene.render.fps_base = 1.0
         M.world(self.data["sky"])
-        root = SC.collection(self.id)
+        root = self.root = SC.collection(self.id)
         for name, items in self.data.get("library", {}).items():
             collection = _unique(SC.collection(f"{self.id}.{name}", parent=root), f"{self.id}.{name}")
             for item in items:
@@ -412,6 +458,9 @@ class SceneBuilder:
 
     def place(self, item, collection):
         spots = self.spots(item)
+        if len(spots) > 1 and "vary" not in item:
+            self.specimens(item, collection, spots)
+            return
         generator = random.Random(f"{self.id}/{item['name']}")
         for index, (location, turn) in enumerate(spots):
             name = item["name"] if len(spots) == 1 else f"{item['name']}.{index:03d}"
@@ -427,6 +476,39 @@ class SceneBuilder:
                 self.modifier(obj, entry, varied)
             for ray, visible in item.get("visible", {}).items():
                 setattr(obj, f"visible_{ray}", visible)
+
+    def specimens(self, item, collection, spots):
+        """An item copied to several spots with no inputs of its own per
+        copy: built once at the origin, in a collection of its own that the
+        view layer leaves out, and instanced at every spot
+        (``GH.Garden.Specimens``), turned and sized as each copy would be --
+        one mesh in memory however many copies."""
+        generator = random.Random(f"{self.id}/{item['name']}")
+        holder_name = f"{self.id}.{item['name']} Specimen"
+        holder = _unique(SC.collection(holder_name, parent=self.root), holder_name)
+        name = f"{item['name']} Specimen"
+        mesh = data_mesh(name, item["mesh"], self.dir, self.data.get("volumes", {})) if "mesh" in item else bpy.data.meshes.new(name)
+        prototype = _unique(bpy.data.objects.new(name, mesh), name)
+        holder.objects.link(prototype)
+        for entry in item.get("stack") or [{"asset": item["asset"], "inputs": item.get("inputs", {}), "preset": item.get("preset")}]:
+            self.modifier(prototype, entry, {})
+        self.exclude(holder)
+        rotations, scales = [], []
+        for index, (location, turn) in enumerate(spots):
+            extra_turn = math.radians(_draw(item["turn"], index, generator)) if "turn" in item else 0.0
+            rotations.append(tuple(_rotation(item, turn + extra_turn)))
+            scales.append(tuple(_scale(item.get("scale")) * (_draw(item["size"], index, generator) if "size" in item else 1.0)))
+        points = bpy.data.meshes.new(item["name"])
+        points.from_pydata([tuple(location) for location, _ in spots], [], [])
+        for attribute_name, values in (("specimen_rotation", rotations), ("specimen_scale", scales)):
+            attribute = points.attributes.new(attribute_name, "FLOAT_VECTOR", "POINT")
+            attribute.data.foreach_set("vector", [component for value in values for component in value])
+        instancer = _unique(bpy.data.objects.new(item["name"], points), item["name"])
+        collection.objects.link(instancer)
+        self.modifier(instancer, {"asset": "GH.Garden.Specimens", "inputs": {"Specimens": holder_name}}, {})
+        for ray, visible in item.get("visible", {}).items():
+            setattr(instancer, f"visible_{ray}", visible)
+            setattr(prototype, f"visible_{ray}", visible)
 
     def modifier(self, obj, entry, varied):
         if "asset" in entry:
@@ -499,7 +581,7 @@ class SceneBuilder:
         return obj
 
     def probe(self, item, collection):
-        low, high = _bounds([self.data["volumes"][name] for name in item["volumes"]])
+        low, high = _bounds([self.data["volumes"][name] for name in item["volumes"]], item["up_to"])
         data = bpy.data.lightprobes.new(item["name"], "SPHERE")
         data.influence_type = "BOX"
         data.influence_distance = 1.0

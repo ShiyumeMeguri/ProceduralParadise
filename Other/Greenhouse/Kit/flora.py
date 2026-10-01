@@ -274,7 +274,8 @@ def umbrella_leaf(graph, leaflets, leaflet_length, leaflet_width, droop):
 def umbrella():
     """A crown of leaves gathered in clumps: ``Clumps`` clump centres lie
     through an ellipsoid crown (``Crown Radius``, ``Crown Height`` above
-    ``Stem``), and ``Leaves`` palmate leaves gather round them within
+    ``Stem``), narrowed towards its top by ``Taper`` (1: a cone, the
+    conifers), and ``Leaves`` palmate leaves gather round them within
     ``Clump Size`` of the crown radius, each facing out of its clump and up
     (``Facing``).  ``Leaflets`` 1 gives simple leaves -- the lumpy crowns of
     trees and shrubs; more give the umbrellas of schefflera.  ``Stems``
@@ -288,6 +289,7 @@ def umbrella():
     droop = graph.inp("Droop", default=math.radians(15.0), subtype="ANGLE")
     radius = graph.inp("Crown Radius", default=0.5, subtype="DISTANCE")
     height = graph.inp("Crown Height", default=0.8, subtype="DISTANCE")
+    taper = graph.inp("Taper", default=0.0, min=0.0, max=1.0)
     clumps = graph.inp("Clumps", "INT", default=8, min=1, max=400)
     clump_size = graph.inp("Clump Size", default=0.35, min=0.01, max=1.0)
     stem = graph.inp("Stem", default=0.3, subtype="DISTANCE")
@@ -306,7 +308,7 @@ def umbrella():
     azimuth = index * GOLDEN_ANGLE + graph.random(0.0, 0.5, seed)
     lift = graph.random(-0.55, 0.95, seed + 1)
     reach = graph.math("POWER", graph.random(0.0, 1.0, seed + 2), 0.5) * (1.0 - clump_size * 0.5)
-    ring = graph.math("SQRT", graph.max(1.0 - lift * lift, 0.0)) * reach
+    ring = graph.math("SQRT", graph.max(1.0 - lift * lift, 0.0)) * reach * (1.0 - taper * (lift + 1.0) * 0.5)
     unit_direction = graph.vec(graph.cos(azimuth) * ring, graph.sin(azimuth) * ring, lift * reach)
     hubs = graph.set_pos(graph.points(clumps, (0.0, 0.0, 0.0)), pos=center + graph.vmath("MULTIPLY", unit_direction, semi_axes))
 

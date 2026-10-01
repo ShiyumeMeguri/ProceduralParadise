@@ -3860,26 +3860,31 @@
     {
       "name": "Atrium Probe",
       "volumes": ["Hall"],
+      "up_to": "ridge",
       "falloff": 0.05
     },
     {
       "name": "Fern House Probe",
       "volumes": ["Fern House"],
+      "up_to": "ridge",
       "falloff": 0.05
     },
     {
       "name": "Palm House Probe",
       "volumes": ["Palm House", "Palm Lantern"],
+      "up_to": "ridge",
       "falloff": 0.05
     },
     {
       "name": "Terrace House Probe",
       "volumes": ["Terrace House"],
+      "up_to": "ridge",
       "falloff": 0.05
     },
     {
       "name": "Stair Tower Probe",
       "volumes": ["Stair Tower"],
+      "up_to": "ridge",
       "falloff": 0.05
     }
   ]
