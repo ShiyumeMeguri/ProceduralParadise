@@ -71,14 +71,17 @@ def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_i
 
 def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resolution="1", trace_quality=0.75,
                 trace_max_roughness=0.5, fast_gi=True, volume_range=None, volume_tile="8", volume_samples=64,
-                volume_distribution=0.8, volume_shadows=False):
+                volume_distribution=0.8, volume_shadows=False, shadow_pool="512", reflection_resolution="512"):
     """EEVEE with screen-space ray tracing (reflections and refraction) at
     full resolution and fast global illumination.  Volumes are evaluated on
     froxels from the camera out to ``volume_range`` ([start, end] metres;
     the camera's clip range without one), ``volume_tile`` pixels wide,
     ``volume_samples`` slices spread towards the camera by
     ``volume_distribution``; ``volume_shadows`` lets the lights cast shadows
-    inside them (sun shafts through the leaves)."""
+    inside them (sun shafts through the leaves).  ``shadow_pool`` (MB) holds
+    the shadow maps -- a dense garden under a sun overflows a small pool and
+    loses shadows; ``reflection_resolution`` is the size of every reflection
+    probe's capture."""
     sc = bpy.context.scene
     sc.render.engine = "BLENDER_EEVEE"
     ee = sc.eevee
@@ -100,6 +103,8 @@ def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resoluti
     ee.volumetric_samples = volume_samples
     ee.volumetric_sample_distribution = volume_distribution
     ee.use_volumetric_shadows = volume_shadows
+    ee.shadow_pool_size = shadow_pool
+    ee.gi_cubemap_resolution = reflection_resolution
     return sc
 
 
@@ -210,7 +215,12 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
          "vignette": {"strength": 0.2, "power": 2.0},
          "lift": [r,g,b], "gamma": [r,g,b], "gain": [r,g,b],
          "hue_sat": {"hue": 0.5, "saturation": 1.0, "value": 1.0},
-         "curves": {"C": [[x,y],...], "R": [...], "G": [...], "B": [...]}}
+         "curves": {"C": [[x,y],...], "R": [...], "G": [...], "B": [...]},
+         "grade": {...}, "engine_transfer": {...}}   (Core.grade dicts)
+
+    The ``grade`` carries the look of the scene; the ``engine_transfer``
+    after it carries the render engine's own response onto the look the
+    grade was made for (a shot fitted on another engine's renders).
 
     ``lines_layer`` (from :func:`lines`) is laid over the render first, with
     the premultiplied over Freestyle itself uses on a combined pass, so the
@@ -288,6 +298,10 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
     if look.get("grade"):
         from .grade import grade_nodes
         img = grade_nodes(t, img, look["grade"])
+
+    if look.get("engine_transfer"):
+        from .grade import grade_nodes
+        img = grade_nodes(t, img, look["engine_transfer"])
 
     if any(k in look for k in ("lift", "gamma", "gain")):
         cb = t.n("CompositorNodeColorBalance")
