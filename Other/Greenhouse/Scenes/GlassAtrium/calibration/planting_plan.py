@@ -82,11 +82,14 @@ class Pinhole:
         return np.c_[self.f * local[:, 0] / local[:, 2] + self.cx, self.f * local[:, 1] / local[:, 2] + self.cy], local[:, 2]
 
 
-def foliage_mask(image):
+def foliage_mask(image, hue_max=100):
+    """Painted foliage of a full-size ``image``: saturated hues from yellow-green
+    through the teal shade to ``hue_max`` (OpenCV hue, half degrees; 100 takes
+    in the blue depths of the shade), in blobs wider than the glazing bars."""
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hue, saturation, value = (hsv[..., k].astype(int) for k in range(3))
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (BLOB, BLOB))
-    foliage = (hue >= 24) & (hue <= 100) & (saturation >= 70) & (value >= 40)
+    foliage = (hue >= 24) & (hue <= hue_max) & (saturation >= 70) & (value >= 40)
     return cv2.morphologyEx(foliage.astype(np.uint8), cv2.MORPH_OPEN, kernel) > 0
 
 

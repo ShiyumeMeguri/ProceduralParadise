@@ -4,16 +4,22 @@ by object.
 
 Every plant object -- a painted specimen, a planting prototype with all its
 instances, a tree outside -- grows its leaves between two colours
-(``Color A``, ``Color B``).  The painting shows the colour each plant has
-where it catches the sun and where it lies in shade; the render, lit by the
-fitted lights and seen as the light fit sees it -- without the shot's look,
-whose grade is fitted last -- shows what the plant's colours give there.
-So the pixels of each plant in the shot (an object-ID
-render: every object an emission of its own colour, glass that the ink pass
-sees through left clear) are split at their median luminance, and in each
-half the median linear colour of the painting is compared with the
-render's.  Light is linear in albedo, so both leaf colours are scaled
-channel by channel by the geometric mean of the two halves' ratios --
+(``Color A``, ``Color B``).  The colour a leaf is made of shows where the
+sun falls on it: in shade the painter colours every leaf with the blue of
+the shade, and that blue belongs to the skylight, not to the leaf.  So the
+pixels of each plant in the shot (an object-ID render: every object an
+emission of its own colour, glass that the ink pass sees through left
+clear), less those the painting does not paint as foliage
+(``planting_plan.foliage_mask``: not the floor, the haze or the glass behind
+a rendered leaf), are split at their median luminance, and the median
+linear colour of the painting's lighter half is compared with the
+render's -- the render lit by the fitted lights and seen as the light fit
+sees it, without the shot's look, whose grade is fitted last.  A plant is
+fitted only where the painting shows sunlit leaves over it: at least
+``MIN_PIXELS`` of its pixels painted yellow-green to green (the foliage
+mask up to ``SUNLIT_HUE_MAX``), not only the teal shade or the cyan glass of
+the stair, whose colours say nothing of the leaf.  Light is linear in albedo, so
+both leaf colours are scaled channel by channel by that ratio --
 ``DAMPING`` of the way, by no more than ``STEP`` either way in one round --
 and then brought back to their own luminance (``LUMINANCE``), never past
 ``ALBEDO_MAX``, and written into scene.json as the object's own colours.
@@ -22,8 +28,8 @@ with rendered ones leaf for leaf, so the painting inside a rendered plant's
 outline mixes the plant with its neighbours, and its brightness regresses
 towards the garden's mean -- fitted, it would flatten the garden's light
 and shade -- while its hue still tells the plant's colour.  The brightness
-of the leaves is the light's.  Plants that show fewer than ``MIN_PIXELS``
-clear pixels keep theirs.
+of the leaves is the light's.  Plants without that much sunlit foliage keep
+their colours.
 
 Alternate with the light fit until neither moves, then fit the grade::
 
@@ -39,7 +45,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = os.path.dirname(HERE)
 ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", "..", ".."))
-for path in (ROOT, os.path.join(ROOT, "Other")):
+for path in (ROOT, os.path.join(ROOT, "Other"), HERE):
     if path not in sys.path:
         sys.path.insert(0, path)
 
@@ -52,6 +58,7 @@ DAMPING = 0.8
 STEP = 2.0
 ALBEDO_MAX = 0.95
 MIN_PIXELS = 150
+SUNLIT_HUE_MAX = 75
 ID_LEVELS = 7
 LUMINANCE = np.array([0.2126, 0.7152, 0.0722])
 
@@ -132,12 +139,10 @@ def encoded(color):
     return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(np.maximum(c, 1e-9), 1.0 / 2.4) - 0.055) * 255.0
 
 
-def halves(lin):
-    """Median linear colour of the darker and of the lighter half."""
-    luminance = lin @ LUMINANCE
-    order = np.argsort(luminance)
-    middle = len(order) // 2
-    return np.median(lin[order[:middle]], axis=0), np.median(lin[order[middle:]], axis=0)
+def lighter_half(lin):
+    """Median linear colour of the lighter half of the pixels ``lin``."""
+    order = np.argsort(lin @ LUMINANCE)
+    return np.median(lin[order[len(order) // 2:]], axis=0)
 
 
 def plants(scene, presets):
@@ -164,11 +169,15 @@ def main(argv):
     import cv2
     from Core.jsonio import dump
     from Greenhouse import PALETTE, PLANTS
+    from planting_plan import foliage_mask
     shot = cv2.imread(os.path.join(work, "shot.png"))
     ids = cv2.imread(os.path.join(work, "ids.png"))[:, :, ::-1].astype(np.float64)
     colors = json.load(open(os.path.join(work, "ids.json"), encoding="utf-8"))
     height, width = shot.shape[:2]
-    painting = cv2.resize(cv2.imread(REFERENCE), (width, height), interpolation=cv2.INTER_AREA)
+    reference = cv2.imread(REFERENCE)
+    painted_foliage = cv2.resize(foliage_mask(reference).astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST) > 0
+    painted_sunlit = cv2.resize(foliage_mask(reference, SUNLIT_HUE_MAX).astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST) > 0
+    painting = cv2.resize(reference, (width, height), interpolation=cv2.INTER_AREA)
     with open(SCENE_JSON, encoding="utf-8") as handle:
         scene = json.load(handle)
     growing = plants(scene, PLANTS)
@@ -178,13 +187,11 @@ def main(argv):
     for name, item in sorted(growing.items()):
         if name not in colors:
             continue
-        mask = (np.abs(ids - encoded(colors[name])).sum(axis=2) < 6.0).astype(np.uint8)
-        mask = cv2.erode(mask, kernel) > 0
-        if mask.sum() < MIN_PIXELS:
+        plant = cv2.erode((np.abs(ids - encoded(colors[name])).sum(axis=2) < 6.0).astype(np.uint8), kernel) > 0
+        if (plant & painted_sunlit).sum() < MIN_PIXELS:
             continue
-        painted_shade, painted_lit = halves(painting_linear[mask])
-        rendered_shade, rendered_lit = halves(shot_linear[mask])
-        ratio = np.sqrt((painted_shade / np.maximum(rendered_shade, 1e-4)) * (painted_lit / np.maximum(rendered_lit, 1e-4)))
+        mask = plant & painted_foliage
+        ratio = lighter_half(painting_linear[mask]) / np.maximum(lighter_half(shot_linear[mask]), 1e-4)
         factor = np.clip(ratio ** DAMPING, 1.0 / STEP, STEP)
         inputs = item.setdefault("inputs", {})
         preset = PLANTS.get(item.get("preset"), {})
