@@ -71,7 +71,8 @@ def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_i
 
 def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resolution="1", trace_quality=0.75,
                 trace_max_roughness=0.5, fast_gi=True, volume_range=None, volume_tile="8", volume_samples=64,
-                volume_distribution=0.8, volume_shadows=False, shadow_pool="512", reflection_resolution="512"):
+                volume_distribution=0.8, volume_shadows=False, shadow_pool="512", reflection_resolution="512",
+                light_threshold=0.01, shadow_resolution=1.0):
     """EEVEE with screen-space ray tracing (reflections and refraction) at
     full resolution and fast global illumination.  Volumes are evaluated on
     froxels from the camera out to ``volume_range`` ([start, end] metres;
@@ -81,7 +82,11 @@ def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resoluti
     inside them (sun shafts through the leaves).  ``shadow_pool`` (MB) holds
     the shadow maps -- a dense garden under a sun overflows a small pool and
     loses shadows; ``reflection_resolution`` is the size of every reflection
-    probe's capture."""
+    probe's capture.  A light reaches only as far as its light falls to
+    ``light_threshold``: a studio of many faint lights, each fitted as if it
+    reached everywhere, needs it near zero.  ``shadow_resolution`` scales
+    every shadow map: a studio of hundreds of soft boxes casts soft shadows
+    that coarse maps hold, and fine ones would overflow the shadow pages."""
     sc = bpy.context.scene
     sc.render.engine = "BLENDER_EEVEE"
     ee = sc.eevee
@@ -105,6 +110,8 @@ def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resoluti
     ee.use_volumetric_shadows = volume_shadows
     ee.shadow_pool_size = shadow_pool
     ee.gi_cubemap_resolution = reflection_resolution
+    ee.light_threshold = light_threshold
+    ee.shadow_resolution_scale = shadow_resolution
     return sc
 
 
@@ -216,11 +223,18 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
          "lift": [r,g,b], "gamma": [r,g,b], "gain": [r,g,b],
          "hue_sat": {"hue": 0.5, "saturation": 1.0, "value": 1.0},
          "curves": {"C": [[x,y],...], "R": [...], "G": [...], "B": [...]},
-         "grade": {...}, "engine_transfer": {...}}   (Core.grade dicts)
+         "grade": {...}, "engine_transfer": {...},   (Core.grade dicts)
+         "backdrop": [r, g, b]}
 
     The ``grade`` carries the look of the scene; the ``engine_transfer``
     after it carries the render engine's own response onto the look the
     grade was made for (a shot fitted on another engine's renders).
+
+    A ``backdrop`` is the sheet a transparent render is laid on (the shot's
+    ``render.transparent``), last of all: a drawing's paper, which must not
+    light the subject -- a world showing it to the camera would, since
+    screen-space light and reflections take whatever the camera sees
+    behind the subject for light.
 
     ``lines_layer`` (from :func:`lines`) is laid over the render first, with
     the premultiplied over Freestyle itself uses on a combined pass, so the
@@ -348,6 +362,14 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
                 curve.points.new(x, y)
         mapping.update()
         img = cv.o
+
+    if look.get("backdrop"):
+        over = t.n("CompositorNodeAlphaOver")
+        background, foreground = [s for s in over.n.inputs if s.type == "RGBA"][:2]
+        background.default_value = (*look["backdrop"], 1.0)
+        t.link(img, foreground)
+        _set(over, "Straight Alpha", False)
+        img = over.o
 
     if new_api:
         out = t.n("NodeGroupOutput")

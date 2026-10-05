@@ -127,7 +127,8 @@ def shot_cameras(shot, matrix):
 
 def render_setup(shot, args, lines_defaults=None):
     """Render engine (the shot's ``render.engine``: CYCLES or EEVEE, with its
-    settings under ``render.cycles`` / ``render.eevee``), colour management
+    settings under ``render.cycles`` / ``render.eevee``; ``render.transparent``
+    for a film laid on the look's backdrop), colour management
     and the compositor look of a shot -- without its ``grade`` for
     ``--no-grade`` (the image a new grade is fitted on), without its
     ``engine_transfer`` for ``--no-transfer`` (the image a transfer is
@@ -144,6 +145,7 @@ def render_setup(shot, args, lines_defaults=None):
     engine = settings["engine"]
     RND.ENGINES[engine](samples=args.samples or settings.get("samples", 128),
                         **settings.get(engine.lower(), {}))
+    sc.render.film_transparent = settings.get("transparent", False)
     view = shot["views"][args.view] if args.view else None
     exposure = (view or {}).get("exposure", settings.get("exposure", 0.0))
     compositor = None

@@ -15,6 +15,12 @@ image (all in pixels of the reference resolution)::
       "dof":          {"focus_distance": 0.45, "fstop": 2.8}   # optional depth of field
     }
 
+An orthographic camera -- the elevation a design sheet is drawn as --
+gives ``ortho_width`` (metres the frame's width spans) instead of
+``focal_px``, and its ``clip`` ([near, far], metres) close round the
+subject: its depth is linear, and over the default 20 km two faces a
+quarter of a millimetre apart share one depth step.
+
 Blender cameras express the principal point through ``shift_x/shift_y`` in
 units of the sensor dimension the camera is fitted to -- the image width,
 since every camera here fits the sensor horizontally, portrait frames
@@ -33,10 +39,9 @@ __all__ = ["camera_from_solve", "look_camera", "project_points", "solve_intrinsi
 
 def solve_intrinsics(solve):
     W, H = solve["resolution"]
-    f_px = solve["focal_px"]
     cx, cy = solve.get("principal_px", (W / 2, H / 2))
     sensor = 36.0
-    lens = f_px / W * sensor
+    lens = solve["focal_px"] / W * sensor if "focal_px" in solve else None
     shift_x = (W / 2 - cx) / W
     shift_y = (cy - H / 2) / W
     return dict(lens=lens, sensor=sensor, shift_x=shift_x, shift_y=shift_y, W=W, H=H)
@@ -58,10 +63,14 @@ def camera_from_solve(name, solve, parent_matrix=None, collection=None, set_acti
     cam = bpy.data.cameras.new(name)
     cam.sensor_fit = "HORIZONTAL"
     cam.sensor_width = intr["sensor"]
-    cam.lens = intr["lens"]
+    if "ortho_width" in solve:
+        cam.type = "ORTHO"
+        cam.ortho_scale = solve["ortho_width"]
+    else:
+        cam.lens = intr["lens"]
     cam.shift_x = intr["shift_x"]
     cam.shift_y = intr["shift_y"]
-    cam.clip_start, cam.clip_end = clip
+    cam.clip_start, cam.clip_end = solve.get("clip", clip)
     ob = bpy.data.objects.new(name, cam)
     (collection or bpy.context.scene.collection).objects.link(ob)
     local = (Matrix.Translation(Vector(solve["location"]))
