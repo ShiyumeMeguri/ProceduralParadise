@@ -27,8 +27,8 @@ brighter) finds the lowest of the objective's valleys.
 
 Two steps, because Blender's Python has no SciPy::
 
-    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py -- groups.npz [--samples 64] [--scale 0.25]
-    python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py groups.npz [--apply]
+    blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_lights.py -- groups.npz [--samples 64] [--scale 0.25]
+    python Other/Greenhouse/GlassAtrium/calibration/fit_lights.py groups.npz [--apply]
 
 ``--apply`` multiplies the scene's strengths by the result: the daylight's
 (the sun lamps' power, and the sky's strengths set to ``sun_ratio`` of
@@ -43,7 +43,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = os.path.dirname(HERE)
-ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", ".."))
 for path in (ROOT, os.path.join(ROOT, "Other")):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -74,7 +74,7 @@ def render_groups(out, samples, scale):
     import tempfile
     ns = {}
     exec(compile(open(os.path.join(ROOT, "Other", "build.py"), encoding="utf-8").read(), "build.py", "exec"), ns)
-    context = ns["main"](["x", "--", "Greenhouse/Scenes/GlassAtrium", "--no-save", "--no-look", "--samples", str(samples)])
+    context = ns["main"](["x", "--", "Greenhouse/GlassAtrium", "--no-save", "--no-look", "--samples", str(samples)])
     from Core import driver
     driver.activate_still(context)
     scene = bpy.context.scene

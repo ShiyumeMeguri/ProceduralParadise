@@ -5,9 +5,9 @@ SIFT 特征 + 仿射，内点残差 1.0 px）。人物不在还原范围内，�
 渲染：`Renders/Nitia.png`（原画机位，和原画同分辨率），`Renders/view_*.png`（自由机位）。
 
 ```bash
-blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium                           # 构建并保存 Build/Greenhouse/GlassAtrium/GlassAtrium.blend
-blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium --render nitia.png        # 原画机位
-blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium --view overview --render overview.png
+blender -b -P Other/build.py -- Greenhouse/GlassAtrium                           # 构建并保存 Build/Greenhouse/GlassAtrium/GlassAtrium.blend
+blender -b -P Other/build.py -- Greenhouse/GlassAtrium --render nitia.png        # 原画机位
+blender -b -P Other/build.py -- Greenhouse/GlassAtrium --view overview --render overview.png
 ```
 
 自由机位：`gallery`（画廊）、`garden`（从中庭地面往上看）、`stair`（楼梯平台）、`overview`（全景鸟瞰）、`table`（边桌特写）、
@@ -175,8 +175,8 @@ Cycles 里光在块里多次全反射，走得更长、更翠，EEVEE 没有这�
 Cycles 上做的，结果锁定（第 4 节）；换引擎只拟合引擎转换：
 
 ```bash
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_engine.py -- untransferred.png --samples 48 --scale 0.25
-python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_engine.py untransferred.png --write
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_engine.py -- untransferred.png --samples 48 --scale 0.25
+python Other/Greenhouse/GlassAtrium/calibration/fit_engine.py untransferred.png --write
 ```
 
 目标 = 1/60 画宽高斯模糊后的显示值误差 + 画面五条横带各自的 CIELAB 分位数误差
@@ -184,8 +184,8 @@ python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_engine.py untransferr
 每块玻璃都会映出一层乳白。
 
 ```bash
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py -- groups.npz --samples 48 --scale 0.25
-python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py groups.npz --apply
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_lights.py -- groups.npz --samples 48 --scale 0.25
+python Other/Greenhouse/GlassAtrium/calibration/fit_lights.py groups.npz --apply
 ```
 
 **调色**（`calibration/fit_grade.py`，灯光之后）：原画的阴影是深青、绿叶饱满、高光粉亮；只拟合光强的渲染在这些地方是灰平的。
@@ -201,8 +201,8 @@ python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_lights.py groups.npz 
 亮度交给灯光。
 
 ```bash
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_foliage.py -- foliage_dir --samples 48 --scale 0.25
-python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_foliage.py foliage_dir --write
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_foliage.py -- foliage_dir --samples 48 --scale 0.25
+python Other/Greenhouse/GlassAtrium/calibration/fit_foliage.py foliage_dir --write
 ```
 
 调色是三条逐通道的色调曲线，把"带着镜头观感（墨线、柔光）但不带调色"（`--no-grade`）的渲染的直方图对到去人物原画的直方图。
@@ -210,8 +210,8 @@ python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_foliage.py foliage_di
 （模糊色调误差 + 分带分位数，`fit_lights.Target`）取最低——本镜头取 0.85。
 
 ```bash
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_grade.py -- ungraded.png --samples 48 --scale 0.25
-python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_grade.py ungraded.png --write
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_grade.py -- ungraded.png --samples 48 --scale 0.25
+python Other/Greenhouse/GlassAtrium/calibration/fit_grade.py ungraded.png --write
 ```
 
 原画是暖光照亮处偏黄、阴影偏青的画法。Cycles 时期，下面这些想把渲染往那边推的物理改动，都和各自的基线成对比较过（四分之一尺寸，
@@ -234,10 +234,10 @@ python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_grade.py ungraded.png
 只有零头。按原画拟合过位置的画廊陈设（方瓶、烧瓶、边桌和桌上物件）不参与挪动。
 
 ```bash
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm,Roof Vines" --field seed --tries 6
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Painted Banana,Painted Dracaena" --field move --step 0.2
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Sun" --field aim --step 1
-blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Areca Palm" --field input --input "Leaflet Width" --step 0.2
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm,Roof Vines" --field seed --tries 6
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/layout_search.py -- "Painted Banana,Painted Dracaena" --field move --step 0.2
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/layout_search.py -- "Sun" --field aim --step 1
+blender -b -P Other/Greenhouse/GlassAtrium/calibration/layout_search.py -- "Areca Palm" --field input --input "Leaflet Width" --step 0.2
 ```
 
 ## 6. 与去人物参考画的定量对比（`Renders/Nitia.png`，2166 × 3000）
@@ -312,7 +312,7 @@ blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -
   `atrium_up`、`stair_tower`、`third_floor`、`bridge`。
 
 ```bash
-blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium --view hero --render hero.png
+blender -b -P Other/build.py -- Greenhouse/GlassAtrium --view hero --render hero.png
 ```
 
 原画机位的回归：新东西都放在原画视野和它们的影子之外，每一步都对原画机位的探针（四分之一尺寸）比过。整座温室最初加上、

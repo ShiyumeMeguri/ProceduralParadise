@@ -5,7 +5,7 @@ Sub-packages
 ------------
 Kit      geometry-node assets: the props' shapes, their simulations (on
          Core.physics) and the material library (EEVEE)
-Scenes   scene definitions (one folder per prop) assembled from the kit
+<Prop>/  one folder per prop (scene.json, shots, README) assembled from the kit
 
 ``PROPS`` is the design system loaded from ``Props.json``: palette and
 liquid presets.

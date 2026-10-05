@@ -5,7 +5,8 @@ Sub-packages
 Kit      geometry-node assets: the steel-and-glass structure, furniture,
          glassware, plants and the outdoor backdrop, and the material
          library (Cycles)
-Scenes   scene definitions (one folder per space) assembled from the kit
+<Space>/ one folder per space (scene.json, shots, reference, renders) assembled
+         from the kit
 
 ``GREENHOUSE`` is the design system loaded from ``Greenhouse.json``: the
 palette, the glasses and the plant presets every scene of the family

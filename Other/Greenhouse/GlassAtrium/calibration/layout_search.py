@@ -34,7 +34,7 @@ whole garden better or worse, never be picked piecewise.
 One Blender session changes the objects in place and renders again, so a
 try costs one small render::
 
-    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm" [--field seed|move|turn|size|aim|input] [--input NAME] [--tries 6] [--step S] [--rounds 1] [--samples 32] [--scale 0.25]
+    blender -b -P Other/Greenhouse/GlassAtrium/calibration/layout_search.py -- "Ground Painted,Areca Palm" [--field seed|move|turn|size|aim|input] [--input NAME] [--tries 6] [--step S] [--rounds 1] [--samples 32] [--scale 0.25]
 
 writes the chosen values into scene.json.  Run it last: lighting and
 material fits change what the best garden is.
@@ -49,7 +49,7 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = os.path.dirname(HERE)
-ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", ".."))
 for path in (ROOT, os.path.join(ROOT, "Other")):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -263,7 +263,7 @@ def main(argv):
     scale = option("--scale", 0.25, float)
     ns = {}
     exec(compile(open(os.path.join(ROOT, "Other", "build.py"), encoding="utf-8").read(), "build.py", "exec"), ns)
-    context = ns["main"](["x", "--", "Greenhouse/Scenes/GlassAtrium", "--no-save", "--samples", str(samples)])
+    context = ns["main"](["x", "--", "Greenhouse/GlassAtrium", "--no-save", "--samples", str(samples)])
     driver.activate_still(context)
     scene = bpy.context.scene
     scene.render.resolution_percentage = int(round(scale * 100))

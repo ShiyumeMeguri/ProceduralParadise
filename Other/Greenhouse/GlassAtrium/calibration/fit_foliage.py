@@ -33,8 +33,8 @@ their colours.
 
 Alternate with the light fit until neither moves, then fit the grade::
 
-    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_foliage.py -- work_dir [--samples 48] [--scale 0.25]
-    python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_foliage.py work_dir [--write]
+    blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_foliage.py -- work_dir [--samples 48] [--scale 0.25]
+    python Other/Greenhouse/GlassAtrium/calibration/fit_foliage.py work_dir [--write]
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = os.path.dirname(HERE)
-ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", ".."))
 for path in (ROOT, os.path.join(ROOT, "Other"), HERE):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -78,7 +78,7 @@ def render(work, samples, scale):
     import bpy
     ns = {}
     exec(compile(open(os.path.join(ROOT, "Other", "build.py"), encoding="utf-8").read(), "build.py", "exec"), ns)
-    context = ns["main"](["x", "--", "Greenhouse/Scenes/GlassAtrium", "--no-save", "--no-look", "--samples", str(samples), "--scale", str(scale)])
+    context = ns["main"](["x", "--", "Greenhouse/GlassAtrium", "--no-save", "--no-look", "--samples", str(samples), "--scale", str(scale)])
     from Core import driver
     from Core.render import INK_SKIP
     driver.activate_still(context)

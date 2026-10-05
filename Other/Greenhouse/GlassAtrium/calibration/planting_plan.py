@@ -21,7 +21,7 @@ where the painted canopy behind is the trees outside), the paths to the
 doorways of the wings -- and so does the floor under the garden furniture
 of the scene (``FURNITURE_MARGIN`` round it).
 
-    python Other/Greenhouse/Scenes/GlassAtrium/calibration/planting_plan.py
+    python Other/Greenhouse/GlassAtrium/calibration/planting_plan.py
 
 writes ``data/planting.json``: cell meshes ``ground`` (up to ``GROUND`` m),
 ``understory`` (up to ``UNDERSTORY`` m), ``shrubs`` (taller), ``designed``
@@ -37,7 +37,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = os.path.dirname(HERE)
-ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 

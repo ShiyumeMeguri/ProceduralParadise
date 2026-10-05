@@ -16,8 +16,8 @@ nearest the anchor (``fit_lights.Target`` with the anchor as its target).
 
 Two steps, because Blender's Python has no OpenCV::
 
-    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_engine.py -- untransferred.png [--samples 48] [--scale 0.25]
-    python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_engine.py untransferred.png [--write]
+    blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_engine.py -- untransferred.png [--samples 48] [--scale 0.25]
+    python Other/Greenhouse/GlassAtrium/calibration/fit_engine.py untransferred.png [--write]
 
 ``--write`` stores the curves in shots/Nitia.json -> look.engine_transfer.
 """
@@ -29,7 +29,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = os.path.dirname(HERE)
-ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", ".."))
 for path in (ROOT, os.path.join(ROOT, "Other"), HERE):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -45,7 +45,7 @@ def render_untransferred(out, samples, scale):
     import bpy
     ns = {}
     exec(compile(open(os.path.join(ROOT, "Other", "build.py"), encoding="utf-8").read(), "build.py", "exec"), ns)
-    context = ns["main"](["x", "--", "Greenhouse/Scenes/GlassAtrium", "--no-save", "--no-transfer", "--samples", str(samples), "--scale", str(scale)])
+    context = ns["main"](["x", "--", "Greenhouse/GlassAtrium", "--no-save", "--no-transfer", "--samples", str(samples), "--scale", str(scale)])
     from Core import driver
     driver.activate_still(context)
     bpy.context.scene.render.filepath = out

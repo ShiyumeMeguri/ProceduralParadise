@@ -14,8 +14,8 @@ ink, glare -- but without a grade, the image the grade is applied to.
 
 Two steps, because Blender's Python has no OpenCV::
 
-    blender -b -P Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_grade.py -- ungraded.png [--samples 48] [--scale 0.25]
-    python Other/Greenhouse/Scenes/GlassAtrium/calibration/fit_grade.py ungraded.png [--write]
+    blender -b -P Other/Greenhouse/GlassAtrium/calibration/fit_grade.py -- ungraded.png [--samples 48] [--scale 0.25]
+    python Other/Greenhouse/GlassAtrium/calibration/fit_grade.py ungraded.png [--write]
 
 ``--write`` stores the grade in shots/Nitia.json -> look.grade.  Fit it
 after the lights (``fit_lights.py``).
@@ -28,7 +28,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCENE = os.path.dirname(HERE)
-ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", "..", ".."))
+ROOT = os.path.abspath(os.path.join(SCENE, "..", "..", ".."))
 for path in (ROOT, os.path.join(ROOT, "Other"), HERE):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -44,7 +44,7 @@ def render_ungraded(out, samples, scale):
     import bpy
     ns = {}
     exec(compile(open(os.path.join(ROOT, "Other", "build.py"), encoding="utf-8").read(), "build.py", "exec"), ns)
-    context = ns["main"](["x", "--", "Greenhouse/Scenes/GlassAtrium", "--no-save", "--no-grade", "--samples", str(samples), "--scale", str(scale)])
+    context = ns["main"](["x", "--", "Greenhouse/GlassAtrium", "--no-save", "--no-grade", "--samples", str(samples), "--scale", str(scale)])
     from Core import driver
     driver.activate_still(context)
     bpy.context.scene.render.filepath = out

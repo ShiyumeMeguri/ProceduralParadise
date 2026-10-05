@@ -12,14 +12,14 @@ README.md is inside as the text ``Guide``).
 * Command line (Blender 5.3)::
 
       blender -b -P Other/build.py
-      blender -b -P Other/build.py -- Props/Scenes/Slime
-      blender -b -P Other/build.py -- Props/Scenes/WaterBalloon --out balloon.blend
-      blender -b -P Other/build.py -- Greenhouse/Scenes/GlassAtrium --render atrium.png
+      blender -b -P Other/build.py -- Props/Slime
+      blender -b -P Other/build.py -- Props/WaterBalloon --out balloon.blend
+      blender -b -P Other/build.py -- Greenhouse/GlassAtrium --render atrium.png
       blender -b -P Other/build.py -- --render still.png
 
 Arguments (all optional)
 ------------------------
-scene                scene folder relative to Other/ (default Props/Scenes/ShishiOdoshi)
+scene                <family>/<item> folder relative to Other/ (default Props/ShishiOdoshi)
 --shot NAME          shot in <scene>/shots/ that is the active camera and look
                      (default: scene.json "defaults")
 --out PATH           .blend to write (default Build/<Family>/<Scene>/<Scene>.blend)
@@ -68,7 +68,7 @@ def _locate_here():
 HERE = _locate_here()
 ROOT = os.path.dirname(HERE)
 BUILD_DIR = os.path.join(ROOT, "Build")
-DEFAULT_SCENE = "Props/Scenes/ShishiOdoshi"
+DEFAULT_SCENE = "Props/ShishiOdoshi"
 for path in (ROOT, HERE):
     if path not in sys.path:
         sys.path.insert(0, path)
