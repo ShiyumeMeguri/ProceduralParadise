@@ -30,6 +30,12 @@
 
   ![Glass atrium](Other/Greenhouse/GlassAtrium/Renders/Nitia.png)
 
+* **设定集镰刀（Other / Weapons / Scythe）**：一页武器设定的侧视图与端视图还原成可以自由换机位的立体镰刀——转子机头、
+  折叠支撑、管柄、握把拨杆、刃上的字；轮廓在设定图上逐个描到亚像素，厚度取自端视图，凹凸照一张对齐到设定图的法线图读出，
+  影棚的柔光箱与每种表面处理的颜色对着设定图拟合。详见 [`Other/Weapons/Scythe/README.md`](Other/Weapons/Scythe/README.md)。
+
+  ![Scythe](Other/Weapons/Scythe/Renders/Sheet.png)
+
 * **小物件（Other / Props）**：不属于任何世界的交互模板，全部用几何节点写的物理：戳得动、拎得起的**水气球**，
   被戳死后流出黏液的**史莱姆**，喷水棍注水、装满翻倒再敲回石头的**惊鹿**。打开 `.blend` 按空格播放就能玩，
   每个小物件的玩法写在 `Other/Props/<小物件>/README.md`（也放在 `.blend` 里的文本 `Guide`），EEVEE 渲染。
@@ -85,6 +91,7 @@ blender -b -P BlueArchive/build.py -- --view reverse --render reverse.png
 **小物件模板**：`blender -b -P Other/build.py -- Props/ShishiOdoshi`（或 `Slime`、`WaterBalloon`），
 存到 `Build/Props/<小物件>/<小物件>.blend`；在 Blender 界面里打开 `Other/build.py` 运行即可。
 **玻璃中庭温室**：`blender -b -P Other/build.py -- Greenhouse/GlassAtrium`，存到 `Build/Greenhouse/GlassAtrium/GlassAtrium.blend`。
+**设定集镰刀**：`blender -b -P Other/build.py -- Weapons/Scythe`，存到 `Build/Weapons/Scythe/Scythe.blend`。
 
 **其他房间**：在参数最前面写房间目录（相对 `BlueArchive/`）。在 Blender 界面里运行时，把 `build.py` 顶部的
 `DEFAULT_ROOM` 改成这个目录即可。例如山海经茶楼：
@@ -142,6 +149,8 @@ Other/
                           花园与窗外环境、材质）、scenes.py 解释器、GlassAtrium/（玻璃中庭）
   Props/                  无归属的小物件：Props.json 设计系统、Kit/ GN 资产库（形状、材质、喷水棍、水气球、史莱姆、惊鹿、摄影台）、
                           scenes.py 解释器、choreography.py 预设动作、WaterBalloon/、Slime/、ShishiOdoshi/
+  Weapons/                武器：Weapons.json 设计系统（色板、表面处理）、Kit/ GN 资产库（按轮廓长出的板件、环、刃、字与笔画、材质）、
+                          scenes.py 解释器、Scythe/（weapon.json 部件与灯光、trace.json 描出的轮廓、calibration/ 描轮廓、凹凸对照与影棚拟合）
 Build/                    构建输出（.blend、视频），git 忽略
 ```
 

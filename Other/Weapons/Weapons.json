@@ -1,0 +1,82 @@
+{
+  "id": "Weapons",
+  "name": "Weapons (武器)",
+  "units": "a weapon is drawn in the units of its design sheet (pixels of the scan); its weapon.json gives the metres per unit and the sheet pixel the origin sits on",
+  "notes": ["Colours are linear RGB.  In weapon data a colour input may name a palette entry instead of giving RGB.", "A finish is a palette colour with its roughness, metallicness and (for a light) emission strength; every part names the finish it is made of.", "The studio is the light a design sheet is drawn under: a dim world and the soft boxes each weapon's studio fit places before it.  The paper is no part of it: a shot renders on transparent film laid on the paper (its look's backdrop), so the paper never lights the weapon."],
+  "palette": {
+    "housing": [0.015, 0.015, 0.014],
+    "polymer": [0.22, 0.22, 0.2],
+    "blackened": [0.06, 0.06, 0.058],
+    "steel": [0.85, 0.86, 0.83],
+    "brushed": [0.55, 0.57, 0.53],
+    "enamel": [0.8, 0.81, 0.77],
+    "paint": [0.85, 0.86, 0.83],
+    "accent": [0.32, 0.86, 0.12],
+    "signal": [0.3, 0.75, 0.12],
+    "cord": [0.32, 0.3, 0.26]
+  },
+  "finishes": {
+    "WPN.Housing": {
+      "color": "housing",
+      "roughness": 0.42,
+      "note": "dark painted alloy of the housing, shaft and fittings"
+    },
+    "WPN.Polymer": {
+      "color": "polymer",
+      "roughness": 0.55,
+      "note": "light grey polymer of the grips, pads and lever"
+    },
+    "WPN.Blackened": {
+      "color": "blackened",
+      "roughness": 0.3,
+      "metallic": 1.0,
+      "note": "blackened steel of the blade's flat"
+    },
+    "WPN.Steel": {
+      "color": "steel",
+      "roughness": 0.25,
+      "metallic": 1.0,
+      "note": "polished steel of the blade's grind"
+    },
+    "WPN.Brushed": {
+      "color": "brushed",
+      "roughness": 0.3,
+      "metallic": 1.0,
+      "note": "spun metal of the rotor face"
+    },
+    "WPN.Enamel": {
+      "color": "enamel",
+      "roughness": 0.35,
+      "note": "white enamel of the rotor ring, hub and grip band"
+    },
+    "WPN.Paint": {
+      "color": "paint",
+      "roughness": 0.5,
+      "note": "white paint of the markings"
+    },
+    "WPN.Signal": {
+      "color": "signal",
+      "roughness": 0.5,
+      "note": "green paint of the markings"
+    },
+    "WPN.Accent": {
+      "color": "accent",
+      "roughness": 0.4,
+      "emission": 1.5,
+      "note": "green indicator lights"
+    },
+    "WPN.Cord": {
+      "color": "cord",
+      "roughness": 0.7,
+      "note": "braided cord of the lanyard"
+    }
+  },
+  "studio": {
+    "world": {
+      "top": [0.6, 0.6, 0.6],
+      "horizon": [0.35, 0.35, 0.35],
+      "bottom": [0.12, 0.12, 0.12],
+      "strength": 1.0
+    }
+  }
+}

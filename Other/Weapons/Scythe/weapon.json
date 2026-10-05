@@ -1,0 +1,3396 @@
+{
+  "id": "Scythe",
+  "name": "Scythe (镰刀)",
+  "defaults": {
+    "shot": "Sheet"
+  },
+  "sheet": {
+    "origin": [1019.48, 463.69],
+    "metres_per_unit": 0.00075
+  },
+  "studio": {
+    "strength": 0.3492
+  },
+  "materials": {
+    "color:blackened": [0.0965, 0.1014, 0.0916],
+    "color:brushed": [0.9862, 1.0, 0.7916],
+    "color:enamel": [1.0, 1.0, 0.96],
+    "color:housing": [0.0154, 0.0161, 0.0123],
+    "color:paint": [0.996, 1.0, 0.9292],
+    "color:polymer": [0.3385, 0.3508, 0.2667],
+    "color:steel": [0.9069, 0.9988, 0.8675]
+  },
+  "parts": {
+    "Head": [
+      {
+        "name": "Housing",
+        "outline": {
+          "trace": [
+            "head.housing",
+            "head.opening",
+            "head.slit",
+            "head.window.pocket",
+            "head.led.mount",
+            "head.slot",
+            "head.mark.play",
+            "head.dial.ticks",
+            "head.stripes.pocket",
+            "head.chin.rod.slot"
+          ]
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.25,
+          "Back": 35.25,
+          "Chamfer": 1.5,
+          "Pockets From": 3,
+          "Pocket Depth": 2.4
+        }
+      },
+      {
+        "name": "Deck",
+        "outline": {
+          "trace": "head.deck"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -27.35,
+          "Back": 27.35,
+          "Chamfer": 1.2
+        }
+      },
+      {
+        "name": "Rail",
+        "outline": {
+          "trace": "head.rail"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -27.35,
+          "Back": 27.35,
+          "Chamfer": 1.2
+        }
+      },
+      {
+        "name": "Boss",
+        "outline": {
+          "trace": "head.boss"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.25,
+          "Back": 35.25,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Rear Cap",
+        "outline": {
+          "trace": "head.cap"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -37.65,
+          "Back": 37.65,
+          "Chamfer": 1.0
+        }
+      },
+      {
+        "name": "Chin",
+        "outline": {
+          "trace": "head.chin.slats"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -15.3,
+          "Back": 15.3,
+          "Chamfer": 1.0,
+          "Material": "WPN.Polymer"
+        }
+      },
+      {
+        "name": "Chin Grooves",
+        "outline": {
+          "trace": "head.chin.core"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -13.9,
+          "Back": 13.9,
+          "Chamfer": 0.0,
+          "Material": "WPN.Housing"
+        }
+      },
+      {
+        "name": "Chin Rod",
+        "outline": {
+          "trace": "head.chin.rod"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -34.45,
+          "Back": 34.45,
+          "Chamfer": 1.5,
+          "Material": "WPN.Polymer"
+        }
+      },
+      {
+        "name": "Slot",
+        "outline": {
+          "trace": "head.slot"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.45,
+          "Back": -32.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Enamel",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Lamp",
+        "outline": {
+          "trace": "head.lamp"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.85,
+          "Back": -34.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Enamel",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Strip Upper",
+        "outline": {
+          "trace": "head.strip.upper"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.85,
+          "Back": -34.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Polymer",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Strip Lower",
+        "outline": {
+          "trace": "head.strip.lower"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.85,
+          "Back": -34.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Polymer",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Window",
+        "outline": {
+          "trace": "head.window.pocket"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.45,
+          "Back": -32.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Enamel",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Window Light",
+        "outline": {
+          "trace": "head.window.led"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.75,
+          "Back": -32.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Accent",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Hump Light",
+        "outline": {
+          "trace": "head.led.hump"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.85,
+          "Back": -34.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Accent",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Mount Light",
+        "outline": {
+          "trace": "head.led.mount"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.45,
+          "Back": -32.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Accent",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Play Mark",
+        "outline": {
+          "trace": "head.mark.play"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.45,
+          "Back": -32.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Arrow",
+        "outline": {
+          "trace": "head.decal.arrow"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.4,
+          "Back": -34.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Signal"
+        }
+      },
+      {
+        "name": "Dashes",
+        "outline": {
+          "trace": "head.decal.dashes"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.4,
+          "Back": -34.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint"
+        }
+      },
+      {
+        "name": "Stripes",
+        "outline": {
+          "trace": "head.decal.stripes"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.0,
+          "Back": -32.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Slashes",
+        "outline": {
+          "trace": "head.decal.slashes"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -35.4,
+          "Back": -34.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Signal"
+        }
+      },
+      {
+        "name": "Quote",
+        "at": [674.5, 0.0, 310.6],
+        "asset": "WPN.Lettering",
+        "inputs": {
+          "Text": "“Three articles of contract”",
+          "Size": 8.6,
+          "Front": -35.4,
+          "Back": -34.95,
+          "Width": 116.5
+        }
+      },
+      {
+        "name": "Rule 1",
+        "at": [677.5, 0.0, 389.6],
+        "asset": "WPN.Lettering",
+        "inputs": {
+          "Text": "Do not be afraid of me.",
+          "Size": 10.0,
+          "Front": -35.4,
+          "Back": -34.95,
+          "Width": 112.5
+        }
+      },
+      {
+        "name": "Rule 2",
+        "at": [678.5, 0.0, 407.6],
+        "asset": "WPN.Lettering",
+        "inputs": {
+          "Text": "Do not lose yourself.",
+          "Size": 10.0,
+          "Front": -35.4,
+          "Back": -34.95,
+          "Width": 99.5
+        }
+      },
+      {
+        "name": "Rule 3",
+        "at": [678.5, 0.0, 426.2],
+        "asset": "WPN.Lettering",
+        "inputs": {
+          "Text": "Do not disturb me.",
+          "Size": 10.0,
+          "Front": -35.4,
+          "Back": -34.95,
+          "Width": 91.5
+        }
+      },
+      {
+        "name": "Number 1",
+        "at": [669.5, 0.0, 389.6],
+        "asset": "WPN.Lettering",
+        "inputs": {
+          "Text": "1",
+          "Size": 10.0,
+          "Front": -35.4,
+          "Back": -34.95,
+          "Material": "WPN.Signal"
+        }
+      },
+      {
+        "name": "Number 2",
+        "at": [669.0, 0.0, 407.6],
+        "asset": "WPN.Lettering",
+        "inputs": {
+          "Text": "2",
+          "Size": 10.0,
+          "Front": -35.4,
+          "Back": -34.95,
+          "Material": "WPN.Signal"
+        }
+      },
+      {
+        "name": "Number 3",
+        "at": [668.5, 0.0, 426.2],
+        "asset": "WPN.Lettering",
+        "inputs": {
+          "Text": "3",
+          "Size": 10.0,
+          "Front": -35.4,
+          "Back": -34.95,
+          "Material": "WPN.Signal"
+        }
+      },
+      {
+        "name": "Dial Bezel",
+        "at": [832.7, 0.0, 517.6],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 25.0,
+          "Outer Radius": 28.4,
+          "Front": -37.7,
+          "Back": -34.75,
+          "Chamfer": 0.8,
+          "Segments": 64
+        }
+      },
+      {
+        "name": "Dial",
+        "at": [832.7, 0.0, 517.6],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 0.0,
+          "Outer Radius": 25.0,
+          "Front": -37.95,
+          "Back": -34.75,
+          "Chamfer": 1.2,
+          "Segments": 64,
+          "Pocket Depth": 1.0,
+          "Material": "WPN.Polymer"
+        },
+        "outline": {
+          "trace": "head.dial.pointer"
+        }
+      },
+      {
+        "name": "Dial Pointer",
+        "outline": {
+          "trace": "head.dial.pointer"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -37.35,
+          "Back": -36.95,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Dial Ticks",
+        "outline": {
+          "trace": "head.dial.ticks"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.45,
+          "Back": -32.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Rear Panel",
+        "outline": {
+          "trace": "head.rear.panel"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -16.45,
+          "Back": 16.45,
+          "Chamfer": 0.6,
+          "Material": "WPN.Polymer"
+        }
+      }
+    ],
+    "Rotor": [
+      {
+        "name": "Rotor Collar",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 187.0,
+          "Outer Radius": 201.0,
+          "Front": -36.92,
+          "Back": 36.92,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": 0.73,
+          "Bulge": 0.145,
+          "Rings": 4,
+          "Start": -62.0,
+          "Sweep": 242.0
+        }
+      },
+      {
+        "name": "Rotor Skirt",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 201.0,
+          "Outer Radius": 214.0,
+          "Front": -35.4,
+          "Back": 35.4,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": 1.52,
+          "Bulge": -0.44,
+          "Rings": 6,
+          "Start": -62.0,
+          "Sweep": 242.0
+        }
+      },
+      {
+        "name": "Rotor Rim",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 167.0,
+          "Outer Radius": 187.0,
+          "Front": -37.65,
+          "Back": 37.65,
+          "Chamfer": 0.5,
+          "Segments": 192,
+          "Rise": -2.39,
+          "Bulge": -0.695,
+          "Rings": 8
+        }
+      },
+      {
+        "name": "Rotor Bezel",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 152.0,
+          "Outer Radius": 167.0,
+          "Front": -35.26,
+          "Back": 35.26,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": 1.33,
+          "Bulge": -0.235,
+          "Rings": 6
+        }
+      },
+      {
+        "name": "Rotor Lip",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 135.7,
+          "Outer Radius": 152.0,
+          "Front": -36.59,
+          "Back": 36.59,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": -0.43,
+          "Bulge": 0.465,
+          "Rings": 6
+        }
+      },
+      {
+        "name": "Rotor Ring",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 126.9,
+          "Outer Radius": 135.7,
+          "Front": -36.16,
+          "Back": 36.16,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": -0.36,
+          "Bulge": -0.19,
+          "Rings": 3,
+          "Material": "WPN.Enamel",
+          "Start": -27.5,
+          "Sweep": 346.0
+        }
+      },
+      {
+        "name": "Rotor Pointer",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 105.0,
+          "Outer Radius": 141.0,
+          "Front": -36.4,
+          "Back": 36.4,
+          "Chamfer": 0.6,
+          "Segments": 12,
+          "Start": -41.5,
+          "Sweep": 14.0
+        }
+      },
+      {
+        "name": "Rotor Channel",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 109.5,
+          "Outer Radius": 126.9,
+          "Front": -35.8,
+          "Back": 35.8,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": 0.23,
+          "Bulge": 0.105,
+          "Rings": 4
+        }
+      },
+      {
+        "name": "Rotor Face Outer",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 75.6,
+          "Outer Radius": 109.5,
+          "Front": -36.03,
+          "Back": 36.03,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": 0.62,
+          "Bulge": -0.15,
+          "Rings": 8,
+          "Material": "WPN.Brushed"
+        }
+      },
+      {
+        "name": "Rotor Ridge",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 65.4,
+          "Outer Radius": 75.6,
+          "Front": -36.65,
+          "Back": 36.65,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": -0.66,
+          "Bulge": 0.33,
+          "Rings": 4
+        }
+      },
+      {
+        "name": "Rotor Face Inner",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 33.8,
+          "Outer Radius": 65.4,
+          "Front": -35.99,
+          "Back": 35.99,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": -2.07,
+          "Bulge": -0.25,
+          "Rings": 8,
+          "Material": "WPN.Brushed"
+        }
+      },
+      {
+        "name": "Hub Rim",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 28.9,
+          "Outer Radius": 33.8,
+          "Front": -33.92,
+          "Back": 33.92,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Rise": 0.98,
+          "Rings": 2
+        }
+      },
+      {
+        "name": "Hub",
+        "at": [1019.48, 0.0, 463.69],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 0.0,
+          "Outer Radius": 28.9,
+          "Front": -34.9,
+          "Back": 34.9,
+          "Chamfer": 0.0,
+          "Segments": 192,
+          "Material": "WPN.Enamel"
+        }
+      }
+    ],
+    "Yoke": [
+      {
+        "name": "Yoke",
+        "outline": {
+          "trace": "yoke.body"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.6,
+          "Back": 33.6,
+          "Chamfer": 1.5
+        }
+      }
+    ],
+    "Linkage": [
+      {
+        "name": "Upper Link",
+        "outline": {
+          "trace": ["link.upper", "link.marks"]
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -14.0,
+          "Back": 14.0,
+          "Chamfer": 2.0,
+          "Pockets From": 1,
+          "Pocket Depth": 1.0
+        }
+      },
+      {
+        "name": "Lower Link",
+        "outline": {
+          "trace": "link.lower"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -12.0,
+          "Back": 12.0,
+          "Chamfer": 5.0
+        }
+      },
+      {
+        "name": "Lug",
+        "outline": {
+          "trace": "link.lug"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -16.0,
+          "Back": 16.0,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Link Marks",
+        "outline": {
+          "trace": "link.marks"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -13.4,
+          "Back": -13.0,
+          "Chamfer": 0.0,
+          "Material": "WPN.Polymer",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Lug Pin",
+        "outline": {
+          "trace": "link.pin"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.0,
+          "Back": -32.3,
+          "Chamfer": 0.0,
+          "Material": "WPN.Polymer",
+          "Mirror": true
+        }
+      }
+    ],
+    "Shaft": [
+      {
+        "name": "Frame",
+        "outline": {
+          "trace": "shaft.frame"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -31.25,
+          "Back": 31.25,
+          "Chamfer": 1.2
+        }
+      },
+      {
+        "name": "Left Rail",
+        "outline": {
+          "trace": "shaft.rail.left"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.6,
+          "Back": 33.6,
+          "Chamfer": 2.0
+        }
+      },
+      {
+        "name": "Lower Rail",
+        "outline": {
+          "trace": "shaft.rail.lower"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -32.7,
+          "Back": 32.7,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Right Band",
+        "outline": {
+          "trace": "shaft.band.right"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -30.4,
+          "Back": 30.4,
+          "Chamfer": 1.2
+        }
+      },
+      {
+        "name": "Panel",
+        "outline": {
+          "trace": "shaft.panel"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -32.65,
+          "Back": 32.65,
+          "Chamfer": 1.0
+        }
+      },
+      {
+        "name": "Indicator",
+        "outline": {
+          "trace": "shaft.indicator"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -32.25,
+          "Back": -30.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Polymer",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Indicator Light",
+        "outline": {
+          "trace": "shaft.indicator.led"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -32.65,
+          "Back": -30.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Accent",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Shaft Dashes",
+        "outline": {
+          "trace": "shaft.dashes"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -32.85,
+          "Back": -32.3,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint"
+        }
+      },
+      {
+        "name": "Shaft Marks",
+        "outline": {
+          "trace": "shaft.marks"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -31.4,
+          "Back": -30.85,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint"
+        }
+      },
+      {
+        "name": "Tube",
+        "outline": {
+          "trace": "shaft.tube"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -27.1,
+          "Back": 27.1,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Tube Mark",
+        "outline": {
+          "trace": "shaft.tube.mark"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -27.25,
+          "Back": -26.7,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint"
+        }
+      },
+      {
+        "name": "Clamp",
+        "outline": {
+          "trace": "shaft.clamp"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -32.85,
+          "Back": 32.85,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Clamp Bolts",
+        "outline": {
+          "trace": "shaft.bolts"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -33.45,
+          "Back": -32.45,
+          "Chamfer": 0.0,
+          "Material": "WPN.Polymer",
+          "Mirror": true
+        }
+      }
+    ],
+    "Grip": [
+      {
+        "name": "Grip",
+        "outline": {
+          "trace": ["grip.clamp", "grip.marks"]
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -40.7,
+          "Back": 40.7,
+          "Chamfer": 2.5,
+          "Pockets From": 1,
+          "Pocket Depth": 1.0
+        }
+      },
+      {
+        "name": "Grip Base",
+        "outline": {
+          "trace": "grip.base"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -43.2,
+          "Back": 43.2,
+          "Chamfer": 2.5
+        }
+      },
+      {
+        "name": "Lever",
+        "outline": {
+          "trace": "grip.lever"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -41.7,
+          "Back": -38.7,
+          "Chamfer": 0.8,
+          "Material": "WPN.Polymer"
+        }
+      },
+      {
+        "name": "Grip Knob",
+        "at": [1104.5, 0.0, 1557.5],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 0.0,
+          "Outer Radius": 26.0,
+          "Front": -41.7,
+          "Back": -38.7,
+          "Chamfer": 1.2,
+          "Segments": 64
+        }
+      },
+      {
+        "name": "Grip Knob Cap",
+        "at": [1104.5, 0.0, 1557.5],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 0.0,
+          "Outer Radius": 17.5,
+          "Front": -42.4,
+          "Back": -41.2,
+          "Chamfer": 1.0,
+          "Segments": 64
+        }
+      },
+      {
+        "name": "Grip Marks",
+        "outline": {
+          "trace": "grip.marks"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -40.1,
+          "Back": -39.7,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint",
+          "Mirror": true
+        }
+      },
+      {
+        "name": "Lanyard",
+        "outline": {
+          "trace": "grip.lanyard"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -2.3,
+          "Back": 2.3,
+          "Chamfer": 2.0,
+          "Material": "WPN.Cord"
+        }
+      }
+    ],
+    "Rails": [
+      {
+        "name": "Rail Base",
+        "outline": {
+          "trace": "rails.base"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -21.0,
+          "Back": 21.0,
+          "Chamfer": 1.0
+        }
+      },
+      {
+        "name": "Rail Left",
+        "outline": {
+          "trace": "rails.left"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -23.5,
+          "Back": 23.5,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Rail Right",
+        "outline": {
+          "trace": "rails.right"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -23.5,
+          "Back": 23.5,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Rail Left Foot",
+        "outline": {
+          "trace": "rails.left.foot"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -22.7,
+          "Back": 22.7,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Rail Right Foot",
+        "outline": {
+          "trace": "rails.right.foot"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -22.7,
+          "Back": 22.7,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Band",
+        "outline": {
+          "trace": "rails.band"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -23.65,
+          "Back": 23.65,
+          "Chamfer": 0.6,
+          "Material": "WPN.Enamel"
+        }
+      }
+    ],
+    "Foot": [
+      {
+        "name": "Sleeve",
+        "outline": {
+          "trace": "foot.sleeve"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -23.2,
+          "Back": 23.2,
+          "Chamfer": 1.0,
+          "Material": "WPN.Polymer"
+        }
+      },
+      {
+        "name": "Sleeve Marks",
+        "outline": {
+          "trace": "foot.marks"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -23.35,
+          "Back": -22.8,
+          "Chamfer": 0.0,
+          "Material": "WPN.Housing"
+        }
+      },
+      {
+        "name": "Clip",
+        "outline": {
+          "trace": "foot.clip"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -19.0,
+          "Back": 19.0,
+          "Chamfer": 1.0
+        }
+      },
+      {
+        "name": "Collar",
+        "outline": {
+          "trace": "foot.collar.upper"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -23.0,
+          "Back": 23.0,
+          "Chamfer": 0.0,
+          "Taper": 0.8174,
+          "Taper Top": 0.0,
+          "Taper Bottom": -8.0
+        },
+        "at": [1029.5, 0.0, 2302.0]
+      },
+      {
+        "name": "Collar Lower",
+        "outline": {
+          "trace": "foot.collar.lower"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -23.0,
+          "Back": 23.0,
+          "Chamfer": 0.0,
+          "Taper": 0.8174,
+          "Taper Top": 0.0,
+          "Taper Bottom": 8.0
+        },
+        "at": [1029.5, 0.0, 2318.0]
+      },
+      {
+        "name": "Boot",
+        "outline": {
+          "trace": "foot.boot"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -22.65,
+          "Back": 22.65,
+          "Chamfer": 1.5
+        }
+      },
+      {
+        "name": "Heel",
+        "outline": {
+          "trace": "foot.heel"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -26.6,
+          "Back": 26.6,
+          "Chamfer": 2.0,
+          "Taper": 0.68,
+          "Taper Top": 0.0,
+          "Taper Bottom": -76.0
+        },
+        "at": [1040.0, 0.0, 2364.0]
+      },
+      {
+        "name": "Sole",
+        "outline": {
+          "trace": "foot.sole"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -28.05,
+          "Back": 28.05,
+          "Chamfer": 3.0,
+          "Taper": 0.68,
+          "Taper Top": 0.0,
+          "Taper Bottom": -76.0,
+          "Material": "WPN.Polymer"
+        },
+        "at": [1040.0, 0.0, 2364.0]
+      }
+    ],
+    "Brace": [
+      {
+        "name": "Brace",
+        "outline": {
+          "trace": "brace.rod"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -17.5,
+          "Back": 17.5,
+          "Chamfer": 6.0
+        }
+      }
+    ],
+    "Blade": [
+      {
+        "name": "Blade",
+        "outline": {
+          "trace": ["blade.spine", "blade.grind", "blade.edge", "blade.cut.notches", "blade.cut.beard", "blade.cut.throat", "blade.cut.gap", "blade.cut.root"]
+        },
+        "asset": "WPN.Blade",
+        "inputs": {
+          "Back Thickness": 8.0,
+          "Tip Thickness": 2.0,
+          "Edge Thickness": 0.6,
+          "Grind Shape": 0.85,
+          "Samples": 520
+        }
+      },
+      {
+        "name": "Blade Logo",
+        "outline": {
+          "trace": "blade.decal.logo"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -3.8,
+          "Back": -2.75,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint"
+        }
+      },
+      {
+        "name": "Blade Bolt",
+        "outline": {
+          "trace": "blade.decal.bolt"
+        },
+        "asset": "WPN.Plate",
+        "inputs": {
+          "Front": -3.8,
+          "Back": -2.75,
+          "Chamfer": 0.0,
+          "Material": "WPN.Paint"
+        }
+      },
+      {
+        "name": "Blade Badge",
+        "at": [1501.5, 0.0, 334.5],
+        "asset": "WPN.Ring",
+        "inputs": {
+          "Inner Radius": 11.0,
+          "Outer Radius": 14.0,
+          "Front": -3.8,
+          "Back": -2.75,
+          "Chamfer": 0.0,
+          "Segments": 64,
+          "Material": "WPN.Paint"
+        }
+      },
+      {
+        "name": "Blade Name",
+        "outline": {
+          "trace": "blade.decal.name"
+        },
+        "asset": "WPN.Strokes",
+        "inputs": {
+          "Width": 3.0,
+          "Front": -3.8,
+          "Back": -2.75
+        }
+      },
+      {
+        "name": "Blade Name Ticks",
+        "outline": {
+          "trace": "blade.decal.ticks"
+        },
+        "asset": "WPN.Strokes",
+        "inputs": {
+          "Width": 1.8,
+          "Front": -3.8,
+          "Back": -2.75
+        }
+      },
+      {
+        "name": "Blade Number",
+        "outline": {
+          "trace": "blade.decal.number"
+        },
+        "asset": "WPN.Strokes",
+        "inputs": {
+          "Width": 3.4,
+          "Front": -3.8,
+          "Back": -2.75
+        }
+      },
+      {
+        "name": "Blade Number Strokes",
+        "outline": {
+          "trace": "blade.decal.slashes"
+        },
+        "asset": "WPN.Strokes",
+        "inputs": {
+          "Width": 2.4,
+          "Front": -3.8,
+          "Back": -2.75
+        }
+      },
+      {
+        "name": "Blade Bracket",
+        "outline": {
+          "trace": "blade.decal.bracket"
+        },
+        "asset": "WPN.Strokes",
+        "inputs": {
+          "Width": 3.6,
+          "Front": -3.8,
+          "Back": -2.75
+        }
+      }
+    ]
+  },
+  "lights": [
+    {
+      "name": "Wall 0.0",
+      "light": "AREA",
+      "power": 0.03271,
+      "diffuse": 1.0,
+      "specular": 0.0758,
+      "size": [150.0, 150.0],
+      "at": [375.0, -320.0, 115.0],
+      "target": [375.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.1",
+      "light": "AREA",
+      "power": 0.01134,
+      "diffuse": 1.0,
+      "specular": 0.0006,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 115.0],
+      "target": [525.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.2",
+      "light": "AREA",
+      "power": 0.03639,
+      "diffuse": 1.0,
+      "specular": 0.0112,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 115.0],
+      "target": [675.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.3",
+      "light": "AREA",
+      "power": 0.03162,
+      "diffuse": 1.0,
+      "specular": 0.1438,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 115.0],
+      "target": [825.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.4",
+      "light": "AREA",
+      "power": 0.00302,
+      "diffuse": 1.0,
+      "specular": 0.0014,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 115.0],
+      "target": [975.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.7",
+      "light": "AREA",
+      "power": 0.00195,
+      "diffuse": 1.0,
+      "specular": 0.2288,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 115.0],
+      "target": [1425.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.8",
+      "light": "AREA",
+      "power": 0.01347,
+      "diffuse": 1.0,
+      "specular": 0.0414,
+      "size": [150.0, 150.0],
+      "at": [1575.0, -320.0, 115.0],
+      "target": [1575.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.9",
+      "light": "AREA",
+      "power": 0.02944,
+      "diffuse": 1.0,
+      "specular": 0.0135,
+      "size": [150.0, 150.0],
+      "at": [1725.0, -320.0, 115.0],
+      "target": [1725.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.10",
+      "light": "AREA",
+      "power": 0.05914,
+      "diffuse": 1.0,
+      "specular": 0.0643,
+      "size": [150.0, 150.0],
+      "at": [1875.0, -320.0, 115.0],
+      "target": [1875.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.11",
+      "light": "AREA",
+      "power": 0.10984,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2025.0, -320.0, 115.0],
+      "target": [2025.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.12",
+      "light": "AREA",
+      "power": 0.15226,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2175.0, -320.0, 115.0],
+      "target": [2175.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 0.13",
+      "light": "AREA",
+      "power": 0.14086,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2325.0, -320.0, 115.0],
+      "target": [2325.0, 0.0, 115.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.0",
+      "light": "AREA",
+      "power": 0.01506,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [375.0, -320.0, 265.0],
+      "target": [375.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.1",
+      "light": "AREA",
+      "power": 0.00513,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 265.0],
+      "target": [525.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.2",
+      "light": "AREA",
+      "power": 0.02519,
+      "diffuse": 1.0,
+      "specular": 0.3972,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 265.0],
+      "target": [675.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.3",
+      "light": "AREA",
+      "power": 0.03635,
+      "diffuse": 1.0,
+      "specular": 0.5811,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 265.0],
+      "target": [825.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.4",
+      "light": "AREA",
+      "power": 0.0276,
+      "diffuse": 0.3011,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 265.0],
+      "target": [975.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.5",
+      "light": "AREA",
+      "power": 0.01304,
+      "diffuse": 0.0572,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 265.0],
+      "target": [1125.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.6",
+      "light": "AREA",
+      "power": 0.03709,
+      "diffuse": 0.006,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 265.0],
+      "target": [1275.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.7",
+      "light": "AREA",
+      "power": 0.09643,
+      "diffuse": 0.0182,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 265.0],
+      "target": [1425.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.8",
+      "light": "AREA",
+      "power": 0.03268,
+      "diffuse": 0.3192,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1575.0, -320.0, 265.0],
+      "target": [1575.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.9",
+      "light": "AREA",
+      "power": 0.02228,
+      "diffuse": 1.0,
+      "specular": 0.7083,
+      "size": [150.0, 150.0],
+      "at": [1725.0, -320.0, 265.0],
+      "target": [1725.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.10",
+      "light": "AREA",
+      "power": 0.04951,
+      "diffuse": 1.0,
+      "specular": 0.0354,
+      "size": [150.0, 150.0],
+      "at": [1875.0, -320.0, 265.0],
+      "target": [1875.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.11",
+      "light": "AREA",
+      "power": 0.10734,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2025.0, -320.0, 265.0],
+      "target": [2025.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.12",
+      "light": "AREA",
+      "power": 0.16988,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2175.0, -320.0, 265.0],
+      "target": [2175.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.13",
+      "light": "AREA",
+      "power": 0.17557,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2325.0, -320.0, 265.0],
+      "target": [2325.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.14",
+      "light": "AREA",
+      "power": 0.15878,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2475.0, -320.0, 265.0],
+      "target": [2475.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 1.15",
+      "light": "AREA",
+      "power": 0.13325,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2625.0, -320.0, 265.0],
+      "target": [2625.0, 0.0, 265.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.0",
+      "light": "AREA",
+      "power": 0.01356,
+      "diffuse": 1.0,
+      "specular": 0.0007,
+      "size": [150.0, 150.0],
+      "at": [375.0, -320.0, 415.0],
+      "target": [375.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.1",
+      "light": "AREA",
+      "power": 0.00244,
+      "diffuse": 1.0,
+      "specular": 0.0001,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 415.0],
+      "target": [525.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.2",
+      "light": "AREA",
+      "power": 0.04709,
+      "diffuse": 0.6773,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 415.0],
+      "target": [675.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.3",
+      "light": "AREA",
+      "power": 0.02629,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 415.0],
+      "target": [825.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.4",
+      "light": "AREA",
+      "power": 0.08515,
+      "diffuse": 1.0,
+      "specular": 0.0718,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 415.0],
+      "target": [975.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.5",
+      "light": "AREA",
+      "power": 0.01382,
+      "diffuse": 1.0,
+      "specular": 0.5668,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 415.0],
+      "target": [1125.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.6",
+      "light": "AREA",
+      "power": 0.00354,
+      "diffuse": 0.225,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 415.0],
+      "target": [1275.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.7",
+      "light": "AREA",
+      "power": 0.00218,
+      "diffuse": 1.0,
+      "specular": 0.6605,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 415.0],
+      "target": [1425.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.8",
+      "light": "AREA",
+      "power": 0.01171,
+      "diffuse": 1.0,
+      "specular": 0.6068,
+      "size": [150.0, 150.0],
+      "at": [1575.0, -320.0, 415.0],
+      "target": [1575.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.9",
+      "light": "AREA",
+      "power": 0.02541,
+      "diffuse": 1.0,
+      "specular": 0.1013,
+      "size": [150.0, 150.0],
+      "at": [1725.0, -320.0, 415.0],
+      "target": [1725.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.10",
+      "light": "AREA",
+      "power": 0.05683,
+      "diffuse": 1.0,
+      "specular": 0.0012,
+      "size": [150.0, 150.0],
+      "at": [1875.0, -320.0, 415.0],
+      "target": [1875.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.11",
+      "light": "AREA",
+      "power": 0.12512,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2025.0, -320.0, 415.0],
+      "target": [2025.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.12",
+      "light": "AREA",
+      "power": 0.20026,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2175.0, -320.0, 415.0],
+      "target": [2175.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.13",
+      "light": "AREA",
+      "power": 0.21545,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2325.0, -320.0, 415.0],
+      "target": [2325.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.14",
+      "light": "AREA",
+      "power": 0.19498,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2475.0, -320.0, 415.0],
+      "target": [2475.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.15",
+      "light": "AREA",
+      "power": 0.15227,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2625.0, -320.0, 415.0],
+      "target": [2625.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 2.16",
+      "light": "AREA",
+      "power": 0.1116,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2775.0, -320.0, 415.0],
+      "target": [2775.0, 0.0, 415.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.0",
+      "light": "AREA",
+      "power": 0.01044,
+      "diffuse": 1.0,
+      "specular": 0.0566,
+      "size": [150.0, 150.0],
+      "at": [375.0, -320.0, 565.0],
+      "target": [375.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.2",
+      "light": "AREA",
+      "power": 0.01598,
+      "diffuse": 0.1006,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 565.0],
+      "target": [675.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.3",
+      "light": "AREA",
+      "power": 0.00548,
+      "diffuse": 1.0,
+      "specular": 0.0001,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 565.0],
+      "target": [825.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.4",
+      "light": "AREA",
+      "power": 0.03272,
+      "diffuse": 1.0,
+      "specular": 0.2887,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 565.0],
+      "target": [975.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.5",
+      "light": "AREA",
+      "power": 0.03169,
+      "diffuse": 1.0,
+      "specular": 0.0578,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 565.0],
+      "target": [1125.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.6",
+      "light": "AREA",
+      "power": 0.00373,
+      "diffuse": 1.0,
+      "specular": 0.0012,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 565.0],
+      "target": [1275.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.7",
+      "light": "AREA",
+      "power": 0.00601,
+      "diffuse": 0.681,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 565.0],
+      "target": [1425.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.8",
+      "light": "AREA",
+      "power": 0.01884,
+      "diffuse": 1.0,
+      "specular": 0.2591,
+      "size": [150.0, 150.0],
+      "at": [1575.0, -320.0, 565.0],
+      "target": [1575.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.9",
+      "light": "AREA",
+      "power": 0.0451,
+      "diffuse": 1.0,
+      "specular": 0.0195,
+      "size": [150.0, 150.0],
+      "at": [1725.0, -320.0, 565.0],
+      "target": [1725.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.10",
+      "light": "AREA",
+      "power": 0.09196,
+      "diffuse": 1.0,
+      "specular": 0.0137,
+      "size": [150.0, 150.0],
+      "at": [1875.0, -320.0, 565.0],
+      "target": [1875.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.11",
+      "light": "AREA",
+      "power": 0.17235,
+      "diffuse": 1.0,
+      "specular": 0.0639,
+      "size": [150.0, 150.0],
+      "at": [2025.0, -320.0, 565.0],
+      "target": [2025.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.12",
+      "light": "AREA",
+      "power": 0.24712,
+      "diffuse": 1.0,
+      "specular": 0.0702,
+      "size": [150.0, 150.0],
+      "at": [2175.0, -320.0, 565.0],
+      "target": [2175.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.13",
+      "light": "AREA",
+      "power": 0.25329,
+      "diffuse": 1.0,
+      "specular": 0.0772,
+      "size": [150.0, 150.0],
+      "at": [2325.0, -320.0, 565.0],
+      "target": [2325.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.14",
+      "light": "AREA",
+      "power": 0.21122,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2475.0, -320.0, 565.0],
+      "target": [2475.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.15",
+      "light": "AREA",
+      "power": 0.15304,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2625.0, -320.0, 565.0],
+      "target": [2625.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 3.16",
+      "light": "AREA",
+      "power": 0.11362,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2775.0, -320.0, 565.0],
+      "target": [2775.0, 0.0, 565.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.0",
+      "light": "AREA",
+      "power": 0.03451,
+      "diffuse": 0.3909,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [375.0, -320.0, 715.0],
+      "target": [375.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.1",
+      "light": "AREA",
+      "power": 0.00192,
+      "diffuse": 0.7046,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 715.0],
+      "target": [525.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.2",
+      "light": "AREA",
+      "power": 0.00223,
+      "diffuse": 1.0,
+      "specular": 0.039,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 715.0],
+      "target": [675.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.3",
+      "light": "AREA",
+      "power": 0.00369,
+      "diffuse": 1.0,
+      "specular": 0.0039,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 715.0],
+      "target": [825.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.4",
+      "light": "AREA",
+      "power": 0.01468,
+      "diffuse": 1.0,
+      "specular": 0.4976,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 715.0],
+      "target": [975.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.5",
+      "light": "AREA",
+      "power": 0.02115,
+      "diffuse": 1.0,
+      "specular": 0.127,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 715.0],
+      "target": [1125.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.6",
+      "light": "AREA",
+      "power": 0.01193,
+      "diffuse": 1.0,
+      "specular": 0.1609,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 715.0],
+      "target": [1275.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.7",
+      "light": "AREA",
+      "power": 0.06521,
+      "diffuse": 0.1881,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 715.0],
+      "target": [1425.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.8",
+      "light": "AREA",
+      "power": 0.11771,
+      "diffuse": 0.2926,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1575.0, -320.0, 715.0],
+      "target": [1575.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.9",
+      "light": "AREA",
+      "power": 0.08241,
+      "diffuse": 1.0,
+      "specular": 0.9302,
+      "size": [150.0, 150.0],
+      "at": [1725.0, -320.0, 715.0],
+      "target": [1725.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.10",
+      "light": "AREA",
+      "power": 0.15437,
+      "diffuse": 1.0,
+      "specular": 0.408,
+      "size": [150.0, 150.0],
+      "at": [1875.0, -320.0, 715.0],
+      "target": [1875.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.11",
+      "light": "AREA",
+      "power": 0.24349,
+      "diffuse": 1.0,
+      "specular": 0.0017,
+      "size": [150.0, 150.0],
+      "at": [2025.0, -320.0, 715.0],
+      "target": [2025.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.12",
+      "light": "AREA",
+      "power": 0.29623,
+      "diffuse": 1.0,
+      "specular": 0.9174,
+      "size": [150.0, 150.0],
+      "at": [2175.0, -320.0, 715.0],
+      "target": [2175.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.13",
+      "light": "AREA",
+      "power": 0.26821,
+      "diffuse": 1.0,
+      "specular": 0.0444,
+      "size": [150.0, 150.0],
+      "at": [2325.0, -320.0, 715.0],
+      "target": [2325.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.14",
+      "light": "AREA",
+      "power": 0.20838,
+      "diffuse": 1.0,
+      "specular": 0.0353,
+      "size": [150.0, 150.0],
+      "at": [2475.0, -320.0, 715.0],
+      "target": [2475.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.15",
+      "light": "AREA",
+      "power": 0.15048,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2625.0, -320.0, 715.0],
+      "target": [2625.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 4.16",
+      "light": "AREA",
+      "power": 0.11107,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2775.0, -320.0, 715.0],
+      "target": [2775.0, 0.0, 715.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.0",
+      "light": "AREA",
+      "power": 0.14365,
+      "diffuse": 0.3825,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [375.0, -320.0, 865.0],
+      "target": [375.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.1",
+      "light": "AREA",
+      "power": 0.03953,
+      "diffuse": 0.5639,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 865.0],
+      "target": [525.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.2",
+      "light": "AREA",
+      "power": 0.01402,
+      "diffuse": 1.0,
+      "specular": 0.0506,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 865.0],
+      "target": [675.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.3",
+      "light": "AREA",
+      "power": 0.00956,
+      "diffuse": 1.0,
+      "specular": 0.2251,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 865.0],
+      "target": [825.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.4",
+      "light": "AREA",
+      "power": 0.00814,
+      "diffuse": 1.0,
+      "specular": 0.7122,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 865.0],
+      "target": [975.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.5",
+      "light": "AREA",
+      "power": 0.00985,
+      "diffuse": 1.0,
+      "specular": 0.3168,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 865.0],
+      "target": [1125.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.6",
+      "light": "AREA",
+      "power": 0.01474,
+      "diffuse": 1.0,
+      "specular": 0.642,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 865.0],
+      "target": [1275.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.7",
+      "light": "AREA",
+      "power": 0.08786,
+      "diffuse": 0.3558,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 865.0],
+      "target": [1425.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.8",
+      "light": "AREA",
+      "power": 0.50886,
+      "diffuse": 0.131,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1575.0, -320.0, 865.0],
+      "target": [1575.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.9",
+      "light": "AREA",
+      "power": 0.51889,
+      "diffuse": 0.2481,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1725.0, -320.0, 865.0],
+      "target": [1725.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.10",
+      "light": "AREA",
+      "power": 0.2433,
+      "diffuse": 0.9126,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1875.0, -320.0, 865.0],
+      "target": [1875.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.11",
+      "light": "AREA",
+      "power": 0.29362,
+      "diffuse": 1.0,
+      "specular": 0.1966,
+      "size": [150.0, 150.0],
+      "at": [2025.0, -320.0, 865.0],
+      "target": [2025.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.12",
+      "light": "AREA",
+      "power": 0.30927,
+      "diffuse": 1.0,
+      "specular": 0.7103,
+      "size": [150.0, 150.0],
+      "at": [2175.0, -320.0, 865.0],
+      "target": [2175.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.13",
+      "light": "AREA",
+      "power": 0.24577,
+      "diffuse": 1.0,
+      "specular": 0.3078,
+      "size": [150.0, 150.0],
+      "at": [2325.0, -320.0, 865.0],
+      "target": [2325.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.14",
+      "light": "AREA",
+      "power": 0.18722,
+      "diffuse": 1.0,
+      "specular": 0.0623,
+      "size": [150.0, 150.0],
+      "at": [2475.0, -320.0, 865.0],
+      "target": [2475.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.15",
+      "light": "AREA",
+      "power": 0.1338,
+      "diffuse": 1.0,
+      "specular": 0.0305,
+      "size": [150.0, 150.0],
+      "at": [2625.0, -320.0, 865.0],
+      "target": [2625.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 5.16",
+      "light": "AREA",
+      "power": 0.10193,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [150.0, 150.0],
+      "at": [2775.0, -320.0, 865.0],
+      "target": [2775.0, 0.0, 865.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.1",
+      "light": "AREA",
+      "power": 0.20691,
+      "diffuse": 0.3838,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 1015.0],
+      "target": [525.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.2",
+      "light": "AREA",
+      "power": 0.07433,
+      "diffuse": 0.6351,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 1015.0],
+      "target": [675.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.3",
+      "light": "AREA",
+      "power": 0.02495,
+      "diffuse": 0.7512,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 1015.0],
+      "target": [825.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.4",
+      "light": "AREA",
+      "power": 0.00993,
+      "diffuse": 0.2613,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 1015.0],
+      "target": [975.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.5",
+      "light": "AREA",
+      "power": 0.00257,
+      "diffuse": 1.0,
+      "specular": 0.7792,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 1015.0],
+      "target": [1125.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.6",
+      "light": "AREA",
+      "power": 0.01048,
+      "diffuse": 1.0,
+      "specular": 0.0974,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 1015.0],
+      "target": [1275.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.7",
+      "light": "AREA",
+      "power": 0.04352,
+      "diffuse": 1.0,
+      "specular": 0.0852,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 1015.0],
+      "target": [1425.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.13",
+      "light": "AREA",
+      "power": 0.21413,
+      "diffuse": 1.0,
+      "specular": 0.1605,
+      "size": [150.0, 150.0],
+      "at": [2325.0, -320.0, 1015.0],
+      "target": [2325.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.14",
+      "light": "AREA",
+      "power": 0.165,
+      "diffuse": 1.0,
+      "specular": 0.202,
+      "size": [150.0, 150.0],
+      "at": [2475.0, -320.0, 1015.0],
+      "target": [2475.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.15",
+      "light": "AREA",
+      "power": 0.12012,
+      "diffuse": 1.0,
+      "specular": 0.1093,
+      "size": [150.0, 150.0],
+      "at": [2625.0, -320.0, 1015.0],
+      "target": [2625.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 6.16",
+      "light": "AREA",
+      "power": 0.09462,
+      "diffuse": 1.0,
+      "specular": 0.1123,
+      "size": [150.0, 150.0],
+      "at": [2775.0, -320.0, 1015.0],
+      "target": [2775.0, 0.0, 1015.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 7.2",
+      "light": "AREA",
+      "power": 0.18316,
+      "diffuse": 0.405,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 1165.0],
+      "target": [675.0, 0.0, 1165.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 7.3",
+      "light": "AREA",
+      "power": 0.0357,
+      "diffuse": 1.0,
+      "specular": 0.502,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 1165.0],
+      "target": [825.0, 0.0, 1165.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 7.4",
+      "light": "AREA",
+      "power": 0.00778,
+      "diffuse": 1.0,
+      "specular": 0.1681,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 1165.0],
+      "target": [975.0, 0.0, 1165.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 7.5",
+      "light": "AREA",
+      "power": 0.04972,
+      "diffuse": 0.2,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 1165.0],
+      "target": [1125.0, 0.0, 1165.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 7.6",
+      "light": "AREA",
+      "power": 0.02765,
+      "diffuse": 1.0,
+      "specular": 0.0615,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 1165.0],
+      "target": [1275.0, 0.0, 1165.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 7.7",
+      "light": "AREA",
+      "power": 0.07531,
+      "diffuse": 1.0,
+      "specular": 0.0171,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 1165.0],
+      "target": [1425.0, 0.0, 1165.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 8.2",
+      "light": "AREA",
+      "power": 0.16332,
+      "diffuse": 0.3614,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 1315.0],
+      "target": [675.0, 0.0, 1315.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 8.3",
+      "light": "AREA",
+      "power": 0.06147,
+      "diffuse": 0.5608,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 1315.0],
+      "target": [825.0, 0.0, 1315.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 8.4",
+      "light": "AREA",
+      "power": 0.03422,
+      "diffuse": 0.4624,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 1315.0],
+      "target": [975.0, 0.0, 1315.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 8.5",
+      "light": "AREA",
+      "power": 0.02582,
+      "diffuse": 0.9703,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 1315.0],
+      "target": [1125.0, 0.0, 1315.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 8.6",
+      "light": "AREA",
+      "power": 0.05024,
+      "diffuse": 1.0,
+      "specular": 0.4607,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 1315.0],
+      "target": [1275.0, 0.0, 1315.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 8.7",
+      "light": "AREA",
+      "power": 0.104,
+      "diffuse": 1.0,
+      "specular": 0.082,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 1315.0],
+      "target": [1425.0, 0.0, 1315.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 9.2",
+      "light": "AREA",
+      "power": 0.06182,
+      "diffuse": 0.5068,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 1465.0],
+      "target": [675.0, 0.0, 1465.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 9.3",
+      "light": "AREA",
+      "power": 0.01198,
+      "diffuse": 1.0,
+      "specular": 0.2683,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 1465.0],
+      "target": [825.0, 0.0, 1465.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 9.4",
+      "light": "AREA",
+      "power": 0.01899,
+      "diffuse": 0.2364,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 1465.0],
+      "target": [975.0, 0.0, 1465.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 9.5",
+      "light": "AREA",
+      "power": 0.01782,
+      "diffuse": 1.0,
+      "specular": 0.1509,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 1465.0],
+      "target": [1125.0, 0.0, 1465.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 9.6",
+      "light": "AREA",
+      "power": 0.03986,
+      "diffuse": 1.0,
+      "specular": 0.0805,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 1465.0],
+      "target": [1275.0, 0.0, 1465.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 9.7",
+      "light": "AREA",
+      "power": 0.08912,
+      "diffuse": 1.0,
+      "specular": 0.2635,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 1465.0],
+      "target": [1425.0, 0.0, 1465.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 10.1",
+      "light": "AREA",
+      "power": 0.15791,
+      "diffuse": 0.4142,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 1615.0],
+      "target": [525.0, 0.0, 1615.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 10.2",
+      "light": "AREA",
+      "power": 0.03851,
+      "diffuse": 0.6804,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 1615.0],
+      "target": [675.0, 0.0, 1615.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 10.3",
+      "light": "AREA",
+      "power": 0.00845,
+      "diffuse": 1.0,
+      "specular": 0.0017,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 1615.0],
+      "target": [825.0, 0.0, 1615.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 10.4",
+      "light": "AREA",
+      "power": 0.00254,
+      "diffuse": 1.0,
+      "specular": 0.0016,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 1615.0],
+      "target": [975.0, 0.0, 1615.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 10.5",
+      "light": "AREA",
+      "power": 0.04554,
+      "diffuse": 0.5693,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 1615.0],
+      "target": [1125.0, 0.0, 1615.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 10.6",
+      "light": "AREA",
+      "power": 0.04718,
+      "diffuse": 0.6143,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 1615.0],
+      "target": [1275.0, 0.0, 1615.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 10.7",
+      "light": "AREA",
+      "power": 0.06925,
+      "diffuse": 0.9264,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 1615.0],
+      "target": [1425.0, 0.0, 1615.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 11.1",
+      "light": "AREA",
+      "power": 0.27543,
+      "diffuse": 0.2434,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [525.0, -320.0, 1765.0],
+      "target": [525.0, 0.0, 1765.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 11.2",
+      "light": "AREA",
+      "power": 0.12166,
+      "diffuse": 0.3096,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 1765.0],
+      "target": [675.0, 0.0, 1765.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 11.3",
+      "light": "AREA",
+      "power": 0.01646,
+      "diffuse": 1.0,
+      "specular": 0.4446,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 1765.0],
+      "target": [825.0, 0.0, 1765.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 11.4",
+      "light": "AREA",
+      "power": 0.0394,
+      "diffuse": 0.1179,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 1765.0],
+      "target": [975.0, 0.0, 1765.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 11.5",
+      "light": "AREA",
+      "power": 0.05648,
+      "diffuse": 0.103,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 1765.0],
+      "target": [1125.0, 0.0, 1765.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 11.6",
+      "light": "AREA",
+      "power": 0.24537,
+      "diffuse": 0.0527,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 1765.0],
+      "target": [1275.0, 0.0, 1765.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 11.7",
+      "light": "AREA",
+      "power": 0.16735,
+      "diffuse": 0.1853,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 1765.0],
+      "target": [1425.0, 0.0, 1765.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 12.2",
+      "light": "AREA",
+      "power": 0.29158,
+      "diffuse": 0.1345,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 1915.0],
+      "target": [675.0, 0.0, 1915.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 12.3",
+      "light": "AREA",
+      "power": 0.25793,
+      "diffuse": 0.5301,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 1915.0],
+      "target": [825.0, 0.0, 1915.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 12.4",
+      "light": "AREA",
+      "power": 0.12674,
+      "diffuse": 0.0313,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 1915.0],
+      "target": [975.0, 0.0, 1915.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 12.5",
+      "light": "AREA",
+      "power": 0.07078,
+      "diffuse": 0.0526,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 1915.0],
+      "target": [1125.0, 0.0, 1915.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 12.6",
+      "light": "AREA",
+      "power": 0.23757,
+      "diffuse": 0.0344,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 1915.0],
+      "target": [1275.0, 0.0, 1915.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 12.7",
+      "light": "AREA",
+      "power": 0.18328,
+      "diffuse": 0.0923,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 1915.0],
+      "target": [1425.0, 0.0, 1915.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 13.2",
+      "light": "AREA",
+      "power": 0.15933,
+      "diffuse": 0.082,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 2065.0],
+      "target": [675.0, 0.0, 2065.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 13.3",
+      "light": "AREA",
+      "power": 0.00864,
+      "diffuse": 0.8629,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 2065.0],
+      "target": [825.0, 0.0, 2065.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 13.6",
+      "light": "AREA",
+      "power": 0.01205,
+      "diffuse": 0.3569,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 2065.0],
+      "target": [1275.0, 0.0, 2065.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 13.7",
+      "light": "AREA",
+      "power": 0.14334,
+      "diffuse": 0.0502,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 2065.0],
+      "target": [1425.0, 0.0, 2065.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 14.2",
+      "light": "AREA",
+      "power": 0.00861,
+      "diffuse": 0.0892,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 2215.0],
+      "target": [675.0, 0.0, 2215.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 14.3",
+      "light": "AREA",
+      "power": 0.01801,
+      "diffuse": 0.0151,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 2215.0],
+      "target": [825.0, 0.0, 2215.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 14.4",
+      "light": "AREA",
+      "power": 0.00631,
+      "diffuse": 0.7535,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 2215.0],
+      "target": [975.0, 0.0, 2215.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 14.5",
+      "light": "AREA",
+      "power": 0.00985,
+      "diffuse": 1.0,
+      "specular": 0.0102,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 2215.0],
+      "target": [1125.0, 0.0, 2215.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 14.6",
+      "light": "AREA",
+      "power": 0.01516,
+      "diffuse": 1.0,
+      "specular": 0.3367,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 2215.0],
+      "target": [1275.0, 0.0, 2215.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 14.7",
+      "light": "AREA",
+      "power": 0.13488,
+      "diffuse": 0.1208,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 2215.0],
+      "target": [1425.0, 0.0, 2215.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 15.2",
+      "light": "AREA",
+      "power": 0.00474,
+      "diffuse": 1.0,
+      "specular": 0.2626,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 2365.0],
+      "target": [675.0, 0.0, 2365.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 15.5",
+      "light": "AREA",
+      "power": 0.00548,
+      "diffuse": 0.0127,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 2365.0],
+      "target": [1125.0, 0.0, 2365.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 15.6",
+      "light": "AREA",
+      "power": 0.04781,
+      "diffuse": 0.0169,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 2365.0],
+      "target": [1275.0, 0.0, 2365.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 15.7",
+      "light": "AREA",
+      "power": 0.18455,
+      "diffuse": 0.0088,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 2365.0],
+      "target": [1425.0, 0.0, 2365.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 16.2",
+      "light": "AREA",
+      "power": 0.059,
+      "diffuse": 1.0,
+      "specular": 0.0367,
+      "size": [150.0, 150.0],
+      "at": [675.0, -320.0, 2515.0],
+      "target": [675.0, 0.0, 2515.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 16.3",
+      "light": "AREA",
+      "power": 0.04645,
+      "diffuse": 1.0,
+      "specular": 0.0545,
+      "size": [150.0, 150.0],
+      "at": [825.0, -320.0, 2515.0],
+      "target": [825.0, 0.0, 2515.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 16.4",
+      "light": "AREA",
+      "power": 0.04204,
+      "diffuse": 1.0,
+      "specular": 0.1013,
+      "size": [150.0, 150.0],
+      "at": [975.0, -320.0, 2515.0],
+      "target": [975.0, 0.0, 2515.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 16.5",
+      "light": "AREA",
+      "power": 0.01794,
+      "diffuse": 1.0,
+      "specular": 0.2269,
+      "size": [150.0, 150.0],
+      "at": [1125.0, -320.0, 2515.0],
+      "target": [1125.0, 0.0, 2515.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 16.6",
+      "light": "AREA",
+      "power": 0.06808,
+      "diffuse": 0.0002,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1275.0, -320.0, 2515.0],
+      "target": [1275.0, 0.0, 2515.0],
+      "twin": true
+    },
+    {
+      "name": "Wall 16.7",
+      "light": "AREA",
+      "power": 0.54916,
+      "diffuse": 0.0001,
+      "specular": 1.0,
+      "size": [150.0, 150.0],
+      "at": [1425.0, -320.0, 2515.0],
+      "target": [1425.0, 0.0, 2515.0],
+      "twin": true
+    },
+    {
+      "name": "Top 0.0",
+      "light": "AREA",
+      "power": 0.09182,
+      "diffuse": 1.0,
+      "specular": 0.0091,
+      "size": [500.0, 600.0],
+      "at": [550.0, -900.0, -500.0],
+      "target": [550.0, -270.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 0.1",
+      "light": "AREA",
+      "power": 0.03758,
+      "diffuse": 1.0,
+      "specular": 0.0082,
+      "size": [500.0, 600.0],
+      "at": [1050.0, -900.0, -500.0],
+      "target": [1050.0, -270.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 0.2",
+      "light": "AREA",
+      "power": 0.03355,
+      "diffuse": 1.0,
+      "specular": 0.0208,
+      "size": [500.0, 600.0],
+      "at": [1550.0, -900.0, -500.0],
+      "target": [1550.0, -270.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 0.3",
+      "light": "AREA",
+      "power": 0.05286,
+      "diffuse": 1.0,
+      "specular": 0.0069,
+      "size": [500.0, 600.0],
+      "at": [2050.0, -900.0, -500.0],
+      "target": [2050.0, -270.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 0.4",
+      "light": "AREA",
+      "power": 0.07936,
+      "diffuse": 1.0,
+      "specular": 0.0,
+      "size": [500.0, 600.0],
+      "at": [2550.0, -900.0, -500.0],
+      "target": [2550.0, -270.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 1.0",
+      "light": "AREA",
+      "power": 0.60811,
+      "diffuse": 0.3478,
+      "specular": 1.0,
+      "size": [500.0, 600.0],
+      "at": [550.0, -300.0, -500.0],
+      "target": [550.0, -90.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 1.1",
+      "light": "AREA",
+      "power": 0.05432,
+      "diffuse": 0.835,
+      "specular": 1.0,
+      "size": [500.0, 600.0],
+      "at": [1050.0, -300.0, -500.0],
+      "target": [1050.0, -90.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 1.2",
+      "light": "AREA",
+      "power": 0.03715,
+      "diffuse": 1.0,
+      "specular": 0.1169,
+      "size": [500.0, 600.0],
+      "at": [1550.0, -300.0, -500.0],
+      "target": [1550.0, -90.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 1.3",
+      "light": "AREA",
+      "power": 0.08085,
+      "diffuse": 1.0,
+      "specular": 0.0865,
+      "size": [500.0, 600.0],
+      "at": [2050.0, -300.0, -500.0],
+      "target": [2050.0, -90.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Top 1.4",
+      "light": "AREA",
+      "power": 0.07709,
+      "diffuse": 1.0,
+      "specular": 0.083,
+      "size": [500.0, 600.0],
+      "at": [2550.0, -300.0, -500.0],
+      "target": [2550.0, -90.0, 600.0],
+      "twin": true
+    },
+    {
+      "name": "Rear 0",
+      "light": "AREA",
+      "power": 0.15238,
+      "diffuse": 0.3097,
+      "specular": 1.0,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 250.0],
+      "target": [430.0, 0.0, 250.0],
+      "twin": false
+    },
+    {
+      "name": "Rear 1",
+      "light": "AREA",
+      "power": 0.22493,
+      "diffuse": 0.7755,
+      "specular": 1.0,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 550.0],
+      "target": [430.0, 0.0, 550.0],
+      "twin": false
+    },
+    {
+      "name": "Rear 2",
+      "light": "AREA",
+      "power": 0.78854,
+      "diffuse": 1.0,
+      "specular": 0.2009,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 850.0],
+      "target": [430.0, 0.0, 850.0],
+      "twin": false
+    },
+    {
+      "name": "Rear 3",
+      "light": "AREA",
+      "power": 0.66,
+      "diffuse": 1.0,
+      "specular": 0.1918,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 1150.0],
+      "target": [430.0, 0.0, 1150.0],
+      "twin": false
+    },
+    {
+      "name": "Rear 4",
+      "light": "AREA",
+      "power": 0.31375,
+      "diffuse": 1.0,
+      "specular": 0.1918,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 1450.0],
+      "target": [430.0, 0.0, 1450.0],
+      "twin": false
+    },
+    {
+      "name": "Rear 5",
+      "light": "AREA",
+      "power": 0.14834,
+      "diffuse": 1.0,
+      "specular": 0.806,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 1750.0],
+      "target": [430.0, 0.0, 1750.0],
+      "twin": false
+    },
+    {
+      "name": "Rear 6",
+      "light": "AREA",
+      "power": 0.12891,
+      "diffuse": 1.0,
+      "specular": 0.7583,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 2050.0],
+      "target": [430.0, 0.0, 2050.0],
+      "twin": false
+    },
+    {
+      "name": "Rear 7",
+      "light": "AREA",
+      "power": 0.24439,
+      "diffuse": 1.0,
+      "specular": 0.0009,
+      "size": [300.0, 300.0],
+      "at": [150.0, 0.0, 2350.0],
+      "target": [430.0, 0.0, 2350.0],
+      "twin": false
+    }
+  ],
+  "views": {
+    "hero": {
+      "location": [-1.05, -2.35, 0.55],
+      "target": [0.3, 0.0, -0.58],
+      "lens": 45.0,
+      "resolution": [2000, 2000]
+    },
+    "back": {
+      "location": [1.2, 1.85, 0.3],
+      "target": [0.3, 0.0, -0.58],
+      "lens": 40.0,
+      "resolution": [2000, 2000]
+    },
+    "head": {
+      "location": [0.3, -0.55, 0.32],
+      "target": [-0.08, 0.0, 0.02],
+      "lens": 45.0,
+      "resolution": [1920, 1080]
+    },
+    "blade": {
+      "location": [0.62, -0.62, -0.38],
+      "target": [0.5, 0.0, 0.06],
+      "lens": 40.0,
+      "resolution": [1920, 1080]
+    },
+    "grip": {
+      "location": [0.32, -0.42, -0.72],
+      "target": [0.03, 0.0, -0.86],
+      "lens": 55.0,
+      "resolution": [1920, 1080]
+    },
+    "foot": {
+      "location": [0.26, -0.36, -1.24],
+      "target": [0.02, 0.0, -1.42],
+      "lens": 50.0,
+      "resolution": [1920, 1080]
+    }
+  }
+}

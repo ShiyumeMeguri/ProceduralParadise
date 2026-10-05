@@ -1,0 +1,29 @@
+{
+  "id": "Sheet",
+  "notes": "The side elevation of the design sheet: an orthographic camera looking along +Y whose frame is the scanned sheet, pixel for pixel (0.75 mm a pixel).",
+  "camera": {
+    "resolution": [2741, 2539],
+    "ortho_width": 2.05575,
+    "location": [0.26289, -3.0, -0.603982],
+    "yaw_deg": 0.0,
+    "pitch_deg": 0.0,
+    "roll_deg": 0.0,
+    "clip": [2.5, 3.5]
+  },
+  "render": {
+    "engine": "EEVEE",
+    "samples": 64,
+    "view": "Standard",
+    "exposure": 0.0,
+    "eevee": {
+      "viewport_samples": 16,
+      "light_threshold": 1e-06,
+      "shadow_pool": "1024",
+      "shadow_resolution": 0.25
+    },
+    "transparent": true
+  },
+  "look": {
+    "backdrop": [1.0, 1.0, 1.0]
+  }
+}
