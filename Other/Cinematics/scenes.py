@@ -42,7 +42,7 @@ import math
 import os
 
 import bpy
-from mathutils import Quaternion, Vector
+from mathutils import Matrix, Quaternion, Vector
 
 from Core import cast as CAST, jsonio, scene as SC, values as V
 from Core import render as RND
@@ -238,9 +238,20 @@ TWISTS = {"Hand_L": ("ForeTwist_L", "ForeTwist1_L"), "Hand_R": ("ForeTwist_R", "
 
 
 def _twist(quaternion, axis=Vector((0.0, 1.0, 0.0))):
-    """Angle of ``quaternion`` about ``axis`` (its swing-twist split)."""
-    projection = Vector((quaternion.x, quaternion.y, quaternion.z)).dot(axis)
-    return 2.0 * math.atan2(projection, quaternion.w)
+    """Angle of ``quaternion`` about ``axis`` (its swing-twist split), within a half turn."""
+    sign = -1.0 if quaternion.w < 0.0 else 1.0
+    projection = sign * Vector((quaternion.x, quaternion.y, quaternion.z)).dot(axis)
+    return 2.0 * math.atan2(projection, sign * quaternion.w)
+
+
+def _continuous(previous, key, quaternion):
+    """``quaternion`` on the same side as the one keyed before it (``q`` and ``-q`` are one
+    rotation, but keys interpolated across a sign flip swing through every other one)."""
+    quaternion = Quaternion(quaternion)
+    if key in previous and previous[key].dot(quaternion) < 0.0:
+        quaternion.negate()
+    previous[key] = quaternion
+    return quaternion
 
 
 def perform(rig, folder, entry, frames, collection_objects):
@@ -249,30 +260,50 @@ def perform(rig, folder, entry, frames, collection_objects):
     shot's ``frames`` (motion blur never reads the next shot's pose), the
     cast hidden on the shot's frames the performance does not cover.  A
     wrist's twist is shared out along the forearm's twist bones (a third
-    each, as the rig expects of them), so the forearm turns with the hand."""
+    each, as the rig expects of them), so the forearm turns with the hand.
+    A held prop's bone (``held``: prop bone -> hand bone) hangs on the hand
+    by a Child Of constraint and is keyed with its grip, the prop in the
+    hand's frame: the bone's own pose is its rest inverted times the grip,
+    so the constraint lands it exactly there."""
     path = os.path.join(folder, entry["performance"])
     performance = jsonio.load(path)
     rig.rotation_mode = "QUATERNION"
     first, last = frames
     keyed = [item for item in performance["frames"] if first <= item["frame"] <= last]
+    previous = {}
+    for held, hand in performance.get("held", {}).items():
+        constraint = rig.pose.bones[held].constraints.new("CHILD_OF")
+        constraint.name = f"Held by {hand}"
+        constraint.target = rig
+        constraint.subtarget = hand
+        constraint.inverse_matrix = Matrix.Identity(4)
     for item in keyed:
         frame = item["frame"]
         rig.location = _vector(item["location"])
-        rig.rotation_quaternion = Quaternion(item["rotation"])
+        rig.rotation_quaternion = _continuous(previous, None, item["rotation"])
         rig.keyframe_insert("location", frame=frame)
         rig.keyframe_insert("rotation_quaternion", frame=frame)
         for name, value in item["bones"].items():
             bone = rig.pose.bones[name]
             bone.rotation_mode = "QUATERNION"
-            bone.rotation_quaternion = Quaternion(value)
+            bone.rotation_quaternion = _continuous(previous, name, value)
             bone.keyframe_insert("rotation_quaternion", frame=frame)
             if name in TWISTS:
                 angle = _twist(Quaternion(value)) / 3.0
                 for twist_name in TWISTS[name]:
                     twist = rig.pose.bones[twist_name]
                     twist.rotation_mode = "QUATERNION"
-                    twist.rotation_quaternion = Quaternion((0.0, 1.0, 0.0), angle)
+                    twist.rotation_quaternion = _continuous(previous, twist_name, Quaternion((0.0, 1.0, 0.0), angle))
                     twist.keyframe_insert("rotation_quaternion", frame=frame)
+        for name, grip in item.get("grips", {}).items():
+            bone = rig.pose.bones[name]
+            matrix = Matrix.Translation(_vector(grip["location"])) @ Quaternion(grip["rotation"]).to_matrix().to_4x4()
+            location, rotation, _scale = (rig.data.bones[name].matrix_local.inverted() @ matrix).decompose()
+            bone.rotation_mode = "QUATERNION"
+            bone.location = location
+            bone.rotation_quaternion = _continuous(previous, name, rotation)
+            bone.keyframe_insert("location", frame=frame)
+            bone.keyframe_insert("rotation_quaternion", frame=frame)
     shown = (keyed[0]["frame"], keyed[-1]["frame"]) if keyed else (last + 1, last)
     switches = [(first, shown[0] > first), (shown[0], False), (shown[1] + 1, True)]
     for obj in collection_objects:
@@ -316,7 +347,7 @@ def build_shot(folder, film, shot, built_set, args):
         sources += perform(built_set["rigs"][name], folder, entry, (first, last), list(built_set["cast"].all_objects))
     scene.frame_set(first)
     path = os.path.join(folder, "shots", f"{shot['id']}.json")
-    return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera,
+    return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=built_set["cast"],
                 sources=[path, built_set["source"], os.path.join(folder, "film.json")] + sources)
 
 

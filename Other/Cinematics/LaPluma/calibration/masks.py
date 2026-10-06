@@ -4,8 +4,9 @@ Video masks of one object of the reference (SAM 2).
     python masks.py <frames dir> <first> <last> <out dir> <prompt frame> <x0,y0,x1,y1> [<x,y> ...]
                     [--checkpoint sam2.1_hiera_large.pt --config configs/sam2.1/sam2.1_hiera_l.yaml]
 
-The object is prompted on one frame with a box round it (and positive
-points, optional) and tracked through the shot both ways; every frame's
+The object is prompted on one frame with a box round it (and points on
+it, optional, and ``--negative`` points on what is not it -- a character
+in front of what she holds) and tracked through the shot both ways; every frame's
 mask is written as ``m####.png`` (white = the object).  Needs the ``sam2``
 package and its checkpoint.
 """
@@ -27,6 +28,7 @@ parser.add_argument("out")
 parser.add_argument("prompt_frame", type=int)
 parser.add_argument("box")
 parser.add_argument("points", nargs="*")
+parser.add_argument("--negative", nargs="*", default=[], help="x,y points that are not the object")
 parser.add_argument("--checkpoint", required=True)
 parser.add_argument("--config", default="configs/sam2.1/sam2.1_hiera_l.yaml")
 args = parser.parse_args()
@@ -40,8 +42,10 @@ predictor = build_sam2_video_predictor(args.config, args.checkpoint, device="cud
 with torch.inference_mode(), torch.autocast("cuda", dtype=torch.bfloat16):
     state = predictor.init_state(video_path=staging, offload_video_to_cpu=True, offload_state_to_cpu=True)
     box = np.array([float(v) for v in args.box.split(",")], np.float32)
-    points = np.array([[float(v) for v in point.split(",")] for point in args.points], np.float32) if args.points else None
-    labels = np.ones(len(points), np.int32) if points is not None else None
+    positive = [[float(v) for v in point.split(",")] for point in args.points]
+    negative = [[float(v) for v in point.split(",")] for point in args.negative]
+    points = np.array(positive + negative, np.float32) if positive or negative else None
+    labels = np.array([1] * len(positive) + [0] * len(negative), np.int32) if points is not None else None
     predictor.add_new_points_or_box(state, frame_idx=frames.index(args.prompt_frame), obj_id=1, box=box, points=points, labels=labels)
     masks = {}
     for reverse in (False, True):

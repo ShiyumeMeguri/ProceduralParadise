@@ -21,7 +21,8 @@ its cadence -- and are never rendered: the edit shows the frame before.
 
 The family's interpreter (``<family>.scenes.build_film(folder, film,
 args)``) builds the sets, the cast and one Blender scene per shot and
-returns ``{"shots": {id: {"scene", "frames"}}}``; this module owns
+returns ``{"shots": {id: {"scene", "frames", "camera", "set", "cast"}}}``
+(the set's and the cast's collections); this module owns
 everything around it: the command line, saving, rendering each shot's
 frames into a folder of its own (a shot's frames survive interruption and
 are kept apart by the inputs they were made with), and the ``Film`` scene
@@ -34,6 +35,9 @@ Command line (after ``--``)::
     --render-shots               render the frames still missing of the shots
     --frames A-B                 only frames A..B of them
     --frame N --render PATH      a still of frame N
+    --frame N --inspect PATH     frame N's cast seen through the shot's camera and from
+                                 around it (right, back, left, above) without the set:
+                                 a pose fitted from one view checked from the others
     --video                      cut the rendered frames into the video
     --scale S --samples N        preview size and quality
     --no-look                    leave every compositor look out
@@ -84,6 +88,7 @@ def parse(argv):
     parser.add_argument("--frames", type=_frame_range, default=None)
     parser.add_argument("--frame", type=int, default=None)
     parser.add_argument("--render", default=None)
+    parser.add_argument("--inspect", default=None)
     parser.add_argument("--video", action="store_true")
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--samples", type=int, default=None)
@@ -177,6 +182,61 @@ def render_shot(shot, folder, holds, frames=None):
     return count
 
 
+INSPECTION_VIEWS = (("right", 90.0, 0.0), ("back", 180.0, 0.0), ("left", 270.0, 0.0), ("above", 0.0, 80.0))
+
+
+def inspect_cast(shot, frame, path):
+    """Render frame ``frame`` of ``shot`` through its camera, then from around the cast
+    (the views orbit the cast's bounds from the shot camera's side) with the set left out,
+    each a PNG next to ``path`` (``<path>_<view>.png``).  Returns the files written."""
+    import math
+
+    from mathutils import Matrix, Vector
+
+    from . import render as RND
+    scene = shot["scene"]
+    scene.frame_set(frame)
+    RND._output_kind("IMAGE", scene).file_format = "PNG"
+    stem = os.path.splitext(os.path.abspath(path))[0]
+    written = [f"{stem}_shot.png"]
+    scene.render.filepath = written[0]
+    bpy.ops.render.render(write_still=True, scene=scene.name)
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    corners = [obj.evaluated_get(depsgraph).matrix_world @ Vector(corner)
+               for obj in shot["cast"].all_objects if obj.type == "MESH" and not obj.hide_render
+               for corner in obj.evaluated_get(depsgraph).bound_box]
+    centre = sum(corners, Vector()) / len(corners)
+    radius = max((corner - centre).length for corner in corners)
+    shot_camera = shot["camera"]
+    toward = centre - shot_camera.matrix_world.translation
+    heading = math.atan2(toward.y, toward.x)
+    data = bpy.data.cameras.new("Inspection")
+    data.lens = 50.0
+    data.clip_start, data.clip_end = 0.01, radius * 20.0
+    viewer = bpy.data.objects.new("Inspection", data)
+    scene.collection.objects.link(viewer)
+    layer = scene.view_layers[0].layer_collection
+    set_layer = next(child for child in layer.children if child.collection == shot["set"])
+    excluded = set_layer.exclude
+    set_layer.exclude = True
+    distance = radius * 2.0 / math.tan(data.angle / 2.0)
+    for name, azimuth, elevation in INSPECTION_VIEWS:
+        angle = heading + math.pi + math.radians(azimuth)
+        lift = math.radians(elevation)
+        offset = Vector((math.cos(angle) * math.cos(lift), math.sin(angle) * math.cos(lift), math.sin(lift))) * distance
+        viewer.location = centre + offset
+        viewer.rotation_euler = (-offset).to_track_quat("-Z", "Y").to_euler()
+        scene.camera = viewer
+        written.append(f"{stem}_{name}.png")
+        scene.render.filepath = written[-1]
+        bpy.ops.render.render(write_still=True, scene=scene.name)
+    scene.camera = shot_camera
+    set_layer.exclude = excluded
+    bpy.data.objects.remove(viewer)
+    bpy.data.cameras.remove(data)
+    return written
+
+
 def edit_scene(film, shots, folders, name="Film"):
     """The ``Film`` scene: a sequencer cut of every shot's frames in film
     order, each hold showing the frame before it; rendering it writes the
@@ -250,10 +310,14 @@ def run(here, root, script_path, argv=None):
         for shot_id, shot in shots.items():
             count = render_shot(shot, folders[shot_id], holds, args.frames)
             print(f"[film] {shot_id}: rendered {count} frames into {folders[shot_id]}")
-    if args.frame is not None and args.render:
+    if args.frame is not None and (args.render or args.inspect):
         shot = next((shot for shot in shots.values() if shot["frames"][0] <= args.frame <= shot["frames"][1]), None)
         if shot is None:
             raise ValueError(f"frame {args.frame} lies in none of the built shots {list(shots)}")
+    if args.frame is not None and args.inspect:
+        for written in inspect_cast(shot, args.frame, args.inspect):
+            print(f"[film] inspection of frame {args.frame} -> {written}")
+    if args.frame is not None and args.render:
         scene = shot["scene"]
         scene.frame_set(args.frame)
         scene.render.filepath = os.path.abspath(args.render)
