@@ -1,0 +1,17 @@
+{
+ "notes": [
+  "Where the hand shot's camera stands in the set: 22.6 m out from the main tower's face and 89 m up, beside where she flew out, looking along the face and away from it (heading 2 degrees off +X towards -Y) and up 35.4 degrees, level.",
+  "Chosen so the tower's top storeys (its roof 108.7 m up) fill the lower left of frame 207 as the reference's structure does and have turned out of the picture by frame 227 with the sky's measured turn (calibration/Hand.camera.json); a level camera keeps her upright within 30-46 degrees."
+ ],
+ "location": [
+  -22.35,
+  -22.6,
+  88.97
+ ],
+ "look": [
+  0.814631,
+  -0.028448,
+  0.579281
+ ],
+ "roll": 0.0
+}

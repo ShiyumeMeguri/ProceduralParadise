@@ -152,11 +152,20 @@ def _shown(frame, holds):
     return frame
 
 
+def present(scene, frame=None):
+    """Make ``scene`` the window's scene, then go to ``frame``: the render operator renders the
+    scene it is given at the frame of the window's scene, whatever frame that one was put on."""
+    bpy.context.window.scene = scene
+    if frame is not None:
+        scene.frame_set(frame)
+
+
 def render_shot(shot, folder, holds, frames=None):
     """Render the frames of ``shot`` that are not on disk yet into
     ``folder`` (``<id>_####.png``), skipping holds."""
     from . import render as RND
     scene = shot["scene"]
+    present(scene)
     first, last = shot["frames"]
     if frames is not None:
         first, last = max(first, frames[0]), min(last, frames[1])
@@ -196,7 +205,7 @@ def inspect_cast(shot, frame, path):
 
     from . import render as RND
     scene = shot["scene"]
-    scene.frame_set(frame)
+    present(scene, frame)
     RND._output_kind("IMAGE", scene).file_format = "PNG"
     stem = os.path.splitext(os.path.abspath(path))[0]
     written = [f"{stem}_shot.png"]
@@ -323,7 +332,7 @@ def run(here, root, script_path, argv=None):
             print(f"[film] inspection of frame {args.frame} -> {written}")
     if args.frame is not None and args.render:
         scene = shot["scene"]
-        scene.frame_set(args.frame)
+        present(scene, args.frame)
         scene.render.filepath = os.path.abspath(args.render)
         RND._output_kind("IMAGE", scene).file_format = "PNG"
         bpy.ops.render.render(write_still=True, scene=scene.name)
@@ -335,6 +344,7 @@ def run(here, root, script_path, argv=None):
         if missing:
             raise RuntimeError(f"cannot cut the video: frames missing in {sorted(set(missing))}")
         os.makedirs(os.path.dirname(video), exist_ok=True)
+        present(edit)
         bpy.ops.render.render(animation=True, scene=edit.name)
         print(f"[film] video -> {video}")
     return production

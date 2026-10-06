@@ -7,7 +7,7 @@
     "A wrist's turn about its bone is shared out along the forearm's twist bones (a share each), so the forearm turns with the hand.",
     "Keypoints are COCO-WholeBody indices (keypoints.py) put on a bone: its head, or `along` its length, plus an `offset` in its frame.",
     "A prop is held by `hand`; the palm is the middle of the two `palm` bones' heads; it closes on the `shaft` (two points in the prop bone's rest frame); the prop's `parts` are told apart by material.  A part's `precision` (and the rest's `rest_precision`) is how hard it is held inside the film's silhouette of it: the film's scythe has the model's blade and hub disc (its ring about the disc's size) but a smaller housing.",
-    "A body part is the surface skinned below its bones; a shot's roto masks it under the part's name (roto.py) -- her legs, told apart by the left one's knee pad and strapped thigh.",
+    "A body part is the surface skinned below its bones; a shot's roto masks it under the part's name (roto.py) -- her legs, told apart by the left one's knee pad and strapped thigh; her right arm (it holds the scythe).",
     "A keypoint detector seeing her from behind may swap one pair of limbs and not another: each swap group (inclusive keypoint ranges) is read left-right as it is or swapped.  A group with masked `parts` (left, right) is read by where its sure keypoints fall: a left knee on the right leg's mask is the detector's swap; elsewhere, whichever reading fits."
   ],
   "props": {
@@ -16,7 +16,7 @@
                          "hub": {"materials": ["WPN.Brushed"], "precision": 1.0}},
                "rest_precision": 0.25}
   },
-  "parts": {"leg_l": ["Thigh_L"], "leg_r": ["Thigh_R"]},
+  "parts": {"leg_l": ["Thigh_L"], "leg_r": ["Thigh_R"], "arm_r": ["UpperArm_R"]},
   "joints": {
     "Pelvis": {"x": [-45, 45], "y": [-45, 45], "z": [-45, 45]},
     "Spine": {"x": [-35, 35], "y": [-35, 35], "z": [-30, 30]},

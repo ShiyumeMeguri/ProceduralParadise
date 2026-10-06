@@ -6,11 +6,11 @@ bone's rest frame.  Where the picture puts it is a placement in the set
 (``placements``: at the model's size; the same picture at any size, the
 prop that much larger that much further from the camera).  A held prop
 goes where the hand holding it goes: its bone's matrix is the hand bone's
-times a grip -- the prop in the hand's frame, its scale the film's size of
-it over the model's (``film_scale``; the reference is generated, its scythe
-larger than the character sheet's) -- which is what a performance records
-(``grips``) and what the film's interpreter hangs on the hand (a Child Of
-constraint).
+times a grip -- the prop in the hand's frame, at the size its maker made it
+(the reference is generated and draws the scythe larger than the character
+sheet does: that ``film_scale`` is only how the picture is matched) -- which
+is what a performance records (``grips``) and what the film's interpreter
+hangs on the hand (a Child Of constraint).
 How well a placement's projection fills the prop's silhouette (``silhouette.py``:
 the prop's masks and what may hide it, the character) and stays inside it.
 ``parts``: a prop whose parts look alike in
@@ -72,7 +72,7 @@ class Prop:
                                                             "rotation": [round(float(v), 6) for v in quaternion_from_matrix(rotation)]}
 
     def write_grips(self, frame_items, grips):
-        """Record grips (F, 4, 4) -- the prop bone's matrix in the hand bone's frame, a uniform scale in it."""
+        """Record grips (F, 4, 4) -- the prop bone's matrix in the hand bone's frame (any uniform scale in it recorded too)."""
         for item, grip in zip(frame_items, grips.cpu().numpy()):
             scale = float(np.cbrt(np.linalg.det(grip[:3, :3])))
             item.setdefault("grips", {})[self.name] = {"location": [round(float(v), 5) for v in grip[:3, 3]],

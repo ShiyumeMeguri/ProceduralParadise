@@ -1,0 +1,40 @@
+{
+ "id": "Hand",
+ "set": "District",
+ "frames": [
+  207,
+  278
+ ],
+ "notes": [
+  "Close on her right hand raised with the scythe against the sky, crows wheeling round; the camera turns with her (the sky's measured turn, calibration/sky_rotation.py) where the place stands it beside the tower, the tower's top storeys leaving the lower left.",
+  "Fitted with the camera at the origin (calibration/fit_prop.py, fit_pose.py): the performance is the camera's own, and moves with it."
+ ],
+ "camera": {
+  "focal_px": 1315.0,
+  "sensor": 36.0,
+  "clip": [
+   0.05,
+   20000.0
+  ],
+  "keys": "calibration/Hand.camera.json",
+  "place": "calibration/Hand.place.json"
+ },
+ "render": {
+  "engine": "EEVEE",
+  "samples": 32,
+  "eevee": {
+   "shadow_pool": "1024"
+  },
+  "view": "AgX",
+  "motion_blur": 0.5
+ },
+ "look": {
+  "exposure": 0.0
+ },
+ "cast": {
+  "LaPluma": {
+   "performance": "performances/Hand.json",
+   "relative_to": "camera"
+  }
+ }
+}

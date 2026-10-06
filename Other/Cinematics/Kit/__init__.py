@@ -1,2 +1,2 @@
 """Cinematics kit: importing the package registers every ``CIN.*`` asset."""
-from . import materials, structure, sky  # noqa: F401
+from . import materials, structure, sky, birds, clouds  # noqa: F401

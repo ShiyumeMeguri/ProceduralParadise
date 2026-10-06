@@ -1,5 +1,5 @@
 {
- "notes": ["Pixels of the reference video, keyed on one frame each: the scythe, its blade, its hub, and her arm."],
+ "notes": ["Pixels of the reference video, keyed on one frame each: the scythe, its blade, its hub, and her right arm (the coat's sleeve on it)."],
  "groups": [
   {"objects": ["scythe"], "keys": {
      "225": {"boxes": {"scythe": [0, 40, 1860, 1000]}, "points": {"scythe": [[1530, 195], [900, 120], [600, 640], [1250, 470], [300, 780], [1760, 310]]}, "negative": [[950, 850], [840, 510], [350, 300], [1300, 850]]}
@@ -10,8 +10,8 @@
   {"objects": ["hub"], "keys": {
      "225": {"boxes": {"hub": [1380, 50, 1690, 340]}, "points": {"hub": [[1530, 195], [1470, 195], [1590, 195], [1530, 135], [1530, 255]]}, "negative": [[1385, 195], [1675, 195], [1530, 345]]}
   }},
-  {"objects": ["arm"], "keys": {
-     "225": {"boxes": {"arm": [780, 460, 1260, 1080]}, "points": {"arm": [[950, 850], [980, 660], [830, 520], [1050, 750]]}, "negative": [[1000, 500], [600, 640], [1300, 850]]}
+  {"objects": ["arm_r"], "keys": {
+     "225": {"boxes": {"arm_r": [780, 460, 1260, 1080]}, "points": {"arm_r": [[950, 850], [980, 660], [830, 520], [1050, 750]]}, "negative": [[1000, 500], [600, 640], [1300, 850]]}
   }}
  ]
 }

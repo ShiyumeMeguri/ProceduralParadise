@@ -32,17 +32,20 @@ bones: a leg below its thigh) are masked in the shot (``--parts``: a
 it wears).  A part fills its own mask, and where a part's mask shows it and
 not another part, that other part, if it falls there, lies behind it:
 seen, a part is in front.
-The fit runs coarse to fine -- placement, then body and limbs, then hands.
+The fit runs coarse to fine -- placement (where the torso is seen, and the hand on what
+it holds), then body and limbs, then hands.
 An ``--anchor frame:axis:value`` pins the root's set coordinate on a frame
 where the reference shows where she is (breaking through a window).
 
 With ``--prop`` the prop she holds (the profile's ``props``) stays where
 its silhouette put it (``fit_prop.py``: the ``--start`` performance's
 ``placements``, one picture for any size) and the palm of her holding hand
-closes on its shaft: her arm reaches it, and how large the prop is in the
-film -- how far, then, it is -- is fitted as one scale for the shot.  The
-grips written (the prop in the hand's frame, its scale in them) hang it on
-the hand where the picture has it.
+closes on its shaft: her arm reaches it, and how large the prop is drawn in
+the film -- how far, then, it is -- is fitted as one scale for the shot.
+That scale is only how the picture is matched: the prop is as large as its
+maker made it (the cast's character sheet).  The grips written (the prop in
+the hand's frame) hang it on the hand at that size, turned as the picture
+has it, the point of its shaft under the palm kept under the palm.
 
 The card is shared (``gpu_budget.py``): the terms each frame answers for
 alone are added up a batch of frames at a time, as many as the claim
@@ -338,6 +341,23 @@ def grip_distance(world, slots):
     return (palm - (ends[:, 0] + along[:, None] * axis)).norm(dim=-1)
 
 
+def held_at_model_size(world, slots):
+    """The prop as large as its maker made it on the frames ``slots``, turned as the fitted one:
+    the point of its shaft under the palm where the fitted prop has it."""
+    held = placed_prop(slots)
+    scale = torch.exp(log_film_scale)
+    ends = torch.einsum("fij,nj->fni", held[:, :3, :3], shaft) + held[:, None, :3, 3]
+    axis = ends[:, 1] - ends[:, 0]
+    along = (((palm_of(world) - ends[:, 0]) * axis).sum(-1) / (axis * axis).sum(-1)).clamp(0.0, 1.0)
+    under = ends[:, 0] + along[:, None] * axis
+    rotation = held[:, :3, :3] / scale
+    local = shaft[0][None] + along[:, None] * (shaft[1] - shaft[0])[None]
+    matrix = torch.eye(4, device=device).repeat(len(slots), 1, 1)
+    matrix[:, :3, :3] = rotation
+    matrix[:, :3, 3] = under - torch.einsum("fij,fj->fi", rotation, local)
+    return matrix
+
+
 def misordered(pixels, depth, slots):
     """How far each part, where another part's mask shows that other part and not it, lies
     in front of that other part's surface there (m, summed over its samples)."""
@@ -387,7 +407,7 @@ def frame_terms(stage, slots):
         terms["cover"] = args.cover_weight * sum((part_silhouettes[name].coverage(pixels[name], slots) * part_silhouettes[name].present[slots]).sum()
                                                  for name in part_names) / count
         terms["order"] = args.order_weight * misordered(pixels, depth, slots) / (count * args.part_samples)
-    if prop is not None and stage >= 1:
+    if prop is not None:
         terms["grip"] = args.grip_weight * torch.sqrt(grip_distance(world, slots) ** 2 + 0.01 ** 2).sum() / count
     return terms
 
@@ -500,7 +520,7 @@ with torch.no_grad():
                                  "rotation_vector": [round(float(v), 6) for v in root_rotation[k].cpu().numpy()],
                                  "bones": bones})
     if prop is not None:
-        prop.write_grips(result["frames"], torch.linalg.inv(world[hand_bone]) @ placed_prop(torch.arange(count, device=device)))
+        prop.write_grips(result["frames"], torch.linalg.inv(world[hand_bone]) @ held_at_model_size(world, torch.arange(count, device=device)))
         result["held"] = {prop.name: prop_profile["hand"]}
 json.dump(result, open(args.out, "w", encoding="utf-8"), indent=1)
 print("wrote", args.out)

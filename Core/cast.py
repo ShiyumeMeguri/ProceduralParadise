@@ -21,6 +21,10 @@ machine.  Every object parented, directly or not, to the armature comes
 with it; ``hidden`` parts are kept but neither drawn nor evaluated -- a
 coat that is not rigged yet, say.  Objects outside the rig's hierarchy (the
 author's reference meshes, curve tools, lights) are left behind.
+
+A character appended once can play in several shots: each gets a performer
+of its own (``instance_character``), copies of the rig and its objects that
+share the character's meshes, materials and armature and animate apart.
 """
 from __future__ import annotations
 
@@ -29,7 +33,7 @@ import os
 
 import bpy
 
-__all__ = ["resolve_blend", "blend_digest", "append_character"]
+__all__ = ["resolve_blend", "blend_digest", "append_character", "instance_character"]
 
 
 def resolve_blend(entry, overrides=None, name=None):
@@ -140,3 +144,62 @@ def append_character(path, armature, collection, hidden=(), prefix=None):
     _drop_new_orphans(identities)
     added = [obj for obj in bpy.data.objects if obj.name_full not in before]
     return rig, added
+
+
+def _drivers(holder):
+    animation = getattr(holder, "animation_data", None) if holder is not None else None
+    return list(animation.drivers) if animation is not None else []
+
+
+def _driver_targets(holder):
+    return [target for curve in _drivers(holder) for variable in curve.driver.variables for target in variable.targets]
+
+
+def _retarget(item, copies):
+    """Point the object properties of ``item`` (a modifier, a constraint, a constraint's target)
+    that name one of the copied objects at its copy."""
+    for prop in item.bl_rna.properties:
+        if prop.type != "POINTER" or prop.is_readonly:
+            continue
+        value = getattr(item, prop.identifier)
+        if isinstance(value, bpy.types.Object) and value in copies:
+            setattr(item, prop.identifier, copies[value])
+
+
+def instance_character(rig, objects, collection, prefix, original_prefix):
+    """Another performer of a character ``append_character`` brought in:
+    copies of ``rig`` and its ``objects`` in ``collection``, each named
+    ``<prefix>.<name>`` for the original's ``<original_prefix>.<name>``,
+    that animate apart from the originals.  They share the originals'
+    meshes, materials and armature; what they refer to among the originals
+    -- a parent, a modifier's or a constraint's object, a driver's target
+    -- is the copy of it, and a mesh whose drivers read one of them (shape
+    keys a bone opens, say) is copied along, its drivers reading the copy.
+    Returns ``(armature object, [objects])``."""
+    copies = {original: original.copy() for original in objects}
+    for original, copy in copies.items():
+        if not original.name.startswith(f"{original_prefix}."):
+            raise ValueError(f"'{original.name}' is not named '{original_prefix}.<name>'")
+        copy.name = f"{prefix}.{original.name[len(original_prefix) + 1:]}"
+        collection.objects.link(copy)
+        if copy.parent in copies:
+            inverse = copy.matrix_parent_inverse.copy()
+            copy.parent = copies[copy.parent]
+            copy.matrix_parent_inverse = inverse
+        data = copy.data
+        if data is not None and any(target.id in copies for holder in (data, getattr(data, "shape_keys", None))
+                                    for target in _driver_targets(holder)):
+            copy.data = data.copy()
+        for holder in (copy, copy.data, getattr(copy.data, "shape_keys", None)):
+            for target in _driver_targets(holder):
+                if target.id in copies:
+                    target.id = copies[target.id]
+        for modifier in copy.modifiers:
+            _retarget(modifier, copies)
+        constraints = list(copy.constraints) + [constraint for bone in (copy.pose.bones if copy.pose else ())
+                                                for constraint in bone.constraints]
+        for constraint in constraints:
+            _retarget(constraint, copies)
+            for target in getattr(constraint, "targets", ()):
+                _retarget(target, copies)
+    return copies[rig], list(copies.values())

@@ -2,8 +2,10 @@
 Cinematics builder -- a small interpreter of a film's data.
 
 ``build_film(folder, film, args)`` builds the sets the chosen shots stand
-in, appends the cast into every set and makes one Blender scene per shot;
-it knows no particular asset, set or film.  A set (``sets/<name>.json``)
+in, appends the cast into every set and makes one Blender scene per shot,
+the set's and a performer of every character the shot casts of its own
+(``Core.cast.instance_character``: shots never share a pose, a constraint
+or a key); it knows no particular asset, set or film.  A set (``sets/<name>.json``)
 is pure data::
 
     {"id": "District",
@@ -26,14 +28,22 @@ A shot (``shots/<id>.json``)::
     {"id": "Breakout", "set": "District", "frames": [68, 206],
      "camera": {"focal_px": 1315.0, "sensor": 36.0, "clip": [0.05, 8000.0],
                 "keys": [{"frame": 68, "location": [x, y, z], "rotation": [w, x, y, z]}, ...]
-                        or "calibration/<file>.json" (a file holding them)},
+                        or "calibration/<file>.json" (a file holding them),
+                "place": "calibration/<shot>.place.json"},       (optional)
      "render": {"engine": "EEVEE", "samples": 64, "eevee": {...}, "view": "AgX", "look": null,
                 "motion_blur": 0.5},
      "look": {...},                                 (Core.render.compositor)
      "cast": {"LaPluma": {"performance": "performances/Breakout.json"}}}
 
 Camera keys are the solved camera of every frame in set metres: Blender's
-convention, the camera looking along its local -Z with +Y up.  The film's
+convention, the camera looking along its local -Z with +Y up.  A camera
+solved against nothing in the set -- the sky, which only shows it turning
+-- is solved about the origin, and its ``place`` says where it stands in
+the set: the ``location`` of the origin and the direction it looks
+(``look``, or a ``target`` it looks at) with how far it turns about that
+direction from upright (``roll``, degrees).  A performance fitted against
+such a camera's picture moves with it (``"relative_to": "camera"``: her
+root on every frame is in the frame's camera's frame).  The film's
 ``resolution`` and ``fps`` apply to every shot.
 """
 from __future__ import annotations
@@ -187,16 +197,16 @@ def build_set(folder, set_name, film, args):
                                  lens=view.get("lens", 24.0), collection=scene.collection, clip=view.get("clip", 0.05))
         camera.data.clip_end = view.get("far", 20000.0)
     cast_collection = SC.collection(f"{set_name}.Cast", parent=scene.collection)
-    rigs = {}
+    characters = {}
     cast_files = []
     for name, entry in _cast_entries(film, set_name).items():
         path = CAST.resolve_blend(entry, args.cast, name)
-        rig, _objects = CAST.append_character(path, entry["armature"], cast_collection, entry.get("hidden", ()),
-                                              prefix=f"{set_name}.{name}")
-        rigs[name] = rig
+        prefix = f"{set_name}.{name}"
+        rig, objects = CAST.append_character(path, entry["armature"], cast_collection, entry.get("hidden", ()), prefix=prefix)
+        characters[name] = dict(rig=rig, objects=objects, prefix=prefix)
         cast_files.append(path)
         _rebuild_shading(entry)
-    return dict(id=set_name, scene=scene, world=world, collection=collection, cast=cast_collection, rigs=rigs,
+    return dict(id=set_name, scene=scene, world=world, collection=collection, characters=characters,
                 cast_files=cast_files, source=os.path.join(folder, "sets", f"{set_name}.json"))
 
 
@@ -208,7 +218,30 @@ def _camera_keys(folder, camera):
     return keys, []
 
 
+def _shot_place(folder, camera):
+    """The matrix carrying a camera solved about the origin to where its ``place`` stands it (identity without one)."""
+    if "place" not in camera:
+        return Matrix.Identity(4), []
+    path = os.path.join(folder, camera["place"])
+    place = jsonio.load(path)
+    location = _vector(place["location"])
+    look = (_vector(place["target"]) - location) if "target" in place else _vector(place["look"])
+    look.normalize()
+    upright = Vector((0.0, 0.0, 1.0)) - look * look.z
+    upright.normalize()
+    backward = -look
+    right = upright.cross(backward)
+    rotation = Matrix((right, upright, backward)).transposed() @ Matrix.Rotation(math.radians(place.get("roll", 0.0)), 3, "Z")
+    return Matrix.Translation(location) @ rotation.to_4x4(), [path]
+
+
+def _key_matrix(location, rotation):
+    return Matrix.Translation(_vector(location)) @ Quaternion(rotation).to_matrix().to_4x4()
+
+
 def build_camera(name, folder, camera, film, collection):
+    """The shot's camera, keyed every frame of its keys (placed by its ``place``); returns it, the
+    files it was read from and its matrix in the set on every keyed frame."""
     data = bpy.data.cameras.new(name)
     data.sensor_fit = "HORIZONTAL"
     data.sensor_width = camera.get("sensor", 36.0)
@@ -219,9 +252,15 @@ def build_camera(name, folder, camera, film, collection):
     collection.objects.link(obj)
     obj.rotation_mode = "QUATERNION"
     keys, sources = _camera_keys(folder, camera)
+    place, place_sources = _shot_place(folder, camera)
+    matrices = {}
+    previous = {}
     for key in keys:
-        obj.location = _vector(key["location"])
-        obj.rotation_quaternion = Quaternion(key["rotation"])
+        matrix = place @ _key_matrix(key["location"], key["rotation"])
+        matrices[key["frame"]] = matrix
+        location, rotation, _scale = matrix.decompose()
+        obj.location = location
+        obj.rotation_quaternion = _continuous(previous, None, rotation)
         obj.keyframe_insert("location", frame=key["frame"])
         obj.keyframe_insert("rotation_quaternion", frame=key["frame"])
         if "focal_px" in key:
@@ -231,7 +270,7 @@ def build_camera(name, folder, camera, film, collection):
     for curve in fcurves_of(obj) + fcurves_of(data):
         for point in curve.keyframe_points:
             point.interpolation = "LINEAR"
-    return obj, sources
+    return obj, sources + place_sources, matrices
 
 
 def _twist(quaternion, axis=Vector((0.0, 1.0, 0.0))):
@@ -251,9 +290,11 @@ def _continuous(previous, key, quaternion):
     return quaternion
 
 
-def perform(rig, folder, entry, frames, collection_objects, profile):
+def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     """Key the performance file ``entry["performance"]`` on ``rig``: its
-    placement and bone rotations every frame of it, constant outside the
+    placement and bone rotations every frame of it (her root in the frame's
+    camera's frame when it is ``relative_to`` the camera: ``cameras``, the
+    shot camera's matrix every frame), constant outside the
     shot's ``frames`` (motion blur never reads the next shot's pose), the
     cast hidden on the shot's frames the performance does not cover.  A
     wrist's twist is shared out along the forearm's twist bones (the cast
@@ -264,6 +305,9 @@ def perform(rig, folder, entry, frames, collection_objects, profile):
     times the grip, so the constraint lands it exactly there."""
     path = os.path.join(folder, entry["performance"])
     performance = jsonio.load(path)
+    relative = entry.get("relative_to")
+    if relative not in (None, "camera"):
+        raise ValueError(f"{path}: a performance is relative to the set or to the 'camera', not '{relative}'")
     twists = profile["twists"]
     rig.rotation_mode = "QUATERNION"
     first, last = frames
@@ -277,8 +321,12 @@ def perform(rig, folder, entry, frames, collection_objects, profile):
         constraint.inverse_matrix = Matrix.Identity(4)
     for item in keyed:
         frame = item["frame"]
-        rig.location = _vector(item["location"])
-        rig.rotation_quaternion = _continuous(previous, None, item["rotation"])
+        root = _key_matrix(item["location"], item["rotation"])
+        if relative == "camera":
+            root = cameras[frame] @ root
+        location, rotation, _scale = root.decompose()
+        rig.location = location
+        rig.rotation_quaternion = _continuous(previous, None, rotation)
         rig.keyframe_insert("location", frame=frame)
         rig.keyframe_insert("rotation_quaternion", frame=frame)
         for name, value in item["bones"].items():
@@ -321,7 +369,7 @@ def build_shot(folder, film, shot, built_set, args):
     scene = bpy.data.scenes.new(f"Shot.{shot['id']}")
     _activate(scene)
     scene.collection.children.link(built_set["collection"])
-    scene.collection.children.link(built_set["cast"])
+    cast = SC.collection(f"Shot.{shot['id']}.Cast", parent=scene.collection)
     scene.world = built_set["world"]
     first, last = shot["frames"]
     scene.frame_start, scene.frame_end = first, last
@@ -329,7 +377,7 @@ def build_shot(folder, film, shot, built_set, args):
     scene.render.resolution_x, scene.render.resolution_y = film["resolution"]
     scene.render.resolution_percentage = int(round(100 * (args.scale or 1.0)))
     cameras = SC.collection(f"Shot.{shot['id']}.Camera", parent=scene.collection)
-    camera, sources = build_camera(f"Shot.{shot['id']}.Camera", folder, shot["camera"], film, cameras)
+    camera, sources, camera_matrices = build_camera(f"Shot.{shot['id']}.Camera", folder, shot["camera"], film, cameras)
     scene.camera = camera
     settings = shot["render"]
     engine = settings["engine"]
@@ -345,12 +393,14 @@ def build_shot(folder, film, shot, built_set, args):
     else:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), settings.get("exposure", 0.0))
     for name, entry in shot.get("cast", {}).items():
+        character = built_set["characters"][name]
+        rig, objects = CAST.instance_character(character["rig"], character["objects"], cast, f"{shot['id']}.{name}",
+                                               character["prefix"])
         profile_path = os.path.join(folder, film["cast"][name]["rig"])
-        sources += perform(built_set["rigs"][name], folder, entry, (first, last), list(built_set["cast"].all_objects),
-                           jsonio.load(profile_path)) + [profile_path]
+        sources += perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices) + [profile_path]
     scene.frame_set(first)
     path = os.path.join(folder, "shots", f"{shot['id']}.json")
-    return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=built_set["cast"],
+    return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=cast,
                 sources=[path, built_set["source"], os.path.join(folder, "film.json")] + sources)
 
 

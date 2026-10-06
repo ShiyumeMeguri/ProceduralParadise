@@ -1,194 +1,389 @@
 {
-  "id": "District",
-  "notes": ["Set metres: the main tower's front column line is Y = 0 (its face looks out along -Y), X runs along that face with column C1 at X = 0, Z up from the tower's foot.", "Measured on the Breakout shot (calibration/stereo.py, orthophoto.py) in solve units of 11 m: bays 0.747 (8.2 m), storeys 0.38 (4.18 m), columns 0.08 square; she breaks out of storey 18 through the bay left of C1."],
-  "materials": {},
-  "sky": {
-    "zenith": [0.42, 0.52, 0.66],
-    "horizon": [0.86, 0.87, 0.88],
-    "ground": [0.5, 0.51, 0.52],
-    "strength": 1.2,
-    "haze": 14.0,
-    "clouds": {
-      "height": 1800.0,
-      "scale": 1400.0,
-      "coverage": 0.55,
-      "softness": 0.25,
-      "lit": [1.0, 1.0, 1.0],
-      "shade": [0.55, 0.58, 0.62],
-      "fade": 4.0,
-      "drift": [2.0, 0.5]
-    }
-  },
-  "items": [
-    {
-      "name": "Main Tower",
-      "loc": [0, 0, 0],
-      "rot": [0, 0, 0],
-      "frame": {
-        "x": {
-          "start": -32.8,
-          "step": 8.2,
-          "count": 9
-        },
-        "y": {
-          "start": 0.0,
-          "step": 8.2,
-          "count": 3
-        },
-        "z": {
-          "start": 0.0,
-          "step": 4.18,
-          "count": 32
-        },
-        "sections": {
-          "column": {
-            "shape": "box",
-            "width": 0.88,
-            "depth": 0.88,
-            "finish": "concrete"
-          },
-          "edge_beam": {
-            "shape": "box",
-            "width": 0.77,
-            "depth": 0.5,
-            "finish": "concrete",
-            "offset": -0.14
-          },
-          "ibeam": {
-            "shape": "I",
-            "width": 0.55,
-            "depth": 0.3,
-            "finish": "steel",
-            "offset": -0.18
-          },
-          "brace_front": {
-            "shape": "box",
-            "width": 0.24,
-            "depth": 0.24,
-            "finish": "steel",
-            "offset": -0.39
-          },
-          "brace_back": {
-            "shape": "box",
-            "width": 0.24,
-            "depth": 0.24,
-            "finish": "steel",
-            "offset": -0.88
-          },
-          "post": {
-            "shape": "box",
-            "width": 0.16,
-            "depth": 0.16,
-            "finish": "steel",
-            "offset": -0.77
-          },
-          "brace": {
-            "shape": "box",
-            "width": 0.24,
-            "depth": 0.24,
-            "finish": "steel",
-            "offset": -0.6
-          }
-        },
-        "columns": "column",
-        "beams": "edge_beam",
-        "slab": 0.3,
-        "beam_drop": 0.605,
-        "modules": {
-          "V": {
-            "members": [
-              {
-                "from": [0.0, 1.0],
-                "to": [0.327, 0.0],
-                "section": "brace_back"
-              },
-              {
-                "from": [0.655, 0.0],
-                "to": [1.0, 1.0],
-                "section": "brace_front"
-              }
-            ]
-          },
-          "A": {
-            "members": [
-              {
-                "from": [0.0, 0.0],
-                "to": [0.333, 1.0],
-                "section": "brace"
-              },
-              {
-                "from": [0.667, 1.0],
-                "to": [1.0, 0.0],
-                "section": "brace"
-              }
-            ]
-          },
-          "P": {
-            "members": [
-              {
-                "from": [0.38, 0],
-                "to": [0.38, 1],
-                "section": "post"
-              },
-              {
-                "from": [0.43, 0],
-                "to": [0.43, 1],
-                "section": "post"
-              },
-              {
-                "from": [0.48, 0],
-                "to": [0.48, 1],
-                "section": "post"
-              },
-              {
-                "from": [0.6, 0],
-                "to": [0.6, 1],
-                "section": "post"
-              }
-            ]
-          }
-        },
-        "faces": {
-          "front": {
-            "cycle": ["V+P V+P V+P V+P V+P V+P V+P V+P V+P", "A+P A+P A+P A+P A+P A+P A+P A+P A+P"]
-          },
-          "back": {
-            "cycle": ["V V V", "A A A"]
-          },
-          "left": {
-            "cycle": ["V V V", "A A A"]
-          },
-          "right": {
-            "cycle": ["V V V", "A A A"]
-          }
-        },
-        "spandrels": [
-          {
-            "face": "front",
-            "levels": [18],
-            "section": "ibeam",
-            "replaces_beam": true
-          }
+ "id": "District",
+ "notes": [
+  "Set metres: the main tower's front column line is Y = 0 (its face looks out along -Y), X runs along that face with column C1 at X = 0, Z up from the tower's foot.",
+  "Measured on the Breakout shot (calibration/stereo.py, orthophoto.py) in solve units of 11 m: bays 0.747 (8.2 m), storeys 0.38 (4.18 m), columns 0.08 square; she breaks out of storey 18 through the bay left of C1.",
+  "The sky's cumulus are solid (CIN.Clouds.Field), bases 600 m up all round the district; crows (CIN.Birds.Flock) wheel round the tower where she breaks out and wider over the district.",
+  "The tower is 26 storeys and its roof (108.7 m): Breakout's camera sees its face up to 95 m, never its top; the hand shot sees the roof edge at the lower left."
+ ],
+ "materials": {},
+ "sky": {
+  "zenith": [
+   0.42,
+   0.52,
+   0.66
+  ],
+  "horizon": [
+   0.86,
+   0.87,
+   0.88
+  ],
+  "ground": [
+   0.5,
+   0.51,
+   0.52
+  ],
+  "strength": 1.2,
+  "haze": 14.0
+ },
+ "items": [
+  {
+   "name": "Main Tower",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "rot": [
+    0,
+    0,
+    0
+   ],
+   "frame": {
+    "x": {
+     "start": -32.8,
+     "step": 8.2,
+     "count": 9
+    },
+    "y": {
+     "start": 0.0,
+     "step": 8.2,
+     "count": 3
+    },
+    "z": {
+     "start": 0.0,
+     "step": 4.18,
+     "count": 27
+    },
+    "sections": {
+     "column": {
+      "shape": "box",
+      "width": 0.88,
+      "depth": 0.88,
+      "finish": "concrete"
+     },
+     "edge_beam": {
+      "shape": "box",
+      "width": 0.77,
+      "depth": 0.5,
+      "finish": "concrete",
+      "offset": -0.14
+     },
+     "ibeam": {
+      "shape": "I",
+      "width": 0.55,
+      "depth": 0.3,
+      "finish": "steel",
+      "offset": -0.18
+     },
+     "brace_front": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.39
+     },
+     "brace_back": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.88
+     },
+     "post": {
+      "shape": "box",
+      "width": 0.16,
+      "depth": 0.16,
+      "finish": "steel",
+      "offset": -0.77
+     },
+     "brace": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.6
+     }
+    },
+    "columns": "column",
+    "beams": "edge_beam",
+    "slab": 0.3,
+    "beam_drop": 0.605,
+    "modules": {
+     "V": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         1.0
         ],
-        "slab_edge": 0.11
-      }
-    }
-  ],
-  "lights": [
-    {
-      "name": "Sun",
-      "light": "SUN",
-      "power": 2.5,
-      "color": [1.0, 0.97, 0.93],
-      "angle": 3.0,
-      "direction": [0.4, -0.6, 0.7]
-    }
-  ],
-  "views": {
-    "aerial": {
-      "location": [-60, -90, 110],
-      "target": [10, 15, 60],
-      "lens": 28
-    }
+        "to": [
+         0.327,
+         0.0
+        ],
+        "section": "brace_back"
+       },
+       {
+        "from": [
+         0.655,
+         0.0
+        ],
+        "to": [
+         1.0,
+         1.0
+        ],
+        "section": "brace_front"
+       }
+      ]
+     },
+     "A": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         0.0
+        ],
+        "to": [
+         0.333,
+         1.0
+        ],
+        "section": "brace"
+       },
+       {
+        "from": [
+         0.667,
+         1.0
+        ],
+        "to": [
+         1.0,
+         0.0
+        ],
+        "section": "brace"
+       }
+      ]
+     },
+     "P": {
+      "members": [
+       {
+        "from": [
+         0.38,
+         0
+        ],
+        "to": [
+         0.38,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.43,
+         0
+        ],
+        "to": [
+         0.43,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.48,
+         0
+        ],
+        "to": [
+         0.48,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.6,
+         0
+        ],
+        "to": [
+         0.6,
+         1
+        ],
+        "section": "post"
+       }
+      ]
+     }
+    },
+    "faces": {
+     "front": {
+      "cycle": [
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P"
+      ]
+     },
+     "back": {
+      "cycle": [
+       "V V V",
+       "A A A"
+      ]
+     },
+     "left": {
+      "cycle": [
+       "V V V",
+       "A A A"
+      ]
+     },
+     "right": {
+      "cycle": [
+       "V V V",
+       "A A A"
+      ]
+     }
+    },
+    "spandrels": [
+     {
+      "face": "front",
+      "levels": [
+       18
+      ],
+      "section": "ibeam",
+      "replaces_beam": true
+     }
+    ],
+    "slab_edge": 0.11
+   }
+  },
+  {
+   "name": "Clouds",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "asset": "CIN.Clouds.Field",
+   "inputs": {
+    "Count": 140,
+    "Seed": 1,
+    "Origin": [
+     0.0,
+     0.0,
+     600.0
+    ],
+    "Extent": [
+     3200.0,
+     3200.0,
+     0.0
+    ],
+    "Size": [
+     420.0,
+     300.0,
+     300.0
+    ],
+    "Size Spread": 0.4,
+    "Voxel": 14.0,
+    "Billow": 26.0,
+    "Drift": [
+     2.5,
+     0.8,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Crows Near",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "asset": "CIN.Birds.Flock",
+   "inputs": {
+    "Count": 70,
+    "Seed": 2,
+    "Origin": [
+     -4.0,
+     -14.0,
+     78.0
+    ],
+    "Extent": [
+     30.0,
+     12.0,
+     10.0
+    ],
+    "Heading": [
+     1.0,
+     -0.4,
+     0.05
+    ],
+    "Spread": 35.0,
+    "Speed": 9.0,
+    "Beat": 4.2,
+    "Glide": 0.25,
+    "Start": 160
+   }
+  },
+  {
+   "name": "Crows Far",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "asset": "CIN.Birds.Flock",
+   "inputs": {
+    "Count": 160,
+    "Seed": 3,
+    "Origin": [
+     0.0,
+     -70.0,
+     90.0
+    ],
+    "Extent": [
+     160.0,
+     60.0,
+     35.0
+    ],
+    "Heading": [
+     1.0,
+     -0.2,
+     0.0
+    ],
+    "Spread": 45.0,
+    "Speed": 10.0,
+    "Beat": 4.0,
+    "Glide": 0.3,
+    "Start": 160
+   }
   }
+ ],
+ "lights": [
+  {
+   "name": "Sun",
+   "light": "SUN",
+   "power": 2.5,
+   "color": [
+    1.0,
+    0.97,
+    0.93
+   ],
+   "angle": 3.0,
+   "direction": [
+    0.4,
+    -0.6,
+    0.7
+   ]
+  }
+ ],
+ "views": {
+  "aerial": {
+   "location": [
+    -60,
+    -90,
+    110
+   ],
+   "target": [
+    10,
+    15,
+    60
+   ],
+   "lens": 28
+  }
+ }
 }

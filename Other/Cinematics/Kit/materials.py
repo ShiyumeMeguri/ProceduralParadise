@@ -73,3 +73,19 @@ def crow():
         return S.bsdf(tree, Base_Color=color("crow"), Roughness=param("CIN.Crow.roughness", 0.55),
                       Sheen_Weight=param("CIN.Crow.sheen", 0.35), Sheen_Tint=(0.55, 0.6, 0.7, 1.0))["BSDF"]
     return S.material("CIN.Crow", build)
+
+
+@register("CIN.Cloud")
+def cloud():
+    """Cumulus: a white body that the sun lights and the blue sky fills in the shade, light
+    carried a little way through it (subsurface, metres deep) so its folds read soft, a silver
+    sheen at grazing angles, and a silhouette that thins out where the surface turns away."""
+    def build(tree: Tree):
+        body = S.bsdf(tree, Base_Color=color("cloud"), Roughness=1.0, Subsurface_Weight=param("CIN.Cloud.subsurface", 0.6),
+                      Subsurface_Radius=(1.0, 1.0, 1.0), Subsurface_Scale=param("CIN.Cloud.depth", 18.0),
+                      Sheen_Weight=param("CIN.Cloud.sheen", 0.4), Sheen_Roughness=0.6)["BSDF"]
+        facing = tree.n("ShaderNodeLayerWeight", Blend=0.5)["Facing"]
+        solid = tree.map_range(facing, param("CIN.Cloud.edge", 0.62), 0.95, 1.0, 0.0, interp="SMOOTHSTEP")
+        clear = tree.n("ShaderNodeBsdfTransparent")["BSDF"]
+        return tree.n("ShaderNodeMixShader", solid, clear, body)["Shader"]
+    return S.material("CIN.Cloud", build)
