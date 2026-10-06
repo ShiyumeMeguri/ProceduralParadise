@@ -18,6 +18,12 @@ README.md is inside as the text ``Guide``).
       blender -b -P Other/build.py -- Weapons/Scythe --view hero --render scythe.png
       blender -b -P Other/build.py -- --render still.png
 
+An item folder holding a ``film.json`` is a film (``Cinematics/LaPluma``):
+its sets, cast and shots are built by ``Core.film`` and its own options
+apply (see that module), e.g.::
+
+      blender -b -P Other/build.py -- Cinematics/LaPluma --render-shots --video
+
 Arguments (all optional)
 ------------------------
 scene                <family>/<item> folder relative to Other/ (default Props/ShishiOdoshi)
@@ -92,7 +98,14 @@ def main(argv=None):
     if __name__ == "__main__":
         from Core import driver as stale
         stale.fresh_modules(ROOT)
-    from Core import driver
+    from Core import driver, film
+    if argv is None:
+        arguments = driver.script_args(sys.argv)
+    else:
+        arguments = argv[argv.index("--") + 1:] if "--" in argv else argv[1:]
+    item = film.target(arguments, DEFAULT_SCENE)
+    if film.is_film(os.path.join(HERE, item)):
+        return film.run(HERE, ROOT, os.path.join(HERE, "build.py"), arguments)
     args = parse(argv)
     context = driver.build_scene_folder(HERE, args)
     name = os.path.basename(args.scene.rstrip("/\\"))

@@ -1,0 +1,31 @@
+{
+  "id": "LaPluma",
+  "name": "La Pluma (羽毛笔) -- recruitment film",
+  "notes": ["Rebuilt from the reference video named by the environment variable LAPLUMA_REFERENCE (1920 x 1080, 30 fps); frame numbers are the video's own.", "The cast's .blend is named by the environment variable LAPLUMA_BLEND (or --cast LaPluma=<path>).  Its shading is runtime data of the RuriRipperImporter add-on, which must be enabled in the Blender that builds the film."],
+  "fps": 30,
+  "resolution": [1920, 1080],
+  "frames": [0, 724],
+  "reference": {
+    "video": {
+      "environment": "LAPLUMA_REFERENCE"
+    },
+    "masks": [[1560, 0, 1920, 130]]
+  },
+  "cast": {
+    "LaPluma": {
+      "blend": {
+        "environment": "LAPLUMA_BLEND"
+      },
+      "armature": "Avatar_LaPluma",
+      "hidden": ["S_actor_lapluma_cloth_02_lod0.001", "S_actor_lapluma_cloth_02_lod0.002", "S_actor_lapluma_cloth_03_lod0.001", "S_actor_lapluma_cloth_03_lod0.002"],
+      "note": "The coat -- its shell, sleeves and iridescent lining -- is not rigged yet and stays hidden until it is.",
+      "shading": {
+        "module": "RuriRipperImporter.Host.Blender.derived_state",
+        "call": "flush",
+        "error": "LAST_ERROR"
+      }
+    }
+  },
+  "shots": ["Breakout"],
+  "holds": []
+}

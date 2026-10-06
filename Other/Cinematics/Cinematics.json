@@ -1,0 +1,152 @@
+{
+  "id": "Cinematics",
+  "name": "Cinematics (影片)",
+  "notes": ["Colours are linear RGB.  In set data a colour input may name a palette entry instead of giving RGB.", "A finish is a palette colour with its roughness, metallicness and weathering: the grime that darkens it in broad patches ('grime': strength, size in metres) and the streaks that run down vertical faces ('streaks': strength, spacing in metres).", "Everything is built for EEVEE; a film's sets may override any finish parameter through their 'materials' (\"<finish>.<parameter>\" or \"color:<palette key>\").", "A module is a facade panel in unit coordinates (u across the bay between its columns' faces, v up the storey from the floor to the underside of the beam above): its members ({from, to, section}) and glazing ([u0, v0, u1, v1] panes); a frame's own 'modules' add to or replace these.  A panel code joins modules with '+'."],
+  "palette": {
+    "concrete": [0.62, 0.63, 0.64],
+    "concrete_grime": [0.29, 0.3, 0.31],
+    "steel_paint": [0.68, 0.69, 0.7],
+    "steel_grime": [0.34, 0.35, 0.36],
+    "interior": [0.16, 0.165, 0.17],
+    "pipe": [0.16, 0.04, 0.03],
+    "glass": [0.86, 0.9, 0.92],
+    "facade_far": [0.42, 0.44, 0.47],
+    "window_far": [0.11, 0.12, 0.14],
+    "crow": [0.012, 0.012, 0.014]
+  },
+  "finishes": {
+    "CIN.Concrete": {
+      "color": "concrete",
+      "grime_color": "concrete_grime",
+      "roughness": 0.78,
+      "grime": [0.45, 1.6],
+      "streaks": [0.3, 0.35],
+      "note": "white-washed concrete of columns, edge beams and slabs"
+    },
+    "CIN.SteelPaint": {
+      "color": "steel_paint",
+      "grime_color": "steel_grime",
+      "roughness": 0.46,
+      "grime": [0.3, 0.9],
+      "streaks": [0.2, 0.2],
+      "note": "white paint on the steel of the braces, spandrel beams and mullions"
+    },
+    "CIN.Interior": {
+      "color": "interior",
+      "grime_color": "interior",
+      "roughness": 0.9,
+      "grime": [0.0, 1.0],
+      "streaks": [0.0, 1.0],
+      "note": "the bare concrete inside a storey"
+    },
+    "CIN.Pipe": {
+      "color": "pipe",
+      "grime_color": "pipe",
+      "roughness": 0.55,
+      "grime": [0.0, 1.0],
+      "streaks": [0.0, 1.0],
+      "note": "service pipes under a ceiling"
+    },
+    "CIN.FacadeFar": {
+      "color": "facade_far",
+      "grime_color": "window_far",
+      "roughness": 0.7,
+      "grime": [0.25, 6.0],
+      "streaks": [0.0, 1.0],
+      "note": "the walls of the distant towers"
+    }
+  },
+  "modules": {
+    "X": {
+      "members": [
+        {
+          "from": [0, 0],
+          "to": [1, 1],
+          "section": "brace"
+        },
+        {
+          "from": [1, 0],
+          "to": [0, 1],
+          "section": "brace"
+        }
+      ]
+    },
+    "V": {
+      "members": [
+        {
+          "from": [0, 1],
+          "to": [0.5, 0],
+          "section": "brace"
+        },
+        {
+          "from": [0.5, 0],
+          "to": [1, 1],
+          "section": "brace"
+        }
+      ]
+    },
+    "A": {
+      "members": [
+        {
+          "from": [0, 0],
+          "to": [0.5, 1],
+          "section": "brace"
+        },
+        {
+          "from": [0.5, 1],
+          "to": [1, 0],
+          "section": "brace"
+        }
+      ]
+    },
+    "D": {
+      "members": [
+        {
+          "from": [0, 0],
+          "to": [1, 1],
+          "section": "brace"
+        }
+      ]
+    },
+    "U": {
+      "members": [
+        {
+          "from": [0, 1],
+          "to": [1, 0],
+          "section": "brace"
+        }
+      ]
+    },
+    "W": {
+      "members": [
+        {
+          "from": [0.0, 0],
+          "to": [0.0, 1],
+          "section": "mullion"
+        },
+        {
+          "from": [0.25, 0],
+          "to": [0.25, 1],
+          "section": "mullion"
+        },
+        {
+          "from": [0.5, 0],
+          "to": [0.5, 1],
+          "section": "mullion"
+        },
+        {
+          "from": [0.75, 0],
+          "to": [0.75, 1],
+          "section": "mullion"
+        },
+        {
+          "from": [1.0, 0],
+          "to": [1.0, 1],
+          "section": "mullion"
+        }
+      ],
+      "glazing": [[0.0, 0.0, 1.0, 1.0]],
+      "glass_offset": 0.05
+    }
+  }
+}

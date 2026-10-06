@@ -1,0 +1,29 @@
+{
+  "id": "Breakout",
+  "set": "District",
+  "frames": [70, 206],
+  "notes": ["Low-angle shot at the facade: a slow drift, then the window bursts (94) and the camera pans after her out over the district."],
+  "camera": {
+    "focal_px": 1315.0,
+    "sensor": 36.0,
+    "clip": [0.05, 8000.0],
+    "keys": "calibration/Breakout.camera.json"
+  },
+  "render": {
+    "engine": "EEVEE",
+    "samples": 32,
+    "eevee": {
+      "shadow_pool": "1024"
+    },
+    "view": "AgX",
+    "motion_blur": 0.5
+  },
+  "look": {
+    "exposure": 0.0
+  },
+  "cast": {
+    "LaPluma": {
+      "performance": "performances/Breakout.json"
+    }
+  }
+}
