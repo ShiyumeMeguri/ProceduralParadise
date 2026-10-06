@@ -74,6 +74,14 @@ class Skeleton:
             count += 1
         return count
 
+    def descendants(self, roots):
+        """``roots`` and every bone below them."""
+        below = set(int(root) for root in roots)
+        for bone in sorted(range(len(self.names)), key=self.depth):
+            if self.parents[bone] in below:
+                below.add(bone)
+        return below
+
     def ancestry(self, bones):
         """``bones`` and all their ancestors, parents first."""
         needed = set()

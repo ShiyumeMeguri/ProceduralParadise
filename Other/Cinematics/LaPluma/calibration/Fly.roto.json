@@ -1,0 +1,11 @@
+{
+ "notes": ["Pixels of the reference video, keyed on one frame each: the character and the scythe."],
+ "groups": [
+  {"objects": ["character"], "keys": {
+     "295": {"boxes": {"character": [150, 170, 1920, 920]}, "points": {"character": [[1000, 480], [500, 470], [700, 700], [1400, 350], [1600, 650], [1200, 230]]}, "negative": [[800, 90], [1500, 190], [400, 300], [900, 900]]}
+  }},
+  {"objects": ["scythe"], "keys": {
+     "295": {"boxes": {"scythe": [630, 40, 1600, 230]}, "points": {"scythe": [[700, 75], [900, 100], [1300, 150], [1530, 200]]}, "negative": [[1180, 175], [1350, 330], [1250, 280]]}
+  }}
+ ]
+}

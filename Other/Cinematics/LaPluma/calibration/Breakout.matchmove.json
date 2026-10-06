@@ -1,0 +1,11 @@
+{
+ "notes": ["The breakout's camera: VGGT every fourth frame (vggt_cameras.py), the match-move from it with the character masked (matchmove.py, roto.py's character), the facade frame (facade_frame.py) and the set (set_camera.py).",
+           "The solve's scale is the distance from its first camera to its last (span, solve units); one unit is 11 m of the set (floors 4.18 m apart, columns 8.2 m: the facade measured in the frame with stereo.py and orthophoto.py).",
+           "The vanishing points are frame 86's: the verticals' and the facade's horizontals' (reference pixels).  The measuring-frame point origin goes to the set's (0, 0, floor): floor 75.24 m is the breakout floor's slab (the 18th).",
+           "Through the smoke (103..111) the few tracks and the building's lines hold the camera's turn (solves from different starts agree to 0.2 deg) but not all of its step: they land up to about 0.9 m apart after it, every one as good a fit (0.63..0.66 px); SIFT matches bridging the smoke narrowed that to 0.5 m without settling it.  Kept: the solve that sets the measured building best after the smoke (frame building edges 6.50 px at half size, the others 6.62..6.69).  What the shot's camera sees is the same either way; seen from elsewhere, she is that much less sure against the building after the smoke.",
+           "Breakout.vggt.json holds VGGT's cameras as first computed (full-precision weights); vggt_cameras.py, holding the aggregator in bfloat16 within the card's claim, gives them again to 0.13 deg (median)."],
+ "vggt": {"first": 70, "last": 206, "every": 4},
+ "matchmove": {"first": 70, "last": 206, "focal_px": 1315.0, "span": 0.16869339, "exclude": [[1560, 0, 1920, 130]]},
+ "facade": {"reference": 86, "vertical": [791.6, -4345.7], "along": [2095.3, 859.2]},
+ "set": {"metres": 11.0, "origin": [0.707, 0.32, 0.045], "floor": 75.24, "first": 68, "last": 206}
+}

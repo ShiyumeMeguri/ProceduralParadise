@@ -234,9 +234,6 @@ def build_camera(name, folder, camera, film, collection):
     return obj, sources
 
 
-TWISTS = {"Hand_L": ("ForeTwist_L", "ForeTwist1_L"), "Hand_R": ("ForeTwist_R", "ForeTwist1_R")}
-
-
 def _twist(quaternion, axis=Vector((0.0, 1.0, 0.0))):
     """Angle of ``quaternion`` about ``axis`` (its swing-twist split), within a half turn."""
     sign = -1.0 if quaternion.w < 0.0 else 1.0
@@ -254,19 +251,20 @@ def _continuous(previous, key, quaternion):
     return quaternion
 
 
-def perform(rig, folder, entry, frames, collection_objects):
+def perform(rig, folder, entry, frames, collection_objects, profile):
     """Key the performance file ``entry["performance"]`` on ``rig``: its
     placement and bone rotations every frame of it, constant outside the
     shot's ``frames`` (motion blur never reads the next shot's pose), the
     cast hidden on the shot's frames the performance does not cover.  A
-    wrist's twist is shared out along the forearm's twist bones (a third
-    each, as the rig expects of them), so the forearm turns with the hand.
+    wrist's twist is shared out along the forearm's twist bones (the cast
+    profile's ``twists``: a share each), so the forearm turns with the hand.
     A held prop's bone (``held``: prop bone -> hand bone) hangs on the hand
     by a Child Of constraint and is keyed with its grip, the prop in the
-    hand's frame: the bone's own pose is its rest inverted times the grip,
-    so the constraint lands it exactly there."""
+    hand's frame and its scale: the bone's own pose is its rest inverted
+    times the grip, so the constraint lands it exactly there."""
     path = os.path.join(folder, entry["performance"])
     performance = jsonio.load(path)
+    twists = profile["twists"]
     rig.rotation_mode = "QUATERNION"
     first, last = frames
     keyed = [item for item in performance["frames"] if first <= item["frame"] <= last]
@@ -288,22 +286,25 @@ def perform(rig, folder, entry, frames, collection_objects):
             bone.rotation_mode = "QUATERNION"
             bone.rotation_quaternion = _continuous(previous, name, value)
             bone.keyframe_insert("rotation_quaternion", frame=frame)
-            if name in TWISTS:
-                angle = _twist(Quaternion(value)) / 3.0
-                for twist_name in TWISTS[name]:
+            if name in twists:
+                angle = _twist(Quaternion(value)) * twists[name]["share"]
+                for twist_name in twists[name]["bones"]:
                     twist = rig.pose.bones[twist_name]
                     twist.rotation_mode = "QUATERNION"
                     twist.rotation_quaternion = _continuous(previous, twist_name, Quaternion((0.0, 1.0, 0.0), angle))
                     twist.keyframe_insert("rotation_quaternion", frame=frame)
         for name, grip in item.get("grips", {}).items():
             bone = rig.pose.bones[name]
-            matrix = Matrix.Translation(_vector(grip["location"])) @ Quaternion(grip["rotation"]).to_matrix().to_4x4()
-            location, rotation, _scale = (rig.data.bones[name].matrix_local.inverted() @ matrix).decompose()
+            matrix = (Matrix.Translation(_vector(grip["location"])) @ Quaternion(grip["rotation"]).to_matrix().to_4x4()
+                      @ Matrix.Scale(grip["scale"], 4))
+            location, rotation, scale = (rig.data.bones[name].matrix_local.inverted() @ matrix).decompose()
             bone.rotation_mode = "QUATERNION"
             bone.location = location
             bone.rotation_quaternion = _continuous(previous, name, rotation)
+            bone.scale = scale
             bone.keyframe_insert("location", frame=frame)
             bone.keyframe_insert("rotation_quaternion", frame=frame)
+            bone.keyframe_insert("scale", frame=frame)
     shown = (keyed[0]["frame"], keyed[-1]["frame"]) if keyed else (last + 1, last)
     switches = [(first, shown[0] > first), (shown[0], False), (shown[1] + 1, True)]
     for obj in collection_objects:
@@ -344,7 +345,9 @@ def build_shot(folder, film, shot, built_set, args):
     else:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), settings.get("exposure", 0.0))
     for name, entry in shot.get("cast", {}).items():
-        sources += perform(built_set["rigs"][name], folder, entry, (first, last), list(built_set["cast"].all_objects))
+        profile_path = os.path.join(folder, film["cast"][name]["rig"])
+        sources += perform(built_set["rigs"][name], folder, entry, (first, last), list(built_set["cast"].all_objects),
+                           jsonio.load(profile_path)) + [profile_path]
     scene.frame_set(first)
     path = os.path.join(folder, "shots", f"{shot['id']}.json")
     return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=built_set["cast"],

@@ -187,7 +187,8 @@ INSPECTION_VIEWS = (("right", 90.0, 0.0), ("back", 180.0, 0.0), ("left", 270.0, 
 
 def inspect_cast(shot, frame, path):
     """Render frame ``frame`` of ``shot`` through its camera, then from around the cast
-    (the views orbit the cast's bounds from the shot camera's side) with the set left out,
+    (the views orbit the cast's skeletons from the shot camera's side, framing their
+    posed bones -- the bodies, not the reach of what they hold) with the set left out,
     each a PNG next to ``path`` (``<path>_<view>.png``).  Returns the files written."""
     import math
 
@@ -202,11 +203,13 @@ def inspect_cast(shot, frame, path):
     scene.render.filepath = written[0]
     bpy.ops.render.render(write_still=True, scene=scene.name)
     depsgraph = bpy.context.evaluated_depsgraph_get()
-    corners = [obj.evaluated_get(depsgraph).matrix_world @ Vector(corner)
-               for obj in shot["cast"].all_objects if obj.type == "MESH" and not obj.hide_render
-               for corner in obj.evaluated_get(depsgraph).bound_box]
-    centre = sum(corners, Vector()) / len(corners)
-    radius = max((corner - centre).length for corner in corners)
+    corners = [rig.evaluated_get(depsgraph).matrix_world @ end
+               for rig in shot["cast"].all_objects if rig.type == "ARMATURE"
+               for bone in rig.evaluated_get(depsgraph).pose.bones for end in (bone.head, bone.tail)]
+    low = Vector([min(corner[axis] for corner in corners) for axis in range(3)])
+    high = Vector([max(corner[axis] for corner in corners) for axis in range(3)])
+    centre = (low + high) / 2.0
+    radius = max((corner - centre).length for corner in corners) * 1.15
     shot_camera = shot["camera"]
     toward = centre - shot_camera.matrix_world.translation
     heading = math.atan2(toward.y, toward.x)
@@ -219,7 +222,8 @@ def inspect_cast(shot, frame, path):
     set_layer = next(child for child in layer.children if child.collection == shot["set"])
     excluded = set_layer.exclude
     set_layer.exclude = True
-    distance = radius * 2.0 / math.tan(data.angle / 2.0)
+    narrow = min(scene.render.resolution_x, scene.render.resolution_y) / max(scene.render.resolution_x, scene.render.resolution_y)
+    distance = radius / math.sin(math.atan(math.tan(data.angle / 2.0) * narrow))
     for name, azimuth, elevation in INSPECTION_VIEWS:
         angle = heading + math.pi + math.radians(azimuth)
         lift = math.radians(elevation)

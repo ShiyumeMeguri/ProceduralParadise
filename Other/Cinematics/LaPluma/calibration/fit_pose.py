@@ -1,38 +1,52 @@
 """
 Fit the cast's rig to the reference, frame by frame (PyTorch).
 
-    python fit_pose.py <rig.npz> <keypoints.npz> <camera.json> <first> <last> <out performance.json>
-                       [--masks DIR] [--start pose.json] [--iterations N]
+    python fit_pose.py <rig.npz> <profile.json> <keypoints.npz> <camera.json> <first> <last> <out performance.json>
+                       [--masks DIR] [--occluders DIR] [--parts DIR] [--start performance.json] [--iterations N]
+                       [--anchor F:AXIS:V ...] [--prop MESH]
 
 The rig (``export_rig.py``) is posed with Blender's own forward kinematics
-(``skeleton.py``); the second and third finger segments add the first
-segment's curl (the rig's Copy Rotation constraints).  Every frame of the
-shot is fitted at once: the whole-body keypoints of the reference
-(``keypoints.py``) pull the rig's joints onto them through the shot's solved
-camera, a silhouette (``--masks``) keeps the rig inside the character's
-outline, and smoothness ties neighbouring frames together.  The fit runs
-coarse to fine -- placement, then body and limbs, then hands.
+(``skeleton.py``).  What the rig is -- which bones are fitted and how far
+each may turn, which keypoint sits on which bone, which finger segments
+copy their first segment's curl, which keypoints mirror which and which
+mirror together -- is the cast's profile (``cast/<name>.json``), data.  A
+detector seeing her from behind reads her left and right the wrong way
+round, sometimes for her legs and not her arms: each swap group (head,
+arms, legs) is read as detected or swapped, whichever fits it.  Every fitted joint is three
+Euler angles in its bone's rest frame, each held within the joint's range
+(a knee and an elbow bend one way about one axis, a hip or a shoulder
+turns within a body's reach): a pose that only fits the picture from the
+camera, folding a knee sideways or backwards, cannot be reached.
 
+Every frame of the shot is fitted at once: the whole-body keypoints of the
+reference (``keypoints.py``) pull the rig's joints onto them through the
+shot's solved camera, a silhouette (``--masks``, and ``--occluders``: what
+may hide her, her scythe) keeps the rig inside the character's outline, and
+smoothness ties neighbouring frames together.
+
+Keypoints and an outline place her limbs on the picture but not which is
+nearer: a leg folded towards the camera and the same leg folded away look
+alike.  The profile's ``parts`` (a part is the surface skinned below its
+bones: a leg below its thigh) are masked in the shot (``--parts``: a
+``roto.py`` folder, a mask per part, each told from the other by what only
+it wears).  A part fills its own mask, and where a part's mask shows it and
+not another part, that other part, if it falls there, lies behind it:
+seen, a part is in front.
+The fit runs coarse to fine -- placement, then body and limbs, then hands.
 An ``--anchor frame:axis:value`` pins the root's set coordinate on a frame
-where the reference shows where she is (breaking through a window) and the
-picture alone cannot tell how far away she is.
+where the reference shows where she is (breaking through a window).
 
-With ``--prop`` the prop she holds (``prop.py``) is fitted with her, in
-her hand: its bone is the hand bone's (the ``--start`` performance's
-``held``) times a grip, one grip for the shot that may drift a little from
-frame to frame (``--grip-drift`` holds it).  The prop is turned as the
-picture turns it (``aims``, from ``fit_prop.py``; ``--aim-weight``), and
-the wrist and arm follow it.  Its silhouette (``--prop-weight``) is matched
-by the prop grown about the hand by the shot's ``film_scale``
-(``prop.py``): where the film's prop is not the model's size, the angle is
-what is kept, and the silhouette may be left out.  Its silhouette
-(``--prop-masks``, hidden only behind her; its parts' own silhouettes with
-``--prop-part``, ``prop.parts``) then poses her arm as much as her
-keypoints do -- the prop's outline is sharper than her hand's.  The grips
-start from the ``--start`` performance's (``fit_prop.py`` places the prop
-on its silhouette and writes them); the shared grip is the one of them
-that fits the most frames, and the drift is let go of slowly, so the arm
-comes to the prop.
+With ``--prop`` the prop she holds (the profile's ``props``) stays where
+its silhouette put it (``fit_prop.py``: the ``--start`` performance's
+``placements``, one picture for any size) and the palm of her holding hand
+closes on its shaft: her arm reaches it, and how large the prop is in the
+film -- how far, then, it is -- is fitted as one scale for the shot.  The
+grips written (the prop in the hand's frame, its scale in them) hang it on
+the hand where the picture has it.
+
+The card is shared (``gpu_budget.py``): the terms each frame answers for
+alone are added up a batch of frames at a time, as many as the claim
+holds, and only the terms that tie frames together see the whole shot.
 
 The performance written is the rig object's placement (set metres) and
 every fitted bone's local rotation for every frame; the film's interpreter
@@ -42,74 +56,67 @@ import argparse
 import json
 import os
 
-import cv2
 import numpy as np
 import torch
 from scipy.spatial.transform import Rotation as ScipyRotation
 
-from prop import Prop, fitted, parts
+from gpu_budget import chunk, claim
+from prop import Prop
+from silhouette import Silhouette
 from skeleton import Camera, Skeleton, axis_angle_matrices, quaternion_from_matrix
 
 parser = argparse.ArgumentParser()
 parser.add_argument("rig")
+parser.add_argument("profile")
 parser.add_argument("keypoints")
 parser.add_argument("camera")
 parser.add_argument("first", type=int)
 parser.add_argument("last", type=int)
 parser.add_argument("out")
 parser.add_argument("--masks", default=None)
+parser.add_argument("--occluders", default=None, help="masks of what may hide her (her scythe)")
+parser.add_argument("--parts", default=None, help="a roto.py folder: a mask folder per profile part")
+parser.add_argument("--cover-weight", type=float, default=1.0, help="a part filling its mask")
+parser.add_argument("--order-weight", type=float, default=20.0, help="a part seen in front of another")
+parser.add_argument("--part-samples", type=int, default=700, help="surface samples per part for coverage and order")
 parser.add_argument("--start", default=None)
 parser.add_argument("--iterations", type=int, default=1500)
 parser.add_argument("--exclude", nargs="*", default=["Scythe"])
 parser.add_argument("--anchor", nargs="*", default=[], help="frame:axis:value -- the root's set coordinate on that frame")
-parser.add_argument("--prop", default=None, help="the mesh of a prop she holds, fitted with her")
-parser.add_argument("--prop-masks", default=None)
-parser.add_argument("--prop-part", action="append", default=[], help="DIR=MATERIAL,MATERIAL -- a part of the prop and its masks")
-parser.add_argument("--prop-rest-precision", type=float, default=1.0)
-parser.add_argument("--prop-weight", type=float, default=1.0)
-parser.add_argument("--prop-smooth", type=float, default=5.0)
-parser.add_argument("--grip-drift", type=float, default=1.0, help="how firmly each frame's grip keeps to the shared one")
-parser.add_argument("--aim-weight", type=float, default=20.0, help="how firmly the prop is turned as the picture turns it")
+parser.add_argument("--prop", default=None, help="the mesh of a prop she holds")
+parser.add_argument("--grip-weight", type=float, default=40.0)
+parser.add_argument("--hand-weight", type=float, default=0.4, help="the hand keypoints' weight against the body's")
 parser.add_argument("--width", type=int, default=1920)
 parser.add_argument("--height", type=int, default=1080)
 args = parser.parse_args()
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cuda"
+budget = claim()
 torch.manual_seed(0)
 
 skeleton = Skeleton(args.rig, device)
+profile = json.load(open(args.profile, encoding="utf-8"))
 names = skeleton.names
 index = skeleton.index
 lengths = skeleton.lengths
 
-BODY = ["Pelvis", "Spine", "Spine1", "Spine2", "Neck", "Head", "Clavicle_L", "Clavicle_R", "UpperArm_L", "UpperArm_R",
-        "Forearm_L", "Forearm_R", "Hand_L", "Hand_R", "Thigh_L", "Thigh_R", "Calf_L", "Calf_R", "Foot_L", "Foot_R",
-        "Toe0_L", "Toe0_R"]
-FINGERS = [f"Finger{digit}_{side}" for side in "LR" for digit in range(5)]
-CURLED = {f"Finger{digit}{segment}_{side}": f"Finger{digit}{'' if segment == 1 else 1}_{side}"
-          for side in "LR" for digit in range(5) for segment in (1, 2)}
-FITTED = BODY + FINGERS
-
-
-def bone_point(name, along=0.0, offset=(0.0, 0.0, 0.0)):
-    return (index[name], along, offset)
-
-
-KEYPOINTS = {
-    0: bone_point("Nose01Joint_M"), 1: bone_point("FaceIrisJoint_L"), 2: bone_point("FaceIrisJoint_R"),
-    3: bone_point("Ear_01_Jnt_L"), 4: bone_point("Ear_01_Jnt_R"),
-    5: bone_point("UpperArm_L"), 6: bone_point("UpperArm_R"), 7: bone_point("Forearm_L"), 8: bone_point("Forearm_R"),
-    9: bone_point("Hand_L"), 10: bone_point("Hand_R"), 11: bone_point("Thigh_L"), 12: bone_point("Thigh_R"),
-    13: bone_point("Calf_L"), 14: bone_point("Calf_R"), 15: bone_point("Foot_L"), 16: bone_point("Foot_R"),
-    17: bone_point("Toe0_L", 1.0), 18: bone_point("Toe0_L", 0.7, (0.03, 0.0, 0.0)), 19: bone_point("Foot_L", 0.0, (0.0, -0.09, -0.06)),
-    20: bone_point("Toe0_R", 1.0), 21: bone_point("Toe0_R", 0.7, (-0.03, 0.0, 0.0)), 22: bone_point("Foot_R", 0.0, (0.0, -0.09, -0.06)),
-}
-for side, base in (("L", 91), ("R", 112)):
-    KEYPOINTS[base] = bone_point(f"Hand_{side}")
-    for digit, first in ((0, 1), (1, 5), (2, 9), (3, 13), (4, 17)):
-        KEYPOINTS[base + first] = bone_point(f"Finger{digit}_{side}")
-        KEYPOINTS[base + first + 1] = bone_point(f"Finger{digit}1_{side}")
-        KEYPOINTS[base + first + 2] = bone_point(f"Finger{digit}2_{side}")
-        KEYPOINTS[base + first + 3] = bone_point(f"Finger{digit}2_{side}", 1.0)
+FITTED = list(profile["joints"])
+fitted_index = {name: k for k, name in enumerate(FITTED)}
+limits = torch.deg2rad(torch.tensor([[profile["joints"][name][axis] for axis in "xyz"] for name in FITTED],
+                                    dtype=torch.float32, device=device))
+low, high = limits[..., 0], limits[..., 1]
+free = (high - low) > 1e-6
+CURLED = profile["curls"]
+KEYPOINTS = {int(key): (index[spec["bone"]], float(spec.get("along", 0.0)), tuple(spec.get("offset", (0.0, 0.0, 0.0))))
+             for key, spec in profile["keypoints"].items()}
+MIRRORED = {}
+for left, right in profile["mirror"]:
+    MIRRORED[left], MIRRORED[right] = right, left
+TORSO = set(profile["torso"])
+BODY_KEYS = profile["body"]
+SWAP_GROUPS = list(profile["swap_groups"])
+GROUP_OF = {key: g for g, name in enumerate(SWAP_GROUPS) for first, last in profile["swap_groups"][name]["keys"] for key in range(first, last + 1)}
+LEFT_KEYS = {left for left, _ in profile["mirror"]}
+RIGHT_KEYS = {right for _, right in profile["mirror"]}
 
 data = np.load(args.keypoints)
 frame_list = [int(f) for f in data["frames"]]
@@ -126,16 +133,6 @@ camera_location = camera.location
 project = camera.project
 
 
-def rotation_vector(matrix):
-    return ScipyRotation.from_matrix(matrix).as_rotvec()
-
-
-def rotation_x(angle):
-    cos, sin = torch.cos(angle), torch.sin(angle)
-    one, zero = torch.ones_like(angle), torch.zeros_like(angle)
-    return torch.stack([one, zero, zero, zero, cos, -sin, zero, sin, cos], -1).reshape(*angle.shape, 3, 3)
-
-
 def euler_xyz(vector):
     """Blender XYZ Euler: R = Rz @ Ry @ Rx."""
     x, y, z = vector.unbind(-1)
@@ -147,21 +144,35 @@ def euler_xyz(vector):
     return Rz @ Ry @ Rx
 
 
+def rotation_x(angle):
+    cos, sin = torch.cos(angle), torch.sin(angle)
+    one, zero = torch.ones_like(angle), torch.zeros_like(angle)
+    return torch.stack([one, zero, zero, zero, cos, -sin, zero, sin, cos], -1).reshape(*angle.shape, 3, 3)
+
+
+def angles_of(parameters):
+    """Joint angles (F, J, 3) within their ranges: a free axis is its range squashed onto the parameter."""
+    return torch.where(free, low + (high - low) * torch.sigmoid(parameters), low)
+
+
+def parameters_of(angles):
+    share = ((angles - low) / (high - low).clamp(min=1e-6)).clamp(0.02, 0.98)
+    return torch.log(share / (1.0 - share))
+
+
 kept_meshes = [name for name in skeleton.meshes if name not in set(args.exclude)]
 samples, sample_bones, sample_weights = skeleton.samples(kept_meshes)
 prop = Prop(skeleton, args.prop) if args.prop else None
-start = json.load(open(args.start, encoding="utf-8")) if args.start and os.path.exists(args.start) else None
-if prop is not None and not (start and prop.name in start.get("held", {})):
-    raise SystemExit(f"--prop needs a --start performance holding {prop.name} (fit_prop.py)")
-held_hand = index[start["held"][prop.name]] if prop is not None else None
+prop_profile = profile["props"][args.prop] if prop is not None else None
+hand_bone = index[prop_profile["hand"]] if prop is not None else None
+palm_bones = [index[name] for name in prop_profile["palm"]] if prop is not None else []
 order = skeleton.ancestry([bone for bone, _, _ in KEYPOINTS.values()] + [int(b) for b in sample_bones.unique()]
-                         + ([held_hand] if held_hand is not None else []))
+                         + palm_bones + ([hand_bone] if hand_bone is not None else []))
 
-fitted_index = {name: k for k, name in enumerate(FITTED)}
-rotations = torch.zeros(count, len(FITTED), 3, device=device)
+start = json.load(open(args.start, encoding="utf-8")) if args.start and os.path.exists(args.start) else None
+angles = torch.zeros(count, len(FITTED), 3, device=device)
 root_rotation = torch.zeros(count, 3, device=device)
 root_location = torch.zeros(count, 3, device=device)
-
 if start is not None:
     by_frame = {key["frame"]: key for key in start["frames"]}
     for k, frame in enumerate(frames):
@@ -169,11 +180,11 @@ if start is not None:
             entry = by_frame[frame]
             root_location[k] = torch.tensor(entry["location"])
             root_rotation[k] = torch.tensor(entry["rotation_vector"])
-            for name, value in entry["bones_vector"].items():
+            for name, value in entry["bones"].items():
                 if name in fitted_index:
-                    rotations[k, fitted_index[name]] = torch.tensor(value)
+                    w, x, y, z = value
+                    angles[k, fitted_index[name]] = torch.tensor(ScipyRotation.from_quat([x, y, z, w]).as_euler("xyz"), dtype=torch.float32)
 else:
-    from scipy.spatial.transform import Rotation as _Rotation
     for k in range(count):
         points_2d = observed[k].cpu().numpy()
         shoulders = (points_2d[5] + points_2d[6]) / 2
@@ -193,12 +204,11 @@ else:
         forward /= np.linalg.norm(forward)
         right = np.cross(forward, body_up)
         world_from_body = np.stack([right, forward, body_up], 1)
-        root_rotation.data[k] = torch.tensor(_Rotation.from_matrix(world_from_body).as_rotvec(), dtype=torch.float32, device=device)
+        root_rotation[k] = torch.tensor(ScipyRotation.from_matrix(world_from_body).as_rotvec(), dtype=torch.float32, device=device)
         ray = np.array([(centre_pixel[0] - args.width / 2) / focal, -(centre_pixel[1] - args.height / 2) / focal, -1.0])
         torso_centre = camera_location[k].cpu().numpy() + rotation_camera @ ray * depth
-        root_location.data[k] = torch.tensor(torso_centre - body_up * 1.12, dtype=torch.float32, device=device)
-
-rotations.requires_grad_(True)
+        root_location[k] = torch.tensor(torso_centre - body_up * 1.12, dtype=torch.float32, device=device)
+joint_parameters = parameters_of(angles).requires_grad_(True)
 root_rotation.requires_grad_(True)
 root_location.requires_grad_(True)
 
@@ -210,31 +220,21 @@ def object_matrices(root_rotation, root_location):
     return matrix
 
 
-def pose(rotations, root_rotation, root_location):
-    """World matrices (F, B, 4, 4) of the needed bones."""
-    F = rotations.shape[0]
+def pose(joint_angles, root_rotation, root_location):
+    """World matrices (F, 4, 4) of the needed bones."""
+    F = joint_angles.shape[0]
     object_matrix = object_matrices(root_rotation, root_location)
-    first_segments = {}
 
     def local(b):
         name = names[b]
         if name in fitted_index:
-            vector = rotations[:, fitted_index[name]]
             matrix = torch.eye(4, device=device).repeat(F, 1, 1)
-            if name in FINGERS:
-                matrix[:, :3, :3] = euler_xyz(vector)
-                first_segments[name] = vector[:, 0]
-            else:
-                matrix[:, :3, :3] = axis_angle_matrices(vector)
+            matrix[:, :3, :3] = euler_xyz(joint_angles[:, fitted_index[name]])
             return matrix
         if name in CURLED:
-            source = CURLED[name]
-            while source in CURLED:
-                source = CURLED[source]
-            if source in first_segments:
-                matrix = torch.eye(4, device=device).repeat(F, 1, 1)
-                matrix[:, :3, :3] = rotation_x(first_segments[source])
-                return matrix
+            matrix = torch.eye(4, device=device).repeat(F, 1, 1)
+            matrix[:, :3, :3] = rotation_x(joint_angles[:, fitted_index[CURLED[name]], 0])
+            return matrix
         return None
 
     return skeleton.pose(object_matrix, local, order)
@@ -249,86 +249,58 @@ def keypoint_positions(world):
     return torch.stack(result, 1)
 
 
-def camera_projection(points, slots):
-    local = torch.einsum("bji,bnj->bni", camera_rotation[slots], points - camera_location[slots][:, None, :])
-    safe = (-local[..., 2]).clamp(min=0.05)
-    return torch.stack([args.width / 2 + focal * local[..., 0] / safe, args.height / 2 - focal * local[..., 1] / safe], -1)
-
-
-if prop is not None:
-    prop_generator = torch.Generator().manual_seed(0)
-    prop_track = prop.subset(16, prop_generator)
-    prop_parts = parts(prop, args.prop_part, args.prop_masks, args.masks, frames, args.width, args.height, device, prop_generator,
-                       args.prop_rest_precision)
-    prop_present = torch.stack([part.silhouette.present for part in prop_parts]).max(0).values
-    frame_slots = torch.arange(count, device=device)
-    start_grips = prop.read_grips([by_frame[frame] for frame in frames])
-    if start_grips is None:
-        raise SystemExit(f"--start has no grip of {prop.name} on every frame (fit_prop.py)")
-    with torch.no_grad():
-        start_hand = pose(rotations, root_rotation, root_location)[held_hand]
-        costs = []
-        for candidate in start_grips:
-            placed = start_hand @ candidate
-            precision, coverage = fitted(prop_parts, camera_projection, placed[:, :3, :3], placed[:, :3, 3], frame_slots, True)
-            costs.append(float(((precision + coverage) * prop_present).sum()))
-        shared = int(np.argmin(costs))
-    print("shared grip starts from frame", frames[shared], flush=True)
-    aims = prop.read_aims([by_frame[frame] for frame in frames])
-    shared_grip = start_grips[shared]
-    drift_start = torch.linalg.inv(shared_grip)[None] @ start_grips
-    log_film_scale = torch.tensor([float(np.log(start["film_scales"][prop.name]))], device=device, requires_grad=args.prop_weight > 0.0)
-    grip_turn = torch.zeros(3, device=device, requires_grad=True)
-    grip_shift = torch.zeros(3, device=device, requires_grad=True)
-    drift_turn = torch.tensor(np.array([rotation_vector(m) for m in drift_start[:, :3, :3].cpu().numpy()]), dtype=torch.float32,
-                              device=device).requires_grad_(True)
-    drift_shift = drift_start[:, :3, 3].clone().requires_grad_(True)
-
-
-def grips():
-    """Each frame's grip: the shared grip times that frame's drift."""
-    shared_matrix = torch.eye(4, device=device)
-    shared_matrix[:3, :3] = shared_grip[:3, :3] @ axis_angle_matrices(grip_turn)
-    shared_matrix[:3, 3] = shared_grip[:3, 3] + grip_shift
-    drift = torch.eye(4, device=device).repeat(count, 1, 1)
-    drift[:, :3, :3] = axis_angle_matrices(drift_turn)
-    drift[:, :3, 3] = drift_shift
-    return shared_matrix[None] @ drift
-
-
-def film_grown(hand_matrix):
-    """The hand's matrix with the film's size of the prop folded in: the prop grown about the hand."""
-    grown = torch.eye(4, device=device) * torch.exp(log_film_scale)
-    grown[3, 3] = 1.0
-    return hand_matrix @ grown
-
-
 keypoint_ids = torch.tensor(sorted(KEYPOINTS), device=device)
-MIRRORED = {}
-for left, right in ((1, 2), (3, 4), (5, 6), (7, 8), (9, 10), (11, 12), (13, 14), (15, 16), (17, 20), (18, 21), (19, 22)):
-    MIRRORED[left], MIRRORED[right] = right, left
-for offset in range(21):
-    MIRRORED[91 + offset], MIRRORED[112 + offset] = 112 + offset, 91 + offset
+keypoint_groups = torch.tensor([GROUP_OF[key] for key in sorted(KEYPOINTS)], device=device)
 mirrored_ids = torch.tensor([MIRRORED.get(key, key) for key in sorted(KEYPOINTS)], device=device)
+weights = torch.tensor([args.hand_weight if key >= BODY_KEYS else 1.0 for key in sorted(KEYPOINTS)], device=device)
+stage_active = [torch.tensor([1.0 if key in TORSO else 0.0 for key in sorted(KEYPOINTS)], device=device),
+                torch.tensor([1.0 if key < BODY_KEYS else 0.0 for key in sorted(KEYPOINTS)], device=device),
+                weights]
 
-mask_distance = None
-if args.masks:
-    maps = []
-    for frame in frames:
-        path = os.path.join(args.masks, "m%04d.png" % frame)
-        mask = cv2.imread(path, cv2.IMREAD_GRAYSCALE) if os.path.exists(path) else None
-        if mask is None:
-            maps.append(np.zeros((args.height, args.width), np.float32))
-            continue
-        outside = cv2.distanceTransform((mask < 128).astype(np.uint8), cv2.DIST_L2, 3)
-        maps.append(outside.astype(np.float32))
-    mask_distance = torch.tensor(np.array(maps), device=device)
+silhouette = Silhouette(args.masks, args.occluders, frames, args.width, args.height, device, targets=8) if args.masks else None
+part_names = [name for name in profile.get("parts", {}) if args.parts and os.path.isdir(os.path.join(args.parts, name))]
+dominant = sample_bones.gather(1, sample_weights.argmax(1, keepdim=True))[:, 0]
+part_generator = torch.Generator().manual_seed(0)
+part_samples, part_silhouettes = {}, {}
+for name in part_names:
+    below = torch.tensor(sorted(skeleton.descendants(index[bone] for bone in profile["parts"][name])), device=device)
+    members = torch.nonzero(torch.isin(dominant, below))[:, 0]
+    part_samples[name] = members[torch.randperm(len(members), generator=part_generator)[:args.part_samples].to(device)]
+    part_silhouettes[name] = Silhouette(os.path.join(args.parts, name), None, frames, args.width, args.height, device, targets=300)
+    print(f"part {name}: {len(members)} samples, masked on {int(part_silhouettes[name].present.sum())} of {count} frames", flush=True)
+
+reading = torch.full((count, len(SWAP_GROUPS)), -1, dtype=torch.long, device=device)
+everything = torch.arange(count, device=device)
+for g, name in enumerate(SWAP_GROUPS):
+    sides = profile["swap_groups"][name].get("parts")
+    if not sides or not all(side in part_silhouettes for side in sides):
+        continue
+    group_keys = [key for key in sorted(KEYPOINTS) if GROUP_OF[key] == g and (key in LEFT_KEYS or key in RIGHT_KEYS)]
+    points = observed[:, group_keys]
+    sure = (scores[:, group_keys] > 3.0).float()
+    handed = torch.tensor([1.0 if key in LEFT_KEYS else -1.0 for key in group_keys], device=device)
+    on_left = (part_silhouettes[sides[0]].inside(points, everything) > 0.5).float()
+    on_right = (part_silhouettes[sides[1]].inside(points, everything) > 0.5).float()
+    vote = ((on_left - on_right) * handed * sure).sum(1)
+    reading[:, g] = torch.where(vote >= 2, 0, torch.where(vote <= -2, 1, -1))
+    print(f"{name}: read as detected on {int((reading[:, g] == 0).sum())} frames, swapped on "
+          f"{[frames[k] for k in range(count) if int(reading[k, g]) == 1]}, left to the fit on {int((reading[:, g] == -1).sum())}", flush=True)
 
 
-def sample_map(maps, pixels):
-    F, H, W = maps.shape
-    grid = torch.stack([pixels[..., 0] / (W - 1) * 2 - 1, pixels[..., 1] / (H - 1) * 2 - 1], -1)
-    return torch.nn.functional.grid_sample(maps[:, None], grid[:, :, None, :], align_corners=True)[:, 0, :, 0]
+def project_frames(points, slots):
+    """points (B, N, 3) world on the frames ``slots`` -> pixels (B, N, 2), depth (B, N)."""
+    local = torch.einsum("fji,fnj->fni", camera_rotation[slots], points - camera_location[slots][:, None, :])
+    depth = -local[..., 2]
+    safe = depth.clamp(min=0.05)
+    u = args.width / 2 + focal * local[..., 0] / safe
+    v = args.height / 2 - focal * local[..., 1] / safe
+    return torch.stack([u, v], -1), depth
+
+
+frames_at_once = chunk(budget, bytes_each=len(samples) * 4 * 16 * 4 * 8 + 4 * 1024 ** 2 + len(part_names) ** 2 * args.part_samples ** 2 * 4 * 6,
+                       resident=(silhouette.outside_maps.numel() * 8 if silhouette is not None else 0)
+                       + sum(part.outside_maps.numel() * 8 for part in part_silhouettes.values()), most=count)
+print(f"[gpu] {frames_at_once} frames at a time", flush=True)
 
 
 def robust(residual, scale):
@@ -336,141 +308,199 @@ def robust(residual, scale):
     return squared / (squared + 1.0)
 
 
-hand_keys = list(range(91, 133))
-weight_map = torch.ones(133, device=device)
-weight_map[hand_keys] = 0.4
+if prop is not None:
+    if start is None or prop.name not in start.get("film_scales", {}):
+        raise SystemExit(f"--prop needs a --start performance with {prop.name}'s placements (fit_prop.py)")
+    placements = prop.read_placements([by_frame[frame] for frame in frames])
+    log_film_scale = torch.tensor([float(np.log(start["film_scales"][prop.name]))], device=device, requires_grad=True)
+    shaft = torch.tensor(prop_profile["shaft"], dtype=torch.float32, device=device)
 
 
-def loss_terms(stage):
-    world = pose(rotations, root_rotation, root_location)
-    joints = keypoint_positions(world)
-    pixels, depth = project(joints)
-    target = observed[:, keypoint_ids]
-    confidence = ((scores[:, keypoint_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
-    active = torch.zeros(len(keypoint_ids), device=device)
-    for slot, key in enumerate(sorted(KEYPOINTS)):
-        if stage == 0 and key in (5, 6, 11, 12, 0, 1, 2):
-            active[slot] = 1.0
-        elif stage == 1 and key < 23:
-            active[slot] = 1.0
-        elif stage == 2:
-            active[slot] = float(weight_map[key])
+def placed_prop(slots):
+    """The prop where its silhouette puts it on the frames ``slots``, as large as the film's: grown about the camera."""
+    scale = torch.exp(log_film_scale)
+    matrix = placements[slots].clone()
+    matrix[:, :3, :3] = placements[slots][:, :3, :3] * scale
+    matrix[:, :3, 3] = camera_location[slots] + scale * (placements[slots][:, :3, 3] - camera_location[slots])
+    return matrix
+
+
+def palm_of(world):
+    return sum(world[bone][:, :3, 3] for bone in palm_bones) / len(palm_bones)
+
+
+def grip_distance(world, slots):
+    held = placed_prop(slots)
+    ends = torch.einsum("fij,nj->fni", held[:, :3, :3], shaft) + held[:, None, :3, 3]
+    axis = ends[:, 1] - ends[:, 0]
+    palm = palm_of(world)
+    along = (((palm - ends[:, 0]) * axis).sum(-1) / (axis * axis).sum(-1)).clamp(0.0, 1.0)
+    return (palm - (ends[:, 0] + along[:, None] * axis)).norm(dim=-1)
+
+
+def misordered(pixels, depth, slots):
+    """How far each part, where another part's mask shows that other part and not it, lies
+    in front of that other part's surface there (m, summed over its samples)."""
+    total = 0.0
+    seen = {name: {other: part_silhouettes[other].inside(pixels[name], slots) for other in part_names} for name in part_names}
+    for name in part_names:
+        for other in part_names:
+            if other == name:
+                continue
+            hidden = (seen[name][other] > 0.5).float() * (seen[name][name] < 0.5).float()
+            near = torch.exp(-torch.cdist(pixels[name], pixels[other]) ** 2 / (2.0 * 6.0 ** 2))
+            weight = near.sum(-1)
+            surface = (near * depth[other][:, None, :]).sum(-1) / weight.clamp(min=1e-6)
+            ahead = torch.relu(surface + 0.06 - depth[name]) * (weight > 0.5).float() * hidden
+            total = total + torch.sqrt(ahead ** 2 + 0.01 ** 2).sub(0.01).sum()
+    return total
+
+
+def grouped(per_key):
+    """Per-keypoint values (B, K) summed over the profile's swap groups (B, G)."""
+    return torch.zeros(per_key.shape[0], len(SWAP_GROUPS), device=device).index_add_(1, keypoint_groups, per_key)
+
+
+def frame_terms(stage, slots):
+    """The terms each frame answers for alone, on the frames ``slots``: parts of the shot's sums."""
+    joint_angles = angles_of(joint_parameters[slots])
+    world = pose(joint_angles, root_rotation[slots], root_location[slots])
+    pixels, depth = project_frames(keypoint_positions(world), slots)
+    target = observed[slots][:, keypoint_ids]
+    confidence = ((scores[slots][:, keypoint_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
+    active = stage_active[stage]
     error = (pixels - target).norm(dim=-1)
-    mirrored_error = (pixels - observed[:, mirrored_ids]).norm(dim=-1)
-    mirrored_confidence = ((scores[:, mirrored_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
-    direct = (robust(error, 25.0) * confidence * active).sum(1)
-    swapped = (robust(mirrored_error, 25.0) * mirrored_confidence * active).sum(1)
-    data_term = torch.minimum(direct, swapped).sum() / count
-    terms = {"keypoints": data_term}
-    accel = rotations[2:] - 2 * rotations[1:-1] + rotations[:-2]
+    mirrored_error = (pixels - observed[slots][:, mirrored_ids]).norm(dim=-1)
+    mirrored_confidence = ((scores[slots][:, mirrored_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
+    direct = grouped(robust(error, 25.0) * confidence * active)
+    swapped = grouped(robust(mirrored_error, 25.0) * mirrored_confidence * active)
+    read = reading[slots]
+    chosen = torch.where(read == 0, direct, torch.where(read == 1, swapped, torch.minimum(direct, swapped)))
+    terms = {"keypoints": chosen.sum() / count, "behind": torch.relu(0.3 - depth).sum()}
+    if (silhouette is not None or part_names) and stage >= 1:
+        sample_pixels, sample_depth = project_frames(skeleton.skin(world, samples, sample_bones, sample_weights, len(slots)), slots)
+    if silhouette is not None and stage >= 1:
+        terms["silhouette"] = 2.0 * (silhouette.precision(sample_pixels, slots) * silhouette.present[slots]).sum() / count
+    if part_names and stage >= 1:
+        pixels = {name: sample_pixels[:, part_samples[name]] for name in part_names}
+        depth = {name: sample_depth[:, part_samples[name]] for name in part_names}
+        terms["cover"] = args.cover_weight * sum((part_silhouettes[name].coverage(pixels[name], slots) * part_silhouettes[name].present[slots]).sum()
+                                                 for name in part_names) / count
+        terms["order"] = args.order_weight * misordered(pixels, depth, slots) / (count * args.part_samples)
+    if prop is not None and stage >= 1:
+        terms["grip"] = args.grip_weight * torch.sqrt(grip_distance(world, slots) ** 2 + 0.01 ** 2).sum() / count
+    return terms
+
+
+def shot_terms():
+    """The terms that tie the frames together."""
+    joint_angles = angles_of(joint_parameters)
+    terms = {}
+    accel = joint_angles[2:] - 2 * joint_angles[1:-1] + joint_angles[:-2]
     terms["smooth"] = 30.0 * (accel ** 2).sum() / count
     root_accel = root_location[2:] - 2 * root_location[1:-1] + root_location[:-2]
     root_spin = root_rotation[2:] - 2 * root_rotation[1:-1] + root_rotation[:-2]
     terms["root_smooth"] = 300.0 * ((root_accel ** 2).sum() + (root_spin ** 2).sum()) / count
-    root_velocity = root_location[1:] - root_location[:-1]
-    terms["root_speed"] = 15.0 * (root_velocity ** 2).sum() / count
     for anchor in args.anchor:
         frame_text, axis_name, value_text = anchor.split(":")
         if int(frame_text) in frames:
             k = frames.index(int(frame_text))
             terms[f"anchor {anchor}"] = 50.0 * (root_location[k, "XYZ".index(axis_name)] - float(value_text)) ** 2
-    terms["prior"] = 0.005 * (rotations ** 2).sum() / count
-    terms["behind"] = torch.relu(0.3 - depth).sum()
-    if mask_distance is not None and stage >= 1:
-        sample_pixels, _ = project(skeleton.skin(world, samples, sample_bones, sample_weights, count))
-        outside = sample_map(mask_distance, sample_pixels)
-        terms["silhouette"] = 2.0 * robust(outside, 15.0).mean()
-    if prop is not None:
-        placed = film_grown(world[held_hand]) @ grips()
-        rotation, translation = placed[:, :3, :3], placed[:, :3, 3]
-        if args.prop_weight > 0.0:
-            precision, coverage = fitted(prop_parts, camera_projection, rotation, translation, frame_slots)
-            terms["prop"] = args.prop_weight * ((precision + coverage) * prop_present).sum() / prop_present.sum().clamp(min=1.0)
-        if aims is not None:
-            held_rotation = (world[held_hand] @ grips())[:, :3, :3]
-            terms["aim"] = args.aim_weight * ((held_rotation - aims) ** 2).sum((1, 2)).mean()
-        held = world[held_hand] @ grips()
-        tracked = Prop.place(held[:, :3, :3], held[:, :3, 3], prop_track)
-        acceleration = tracked[2:] - 2 * tracked[1:-1] + tracked[:-2]
-        terms["prop_smooth"] = args.prop_smooth * (acceleration ** 2).sum(-1).mean()
-        drift = (drift_turn ** 2).sum(-1) / 0.1 ** 2 + (drift_shift ** 2).sum(-1) / 0.03 ** 2
-        terms["drift"] = args.grip_drift * DRIFT_SCHEDULE[stage] * drift.mean()
+    terms["prior"] = 0.005 * (joint_angles ** 2).sum() / count
     return terms
 
 
-DRIFT_SCHEDULE = (0.01, 0.1, 1.0)
+chunks = [torch.arange(start, min(count, start + frames_at_once), device=device) for start in range(0, count, frames_at_once)]
 
 
 stages = [(0, int(args.iterations * 0.25), [root_rotation, root_location], 0.03),
-          (1, int(args.iterations * 0.45), [rotations, root_rotation, root_location], 0.02),
-          (2, int(args.iterations * 0.30), [rotations, root_rotation, root_location], 0.01)]
+          (1, int(args.iterations * 0.45), [joint_parameters, root_rotation, root_location], 0.02),
+          (2, int(args.iterations * 0.30), [joint_parameters, root_rotation, root_location], 0.01)]
 for stage, steps, parameters, rate in stages:
     groups = [{"params": parameters, "lr": rate}]
-    if prop is not None:
-        groups.append({"params": [grip_turn, grip_shift, drift_turn, drift_shift], "lr": 0.01})
-        if log_film_scale.requires_grad:
-            groups.append({"params": [log_film_scale], "lr": 0.003})
+    if prop is not None and stage >= 1:
+        groups.append({"params": [log_film_scale], "lr": 0.003})
     optimizer = torch.optim.Adam(groups)
     for step in range(steps):
         optimizer.zero_grad()
-        terms = loss_terms(stage)
-        total = sum(terms.values())
-        total.backward()
+        values = {}
+        for slots in chunks:
+            terms = frame_terms(stage, slots)
+            sum(terms.values()).backward()
+            for key, value in terms.items():
+                values[key] = values.get(key, 0.0) + float(value)
+        terms = shot_terms()
+        sum(terms.values()).backward()
+        values.update({key: float(value) for key, value in terms.items()})
         optimizer.step()
         if step % 200 == 0 or step == steps - 1:
-            print(f"stage {stage} step {step:4d} " + " ".join(f"{k} {float(v):.3f}" for k, v in terms.items()), flush=True)
+            print(f"stage {stage} step {step:4d} " + " ".join(f"{k} {v:.3f}" for k, v in values.items()), flush=True)
 
 with torch.no_grad():
-    world = pose(rotations, root_rotation, root_location)
+    joint_angles = angles_of(joint_parameters)
+    world = pose(joint_angles, root_rotation, root_location)
     pixels, _ = project(keypoint_positions(world))
     target = observed[:, keypoint_ids]
     confidence = scores[:, keypoint_ids]
     direct = (pixels - target).norm(dim=-1)
     mirrored = (pixels - observed[:, mirrored_ids]).norm(dim=-1)
-    use_mirror = (mirrored.median(1).values < direct.median(1).values)[:, None]
+    weight = ((confidence - 1.5) / 3.0).clamp(0.0, 1.0)
+    mirrored_weight = ((scores[:, mirrored_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
+    better = grouped(robust(mirrored, 25.0) * mirrored_weight) < grouped(robust(direct, 25.0) * weight)
+    use_mirror = torch.where(reading == -1, better, reading == 1)[:, keypoint_groups]
     error = torch.where(use_mirror, mirrored, direct)
-    print("frames fitted with left and right swapped:", [frames[k] for k in range(count) if bool(use_mirror[k, 0])])
+    for g, name in enumerate(SWAP_GROUPS):
+        print(f"frames whose {name} are fitted with left and right swapped:",
+              [frames[k] for k in range(count) if bool(use_mirror[k, (keypoint_groups == g).nonzero()[0, 0]])])
     good = confidence > 3.0
-    print("median keypoint error (px, confident body):", float(error[:, :23][good[:, :23]].median()),
-          " hands:", float(error[:, 23:][good[:, 23:]].median()) if good[:, 23:].any() else None)
+    body = keypoint_ids < BODY_KEYS
+    per_frame = [float(error[k][good[k] & body].median()) if (good[k] & body).any() else float("nan") for k in range(count)]
+    print("median keypoint error (px, confident body):", float(error[:, body][good[:, body]].median()),
+          " hands:", float(error[:, ~body][good[:, ~body]].median()) if good[:, ~body].any() else None)
+    print("frames whose confident body keypoints miss by over 20 px (median):",
+          [(frames[k], round(value)) for k, value in enumerate(per_frame) if value > 20.0])
+    at_limit = ((joint_angles - low).abs() < 0.01) | ((high - joint_angles).abs() < 0.01)
+    held_at_limit = {}
+    for j, name in enumerate(FITTED):
+        if free[j].any():
+            share = float(at_limit[:, j][:, free[j]].float().mean())
+            if share > 0.2:
+                held_at_limit[name] = round(share, 2)
+    print("joints held at a limit (share of frames):", held_at_limit)
+    if part_names:
+        everything = torch.arange(count, device=device)
+        sample_pixels, sample_depth = project(skeleton.skin(world, samples, sample_bones, sample_weights, count))
+        for name in part_names:
+            gaps = part_silhouettes[name].gaps(sample_pixels[:, part_samples[name]], everything).median(1).values
+            shown = part_silhouettes[name].present.bool()
+            print(f"part {name}: median gap of its mask to it (px), every 5th masked frame:",
+                  " ".join(f"{frames[k]}:{float(gaps[k]):.0f}" for k in range(0, count, 5) if shown[k]))
+        ahead = []
+        for k in range(count):
+            slots = everything[k:k + 1]
+            amount = float(misordered({name: sample_pixels[k:k + 1, part_samples[name]] for name in part_names},
+                                 {name: sample_depth[k:k + 1, part_samples[name]] for name in part_names}, slots))
+            if amount > 0.5:
+                ahead.append((frames[k], round(amount, 1)))
+        print("frames where a part lies in front of the part its mask shows (summed m):", ahead)
     if prop is not None:
-        placed = film_grown(world[held_hand]) @ grips()
-        rotation, translation = placed[:, :3, :3], placed[:, :3, 3]
-        print("film scale", float(torch.exp(log_film_scale)))
-        for part_index, part in enumerate(prop_parts):
-            inner = camera_projection(Prop.place(rotation, translation, part.points), frame_slots)
-            cover = camera_projection(Prop.place(rotation, translation, part.cover_points), frame_slots)
-            outside = part.silhouette.outside(inner, frame_slots)
-            gaps = part.silhouette.gaps(cover, frame_slots)
-            print(f"prop part {part_index}: frame, share outside its silhouette, median gap (px):",
-                  " ".join(f"{frame}:{float((outside[k] > 6.0).float().mean()):.2f}/{float(gaps[k].median()):.1f}" for k, frame in enumerate(frames)))
-        if aims is not None:
-            held_rotation = (world[held_hand] @ grips())[:, :3, :3]
-            turn = torch.acos(((torch.einsum("fij,fij->f", held_rotation, aims) - 1.0) / 2.0).clamp(-1.0, 1.0)) * 57.2958
-            print("prop turned off the picture's angle (degrees):", " ".join(f"{frames[k]}:{float(turn[k]):.0f}" for k in range(0, count, 5)))
-        print("grip drift (degrees / cm):", " ".join(f"{frames[k]}:{float(drift_turn[k].norm()) * 57.3:.0f}/{float(drift_shift[k].norm()) * 100:.0f}"
-                                                    for k in range(0, count, 5)))
+        distance = grip_distance(world, torch.arange(count, device=device))
+        print("film scale", round(float(torch.exp(log_film_scale)), 4))
+        print("palm to shaft (cm):", " ".join(f"{frames[k]}:{float(distance[k]) * 100:.0f}" for k in range(0, count, 5)))
 
-result = {"armature": "Avatar_LaPluma", "frames": []}
+result = {"armature": profile["armature"], "frames": []}
 with torch.no_grad():
     object_rotation = axis_angle_matrices(root_rotation).cpu().numpy()
+    rotation_matrices = euler_xyz(joint_angles).cpu().numpy()
     for k, frame in enumerate(frames):
-        bones = {}
-        vectors = {}
-        for name in FITTED:
-            vector = rotations[k, fitted_index[name]]
-            matrix = (euler_xyz(vector) if name in FINGERS else axis_angle_matrices(vector)).cpu().numpy()
-            bones[name] = [round(float(v), 6) for v in quaternion_from_matrix(matrix)]
-            vectors[name] = [round(float(v), 6) for v in vector.cpu().numpy()]
+        bones = {name: [round(float(v), 6) for v in quaternion_from_matrix(rotation_matrices[k, j])] for j, name in enumerate(FITTED)}
         result["frames"].append({"frame": frame,
                                  "location": [round(float(v), 5) for v in root_location[k].cpu().numpy()],
                                  "rotation": [round(float(v), 6) for v in quaternion_from_matrix(object_rotation[k])],
                                  "rotation_vector": [round(float(v), 6) for v in root_rotation[k].cpu().numpy()],
-                                 "bones": bones, "bones_vector": vectors})
-if prop is not None:
-    with torch.no_grad():
-        prop.write_grips(result["frames"], grips())
-        result["held"] = {prop.name: names[held_hand]}
-        result["film_scales"] = {prop.name: round(float(torch.exp(log_film_scale)), 4)}
+                                 "bones": bones})
+    if prop is not None:
+        prop.write_grips(result["frames"], torch.linalg.inv(world[hand_bone]) @ placed_prop(torch.arange(count, device=device)))
+        result["held"] = {prop.name: prop_profile["hand"]}
 json.dump(result, open(args.out, "w", encoding="utf-8"), indent=1)
 print("wrote", args.out)
