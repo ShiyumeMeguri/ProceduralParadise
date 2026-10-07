@@ -1,7 +1,7 @@
 {
   "id": "Cinematics",
   "name": "Cinematics (影片)",
-  "notes": ["Colours are linear RGB.  In set data a colour input may name a palette entry instead of giving RGB.", "A finish is a palette colour with its roughness, metallicness and weathering: the grime that darkens it in broad patches ('grime': strength, size in metres) and the streaks that run down vertical faces ('streaks': strength, spacing in metres).", "Everything is built for EEVEE; a film's sets may override any finish parameter through their 'materials' (\"<finish>.<parameter>\" or \"color:<palette key>\").", "A module is a facade panel in unit coordinates (u across the bay between its columns' faces, v up the storey from the floor to the underside of the beam above): its members ({from, to, section}) and glazing ([u0, v0, u1, v1] panes); a frame's own 'modules' add to or replace these.  A panel code joins modules with '+'."],
+  "notes": ["Colours are linear RGB.  In set data a colour input may name a palette entry instead of giving RGB.", "A finish is a palette colour with its roughness, metallicness and weathering: the grime that darkens it in broad patches ('grime': strength, size in metres) and the streaks that run down vertical faces ('streaks': strength, spacing in metres).", "Everything is built for EEVEE; a film's sets may override any finish parameter through their 'materials' (\"<finish>.<parameter>\" or \"color:<palette key>\").", "A module is a facade panel in unit coordinates (u across the bay between its columns' faces, v up the storey from the floor to the underside of the beam above): its members ({from, to, section}) and glazing ([u0, v0, u1, v1] panes); a frame's own 'modules' add to or replace these.  A panel code joins modules with '+'.", "The rarity emblem is three folded blades a third of a turn apart round its centre, pointing the emblem rightwards: each blade a lit face ('light') and a shaded one ('shade', drawn at 'shade_opacity' of the emblem's ink), corners in units of the emblem's width (x right, y up), measured off the reference's emblems."],
   "palette": {
     "concrete": [0.48, 0.49, 0.5],
     "concrete_grime": [0.29, 0.3, 0.31],
@@ -23,11 +23,17 @@
     "hall_paint": [0.85, 0.86, 0.87],
     "hall_metal": [0.62, 0.62, 0.64],
     "gold": [0.95, 0.7, 0.3],
-    "hall_glow": [1.0, 0.86, 0.62]
+    "hall_glow": [1.0, 0.86, 0.62],
+    "hall_window": [0.93, 0.96, 1.0]
   },
   "fonts": {
     "ui": "Dengb.ttf",
     "title": "impact.ttf"
+  },
+  "emblem": {
+    "light": [[0.2315, 0.2914], [0.2742, -0.1219], [0.0505, 0.0465], [0.0501, 0.3848]],
+    "shade": [[-0.0187, 0.45], [-0.041, 0.0542], [-0.2704, 0.1338], [-0.2513, 0.5615]],
+    "shade_opacity": 0.62
   },
   "finishes": {
     "CIN.Concrete": {

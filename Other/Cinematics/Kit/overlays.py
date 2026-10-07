@@ -32,14 +32,16 @@ text is.
 ``CIN.Overlay.Triangle``: a triangle with the corners ``A``, ``B`` and ``C``.
 
 ``CIN.Overlay.Emblems``: ``Count`` rarity emblems in a row about ``Position``, ``Spacing``
-apart, each ``Size`` across: three chevrons turned a third of a turn apart round a point.
+apart, each ``Size`` across: the design system's ``emblem``, three folded blades turned a third
+of a turn apart round a point, the shaded face of each drawn at its ``shade_opacity``.
 
 ``CIN.Overlay.Beam``: a line of light across the picture at height ``Height``, ``Width`` thick,
 its head travelling from the left edge to the right one between the frames ``Grow``
 (start, frames), a soft halo ``Halo`` times as thick round it.
 
-``CIN.Overlay.Curtain``: an aurora of ``Count`` upright streaks of light filling the picture,
-each its own width, drifting sideways at ``Drift``; their colours pass from ``Color A`` through
+``CIN.Overlay.Curtain``: an aurora of ``Count`` upright streaks of light across the picture
+between ``Across`` (left and right ends; 0, 0: all of it), each its own width, drifting sideways
+at ``Drift``; their colours pass from ``Color A`` through
 ``Color B`` and ``Color C`` to ``Color D`` at the frames ``Times`` (x, y, z, w), each streak a
 little ahead or behind (``Stagger`` frames), brighter at its foot (``Foot``) or its head; the
 whole curtain comes in over ``Fade In`` and goes out over ``Fade Out`` (start frame, frames).
@@ -73,7 +75,7 @@ def font(key):
 def _inked(graph, geometry):
     """Store ``ink``, ``glow``, ``alpha``, ``hatch`` and ``place`` (from the inputs Color, Glow, Fade In, Fade Out, Falloff,
     Hatch) on ``geometry``, moved as it slides in, drifts and slides out (Slide In, Slide Time, Slide Ease, Drift, Slide Out, Slide Out Time), in
-    CIN.OverlayInk."""
+    CIN.OverlayInk.  A part of ``geometry`` carrying an ``opacity`` of its own is drawn at that share of the item's."""
     color = graph.inp("Color", "COLOR", default=(1.0, 1.0, 1.0, 1.0))
     glow = graph.inp("Glow", default=1.0, min=0.0)
     fade_in = graph.inp("Fade In", "VECTOR", default=(0.0, 0.0, 0.0), desc="Start frame, frames")
@@ -96,7 +98,9 @@ def _inked(graph, geometry):
     remaining = graph.math("POWER", 1.0 - arriving, ease)
     geometry = graph.store(geometry, "ink", color, "FLOAT_COLOR")
     geometry = graph.store(geometry, "glow", glow)
-    geometry = graph.store(geometry, "alpha", coming * going * (1.0 - falloff * (1.0 - rise)))
+    own = graph.n("GeometryNodeInputNamedAttribute", Name="opacity", props={"data_type": "FLOAT"})
+    opacity = graph.switch(own["Exists"], 1.0, own["Attribute"], input_type="FLOAT")
+    geometry = graph.store(geometry, "alpha", coming * going * (1.0 - falloff * (1.0 - rise)) * opacity)
     geometry = graph.store(geometry, "hatch", hatch, "FLOAT_VECTOR")
     geometry = graph.store(geometry, "place", graph.position(), "FLOAT_VECTOR")
     leaving = graph.math("POWER", graph.clamp01((frame - slide_out_time.x) / graph.max(slide_out_time.y, 0.001)), ease)
@@ -204,9 +208,11 @@ def emblems():
     position = graph.inp("Position", "VECTOR", default=(0.0, 0.0, 0.0))
     spacing = graph.inp("Spacing", default=0.15, min=0.0)
     size = graph.inp("Size", default=0.13, min=0.0)
-    chevron = [(0.0, 0.08), (0.42, 0.5), (0.2, 0.5), (0.0, 0.3), (-0.2, 0.5), (-0.42, 0.5)]
-    blade = graph.fill(graph.polyline([(x, y - 0.04, 0.0) for x, y in chevron], cyclic=True))
-    blades = graph.join(*[graph.transform(blade, r=graph.vec(0.0, 0.0, math.radians(120.0 * k + 180.0))) for k in range(3)])
+    design = CINEMATICS["emblem"]
+    faces = [graph.store(graph.fill(graph.polyline([(x, y, 0.0) for x, y in design[key]], cyclic=True)), "opacity", opacity)
+             for key, opacity in (("light", 1.0), ("shade", design["shade_opacity"]))]
+    blade = graph.join(*faces)
+    blades = graph.join(*[graph.transform(blade, r=graph.vec(0.0, 0.0, math.radians(120.0 * k))) for k in range(3)])
     row = graph.n("GeometryNodeMeshLine", Count=count, Offset=graph.vec(spacing, 0.0, 0.0)).o
     row = graph.set_pos(row, offset=graph.vec(spacing * (count - 1) * -0.5, 0.0, 0.0) + position)
     graph.result(_inked(graph, graph.realize(graph.iop(graph.n("GeometryNodeMeshToPoints", Mesh=row).o, blades,
@@ -239,6 +245,7 @@ def curtain():
     graph = GN("CIN.Overlay.Curtain", curtain.__doc__)
     aspect = graph.inp("Aspect", default=16.0 / 9.0, min=0.1)
     count = graph.inp("Count", "INT", default=90, min=1)
+    across_range = graph.inp("Across", "VECTOR", default=(0.0, 0.0, 0.0), desc="Left and right ends of the streaks (0, 0: the whole picture)")
     seed = graph.inp("Seed", "INT", default=0)
     drift = graph.inp("Drift", default=0.004, desc="Picture units a frame")
     times = graph.inp("Times", "VECTOR", default=(0.0, 10.0, 20.0), desc="Frames of colours B, C and D")
@@ -257,7 +264,10 @@ def curtain():
 
     streaks = graph.new_points(count)
     clock = graph.scene_frame() + draw(1, -1.0, 1.0) * stagger
-    across = draw(2, -1.0, 1.0) * aspect * 1.2 + graph.scene_frame() * drift * draw(3, 0.5, 1.5)
+    whole = graph.compare(graph.abs(across_range.x) + graph.abs(across_range.y), 0.0, "EQUAL")
+    left = graph.switch(whole, across_range.x, aspect * -1.2, "FLOAT")
+    right = graph.switch(whole, across_range.y, aspect * 1.2, "FLOAT")
+    across = left + (right - left) * draw(2) + graph.scene_frame() * drift * draw(3, 0.5, 1.5)
     streaks = graph.set_pos(streaks, pos=graph.vec(across, 0.0, draw(4, -0.01, 0.0)))
     stops = [first, times.x, times.y, times.z]
     blend = colors[0]

@@ -6,8 +6,9 @@
   67
  ],
  "notes": [
-  "The recruitment's opening on black: a line of light shoots across from the left (frames 4-8) over the company's logo in gold, a curtain of light floods the picture -- green and sea blue, then gold to white, then deep orange under green -- with six rarity emblems on the line, and dies away (frames 8-50); then the logo in grey with the six emblems in white (frames 52-67).",
-  "Measured on the reference in pixels and written in the picture's units (half its height = 1): the emblems 82 px apart round the middle, the logo 590 px wide just above it, the contour triangle 640 px across."
+  "The recruitment's opening on black: a line of light shoots across from the left (frames 4-8) over the company's logo in gold, a curtain of light floods the picture -- green on the left and sea blue on the right, then yellow-green to white, then gold under a darkening top -- with six rarity emblems on the line, and dies away (frames 8-48); then the logo in grey with the six emblems in white (frames 49-67).",
+  "Measured on the reference in pixels and written in the picture's units (half its height = 1): the emblems 82 px apart round the middle, the logo 590 px wide just above it, the contour triangle 640 px across.",
+  "Measured on the reference (display values): the curtain holds to frame 48, a fifth darker by then, and the picture cuts to black on 49 with the grey logo and the six white emblems already there; the logo fades out from 61 to black by 67 and the emblems blink out on 65, back on 66 at four fifths and out on 67."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -57,7 +58,7 @@
    "asset": "CIN.Overlay.Curtain",
    "shown": [
     6,
-    52
+    48
    ],
    "inputs": {
     "Count": 120,
@@ -74,18 +75,18 @@
     "Color A": [
      0.12,
      0.5,
-     0.3,
+     0.2,
      1.0
     ],
     "Color B": [
-     0.9,
-     0.95,
-     0.6,
+     0.54,
+     0.85,
+     0.25,
      1.0
     ],
     "Color C": [
-     0.95,
-     0.88,
+     0.94,
+     0.89,
      0.22,
      1.0
     ],
@@ -102,7 +103,67 @@
     ],
     "Fade Out": [
      44.0,
-     6.0,
+     20.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Curtain Right",
+   "asset": "CIN.Overlay.Curtain",
+   "shown": [
+    6,
+    48
+   ],
+   "inputs": {
+    "Count": 50,
+    "Seed": 9,
+    "First": 8.0,
+    "Times": [
+     20.0,
+     29.0,
+     41.0
+    ],
+    "Stagger": 3.0,
+    "Drift": 0.006,
+    "Foot": 0.85,
+    "Color A": [
+     0.16,
+     0.81,
+     0.84,
+     1.0
+    ],
+    "Color B": [
+     0.51,
+     0.93,
+     0.91,
+     1.0
+    ],
+    "Color C": [
+     0.96,
+     0.94,
+     0.45,
+     1.0
+    ],
+    "Color D": [
+     0.9,
+     0.9,
+     0.35,
+     1.0
+    ],
+    "Fade In": [
+     7.0,
+     3.0,
+     0.0
+    ],
+    "Fade Out": [
+     44.0,
+     20.0,
+     0.0
+    ],
+    "Across": [
+     0.55,
+     2.13,
      0.0
     ]
    }
@@ -210,7 +271,7 @@
    "asset": "CIN.Overlay.Emblems",
    "shown": [
     9,
-    50
+    48
    ],
    "inputs": {
     "Count": 6,
@@ -232,11 +293,6 @@
      9.0,
      2.0,
      0.0
-    ],
-    "Fade Out": [
-     48.0,
-     2.0,
-     0.0
     ]
    }
   },
@@ -244,7 +300,7 @@
    "name": "Logo Grey Contours",
    "asset": "CIN.Overlay.Contours",
    "shown": [
-    51,
+    49,
     67
    ],
    "inputs": {
@@ -261,9 +317,9 @@
      1.0
     ],
     "Glow": 0.7,
-    "Fade In": [
-     51.0,
-     3.0,
+    "Fade Out": [
+     61.0,
+     6.2,
      0.0
     ]
    }
@@ -272,7 +328,7 @@
    "name": "Logo Grey",
    "asset": "CIN.Overlay.Text",
    "shown": [
-    51,
+    49,
     67
    ],
    "inputs": {
@@ -291,9 +347,9 @@
      1.0
     ],
     "Glow": 1.0,
-    "Fade In": [
-     51.0,
-     3.0,
+    "Fade Out": [
+     61.0,
+     6.2,
      0.0
     ]
    }
@@ -302,7 +358,7 @@
    "name": "Company",
    "asset": "CIN.Overlay.Text",
    "shown": [
-    51,
+    49,
     67
    ],
    "inputs": {
@@ -321,9 +377,9 @@
      1.0
     ],
     "Glow": 1.0,
-    "Fade In": [
-     51.0,
-     3.0,
+    "Fade Out": [
+     61.0,
+     6.2,
      0.0
     ]
    }
@@ -332,7 +388,32 @@
    "name": "Emblems White",
    "asset": "CIN.Overlay.Emblems",
    "shown": [
-    51,
+    49,
+    64
+   ],
+   "inputs": {
+    "Count": 6,
+    "Position": [
+     0.0,
+     0.0,
+     0.003
+    ],
+    "Spacing": 0.152,
+    "Size": 0.14,
+    "Color": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "Glow": 1.6
+   }
+  },
+  {
+   "name": "Emblems White Blink",
+   "asset": "CIN.Overlay.Emblems",
+   "shown": [
+    66,
     67
    ],
    "inputs": {
@@ -351,9 +432,9 @@
      1.0
     ],
     "Glow": 1.6,
-    "Fade In": [
-     51.0,
-     2.0,
+    "Fade Out": [
+     65.72,
+     1.41,
      0.0
     ]
    }

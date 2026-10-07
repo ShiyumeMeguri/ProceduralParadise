@@ -278,10 +278,38 @@ def fade_nodes(t, img, keys, display):
     return decode.o
 
 
-def underlay_nodes(t, img, depth, scene, distance):
+def display_over(t, background, foreground, display):
+    """``foreground`` (premultiplied) laid over ``background`` the way an editor lays a title over a film: both
+    encoded for the ``display``, mixed there by the title's opacity, the mix decoded back to scene light -- a
+    half-transparent title darkens a bright picture as much as it lightens a dark one."""
+    parts = t.n("CompositorNodeSeparateColor", foreground)
+    alpha = parts[3]
+    held = t.math("MAXIMUM", alpha, 0.000001)
+    straight = t.n("CompositorNodeCombineColor", t.math("DIVIDE", parts[0], held), t.math("DIVIDE", parts[1], held),
+                   t.math("DIVIDE", parts[2], held), 1.0).o
+    encoded = []
+    for picture in (background, straight):
+        encode = t.n("CompositorNodeConvertColorSpace")
+        t.link(picture, encode.n.inputs[0])
+        encode.n.from_color_space, encode.n.to_color_space = "scene_linear", display
+        encoded.append(encode.o)
+    title = t.n("CompositorNodeSeparateColor", encoded[1])
+    over = t.n("CompositorNodeAlphaOver")
+    under, above = [s for s in over.n.inputs if s.type == "RGBA"][:2]
+    t.link(encoded[0], under)
+    t.link(t.n("CompositorNodeCombineColor", title[0], title[1], title[2], alpha).o, above)
+    _set(over, "Straight Alpha", True)
+    decode = t.n("CompositorNodeConvertColorSpace")
+    t.link(over.o, decode.n.inputs[0])
+    decode.n.from_color_space, decode.n.to_color_space = display, "scene_linear"
+    return decode.o
+
+
+def underlay_nodes(t, img, depth, scene, distance, display):
     """``scene`` (a transparent render through the same camera: a title card) laid over the picture where what the picture
     shows lies beyond ``distance`` metres (its ``depth`` pass), the edge of what stands nearer smoothed as the picture's
-    own edges are -- a card standing behind her, sharp, wherever the lens is focused."""
+    own edges are -- a card standing behind her, sharp, wherever the lens is focused -- laid as titles are
+    (:func:`display_over`)."""
     layer = t.n("CompositorNodeRLayers")
     layer.n.scene = scene
     layer.n.layer = scene.view_layers[0].name
@@ -291,12 +319,7 @@ def underlay_nodes(t, img, depth, scene, distance):
     mask = t.n("CompositorNodeSeparateColor", smoothed.o)[0]
     card = t.n("CompositorNodeSeparateColor", layer["Image"])
     held = t.n("CompositorNodeCombineColor", card[0] * mask, card[1] * mask, card[2] * mask, card[3] * mask).o
-    over = t.n("CompositorNodeAlphaOver")
-    background, foreground = [s for s in over.n.inputs if s.type == "RGBA"][:2]
-    t.link(img, background)
-    t.link(held, foreground)
-    _set(over, "Straight Alpha", False)
-    return over.o
+    return display_over(t, img, held, display)
 
 
 def compositor(look: dict | None = None, lines_layer: str | None = None, ink_layer: str | None = None, overlay_scene=None,
@@ -321,8 +344,8 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
 
     An ``overlay_scene`` (a scene rendered on a transparent film through the
     same camera: titles, wipes) is laid over everything, so the look never
-    touches it; only the ``fade`` comes after it, the whole picture going
-    to black together.  An ``underlay`` (scene, metres) is laid under it,
+    touches it, in display space as an editor lays titles (:func:`display_over`);
+    only the ``fade`` comes after it, the whole picture going to black together.  An ``underlay`` (scene, metres) is laid under it,
     over what the picture shows beyond that distance (:func:`underlay_nodes`).
 
     A ``backdrop`` is the sheet a transparent render is laid on (the shot's
@@ -469,22 +492,18 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
         _set(over, "Straight Alpha", False)
         img = over.o
 
+    display = sc.display_settings.display_device
     if underlay is not None:
-        img = underlay_nodes(t, img, rl["Depth"], *underlay)
+        img = underlay_nodes(t, img, rl["Depth"], *underlay, display)
 
     if overlay_scene is not None:
         layer = t.n("CompositorNodeRLayers")
         layer.n.scene = overlay_scene
         layer.n.layer = overlay_scene.view_layers[0].name
-        over = t.n("CompositorNodeAlphaOver")
-        background, foreground = [s for s in over.n.inputs if s.type == "RGBA"][:2]
-        t.link(img, background)
-        t.link(layer["Image"], foreground)
-        _set(over, "Straight Alpha", False)
-        img = over.o
+        img = display_over(t, img, layer["Image"], display)
 
     if look.get("fade"):
-        img = fade_nodes(t, img, look["fade"], sc.display_settings.display_device)
+        img = fade_nodes(t, img, look["fade"], display)
 
     if new_api:
         out = t.n("NodeGroupOutput")
