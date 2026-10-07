@@ -9,8 +9,7 @@
   "Low-angle shot at the facade: a slow drift, then the window bursts (94) and the camera pans after her out over the district.",
   "The film comes in on this shot through a lattice of diamonds shrinking from the right (frames 68-76); the camera holds its frame-70 place on 68 and 69.",
   "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 68-206).",
-  "Its crows are the reference's own (calibration/track_crows.py from frame 112 -- before she breaks out a dark blot is the building --, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out.",
-  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [110, 131, 150, 180, 200]."
+  "Its crows are the reference's own (calibration/track_crows.py from frame 112 -- before she breaks out a dark blot is the building --, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -43,107 +42,10 @@
    "volume_distribution": 1.0
   },
   "view": "Standard",
-  "motion_blur": 0.5
+  "motion_blur": 0.25
  },
  "look": {
-  "exposure": 0.0,
-  "grade": {
-   "matrix": [
-    [
-     1.0,
-     0.0,
-     0.0
-    ],
-    [
-     0.0,
-     1.0,
-     0.0
-    ],
-    [
-     0.0,
-     0.0,
-     1.0
-    ]
-   ],
-   "offset": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "curves": {
-    "L": [
-     [
-      0.0,
-      0.0
-     ],
-     [
-      0.0625,
-      0.0
-     ],
-     [
-      0.125,
-      0.04552874023951213
-     ],
-     [
-      0.1875,
-      0.08281427632928526
-     ],
-     [
-      0.25,
-      0.11479420795245376
-     ],
-     [
-      0.3125,
-      0.13769301511634785
-     ],
-     [
-      0.375,
-      0.15956801511634786
-     ],
-     [
-      0.4375,
-      0.18144301511634786
-     ],
-     [
-      0.5,
-      0.22263952637021625
-     ],
-     [
-      0.5625,
-      0.2544282978232156
-     ],
-     [
-      0.625,
-      0.3064472775474114
-     ],
-     [
-      0.6875,
-      0.41774623660253263
-     ],
-     [
-      0.75,
-      0.5519621286856096
-     ],
-     [
-      0.8125,
-      0.6949072613208085
-     ],
-     [
-      0.875,
-      0.8516772935712251
-     ],
-     [
-      0.9375,
-      0.9320537860135912
-     ],
-     [
-      1.0,
-      0.9882777575948964
-     ]
-    ]
-   },
-   "highlight_rolloff": true
-  }
+  "exposure": 0.0
  },
  "cast": {
   "LaPluma": {
@@ -169,44 +71,49 @@
  ],
  "sky": {
   "zenith": [
-   0.6024999999999999,
-   0.7462500000000001,
-   0.7587500000000001
+   0.6125,
+   0.7200000000000001,
+   0.6837500000000001
   ],
   "clouds": {
    "color": [
-    1.0752499999999998,
-    1.0869375,
-    1.1103124999999996
+    1.0407499999999996,
+    1.0520624999999997,
+    1.0746874999999996
    ],
    "loc": [
     0.0,
     0.0,
-    885.0
+    860.0
    ],
    "scale": [
     6000.0,
     6000.0,
-    285.0
+    260.0
    ],
    "threshold": 0.6,
    "climb": 0.1825,
    "gather": 0.44999999999999996,
-   "soft": 0.08249999999999999,
-   "billow": 53.75,
-   "erode": 0.6625,
-   "density": 0.0225,
+   "soft": 0.09375,
+   "billow": 57.5,
+   "erode": 0.575,
+   "density": 0.036250000000000004,
    "map": "calibration/Breakout.clouds.json",
-   "shade_low": 0.39999999999999997,
-   "shade_high": 0.7000000000000001,
-   "forward": 0.5499999999999999
+   "shade_low": 0.0,
+   "shade_high": 0.625,
+   "forward": 0.5749999999999998
   },
   "horizon": [
-   0.6299999999999999,
    0.7,
-   0.9299999999999999
+   0.69,
+   0.82
   ],
-  "strength": 0.9375000000000001
+  "strength": 0.6937500000000001,
+  "ambient": [
+   0.6186,
+   0.6931,
+   0.7595
+  ]
  },
  "wind": [
   {
@@ -1525,5 +1432,10 @@
   "Crows Near",
   "Crows Far",
   "Crows Round"
- ]
+ ],
+ "lights": {
+  "Key": {
+   "power": 1.1732
+  }
+ }
 }

@@ -9,8 +9,7 @@
   "She flies on past the tower, the scythe held high, and the camera swings round and under her until it looks up at her from behind; crows all round.  The camera turns with the sky (calibration/sky_rotation.py) where the place stands it.",
   "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py): her body by its keypoints and outline, the scythe by its outline, her hand held to its shaft lightly (--grip-weight 4) -- the joint fit at full weight pulled her off her keypoints, the picture's scythe and hand disagreeing in depth -- and the scythe hung in her hand at its model size.",
   "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
-  "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 279-379).",
-  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [290, 303, 330, 350, 370]."
+  "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 279-379)."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -47,104 +46,7 @@
   "motion_blur": 0.5
  },
  "look": {
-  "exposure": 0.0,
-  "grade": {
-   "matrix": [
-    [
-     1.0,
-     0.0,
-     0.0
-    ],
-    [
-     0.0,
-     1.0,
-     0.0
-    ],
-    [
-     0.0,
-     0.0,
-     1.0
-    ]
-   ],
-   "offset": [
-    0.0,
-    0.0,
-    0.0
-   ],
-   "curves": {
-    "L": [
-     [
-      0.0,
-      0.0
-     ],
-     [
-      0.0625,
-      0.00749063826815533
-     ],
-     [
-      0.125,
-      0.04210795219127201
-     ],
-     [
-      0.1875,
-      0.07009933171627118
-     ],
-     [
-      0.25,
-      0.13147504305439345
-     ],
-     [
-      0.3125,
-      0.2020257168144247
-     ],
-     [
-      0.375,
-      0.26191890780857874
-     ],
-     [
-      0.4375,
-      0.33605469735181515
-     ],
-     [
-      0.5,
-      0.46939418961246904
-     ],
-     [
-      0.5625,
-      0.5679094112230012
-     ],
-     [
-      0.625,
-      0.624822487363657
-     ],
-     [
-      0.6875,
-      0.6841222429219789
-     ],
-     [
-      0.75,
-      0.7598126176819346
-     ],
-     [
-      0.8125,
-      0.8262169287216765
-     ],
-     [
-      0.875,
-      0.8705368161056427
-     ],
-     [
-      0.9375,
-      0.9060871194213092
-     ],
-     [
-      1.0,
-      0.9816962219716123
-     ]
-    ]
-   },
-   "highlight_rolloff": true
-  }
+  "exposure": 0.0
  },
  "cast": {
   "LaPluma": {
@@ -787,44 +689,49 @@
  ],
  "sky": {
   "zenith": [
-   0.007500000000000002,
-   0.1375,
-   0.28375000000000006
+   0.0125,
+   0.13375,
+   0.26500000000000007
   ],
   "clouds": {
    "color": [
-    0.5750000000000001,
-    0.58125,
-    0.59375
+    0.71875,
+    0.7265625,
+    0.7421875
    ],
    "loc": [
     0.0,
     0.0,
-    1080.0
+    1000.0
    ],
    "scale": [
     6000.0,
     6000.0,
-    480.0
+    400.0
    ],
-   "threshold": 0.585,
+   "threshold": 0.6,
    "climb": 0.16374999999999998,
-   "gather": 0.65625,
-   "soft": 0.07875,
-   "billow": 53.75,
-   "erode": 0.6499999999999999,
-   "density": 0.05750000000000001,
+   "gather": 0.7125,
+   "soft": 0.11625000000000002,
+   "billow": 95.0,
+   "erode": 0.6249999999999999,
+   "density": 0.065,
    "map": "calibration/Fly.clouds.json",
-   "shade_low": 0.28750000000000003,
-   "shade_high": 0.5249999999999999,
-   "forward": 0.65
+   "shade_low": 0.23750000000000002,
+   "shade_high": 0.4499999999999999,
+   "forward": 0.5125
   },
   "horizon": [
-   0.5799999999999998,
-   0.8200000000000001,
-   0.9700000000000002
+   0.4999999999999998,
+   0.75,
+   0.8600000000000002
   ],
-  "strength": 1.3125000000000002
+  "strength": 0.9750000000000002,
+  "ambient": [
+   0.2444,
+   0.3557,
+   0.4677
+  ]
  },
  "wind": [
   {
@@ -836,5 +743,10 @@
    "strength": 2.5,
    "turbulence": 0.8
   }
- ]
+ ],
+ "lights": {
+  "Key": {
+   "power": 2.3719
+  }
+ }
 }

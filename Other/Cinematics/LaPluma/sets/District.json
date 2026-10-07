@@ -19,7 +19,7 @@
  "materials": {
   "CIN.Air.density": 0.0075,
   "CIN.Air.height": 60.0,
-  "CIN.Dust.density": 1.475,
+  "CIN.Dust.density": 2.0,
   "color:interior": [
    0.07250000000000001,
    0.0435,
@@ -27,10 +27,10 @@
   ],
   "color:dust": [
    0.515,
-   0.62,
-   0.745
+   0.605,
+   0.64
   ],
-  "CIN.Dust.ambient": 1.6,
+  "CIN.Dust.ambient": 0.9000000000000002,
   "color:debris": [
    0.75,
    0.76,
@@ -1210,29 +1210,29 @@
      1.2
     ],
     "Direction": [
-     1.15,
-     -0.35,
-     -0.05
+     1.2999999999999998,
+     -0.14999999999999997,
+     -0.39999999999999997
     ],
-    "Spread": 27.0,
-    "Speed": 3.5,
+    "Spread": 15.0,
+    "Speed": 1.75,
     "Speed Spread": 0.4,
-    "Drag": 0.45,
+    "Drag": 0.3,
     "Sink": 0.05,
     "Wind": [
-     1.7,
-     0.35,
-     -0.4
+     1.2999999999999998,
+     0.95,
+     -1.1
     ],
-    "Radius": 0.7250000000000001,
-    "Growth": 0.6124999999999999,
+    "Radius": 0.55,
+    "Growth": 0.3499999999999999,
     "Start": 96.0,
     "Duration": 36.0,
     "Voxel": 0.08,
-    "Softness": 0.08000000000000002,
-    "Thickness": 2.125,
-    "Billows": 0.6250000000000001,
-    "Billow Size": 0.19999999999999998,
+    "Softness": 0.22000000000000003,
+    "Thickness": 3.0,
+    "Billows": 0.4500000000000001,
+    "Billow Size": 0.15,
     "Churn": 0.3
    }
   },
