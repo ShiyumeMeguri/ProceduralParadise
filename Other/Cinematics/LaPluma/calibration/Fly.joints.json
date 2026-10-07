@@ -1,0 +1,185 @@
+{
+ "notes": [
+  "Pixels of the reference video, read by eye on the frames the camera passes under her (327-355): seen from below through her billowing coat the detector finds faces in its lining, so its keypoints there are not used.  Her right arm is up on the scythe's shaft, the left reaches down and out to her left; her left leg wears the strapped thigh and the knee pad."
+ ],
+ "cleared": [
+  327,
+  355
+ ],
+ "frames": {
+  "330": {
+   "shoulder_r": [
+    1056,
+    372
+   ],
+   "shoulder_l": [
+    936,
+    408
+   ],
+   "elbow_r": [
+    1042,
+    228
+   ],
+   "wrist_r": [
+    1034,
+    72
+   ],
+   "wrist_l": [
+    960,
+    948
+   ],
+   "hip_l": [
+    996,
+    720
+   ],
+   "hip_r": [
+    1116,
+    744
+   ],
+   "knee_l": [
+    576,
+    828
+   ],
+   "ankle_l": [
+    252,
+    828
+   ],
+   "knee_r": [
+    1152,
+    1020
+   ]
+  },
+  "338": {
+   "shoulder_r": [
+    1086,
+    432
+   ],
+   "elbow_r": [
+    1068,
+    264
+   ],
+   "wrist_r": [
+    1086,
+    96
+   ],
+   "hip_l": [
+    996,
+    696
+   ],
+   "hip_r": [
+    1128,
+    708
+   ],
+   "knee_l": [
+    972,
+    996
+   ]
+  },
+  "342": {
+   "shoulder_r": [
+    1080,
+    468
+   ],
+   "shoulder_l": [
+    936,
+    540
+   ],
+   "elbow_r": [
+    1122,
+    324
+   ],
+   "wrist_r": [
+    1152,
+    156
+   ],
+   "elbow_l": [
+    720,
+    828
+   ],
+   "wrist_l": [
+    516,
+    960
+   ],
+   "hip_l": [
+    1020,
+    780
+   ],
+   "hip_r": [
+    1176,
+    792
+   ],
+   "knee_l": [
+    1056,
+    1008
+   ]
+  },
+  "346": {
+   "shoulder_r": [
+    1086,
+    492
+   ],
+   "shoulder_l": [
+    948,
+    564
+   ],
+   "elbow_r": [
+    1146,
+    348
+   ],
+   "wrist_r": [
+    1182,
+    168
+   ],
+   "elbow_l": [
+    696,
+    768
+   ],
+   "wrist_l": [
+    450,
+    942
+   ],
+   "hip_l": [
+    1032,
+    924
+   ],
+   "hip_r": [
+    1188,
+    912
+   ]
+  },
+  "354": {
+   "shoulder_r": [
+    1116,
+    504
+   ],
+   "shoulder_l": [
+    840,
+    564
+   ],
+   "elbow_r": [
+    1152,
+    396
+   ],
+   "wrist_r": [
+    1194,
+    216
+   ],
+   "elbow_l": [
+    600,
+    696
+   ],
+   "wrist_l": [
+    348,
+    828
+   ],
+   "hip_l": [
+    1020,
+    948
+   ],
+   "hip_r": [
+    1212,
+    948
+   ]
+  }
+ }
+}

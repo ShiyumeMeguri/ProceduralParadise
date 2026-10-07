@@ -35,7 +35,15 @@ profile's ``segments``) are pulled onto their places.  A limb is fitted by
 its segments' angles: each segment (a keypoint from its parent keypoint)
 turns as the picture turns it, and is shortened only as far as the picture
 shortens it beyond ``PROPORTION_TOLERANCE`` -- matching the places of a
-limb the model draws shorter would reach it towards the camera.
+limb the model draws shorter would reach it towards the camera.  How far a
+keypoint still pulls (its robust scale) starts wide and narrows stage by
+stage (``REACH``): a pose that starts far from its keypoints is first drawn
+near them, then fitted closely, a detector's stray keypoint let go again.
+Frames whose keypoints were set by hand (the keypoints file's ``annotated``)
+are read left and right as given.  Without a ``--start`` she starts on each
+frame where her torso's keypoints are seen standing on them, turned the way
+they face; a frame where they are not seen starts between the nearest two
+that are.
 
 Keypoints and an outline place her limbs on the picture but not which is
 nearer: a leg folded towards the camera and the same leg folded away look
@@ -78,6 +86,7 @@ import cv2
 import numpy as np
 import torch
 from scipy.spatial.transform import Rotation as ScipyRotation
+from scipy.spatial.transform import Slerp
 
 from gpu_budget import chunk, claim
 from prop import Prop
@@ -138,6 +147,7 @@ SWAP_GROUPS = list(profile["swap_groups"])
 GROUP_OF = {key: g for g, name in enumerate(SWAP_GROUPS) for first, last in profile["swap_groups"][name]["keys"] for key in range(first, last + 1)}
 SEGMENT_OF = {int(child): int(parent) for child, parent in profile["segments"].items()}
 PROPORTION_TOLERANCE = float(np.log(1.3))
+REACH = (4.0, 2.0, 1.0)
 LEFT_KEYS = {left for left, _ in profile["mirror"]}
 RIGHT_KEYS = {right for _, right in profile["mirror"]}
 
@@ -237,7 +247,11 @@ if start is not None:
                     w, x, y, z = value
                     angles[k, fitted_index[name]] = torch.tensor(ScipyRotation.from_quat([x, y, z, w]).as_euler("xyz"), dtype=torch.float32)
 else:
-    for k in range(count):
+    torso_keys = [5, 6, 11, 12]
+    seen = [k for k in range(count) if bool((scores[k, torso_keys] > 1.5).all())]
+    if not seen:
+        raise SystemExit("her torso's keypoints are seen on no frame: give a --start")
+    for k in seen:
         points_2d = observed[k].cpu().numpy()
         shoulders = (points_2d[5] + points_2d[6]) / 2
         hips = (points_2d[11] + points_2d[12]) / 2
@@ -260,6 +274,21 @@ else:
         ray = np.array([(centre_pixel[0] - args.width / 2) / focal, -(centre_pixel[1] - args.height / 2) / focal, -1.0])
         torso_centre = camera_location[k].cpu().numpy() + rotation_camera @ ray * depth
         root_location[k] = torch.tensor(torso_centre - body_up * 1.12, dtype=torch.float32, device=device)
+    known = ScipyRotation.from_rotvec(root_rotation[seen].cpu().numpy())
+    between = Slerp(seen, known) if len(seen) > 1 else None
+    for k in range(count):
+        if k in seen:
+            continue
+        if between is not None and seen[0] < k < seen[-1]:
+            root_rotation[k] = torch.tensor(between([k]).as_rotvec()[0], dtype=torch.float32, device=device)
+            after = next(j for j in seen if j > k)
+            before = max(j for j in seen if j < k)
+            share = (k - before) / (after - before)
+            root_location[k] = root_location[before] * (1.0 - share) + root_location[after] * share
+        else:
+            nearest = seen[0] if k < seen[0] else seen[-1]
+            root_rotation[k] = root_rotation[nearest]
+            root_location[k] = root_location[nearest]
 joint_parameters = parameters_of(angles).requires_grad_(True)
 root_rotation.requires_grad_(True)
 root_location.requires_grad_(True)
@@ -341,6 +370,10 @@ for g, name in enumerate(SWAP_GROUPS):
     reading[:, g] = torch.where(vote >= 2, 0, torch.where(vote <= -2, 1, -1))
     print(f"{name}: read as detected on {int((reading[:, g] == 0).sum())} frames, swapped on "
           f"{[frames[k] for k in range(count) if int(reading[k, g]) == 1]}, left to the fit on {int((reading[:, g] == -1).sum())}", flush=True)
+annotated = [k for k, frame in enumerate(frames) if frame in {int(value) for value in data.get("annotated", ())}]
+reading[annotated] = 0
+if annotated:
+    print("frames annotated by hand, read as given:", [frames[k] for k in annotated], flush=True)
 
 
 def project_frames(points, slots):
@@ -455,16 +488,17 @@ def segment_misfit(pixels, target):
     return chord, torch.relu(ratio.abs() - PROPORTION_TOLERANCE), seen_length * usable
 
 
-def keypoint_misfit(pixels, ids, slots):
+def keypoint_misfit(pixels, ids, slots, reach=1.0):
     """Per keypoint (B, K), read against the detector's keypoints ``ids`` (as detected or mirrored): a torso
-    keypoint's distance from its place, a limb keypoint's segment's turn and shortening, each robust and
-    weighted by how sure the detector is of what it needs."""
+    keypoint's distance from its place, a limb keypoint's segment's turn and shortening, each robust (its
+    scale ``reach`` times its own) and weighted by how sure the detector is of what it needs."""
     target = observed[slots][:, ids]
     confidence = ((scores[slots][:, ids] - 1.5) / 3.0).clamp(0.0, 1.0)
-    placed = robust((pixels - target).norm(dim=-1), 25.0) * confidence
+    placed = robust((pixels - target).norm(dim=-1), 25.0 * reach) * confidence
     chord, shortening, length = segment_misfit(pixels, target)
     sure = torch.minimum(confidence[:, segment_columns], confidence[:, parent_columns]) * (length / 30.0).clamp(0.0, 1.0)
-    angled = torch.zeros_like(placed).index_copy(1, segment_columns, (robust_squared(chord, 0.25) + robust(shortening, 0.2)) * sure)
+    angled = torch.zeros_like(placed).index_copy(1, segment_columns,
+                                                 (robust_squared(chord, 0.25 * reach) + robust(shortening, 0.2 * reach)) * sure)
     return torch.where(is_segment[None], angled, placed)
 
 
@@ -474,8 +508,8 @@ def frame_terms(stage, slots):
     world = pose(joint_angles, root_rotation[slots], root_location[slots])
     pixels, depth = project_frames(keypoint_positions(world), slots)
     active = stage_active[stage]
-    direct = grouped(keypoint_misfit(pixels, keypoint_ids, slots) * active)
-    swapped = grouped(keypoint_misfit(pixels, mirrored_ids, slots) * active)
+    direct = grouped(keypoint_misfit(pixels, keypoint_ids, slots, REACH[stage]) * active)
+    swapped = grouped(keypoint_misfit(pixels, mirrored_ids, slots, REACH[stage]) * active)
     read = reading[slots]
     chosen = torch.where(read == 0, direct, torch.where(read == 1, swapped, torch.minimum(direct, swapped)))
     terms = {"keypoints": chosen.sum() / count, "behind": torch.relu(0.3 - depth).sum()}
