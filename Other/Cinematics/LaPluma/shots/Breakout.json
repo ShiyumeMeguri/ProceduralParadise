@@ -8,7 +8,9 @@
  "notes": [
   "Low-angle shot at the facade: a slow drift, then the window bursts (94) and the camera pans after her out over the district.",
   "The film comes in on this shot through a lattice of diamonds shrinking from the right (frames 68-76); the camera holds its frame-70 place on 68 and 69.",
-  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [100, 110, 131, 150, 180, 200]."
+  "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 68-206).",
+  "Its crows are the reference's own (calibration/track_crows.py from frame 112 -- before she breaks out a dark blot is the building --, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out.",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [80, 110, 131, 150, 180, 200]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -33,10 +35,10 @@
    "shadow_pool": "1024",
    "volume_range": [
     0.5,
-    2500.0
+    6000.0
    ],
    "volume_tile": "4",
-   "volume_samples": 96,
+   "volume_samples": 192,
    "volume_shadows": true,
    "volume_distribution": 1.0
   },
@@ -76,67 +78,67 @@
      ],
      [
       0.0625,
-      0.006277964981630941
+      0.0
      ],
      [
       0.125,
-      0.043750085459946984
+      0.04017432418990484
      ],
      [
       0.1875,
-      0.08135379755029967
+      0.10219525295454027
      ],
      [
       0.25,
-      0.1087611549669874
+      0.13629914841102153
      ],
      [
       0.3125,
-      0.14521399500934964
+      0.15817414841102154
      ],
      [
       0.375,
-      0.17179953935555248
+      0.18004914841102154
      ],
      [
       0.4375,
-      0.2157161548883644
+      0.20655212002561915
      ],
      [
       0.5,
-      0.3271943733981353
+      0.26209889373224726
      ],
      [
       0.5625,
-      0.4275954149079277
+      0.2924697925383536
      ],
      [
       0.625,
-      0.4986618218948853
+      0.33762325906032176
      ],
      [
       0.6875,
-      0.6024319979762656
+      0.42730650419889
      ],
      [
       0.75,
-      0.7064738695497498
+      0.5541013000492009
      ],
      [
       0.8125,
-      0.8170795506190741
+      0.7051452729437239
      ],
      [
       0.875,
-      0.8930269430134701
+      0.8574166376138461
      ],
      [
       0.9375,
-      0.9527234049960602
+      0.9344677462931081
      ],
      [
       1.0,
-      0.992599837149625
+      0.9887029960558936
      ]
     ]
    },
@@ -167,10 +169,44 @@
  ],
  "sky": {
   "zenith": [
-   0.6,
-   0.66,
-   0.74
-  ]
+   0.5275,
+   0.6975000000000001,
+   0.7337500000000001
+  ],
+  "clouds": {
+   "color": [
+    1.0407499999999996,
+    1.0520624999999997,
+    1.0746874999999996
+   ],
+   "loc": [
+    0.0,
+    0.0,
+    885.0
+   ],
+   "scale": [
+    6000.0,
+    6000.0,
+    285.0
+   ],
+   "threshold": 0.6,
+   "climb": 0.1825,
+   "gather": 0.44999999999999996,
+   "soft": 0.08249999999999999,
+   "billow": 38.75,
+   "erode": 0.8125,
+   "density": 0.0225,
+   "map": "calibration/Breakout.clouds.json",
+   "shade_low": 0.5125,
+   "shade_high": 0.7125,
+   "forward": 0.675
+  },
+  "horizon": [
+   0.6799999999999999,
+   0.69,
+   0.8699999999999999
+  ],
+  "strength": 0.9187500000000001
  },
  "wind": [
   {
@@ -182,5 +218,1312 @@
    "strength": 2.5,
    "turbulence": 0.8
   }
+ ],
+ "items": [
+  {
+   "name": "Crow 1",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 200,
+    "Origin": [
+     8.171,
+     -6.476,
+     74.914
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.8893,
+     -0.4022,
+     -0.2174
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 9.889,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 123.0
+   }
+  },
+  {
+   "name": "Crow 2",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 201,
+    "Origin": [
+     3.806,
+     -7.748,
+     74.279
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9638,
+     -0.2637,
+     -0.0403
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 10.299,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 131.0
+   }
+  },
+  {
+   "name": "Crow 3",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 202,
+    "Origin": [
+     10.234,
+     -8.253,
+     74.722
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.8708,
+     -0.3796,
+     0.3124
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 10.136,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 131.0
+   }
+  },
+  {
+   "name": "Crow 4",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 203,
+    "Origin": [
+     -2.575,
+     -5.332,
+     74.365
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.9569,
+     -0.2897,
+     -0.0184
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 2.509,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 129.0
+   }
+  },
+  {
+   "name": "Crow 5",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 204,
+    "Origin": [
+     16.309,
+     -3.369,
+     74.203
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.503,
+     0.8611,
+     0.0737
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 7.82,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 127.0
+   }
+  },
+  {
+   "name": "Crow 6",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 205,
+    "Origin": [
+     10.642,
+     3.388,
+     83.858
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.7516,
+     -0.0519,
+     -0.6576
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 11.23,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 123.0
+   }
+  },
+  {
+   "name": "Crow 7",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 206,
+    "Origin": [
+     11.716,
+     -10.046,
+     75.956
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.1546,
+     -0.9692,
+     0.1919
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 3.979,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 171.0
+   }
+  },
+  {
+   "name": "Crow 8",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 207,
+    "Origin": [
+     8.716,
+     -8.391,
+     74.588
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9338,
+     0.3578,
+     -0.0087
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 5.11,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 122.0
+   }
+  },
+  {
+   "name": "Crow 9",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 208,
+    "Origin": [
+     6.32,
+     -4.396,
+     74.252
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.9946,
+     0.0906,
+     -0.0511
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 10.188,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 127.0
+   }
+  },
+  {
+   "name": "Crow 10",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 209,
+    "Origin": [
+     9.023,
+     -12.193,
+     78.348
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9977,
+     0.0336,
+     0.0588
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 13.22,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 119.0
+   }
+  },
+  {
+   "name": "Crow 11",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 210,
+    "Origin": [
+     8.305,
+     -5.95,
+     74.528
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.2459,
+     0.598,
+     0.7628
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 3.702,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 126.0
+   }
+  },
+  {
+   "name": "Crow 12",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 211,
+    "Origin": [
+     10.255,
+     3.448,
+     84.138
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.8345,
+     -0.2629,
+     -0.4843
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 8.194,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 129.0
+   }
+  },
+  {
+   "name": "Crow 13",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 212,
+    "Origin": [
+     17.016,
+     -5.187,
+     74.223
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.7912,
+     0.6109,
+     0.0277
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 17.903,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 134.0
+   }
+  },
+  {
+   "name": "Crow 14",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 213,
+    "Origin": [
+     12.589,
+     -16.315,
+     81.865
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.5585,
+     -0.6788,
+     -0.4767
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 8.878,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 138.0
+   }
+  },
+  {
+   "name": "Crow 15",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 214,
+    "Origin": [
+     -3.343,
+     -4.597,
+     74.781
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.3793,
+     -0.9246,
+     0.0359
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 3.034,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 147.0
+   }
+  },
+  {
+   "name": "Crow 16",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 215,
+    "Origin": [
+     12.014,
+     -8.799,
+     74.596
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.9963,
+     -0.0848,
+     0.0146
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 6.376,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 142.0
+   }
+  },
+  {
+   "name": "Crow 17",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 216,
+    "Origin": [
+     5.085,
+     -11.499,
+     78.121
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9119,
+     -0.0999,
+     -0.398
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 2.853,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 142.0
+   }
+  },
+  {
+   "name": "Crow 18",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 217,
+    "Origin": [
+     0.694,
+     -5.392,
+     74.632
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.2671,
+     -0.9244,
+     0.2722
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 5.519,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 156.0
+   }
+  },
+  {
+   "name": "Crow 19",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 218,
+    "Origin": [
+     6.057,
+     -9.331,
+     74.759
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.8035,
+     -0.5917,
+     0.0655
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 8.392,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 173.0
+   }
+  },
+  {
+   "name": "Crow 20",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 219,
+    "Origin": [
+     9.311,
+     -9.712,
+     75.262
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.8829,
+     -0.3886,
+     -0.2635
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 6.322,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 168.0
+   }
+  },
+  {
+   "name": "Crow 21",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 220,
+    "Origin": [
+     -3.307,
+     -5.786,
+     75.141
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.5209,
+     -0.8478,
+     0.0993
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 3.378,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 162.0
+   }
+  },
+  {
+   "name": "Crow 22",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 221,
+    "Origin": [
+     18.568,
+     -17.421,
+     78.209
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.0312,
+     -0.987,
+     0.1575
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 16.367,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 162.0
+   }
+  },
+  {
+   "name": "Crow 23",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 222,
+    "Origin": [
+     -1.078,
+     -5.631,
+     75.908
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.2235,
+     -0.9481,
+     0.2261
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 5.97,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 178.0
+   }
+  },
+  {
+   "name": "Crow 24",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 223,
+    "Origin": [
+     9.722,
+     -12.779,
+     77.454
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.2389,
+     -0.9478,
+     -0.2112
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 3.234,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 182.0
+   }
+  },
+  {
+   "name": "Crow 25",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 224,
+    "Origin": [
+     1.166,
+     -4.998,
+     78.477
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.6163,
+     0.1961,
+     0.7627
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 8.403,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 167.0
+   }
+  },
+  {
+   "name": "Crow 26",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 225,
+    "Origin": [
+     4.483,
+     -6.386,
+     79.317
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.1196,
+     0.9301,
+     0.3473
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 18.345,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 175.0
+   }
+  },
+  {
+   "name": "Crow 27",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 226,
+    "Origin": [
+     9.727,
+     -6.418,
+     74.914
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9855,
+     0.1614,
+     -0.0528
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 11.096,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 184.0
+   }
+  },
+  {
+   "name": "Crow 28",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 227,
+    "Origin": [
+     1.595,
+     -8.523,
+     75.221
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.6601,
+     -0.7254,
+     0.1951
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 4.341,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 189.0
+   }
+  },
+  {
+   "name": "Crow 29",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 228,
+    "Origin": [
+     15.7,
+     -5.975,
+     75.126
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9958,
+     0.0893,
+     -0.0201
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 7.351,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 188.0
+   }
+  },
+  {
+   "name": "Crow 30",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 229,
+    "Origin": [
+     13.742,
+     -13.011,
+     80.762
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.3611,
+     -0.8252,
+     0.4343
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 23.133,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 189.0
+   }
+  },
+  {
+   "name": "Crow 31",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 230,
+    "Origin": [
+     -3.058,
+     -3.703,
+     76.903
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.5984,
+     -0.6944,
+     0.3998
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 5.608,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 179.0
+   }
+  },
+  {
+   "name": "Crow 32",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 231,
+    "Origin": [
+     12.45,
+     -5.681,
+     74.312
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9929,
+     0.1186,
+     -0.0066
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 4.216,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 189.0
+   }
+  },
+  {
+   "name": "Crow 33",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 232,
+    "Origin": [
+     22.578,
+     -7.314,
+     76.46
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.2278,
+     -0.8547,
+     -0.4665
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 13.437,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 184.0
+   }
+  },
+  {
+   "name": "Crow 34",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 233,
+    "Origin": [
+     1.987,
+     -9.995,
+     78.028
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9641,
+     0.2119,
+     0.1597
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 10.633,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 185.0
+   }
+  },
+  {
+   "name": "Crow 35",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 234,
+    "Origin": [
+     2.071,
+     -10.522,
+     75.941
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.4346,
+     -0.6349,
+     0.6388
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 23.551,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 187.0
+   }
+  },
+  {
+   "name": "Crow 36",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 235,
+    "Origin": [
+     11.52,
+     -13.346,
+     79.196
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.75,
+     -0.605,
+     -0.2675
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 5.281,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 197.0
+   }
+  },
+  {
+   "name": "Crow 37",
+   "asset": "CIN.Birds.Flock",
+   "shown": [
+    68,
+    206
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 236,
+    "Origin": [
+     9.784,
+     -6.682,
+     74.991
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.9186,
+     0.3935,
+     0.0366
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 11.116,
+    "Speed Spread": 0.0,
+    "Size": 1.0,
+    "Size Spread": 0.0,
+    "Start": 199.0
+   }
+  },
+  {
+   "name": "Lens Crow B1",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 194,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    193,
+    197
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 300,
+    "Origin": [
+     -0.3497,
+     1.726,
+     0.4545
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.5958,
+     -0.6305,
+     -0.4976
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 8.906,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 194.0
+   }
+  }
+ ],
+ "hidden": [
+  "Crows Near",
+  "Crows Far",
+  "Crows Round"
  ]
 }

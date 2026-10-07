@@ -10,7 +10,7 @@ is pure data::
 
     {"id": "District",
      "materials": {"CIN.Concrete.roughness": 0.8, "color:concrete": [r, g, b], ...},
-     "sky": {...},                                 (Kit.sky.sky_world)
+     "sky": {...},                                 (Kit.sky.sky_world; its "clouds": Kit.clouds)
      "items": [item, ...],
      "lights": [lamp, ...],
      "views": {"name": {"location", "target", "lens"}, ...}}   (free cameras of the set scene)
@@ -20,7 +20,9 @@ either a ``frame`` (a frame building, see :mod:`frames`) or an ``asset``
 with its ``inputs`` (one geometry-nodes modifier on an empty mesh).  An
 item that is only there for a while -- what a breach throws into the air,
 gone by the time another shot looks -- names its frames (``shown``:
-[first, last]); outside them it is not rendered.
+[first, last]); outside them it is not rendered.  An item with ``shadows``
+false casts none (debris by the hundred would comb the dust with shadows
+the reference does not show).
 Inputs are data: degrees for angles, palette names for colours, library
 names for materials.  A lamp is ``{"name", "light": "SUN" | "AREA" |
 "POINT" | "SPOT", "power", "color", "angle" (a sun's disc, degrees),
@@ -39,6 +41,7 @@ A shot (``shots/<id>.json``)::
      "look": {...},                                 (Core.render.compositor)
      "cast": {"LaPluma": {"performance": "performances/Breakout.json"}},
      "items": [item, ...],                          (optional)
+     "hidden": ["Annex", ...],                      (optional: set items it leaves out)
      "sky": {...},                                  (optional: the set's sky with these changes)
      "wind": [{"direction": [x, y, z], "strength": 5.0, "turbulence": 1.0}, ...],   (optional)
      "overlays": [{"name", "asset", "inputs", "shown": [first, last],          (optional)
@@ -66,11 +69,16 @@ parameters and the colliders on the body) is set on the shot's performer,
 the shot's ``wind`` zones blow (each a global wind along ``direction``, as
 strong and as gusty as given) and the cloth is baked into keys over the
 shot's frames, from ``settle`` frames before its first so it has hung
-still before the shot begins.  A shot's ``sky`` changes the set's for its frames alone (the weather of a
-picture: one shot under a pale haze, the next under cloud).  A shot's own
+still before the shot begins.  A scene's sky is its world and its clouds -- a deck of cumulus of its own
+(``Kit.clouds``), lit by the set's SUN lamp.  A shot's ``sky`` changes the set's for its frames alone (the weather
+of a picture: one shot under a pale haze, the next under cloud), its ``clouds`` key by key.  A shot's own
 ``items`` are set items only its camera sees -- a crow passing its lens.  One with a ``camera_frame`` is placed in the frame of
 the shot's camera on that frame (looking along its -Z, +Y up): where the
-camera stood then, wherever the shot's camera is solved to stand.
+camera stood then, wherever the shot's camera is solved to stand.  The set
+items a shot's ``hidden`` names are not rendered over its frames: the
+reference leaves a building out of one picture that another shows, or flies
+crows of its own (fitted to its picture, calibration/fit_crows.py) where the
+set's flocks would wheel.
 
 An overlay is an asset the shot's camera carries in front of its lens --
 a wipe, a title card -- drawn in the picture's own units: across from
@@ -105,7 +113,7 @@ from Core import cast as CAST, jsonio, scene as SC, values as V
 from Core import render as RND
 from Core.gn import get_asset
 from . import CINEMATICS, PALETTE, drawings as DR, frames as FR
-from .Kit import materials as M, sky as SKY
+from .Kit import clouds as CL, materials as M, sky as SKY
 
 __all__ = ["build_film", "load_scene", "build_scene"]
 
@@ -192,18 +200,52 @@ def _key_inputs(obj, keys):
                 point.interpolation = "CONSTANT"
 
 
-def _show_between(obj, first, last):
-    """Key ``obj`` (and what hangs under it) rendered on the frames ``first``..``last`` alone."""
+def _key_hidden(obj, keys):
+    """Key ``obj`` (and what hangs under it) hidden from renders or not: ``keys`` are (frame, hidden)."""
     for part in [obj] + list(obj.children_recursive):
-        for frame, hidden in ((first - 1, True), (first, False), (last, False), (last + 1, True)):
+        for frame, hidden in keys:
             part.hide_render = hidden
             part.keyframe_insert("hide_render", frame=frame)
+
+
+def _show_between(obj, first, last):
+    """Key ``obj`` (and what hangs under it) rendered on the frames ``first``..``last`` alone."""
+    _key_hidden(obj, ((first - 1, True), (first, False), (last, False), (last + 1, True)))
+
+
+def _hide_over(obj, first, last):
+    """Key ``obj`` (and what hangs under it) hidden on the frames ``first``..``last``, as it was before and after them."""
+    from Core.anim import fcurves_of
+    for part in [obj] + list(obj.children_recursive):
+        curve = next((curve for curve in fcurves_of(part) if curve.data_path == "hide_render"), None)
+        before = bool(curve.evaluate(first - 1)) if curve else part.hide_render
+        after = bool(curve.evaluate(last + 1)) if curve else part.hide_render
+        inside = [] if curve is None else [point for point in curve.keyframe_points if first - 1 < point.co.x < last + 1]
+        while inside:
+            curve.keyframe_points.remove(inside[0])
+            inside = [point for point in curve.keyframe_points if first - 1 < point.co.x < last + 1]
+        for frame, hidden in ((first - 1, before), (first, True), (last, True), (last + 1, after)):
+            part.hide_render = hidden
+            part.keyframe_insert("hide_render", frame=frame)
+
+
+def hide_set_items(shot, set_collection):
+    """Leave the set items the shot's ``hidden`` names out of its frames (see the module notes)."""
+    first, last = shot["frames"]
+    for name in shot.get("hidden", []):
+        obj = set_collection.all_objects.get(name)
+        if obj is None:
+            raise KeyError(f"shot {shot['id']} hides '{name}', which its set has no item of")
+        _hide_over(obj, first, last)
 
 
 def build_item(item, collection):
     obj = _build_item(item, collection)
     if "shown" in item:
         _show_between(obj, *item["shown"])
+    if not item.get("shadows", True):
+        for part in [obj] + list(obj.children_recursive):
+            part.visible_shadow = False
     return obj
 
 
@@ -230,6 +272,37 @@ def build_lamp(item, collection):
     if "direction" in item:
         obj.rotation_euler = (-_vector(item["direction"])).to_track_quat("-Z", "Y").to_euler()
     return obj
+
+
+def set_materials(spec):
+    """The set's material parameters and colours (its ``materials``) for every material built after."""
+    M.PARAMS.clear()
+    M.PARAMS.update(spec.get("materials", {}))
+
+
+def shot_sky(set_sky, changes):
+    """The set's sky with a shot's ``changes``: its own colours and light, its clouds changed key by key."""
+    sky = {**set_sky, **changes}
+    if "clouds" in changes:
+        sky["clouds"] = {**set_sky.get("clouds", {}), **changes["clouds"]}
+    return sky
+
+
+def build_sky(folder, sky, sun, name, parent):
+    """A scene's sky: the world ``<name>.Sky`` and, with ``clouds``, their deck (``Kit.clouds``) lit by ``sun`` in a
+    collection ``<name>.Clouds`` under ``parent`` (None without them), with the files it was read from."""
+    world = SKY.sky_world(sky, f"{name}.Sky")
+    clouds = sky.get("clouds")
+    if not clouds:
+        return world, None, []
+    files = [os.path.join(folder, clouds["map"])] if "map" in clouds else []
+    measured = jsonio.load(files[0]) if files else None
+    collection = SC.collection(f"{name}.Clouds", parent=parent)
+    deck = _modified_object(f"{name}.Clouds", bpy.data.meshes.new(f"{name}.Clouds"), "CIN.Clouds.Deck", {}, collection)
+    SC.set_gn_inputs(deck.modifiers[0], {"Material": CL.cloud_material(f"{name}.Clouds", clouds, sun, measured)})
+    deck.location = _vector(clouds["loc"])
+    deck.scale = _vector(clouds["scale"])
+    return world, collection, files
 
 
 def _cast_entries(film, set_name):
@@ -260,9 +333,9 @@ def build_set(folder, set_name, film, args):
     _activate(scene)
     scene.render.resolution_x, scene.render.resolution_y = film["resolution"]
     scene.render.fps = film["fps"]
-    M.PARAMS.clear()
-    M.PARAMS.update(spec.get("materials", {}))
-    world = SKY.sky_world(spec["sky"], f"{set_name}.Sky")
+    set_materials(spec)
+    sun = next((lamp for lamp in spec.get("lights", []) if lamp["light"] == "SUN"), None)
+    world, sky_collection, sky_files = build_sky(folder, spec["sky"], sun, set_name, scene.collection)
     collection = SC.collection(set_name, parent=scene.collection)
     for item in spec.get("items", []):
         build_item(item, collection)
@@ -284,7 +357,8 @@ def build_set(folder, set_name, film, args):
         characters[name] = dict(rig=rig, objects=objects, prefix=prefix)
         cast_files.append(path)
         _rebuild_shading(entry)
-    return dict(id=set_name, scene=scene, world=world, sky=spec["sky"], collection=collection, characters=characters,
+    return dict(id=set_name, scene=scene, world=world, sky=spec["sky"], sun=sun, sky_collection=sky_collection, sky_files=sky_files,
+                collection=collection, characters=characters,
                 cast_files=cast_files, source=os.path.join(folder, "sets", f"{set_name}.json"))
 
 
@@ -587,7 +661,13 @@ def build_shot(folder, film, shot, built_set, args):
     _activate(scene)
     scene.collection.children.link(built_set["collection"])
     cast = SC.collection(f"Shot.{shot['id']}.Cast", parent=scene.collection)
-    scene.world = SKY.sky_world({**built_set["sky"], **shot["sky"]}, f"Shot.{shot['id']}.Sky") if "sky" in shot else built_set["world"]
+    if "sky" in shot:
+        scene.world, _clouds, sky_files = build_sky(folder, shot_sky(built_set["sky"], shot["sky"]), built_set["sun"], f"Shot.{shot['id']}",
+                                                    scene.collection)
+    else:
+        scene.world, sky_files = built_set["world"], built_set["sky_files"]
+        if built_set["sky_collection"] is not None:
+            scene.collection.children.link(built_set["sky_collection"])
     first, last = shot["frames"]
     scene.frame_start, scene.frame_end = first, last
     scene.render.fps, scene.render.fps_base = film["fps"], 1.0
@@ -595,8 +675,10 @@ def build_shot(folder, film, shot, built_set, args):
     scene.render.resolution_percentage = int(round(100 * (args.scale or 1.0)))
     cameras = SC.collection(f"Shot.{shot['id']}.Camera", parent=scene.collection)
     camera, sources, camera_matrices = build_camera(f"Shot.{shot['id']}.Camera", folder, shot["camera"], film, cameras)
+    sources += sky_files
     scene.camera = camera
     build_shot_items(shot, camera, scene)
+    hide_set_items(shot, built_set["collection"])
     settings = shot["render"]
     engine = settings["engine"]
     RND.ENGINES[engine](samples=args.samples or settings.get("samples", 64), **settings.get(engine.lower(), {}))

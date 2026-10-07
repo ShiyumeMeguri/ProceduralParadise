@@ -4,16 +4,48 @@
   "Set metres: she stands at the origin, the camera (level, 1.06 m up, calibration/Hall.place.json) looks into the hall along +Y.",
   "Laid out round that camera from the reference's frame 700 (calibration in the session's layout of the hall): the left wall where its foot meets the floor in the picture, the lockers where their corners' rays meet that wall, the ring, its glowing hole, the gold crystal and its two cables at the depth chosen for them (9 m: the picture alone does not fix it), sized and raised to their pixels; a curved soffit round the ring under a 4.6 m ceiling, windows of light to the right, a terminal at the far right, two lanes painted on the floor along the wall.",
   "As the picture comes in out of the glitch (frames 543-560) crows fly through the hall round her and out (Crows).",
-  "Her name, LA PLUMA, behind her is the shot's underlay (shots/Hall.json), not the set's."
+  "Her name, LA PLUMA, behind her is the shot's underlay (shots/Hall.json), not the set's.",
+  "The windows on the right glow at 0.9: seen through the shot's exposure they come to the light grey the reference shows there (a display value of about 170), not white; the window lamp lights the hall."
  ],
  "materials": {
-  "CIN.HallGlow.strength": 14.0
+  "CIN.HallGlow.strength": 1.25,
+  "CIN.HallWindow.strength": 1.25,
+  "color:hall_wall": [
+   0.8375,
+   0.8250000000000001,
+   0.78
+  ],
+  "color:hall_floor": [
+   0.15374999999999997,
+   0.21062500000000003,
+   0.615
+  ],
+  "color:hall_paint": [
+   0.834375,
+   0.9225000000000001,
+   0.96375
+  ],
+  "color:hall_metal": [
+   0.595,
+   0.6106250000000001,
+   1.02125
+  ],
+  "color:gold": [
+   1.125,
+   0.9468750000000001,
+   0.15937499999999993
+  ],
+  "color:hall_glow": [
+   1.15,
+   0.95375,
+   0.5950000000000001
+  ]
  },
  "sky": {
   "zenith": [
-   0.55,
-   0.57,
-   0.6
+   0.6531250000000001,
+   0.5449999999999999,
+   0.51875
   ],
   "horizon": [
    0.62,
@@ -25,7 +57,7 @@
    0.21,
    0.22
   ],
-  "strength": 0.35,
+  "strength": 0.33124999999999993,
   "haze": 30.0
  },
  "items": [
@@ -449,9 +481,9 @@
    "light": "AREA",
    "power": 4500.0,
    "color": [
-    0.95,
+    0.9906250000000001,
     0.97,
-    1.0
+    0.975
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -472,11 +504,11 @@
   {
    "name": "Ceiling Light",
    "light": "AREA",
-   "power": 700.0,
+   "power": 512.5,
    "color": [
-    0.96,
-    0.98,
-    1.0
+    0.8662499999999997,
+    0.8612500000000001,
+    1.0937499999999998
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -497,11 +529,11 @@
   {
    "name": "Back Light",
    "light": "AREA",
-   "power": 400.0,
+   "power": 200.0,
    "color": [
-    1.0,
-    0.9,
-    0.75
+    0.89375,
+    1.2437500000000001,
+    0.43749999999999994
    ],
    "shape": "RECTANGLE",
    "size": [

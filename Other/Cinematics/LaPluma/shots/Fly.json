@@ -9,6 +9,7 @@
   "She flies on past the tower, the scythe held high, and the camera swings round and under her until it looks up at her from behind; crows all round.  The camera turns with the sky (calibration/sky_rotation.py) where the place stands it.",
   "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py): her body by its keypoints and outline, the scythe by its outline, her hand held to its shaft lightly (--grip-weight 4) -- the joint fit at full weight pulled her off her keypoints, the picture's scythe and hand disagreeing in depth -- and the scythe hung in her hand at its model size.",
   "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
+  "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 279-379).",
   "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [290, 303, 330, 350, 370]."
  ],
  "camera": {
@@ -35,10 +36,10 @@
    "shadow_pool": "1024",
    "volume_range": [
     0.5,
-    2500.0
+    6000.0
    ],
    "volume_tile": "4",
-   "volume_samples": 96,
+   "volume_samples": 192,
    "volume_shadows": true,
    "volume_distribution": 1.0
   },
@@ -78,67 +79,67 @@
      ],
      [
       0.0625,
-      0.021025838939714152
+      0.0
      ],
      [
       0.125,
-      0.0954781604326908
+      0.022174594406830957
      ],
      [
       0.1875,
-      0.17342821090783708
+      0.046651319120323914
      ],
      [
       0.25,
-      0.23078596484683722
+      0.09397625660038023
      ],
      [
       0.3125,
-      0.265657165170903
+      0.1506422283692147
      ],
      [
       0.375,
-      0.3345664623569985
+      0.20923679011861698
      ],
      [
       0.4375,
-      0.42327171377271244
+      0.26864574936979724
      ],
      [
       0.5,
-      0.46640576081330776
+      0.367161191149037
      ],
      [
       0.5625,
-      0.5211982320967747
+      0.5289445248567035
      ],
      [
       0.625,
-      0.6679965126672465
+      0.608369715352612
      ],
      [
       0.6875,
-      0.8482955628428153
+      0.654482251348853
      ],
      [
       0.75,
-      0.8937319939100172
+      0.7125073127468625
      ],
      [
       0.8125,
-      0.9156069939100172
+      0.7919009159514026
      ],
      [
       0.875,
-      0.9374819939100172
+      0.8603836668434011
      ],
      [
       0.9375,
-      0.967363718291189
+      0.905483594115847
      ],
      [
       1.0,
-      0.994560619715198
+      0.9818107528944755
      ]
     ]
    },
@@ -240,10 +241,33 @@
  ],
  "sky": {
   "zenith": [
-   0.035,
-   0.1,
-   0.19
-  ]
+   0.027500000000000004,
+   0.1375,
+   0.25875000000000004
+  ],
+  "clouds": {
+   "color": [
+    0.5750000000000001,
+    0.58125,
+    0.59375
+   ],
+   "threshold": 0.585,
+   "climb": 0.16374999999999998,
+   "gather": 0.50625,
+   "soft": 0.07875,
+   "billow": 128.75,
+   "erode": 0.8124999999999999,
+   "density": 0.05625,
+   "map": "calibration/Fly.clouds.json",
+   "shade_low": 0.2625,
+   "shade_high": 0.43749999999999994
+  },
+  "horizon": [
+   0.5399999999999999,
+   0.8200000000000001,
+   0.8900000000000001
+  ],
+  "strength": 1.425
  },
  "wind": [
   {

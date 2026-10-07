@@ -26,7 +26,9 @@ returns ``{"shots": {id: {"scene", "frames", "camera", "set", "cast"}}}``
 (the set's and the cast's collections); this module owns
 everything around it: the command line, saving, rendering each shot's
 frames into a folder of its own (a shot's frames survive interruption and
-are kept apart by the inputs they were made with), and the ``Film`` scene
+are kept apart by the inputs they were made with; rendering a shot anew
+removes its frames made with other inputs, so one rendering of it is kept),
+and the ``Film`` scene
 whose sequencer cuts the shots into the video.  The soundtrack is a sound
 file of its owner's named by an environment variable (as the cast's files
 are), never part of the project; the film's frame 0 plays it from
@@ -56,6 +58,7 @@ import argparse
 import hashlib
 import importlib
 import os
+import shutil
 import sys
 
 import bpy
@@ -165,6 +168,18 @@ def present(scene, frame=None):
     bpy.context.window.scene = scene
     if frame is not None:
         scene.frame_set(frame)
+
+
+def prune_renderings(folder):
+    """Remove the shot's frames made with other inputs than ``folder``'s (its siblings)."""
+    parent = os.path.dirname(folder)
+    if not os.path.isdir(parent):
+        return
+    for name in os.listdir(parent):
+        other = os.path.join(parent, name)
+        if os.path.isdir(other) and os.path.normcase(other) != os.path.normcase(folder):
+            shutil.rmtree(other)
+            print(f"[film] removed the frames of other inputs {other}")
 
 
 def render_shot(shot, folder, holds, frames=None):
@@ -345,6 +360,7 @@ def run(here, root, script_path, argv=None):
     holds = set(film.get("holds", ()))
     if args.render_shots:
         for shot_id, shot in shots.items():
+            prune_renderings(folders[shot_id])
             count = render_shot(shot, folders[shot_id], holds, args.frames)
             print(f"[film] {shot_id}: rendered {count} frames into {folders[shot_id]}")
     if args.frame is not None and (args.render or args.inspect):

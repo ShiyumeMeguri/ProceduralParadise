@@ -1,0 +1,227 @@
+{
+ "notes": [
+  "Crows that sweep past the lens as she turns to the camera, and the last that blacks it out (frames 380-542)."
+ ],
+ "crows": [
+  {
+   "name": "C0a",
+   "frames": [
+    380,
+    381
+   ],
+   "frame": 380,
+   "guess": {
+    "center": [
+     280,
+     470
+    ],
+    "width": 1100,
+    "motion": [
+     -30,
+     -280,
+     0.9
+    ]
+   }
+  },
+  {
+   "name": "C0b",
+   "frames": [
+    382,
+    384
+   ],
+   "frame": 383,
+   "guess": {
+    "center": [
+     1264,
+     60
+    ],
+    "width": 600,
+    "motion": [
+     90,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "C1",
+   "frames": [
+    492,
+    496
+   ],
+   "frame": 495,
+   "guess": {
+    "center": [
+     550,
+     600
+    ],
+    "width": 1600,
+    "motion": [
+     215,
+     -20,
+     1.2
+    ]
+   }
+  },
+  {
+   "name": "C2a",
+   "frames": [
+    501,
+    510
+   ],
+   "frame": 504,
+   "guess": {
+    "center": [
+     400,
+     150
+    ],
+    "width": 1100,
+    "motion": [
+     60,
+     0,
+     0.92
+    ]
+   }
+  },
+  {
+   "name": "C2b",
+   "frames": [
+    502,
+    504
+   ],
+   "frame": 502,
+   "guess": {
+    "center": [
+     1800,
+     680
+    ],
+    "width": 700,
+    "motion": [
+     100,
+     50,
+     1.1
+    ]
+   }
+  },
+  {
+   "name": "C3",
+   "frames": [
+    512,
+    520
+   ],
+   "frame": 516,
+   "guess": {
+    "center": [
+     550,
+     540
+    ],
+    "width": 1700,
+    "motion": [
+     180,
+     0,
+     1.1
+    ]
+   }
+  },
+  {
+   "name": "C4",
+   "frames": [
+    522,
+    526
+   ],
+   "frame": 524,
+   "guess": {
+    "center": [
+     900,
+     800
+    ],
+    "width": 1700,
+    "motion": [
+     -200,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "C5",
+   "frames": [
+    527,
+    531
+   ],
+   "frame": 529,
+   "guess": {
+    "center": [
+     790,
+     580
+    ],
+    "width": 2200,
+    "motion": [
+     30,
+     -10,
+     1.1
+    ]
+   }
+  },
+  {
+   "name": "C6",
+   "frames": [
+    532,
+    536
+   ],
+   "frame": 535,
+   "guess": {
+    "center": [
+     710,
+     860
+    ],
+    "width": 1900,
+    "motion": [
+     50,
+     -40,
+     1.1
+    ]
+   }
+  },
+  {
+   "name": "C6b",
+   "frames": [
+    532,
+    536
+   ],
+   "frame": 533,
+   "guess": {
+    "center": [
+     450,
+     130
+    ],
+    "width": 760,
+    "motion": [
+     40,
+     -10,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "C7",
+   "frames": [
+    537,
+    542
+   ],
+   "frame": 539,
+   "guess": {
+    "center": [
+     940,
+     548
+    ],
+    "width": 3000,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  }
+ ]
+}

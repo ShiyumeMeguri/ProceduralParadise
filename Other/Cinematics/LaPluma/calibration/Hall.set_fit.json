@@ -1,0 +1,70 @@
+{
+ "notes": [
+  "The hall's lamps, finishes and sky fitted to the reference (fit_set.py): its background stands still from frame 563, so two frames of her standing in it are enough; her name and card are drawn over the picture, the worst sixteenth of the blocks left out (what they cover, no more: the blown windows must count). Steps are wide: the reference's hall is warm where the start was cold."
+ ],
+ "frames": [
+  640,
+  700
+ ],
+ "scale": 0.25,
+ "samples": 16,
+ "trim": 0.06,
+ "rounds": 5,
+ "parameters": [
+  {
+   "light": "Window Light",
+   "power": 2000.0,
+   "color": 0.15
+  },
+  {
+   "light": "Ceiling Light",
+   "power": 300.0,
+   "color": 0.15
+  },
+  {
+   "light": "Back Light",
+   "power": 200.0,
+   "color": 0.15
+  },
+  {
+   "material": "CIN.HallGlow.strength",
+   "step": 6.0
+  },
+  {
+   "material": "CIN.HallWindow.strength",
+   "step": 0.4
+  },
+  {
+   "material": "color:hall_wall",
+   "step": 0.15
+  },
+  {
+   "material": "color:hall_floor",
+   "step": 0.15
+  },
+  {
+   "material": "color:hall_paint",
+   "step": 0.15
+  },
+  {
+   "material": "color:hall_metal",
+   "step": 0.15
+  },
+  {
+   "material": "color:gold",
+   "step": 0.15
+  },
+  {
+   "material": "color:hall_glow",
+   "step": 0.15
+  },
+  {
+   "sky": "zenith",
+   "step": 0.15
+  },
+  {
+   "sky": "strength",
+   "step": 0.1
+  }
+ ]
+}

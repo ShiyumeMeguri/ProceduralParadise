@@ -1,0 +1,27 @@
+{
+ "notes": [
+  "The crow that sweeps past the top left of the lens as she flies clear of the breach (frames 193-197)."
+ ],
+ "crows": [
+  {
+   "name": "B1",
+   "frames": [
+    193,
+    197
+   ],
+   "frame": 194,
+   "guess": {
+    "center": [
+     420,
+     220
+    ],
+    "width": 850,
+    "motion": [
+     -135,
+     -35,
+     1.0
+    ]
+   }
+  }
+ ]
+}

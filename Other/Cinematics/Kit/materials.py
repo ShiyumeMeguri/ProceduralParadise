@@ -113,18 +113,14 @@ def facade():
 
 @register("CIN.Dust")
 def dust():
-    """Dust of a breach, a volume (``CIN.FX.Plume``): the plume's ``density`` broken into billows
-    ``CIN.Dust.billow`` metres across, ``CIN.Dust.density`` per metre at its thickest,
-    scattering the ``dust`` colour a little more forwards (``CIN.Dust.anisotropy``), and glowing
-    its own colour by ``CIN.Dust.ambient`` as thick as it is: the light that bounces about inside a
-    sunlit cloud of dust, which the engine's single scattering leaves out (its heart would go grey)."""
+    """Dust of a breach, a volume (``CIN.FX.Plume``, whose puffs billow of themselves): the plume's
+    ``density`` times ``CIN.Dust.density`` per metre, scattering the ``dust`` colour a little more
+    forwards (``CIN.Dust.anisotropy``), and glowing its own colour by ``CIN.Dust.ambient`` as thick
+    as it is: the light that bounces about inside a sunlit cloud of dust, which the engine's single
+    scattering leaves out (its heart would go black)."""
     def build(tree: Tree):
         grid = tree.n("ShaderNodeAttribute", props={"attribute_name": "density", "attribute_type": "GEOMETRY"})["Fac"]
-        position = tree.n("ShaderNodeNewGeometry")["Position"]
-        billows = tree.n("ShaderNodeTexNoise", Vector=position, Scale=1.0 / param("CIN.Dust.billow", 2.5), Detail=5.0,
-                         Roughness=0.55, props={"noise_dimensions": "3D"})["Fac"]
-        breakup = tree.map_range(billows, 0.38, 0.62, 0.0, 1.0, interp="SMOOTHSTEP")
-        density = tree.math("MULTIPLY", grid * breakup, param("CIN.Dust.density", 3.0))
+        density = tree.math("MULTIPLY", grid, param("CIN.Dust.density", 3.0))
         return {"Volume": tree.n("ShaderNodeVolumePrincipled", Color=color("dust"), Density=density, Density_Attribute="",
                                  Anisotropy=param("CIN.Dust.anisotropy", 0.25), Emission_Color=color("dust"),
                                  Emission_Strength=density * param("CIN.Dust.ambient", 0.0))["Volume"]}
@@ -206,22 +202,3 @@ def air():
         return {"Volume": tree.n("ShaderNodeVolumePrincipled", Color=color("air"), Density=density,
                                  Anisotropy=param("CIN.Air.anisotropy", 0.3))["Volume"]}
     return S.material("CIN.Air", build)
-
-
-@register("CIN.Cloud")
-def cloud():
-    """Cumulus: a white body that the sun lights and the blue sky fills in the shade, light
-    carried a little way through it (subsurface, metres deep) so its folds read soft, the light
-    a cloud scatters on through itself many times standing in as a glow of its own
-    (``CIN.Cloud.glow``: the renderer follows light a few metres into it, not hundreds), a silver
-    sheen at grazing angles, and a silhouette that thins out where the surface turns away."""
-    def build(tree: Tree):
-        body = S.bsdf(tree, Base_Color=color("cloud"), Roughness=1.0, Subsurface_Weight=param("CIN.Cloud.subsurface", 0.6),
-                      Subsurface_Radius=(1.0, 1.0, 1.0), Subsurface_Scale=param("CIN.Cloud.depth", 18.0),
-                      Sheen_Weight=param("CIN.Cloud.sheen", 0.4), Sheen_Roughness=0.6,
-                      Emission_Color=color("cloud"), Emission_Strength=param("CIN.Cloud.glow", 0.0))["BSDF"]
-        facing = tree.n("ShaderNodeLayerWeight", Blend=0.5)["Facing"]
-        solid = tree.map_range(facing, param("CIN.Cloud.edge", 0.62), 0.95, 1.0, 0.0, interp="SMOOTHSTEP")
-        clear = tree.n("ShaderNodeBsdfTransparent")["BSDF"]
-        return tree.n("ShaderNodeMixShader", solid, clear, body)["Shader"]
-    return S.material("CIN.Cloud", build)

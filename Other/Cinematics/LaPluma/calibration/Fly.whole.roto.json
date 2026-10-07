@@ -1,0 +1,11 @@
+{
+ "notes": ["All of her, coat and all, keyed on four frames: what the crows that cross the lens are told apart from (track_crows.py). The crows before her are what she is not on frame 330."],
+ "groups": [
+  {"objects": ["whole"], "keys": {
+     "295": {"boxes": {"whole": [150, 100, 1920, 940]}, "points": {"whole": [[1000, 480], [500, 470], [700, 700], [1200, 230], [1800, 500], [1880, 450], [1600, 700]]}, "negative": [[300, 400], [1500, 190], [900, 920]]},
+     "330": {"points": {"whole": [[1000, 300], [900, 700], [1100, 500]]}, "negative": [[450, 600], [700, 820], [1650, 700], [1400, 200]]},
+     "342": {"points": {"whole": [[600, 500], [900, 300], [400, 800], [1000, 700], [1500, 700]]}, "negative": [[1800, 150], [60, 680], [1300, 900]]},
+     "360": {"points": {"whole": [[700, 900], [1100, 760], [1500, 640], [1700, 640], [900, 420]]}, "negative": [[150, 150], [1600, 300], [200, 650]]}
+  }}
+ ]
+}

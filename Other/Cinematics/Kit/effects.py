@@ -7,10 +7,14 @@ closed form of the scene's time -- nothing is simulated or kept between frames.
 thrown along ``Direction`` within ``Spread`` at about ``Speed`` m/s and slowed by the air
 (the speed falls to 1/e in ``Drag`` seconds), sinking at ``Sink`` m/s and carried by ``Wind``;
 a puff swells from ``Radius`` by ``Growth`` metres times the square root of its age in
-seconds.  The plume is a volume ``Voxel`` metres fine round the puffs: dense in a puff's core,
-thinning out over the outer ``Softness`` of its radius, the nearest puff's alone where puffs
-overlap; its billows are its shading's (``CIN.Dust``).  A puff that has not left yet is not
-there; before the first one leaves there is no plume.
+seconds.  The plume is a volume ``Voxel`` metres fine round the puffs, ``Thickness`` times as
+dense as its dust (``CIN.Dust``) in a puff's core, thinning out over the outer ``Softness`` of
+its radius, the nearest puff's alone where puffs overlap.  A puff's outline billows: swelling
+out by up to ``Billows`` of its radius in rounded lumps ``Billow Size`` of its radius across,
+creased where they meet (the folds of a cauliflower), a pattern of its own that it carries
+along, that grows with it and that churns as it ages (``Churn`` turns of the pattern a
+second).  A puff that has not left yet is not there;
+before the first one leaves there is no plume.
 
 ``CIN.FX.Debris``: fragments thrown out of a breach.  ``Count`` pieces leave ``Source`` +-
 ``Source Size`` between the frame ``Start`` and ``Burst`` frames after it, along
@@ -29,9 +33,10 @@ from . import materials as M
 
 CHUNKS = 6
 PLATES = 3
+SWELL = 1.0
 SEEDS = {"leave": 1.0, "x": 2.0, "y": 3.0, "z": 4.0, "aim x": 5.0, "aim y": 6.0, "aim z": 7.0, "speed": 8.0, "radius": 9.0,
          "turn": 10.0, "spin": 11.0, "size": 12.0, "flat": 13.0, "shape": 14.0, "variant": 15.0, "axis x": 16.0,
-         "axis y": 17.0, "axis z": 18.0}
+         "axis y": 17.0, "axis z": 18.0, "pattern x": 19.0, "pattern y": 20.0, "pattern z": 21.0}
 
 
 def _draws(graph, seed, salt):
@@ -69,6 +74,10 @@ def plume():
     duration = graph.inp("Duration", default=30.0, min=0.0, desc="Frames over which the puffs leave")
     voxel = graph.inp("Voxel", default=0.3, min=0.02, subtype="DISTANCE")
     softness = graph.inp("Softness", default=0.6, min=0.01, max=1.0, desc="Share of a puff's radius over which it thins out")
+    thickness = graph.inp("Thickness", default=1.0, min=0.0, desc="How many times the dust's density a puff's core is")
+    billows = graph.inp("Billows", default=0.35, min=0.0, max=1.0, desc="Share of a puff's radius its outline swells out by")
+    billow_size = graph.inp("Billow Size", default=0.35, min=0.01, desc="Billows across, as a share of a puff's radius")
+    churn = graph.inp("Churn", default=0.4, min=0.0, desc="Turns of a puff's billows a second")
     fps = graph.inp("FPS", default=30.0, min=1.0)
     material = graph.inp("Material", "MATERIAL", default=M.get("CIN.Dust"))
     draw = _draws(graph, seed, 59)
@@ -79,17 +88,27 @@ def plume():
     slowed = drag * (1.0 - graph.math("EXPONENT", age * -1.0 / drag))
     place = origin + velocity * slowed + wind * age + graph.vec(0.0, 0.0, -1.0) * (sink * age)
     puffs = graph.set_pos(puffs, pos=place)
+    puffs = graph.store(puffs, "pattern", graph.vec(draw("pattern x", -50.0, 50.0), draw("pattern y", -50.0, 50.0),
+                                                    draw("pattern z", -50.0, 50.0)), "FLOAT_VECTOR")
+    puffs = graph.store(puffs, "age", age)
     puffs = graph.delete(puffs, graph.compare(graph.scene_frame(), leave, "LESS_THAN"))
     size = radius * draw("radius", 0.6, 1.0) + growth * graph.math("SQRT", age)
     puffs = graph.n("GeometryNodeSetPointRadius", Points=puffs, Radius=size).o
-    bounds = graph.n("GeometryNodeBoundBox", Geometry=puffs, Use_Radius=True)
+    swollen = graph.n("GeometryNodeSetPointRadius", Points=puffs, Radius=size * (1.0 + billows * SWELL)).o
+    bounds = graph.n("GeometryNodeBoundBox", Geometry=swollen, Use_Radius=True)
     span = bounds["Max"] - bounds["Min"]
     cells = [graph.to_int(graph.math("MINIMUM", graph.math("MAXIMUM", axis / voxel, 2.0), 320.0), "CEILING") for axis in graph.sep(span)]
     nearest = graph.sample_nearest(puffs, graph.position())
     centre = graph.sample_index(puffs, graph.position(), nearest, "FLOAT_VECTOR")
-    reach = graph.sample_index(puffs, graph.n("GeometryNodeInputRadius").o, nearest)
-    inside = graph.vmath("DISTANCE", graph.position(), centre) / graph.max(reach, 0.001)
-    density = graph.map_range(inside, 1.0 - softness, 1.0, 1.0, 0.0, interp="SMOOTHSTEP")
+    reach = graph.max(graph.sample_index(puffs, graph.n("GeometryNodeInputRadius").o, nearest), 0.001)
+    pattern = graph.sample_index(puffs, graph.named("pattern", "FLOAT_VECTOR"), nearest, "FLOAT_VECTOR")
+    puff_age = graph.sample_index(puffs, graph.named("age"), nearest)
+    local = (graph.position() - centre) / reach
+    lumps = graph.n("ShaderNodeTexNoise", Vector=local / billow_size + pattern, W=puff_age * churn, Scale=1.0, Detail=3.0,
+                    Roughness=0.55, props={"noise_dimensions": "4D"})["Fac"]
+    swell = graph.min(graph.abs(lumps - 0.5) * 4.0, SWELL)
+    inside = graph.vmath("LENGTH", local) - swell * billows
+    density = graph.map_range(inside, 1.0 - softness, 1.0, thickness, 0.0, interp="SMOOTHSTEP")
     cloud = graph.n("GeometryNodeVolumeCube", Density=density, Background=0.0, Min=bounds["Min"], Max=bounds["Max"],
                     Resolution_X=cells[0], Resolution_Y=cells[1], Resolution_Z=cells[2]).o
     present = graph.compare(graph.domain_size(puffs, "POINTCLOUD")["Point Count"], 0, "GREATER_THAN", "INT")

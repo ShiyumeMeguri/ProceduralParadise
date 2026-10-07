@@ -1,0 +1,19 @@
+{
+ "notes": ["The tower's finishes fitted to the reference's close look at the breach before she breaks out (fit_set.py, frames 74-92): white-painted steel, white-washed concrete, the glass and the dark storey behind it; the sun is the whole district's and is left as it is."],
+ "frames": [74, 80, 86, 92],
+ "scale": 0.25,
+ "samples": 16,
+ "trim": 0.1,
+ "rounds": 4,
+ "parameters": [
+  {"material": "color:steel_paint", "step": 0.05},
+  {"material": "color:steel_grime", "step": 0.05},
+  {"material": "color:concrete", "step": 0.05},
+  {"material": "color:concrete_grime", "step": 0.05},
+  {"material": "color:interior", "step": 0.02},
+  {"material": "color:glass", "step": 0.05},
+  {"material": "CIN.SteelPaint.roughness", "step": 0.1, "start": 0.46},
+  {"material": "CIN.Concrete.roughness", "step": 0.1, "start": 0.78},
+  {"material": "CIN.Glass.reflect", "step": 0.2, "start": 1.0}
+ ]
+}

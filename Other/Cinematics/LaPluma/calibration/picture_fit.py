@@ -1,0 +1,84 @@
+"""
+Fitting what a shot renders to its reference picture by eye (``fit_sky.py``, ``fit_set.py``).
+
+A frame is compared on the blocks it is fitted on (weights 1, the rest 0) as the eye tells colours apart: CIE Lab of
+both pictures, each blurred over ``BLUR`` blocks within the fitted blocks (a cloud or a lamp a little off its place
+is a little wrong rather than wholly), the mean distance over the blocks -- leaving out the worst ``trim`` of them,
+what the fit cannot be asked to draw (a title over the picture, a fold of her coat the masks missed) -- plus how
+its colours are spread (the :data:`QUANTILES` of each of L, a and b over the blocks: as bright, as blue, as much
+cloud wherever it stands), the mean distance of the quantiles summed over L, a and b, times ``spread`` (a sky whose
+clouds cannot stand exactly where the picture's do is drawn grey to spare them unless its spread of colours counts).  Parameters are turned one
+after another (:func:`descend`), each to the better of a step either way, the steps halving round by round.
+"""
+import numpy as np
+
+BLUR = 2.0
+QUANTILES = [10, 30, 50, 70, 90]
+
+
+def lab(rgb):
+    """CIE Lab of display sRGB 0..255 (D65)."""
+    value = rgb / 255.0
+    linear = np.where(value <= 0.04045, value / 12.92, ((value + 0.055) / 1.055) ** 2.4)
+    xyz = linear @ np.array([[0.4124, 0.3576, 0.1805], [0.2126, 0.7152, 0.0722], [0.0193, 0.1192, 0.9505]]).T
+    xyz = xyz / np.array([0.95047, 1.0, 1.08883])
+    f = np.where(xyz > (6.0 / 29.0) ** 3, np.cbrt(xyz), xyz / (3.0 * (6.0 / 29.0) ** 2) + 4.0 / 29.0)
+    return np.stack([116.0 * f[..., 1] - 16.0, 500.0 * (f[..., 0] - f[..., 1]), 200.0 * (f[..., 1] - f[..., 2])], axis=-1)
+
+
+def blurred(values, weight, sigma=BLUR):
+    """``values`` (rows x columns x channels) blurred within ``weight``."""
+    radius = int(np.ceil(sigma * 3.0))
+    kernel = np.exp(-0.5 * (np.arange(-radius, radius + 1) / sigma) ** 2)
+
+    def blur(field):
+        rows = np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 1, field)
+        return np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 0, rows)
+    total = np.stack([blur(values[..., channel] * weight) for channel in range(values.shape[-1])], axis=-1)
+    return total / np.maximum(blur(weight), 1e-6)[..., None]
+
+
+class Measure:
+    """The reference frames to fit to: ``pictures`` {frame: blocks RGB 0..255}, ``weights`` {frame: 0/1 blocks}."""
+
+    def __init__(self, pictures, weights, trim=0.0, spread=1.0):
+        self.weights = weights
+        self.trim = trim
+        self.spread = spread
+        self.references = {frame: blurred(lab(picture), weights[frame]) for frame, picture in pictures.items()}
+
+    def distance(self, frame, picture):
+        weight = self.weights[frame]
+        rows, columns = weight.shape
+        ours = blurred(lab(picture[:rows, :columns]), weight)
+        reference = self.references[frame]
+        kept = weight > 0.5
+        differences = np.linalg.norm(ours - reference, axis=-1)[kept]
+        if self.trim > 0.0:
+            differences = np.sort(differences)[:max(1, int(round(differences.size * (1.0 - self.trim))))]
+        spread = np.abs(np.percentile(ours[kept], QUANTILES, axis=0) - np.percentile(reference[kept], QUANTILES, axis=0))
+        return float(differences.mean()) + self.spread * float(spread.sum(axis=1).mean())
+
+
+def descend(state, parameters, score, rounds, read, changed, log):
+    """Coordinate descent from ``state`` (each value raised to its lowest first): ``parameters`` [(key, step, lowest)],
+    ``score(state)`` -> (value, parts), ``read(state, key)`` the value, ``changed(state, key, value)`` a new state.
+    Returns the best state and score."""
+    for key, _step, lowest in parameters:
+        if read(state, key) < lowest:
+            state = changed(state, key, lowest)
+    best, parts = score(state)
+    log(f"start {best:.3f} {[round(part, 2) for part in parts]}")
+    for round_index in range(rounds):
+        for key, step, lowest in parameters:
+            step = step * 0.5 ** round_index
+            current = read(state, key)
+            for candidate in (current - step, current + step):
+                candidate = max(candidate, lowest)
+                trial = changed(state, key, candidate)
+                value, trial_parts = score(trial)
+                if value < best - 1e-4:
+                    best, state, parts = value, trial, trial_parts
+                    log(f"round {round_index} {key} -> {candidate:.4f}: {best:.3f} {[round(part, 2) for part in parts]}")
+                    break
+    return state, best

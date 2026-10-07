@@ -1,0 +1,27 @@
+{
+ "notes": [
+  "The crow that crosses the lens as the flight ends (frames 377-379)."
+ ],
+ "crows": [
+  {
+   "name": "F1",
+   "frames": [
+    377,
+    379
+   ],
+   "frame": 379,
+   "guess": {
+    "center": [
+     150,
+     470
+    ],
+    "width": 1100,
+    "motion": [
+     90,
+     -10,
+     1.05
+    ]
+   }
+  }
+ ]
+}
