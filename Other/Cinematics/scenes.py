@@ -398,7 +398,12 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     A held prop's bone (``held``: prop bone -> hand bone) hangs on the hand
     by a Child Of constraint and is keyed with its grip, the prop in the
     hand's frame and its scale: the bone's own pose is its rest inverted
-    times the grip, so the constraint lands it exactly there.  A prop's
+    times the grip, so the constraint lands it exactly there.  A performance
+    records the rest of every bone it keys or hangs a prop on, as the fit
+    posed it (``rests``: rig-space quaternions); a bone the rig has turned
+    about since (its roll set anew) has its rotations, and a hand its grips,
+    carried onto its present rest, so the pose and the prop stay where the
+    fit put them.  A prop's
     object (the profile's ``props``: an object of the cast by that name)
     rides its bone alone -- where the cast's file happens to move the object
     itself (its location, rotation and scale) is set aside, as the fits took
@@ -410,6 +415,11 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     if relative not in (None, "camera"):
         raise ValueError(f"{path}: a performance is relative to the set or to the 'camera', not '{relative}'")
     twists = profile["twists"]
+    turns = {name: Quaternion(rest).inverted() @ rig.data.bones[name].matrix_local.to_quaternion() for name, rest in performance["rests"].items()}
+
+    def carried(name, value):
+        return turns[name].inverted() @ Quaternion(value) @ turns[name]
+
     rig.rotation_mode = "QUATERNION"
     first, last = frames
     keyed = [item for item in performance["frames"] if first <= item["frame"] <= last]
@@ -439,10 +449,11 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
         for name, value in item["bones"].items():
             bone = rig.pose.bones[name]
             bone.rotation_mode = "QUATERNION"
-            bone.rotation_quaternion = _continuous(previous, name, value)
+            rotation = carried(name, value)
+            bone.rotation_quaternion = _continuous(previous, name, rotation)
             bone.keyframe_insert("rotation_quaternion", frame=frame)
             if name in twists:
-                angle = _twist(Quaternion(value)) * twists[name]["share"]
+                angle = _twist(rotation) * twists[name]["share"]
                 for twist_name in twists[name]["bones"]:
                     twist = rig.pose.bones[twist_name]
                     twist.rotation_mode = "QUATERNION"
@@ -450,8 +461,8 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
                     twist.keyframe_insert("rotation_quaternion", frame=frame)
         for name, grip in item.get("grips", {}).items():
             bone = rig.pose.bones[name]
-            matrix = (Matrix.Translation(_vector(grip["location"])) @ Quaternion(grip["rotation"]).to_matrix().to_4x4()
-                      @ Matrix.Scale(grip["scale"], 4))
+            matrix = (turns[performance["held"][name]].inverted().to_matrix().to_4x4() @ Matrix.Translation(_vector(grip["location"]))
+                      @ Quaternion(grip["rotation"]).to_matrix().to_4x4() @ Matrix.Scale(grip["scale"], 4))
             location, rotation, scale = (rig.data.bones[name].matrix_local.inverted() @ matrix).decompose()
             bone.rotation_mode = "QUATERNION"
             bone.location = location

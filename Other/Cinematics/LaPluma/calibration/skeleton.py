@@ -20,6 +20,12 @@ def quaternion_matrices(quaternions):
                         2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)], -1).reshape(*w.shape, 3, 3)
 
 
+def rests(skeleton, names):
+    """The rest of each named bone, a rig-space quaternion (w, x, y, z): what a performance records of the rig its fit posed."""
+    return {name: [round(float(v), 7) for v in quaternion_from_matrix(skeleton.rest[skeleton.index[name]][:3, :3].cpu().numpy())]
+            for name in names}
+
+
 def axis_angle_matrices(vector):
     angle = vector.norm(dim=-1, keepdim=True).clamp(min=1e-8)
     axis = vector / angle

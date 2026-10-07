@@ -75,8 +75,9 @@ alone are added up a batch of frames at a time, as many as the claim
 holds, and only the terms that tie frames together see the whole shot.
 
 The performance written is the rig object's placement (set metres) and
-every fitted bone's local rotation for every frame; the film's interpreter
-keys them on the cast.
+every fitted bone's local rotation for every frame, with the rest of every
+bone it keys or holds a prop with (``rests``: a rig re-rolled since is
+keyed the same pose); the film's interpreter keys them on the cast.
 """
 import argparse
 import json
@@ -91,7 +92,7 @@ from scipy.spatial.transform import Slerp
 from gpu_budget import chunk, claim
 from prop import Prop
 from silhouette import Silhouette
-from skeleton import Camera, Skeleton, axis_angle_matrices, quaternion_from_matrix
+from skeleton import Camera, Skeleton, axis_angle_matrices, quaternion_from_matrix, rests
 
 parser = argparse.ArgumentParser()
 parser.add_argument("rig")
@@ -642,8 +643,10 @@ with torch.no_grad():
                                  "rotation": [round(float(v), 6) for v in quaternion_from_matrix(object_rotation[k])],
                                  "rotation_vector": [round(float(v), 6) for v in root_rotation[k].cpu().numpy()],
                                  "bones": bones})
+    result["rests"] = rests(skeleton, FITTED)
     if prop is not None:
         prop.write_grips(result["frames"], torch.linalg.inv(world[hand_bone]) @ held_at_model_size(world, torch.arange(count, device=device)))
         result["held"] = {prop.name: grip["hand"]}
+        result["rests"].update(rests(skeleton, [grip["hand"]]))
 json.dump(result, open(args.out, "w", encoding="utf-8"), indent=1)
 print("wrote", args.out)
