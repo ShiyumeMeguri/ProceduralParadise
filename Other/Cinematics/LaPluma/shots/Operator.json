@@ -8,6 +8,7 @@
  "notes": [
   "Her title: close on her with the scythe across her shoulders, clouds and the tower's frame far behind her out of focus; the title card -- a dark band, OPERATOR, yellow rules, her name and rarity -- comes and goes over the first second (frames 380-420); crows cross the lens (492-536), the picture breaks up (535-536) and a crow's body blacks it out into the hall (537-542).",
   "Fitted with the camera at the origin on the frames she is seen (380-534: calibration/fit_pose.py, fit_prop.py, the lens the best of a scan of focal lengths, her right hand held to the shaft lightly; the frames crows cover left to the fit's smoothness) and turned with the sky (calibration/sky_rotation.py).  From 481 on she holds still as the picture shows her (the fit there turns her where the crows and the cropped blade leave her pose open); the crows past the lens are fitted to the dark they make of the reference, each flying straight from where it is on its frame (the items' camera_frame).",
+  "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
   "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [430, 450, 470, 476]."
  ],
  "camera": {
@@ -111,67 +112,67 @@
      ],
      [
       0.0625,
-      0.04049258219001935
+      0.05523907086788592
      ],
      [
       0.125,
-      0.11294982438298304
+      0.12391588885594942
      ],
      [
       0.1875,
-      0.14859232952820178
+      0.1549845680634884
      ],
      [
       0.25,
-      0.1704673295282018
+      0.19988524794606616
      ],
      [
       0.3125,
-      0.1923423295282018
+      0.3406864495261751
      ],
      [
       0.375,
-      0.2678273825031421
+      0.4113720993266512
      ],
      [
       0.4375,
-      0.384919217035788
+      0.4642081724647307
      ],
      [
       0.5,
-      0.4346190933233014
+      0.4952209588128672
      ],
      [
       0.5625,
-      0.4980290428943375
+      0.5668583909738243
      ],
      [
       0.625,
-      0.6855290428943375
+      0.7543583909738243
      ],
      [
       0.6875,
-      0.847142595589684
+      0.887495706500053
      ],
      [
       0.75,
-      0.8944842581466277
+      0.9131092753567965
      ],
      [
       0.8125,
-      0.9214426953105068
+      0.9349842753567965
      ],
      [
       0.875,
-      0.9476284635403368
+      0.9568592753567965
      ],
      [
       0.9375,
-      0.9738142317701681
+      0.9787342753567965
      ],
      [
       1.0,
-      0.9956892317701681
+      1.0
      ]
     ]
    },
@@ -2122,9 +2123,9 @@
  },
  "sky": {
   "zenith": [
-   0.4,
-   0.45,
-   0.5
+   0.09,
+   0.14,
+   0.2
   ],
   "horizon": [
    0.7,

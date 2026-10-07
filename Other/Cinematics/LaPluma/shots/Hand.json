@@ -8,6 +8,7 @@
  "notes": [
   "Close on her right hand raised with the scythe against the sky, crows wheeling round; the camera turns with her (the sky's measured turn, calibration/sky_rotation.py) where the place stands it beside the tower, the tower's top storeys leaving the lower left.",
   "Fitted with the camera at the origin (calibration/fit_prop.py, fit_pose.py): the performance is the camera's own, and moves with it.  The scythe is placed on frames 219-278 and carried back over 207-218 at its own pace (calibration/extend_placements.py: the search reads its shaft end for end on the opening frames); her arm fills the sleeve's outline lightly (--cover-weight 0.3: the sleeve in the picture is the coat's, wider than her arm) and the rest of her is kept out of the picture, which shows none of her but the arm (--silhouette-weight 20).",
+  "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
   "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [215, 230, 250, 270]."
  ],
  "camera": {
@@ -73,67 +74,67 @@
     "L": [
      [
       0.0,
-      0.00043931410952741633
+      0.004637908031790714
      ],
      [
       0.0625,
-      0.06727339487709308
+      0.07978958166441195
      ],
      [
       0.125,
-      0.16013565468260815
+      0.22451084237998364
      ],
      [
       0.1875,
-      0.23896681333935438
+      0.3794642199486632
      ],
      [
       0.25,
-      0.3608373015461377
+      0.4305381909013861
      ],
      [
       0.3125,
-      0.4184725255367106
+      0.4524131909013861
      ],
      [
       0.375,
-      0.4403475255367106
+      0.4742881909013861
      ],
      [
       0.4375,
-      0.46222252553671056
+      0.49616319090138605
      ],
      [
       0.5,
-      0.48409752553671054
+      0.5470298214116561
      ],
      [
       0.5625,
-      0.5059725255367106
+      0.5850509588023092
      ],
      [
       0.625,
-      0.5441436726013715
+      0.6832440047079125
      ],
      [
       0.6875,
-      0.7262756132815003
+      0.8638453082058601
      ],
      [
       0.75,
-      0.8753214520066711
+      0.9314405525777146
      ],
      [
       0.8125,
-      0.9312701622950547
+      0.9533155525777146
      ],
      [
       0.875,
-      0.9563705590588312
+      0.9751905525777146
      ],
      [
       0.9375,
-      0.978910224165228
+      0.9970655525777146
      ],
      [
       1.0,
@@ -152,9 +153,9 @@
  },
  "sky": {
   "zenith": [
-   0.3,
-   0.42,
-   0.6
+   0.06,
+   0.15,
+   0.28
   ]
  },
  "wind": [
