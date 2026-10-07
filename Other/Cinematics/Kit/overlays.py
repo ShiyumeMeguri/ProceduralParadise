@@ -16,7 +16,8 @@ as it arrives (the share of the way still to go is the share of the time left to
 what the front has not reached is unlit, and behind it the light fades over ``Trail`` (0: it
 does not fade).  With a ``Hatch`` (period, angle in degrees, share) its ink
 is laid in stripes ``period`` apart along the picture's direction ``angle``, ``share`` of each
-inked, the stripes moving with it.  A piece is a picture's overlay or, in
+inked, the stripes moving with it: laid from its ``Position``, the first ``Hatch Phase`` of a
+period along.  A piece is a picture's overlay or, in
 metres, an item of a set (a title standing behind her).
 
 ``CIN.Overlay.DiamondWipe``: the picture uncovered through a lattice of diamonds.  The picture is
@@ -32,7 +33,9 @@ system's font folder).
 ``CIN.Overlay.Title``: a line of display type in the design system's ``title`` font, as the
 text is.
 
-``CIN.Overlay.Rect``: a rectangle ``Size`` (width, height) about ``Position``, turned ``Angle``.
+``CIN.Overlay.Rect``: a rectangle ``Size`` (width, height) about ``Position``, turned ``Angle``,
+its top edge standing ``Slant`` to the right of its foot (a parallelogram) and its corners
+rounded to the radius ``Round``.
 
 ``CIN.Overlay.Triangle``: a triangle with the corners ``A``, ``B`` and ``C``.
 
@@ -96,10 +99,12 @@ def font(key):
     return loaded or bpy.data.fonts.load(path)
 
 
-def _inked(graph, geometry):
+def _inked(graph, geometry, origin=None):
     """Store ``ink``, ``glow``, ``alpha``, ``hatch`` and ``place`` (from the inputs Color, Glow, Fade In, Fade Out, Falloff,
-    Hatch) on ``geometry``, moved as it slides in, drifts and slides out (Slide In, Slide Time, Slide Ease, Drift, Slide Out, Slide Out Time), in
-    CIN.OverlayInk, at ``Opacity``.  A part of ``geometry`` carrying an ``opacity`` of its own is drawn at that share of the item's."""
+    Hatch, Hatch Phase; ``place`` from ``origin``, the piece's Position, or the picture's middle when None, shifted along the
+    stripes by the phase) on ``geometry``, moved as it slides in, drifts and slides out (Slide In, Slide Time, Slide Ease,
+    Drift, Slide Out, Slide Out Time), in CIN.OverlayInk, at ``Opacity``.  A part of ``geometry`` carrying an ``opacity``
+    of its own is drawn at that share of the item's."""
     color = graph.inp("Color", "COLOR", default=(1.0, 1.0, 1.0, 1.0))
     glow = graph.inp("Glow", default=1.0, min=0.0)
     opacity_input = graph.inp("Opacity", default=1.0, min=0.0, max=1.0)
@@ -117,6 +122,7 @@ def _inked(graph, geometry):
     sweep_angle = graph.inp("Sweep Angle", default=0.0, desc="Direction the front travels in, degrees (0: rightwards)")
     trail = graph.inp("Trail", default=0.0, min=0.0, desc="Distance the light fades over behind the front (0: no fading)")
     hatch = graph.inp("Hatch", "VECTOR", default=(0.0, 0.0, 0.5), desc="Stripes: period (0: solid), angle (degrees), inked share")
+    phase = graph.inp("Hatch Phase", default=0.0, desc="The share of a period along their direction the stripes start from its Position")
     frame = graph.scene_frame()
     coming = graph.clamp01((frame - fade_in.x) / graph.max(fade_in.y, 0.001))
     going = 1.0 - graph.clamp01((frame - fade_out.x) / graph.max(fade_out.y, 0.001))
@@ -132,7 +138,12 @@ def _inked(graph, geometry):
     lit = _swept(graph, low, high, sweep, sweep_span, sweep_angle, trail)
     geometry = graph.store(geometry, "alpha", coming * going * (1.0 - falloff * (1.0 - rise)) * opacity * opacity_input * lit)
     geometry = graph.store(geometry, "hatch", hatch, "FLOAT_VECTOR")
-    geometry = graph.store(geometry, "place", graph.position(), "FLOAT_VECTOR")
+    turn = graph.math("RADIANS", hatch.y)
+    across = graph.vec(graph.math("COSINE", turn), graph.math("SINE", turn), 0.0)
+    place = graph.position() + across * (phase * hatch.x)
+    if origin is not None:
+        place = place - origin
+    geometry = graph.store(geometry, "place", place, "FLOAT_VECTOR")
     leaving = graph.math("POWER", graph.clamp01((frame - slide_out_time.x) / graph.max(slide_out_time.y, 0.001)), ease)
     geometry = graph.set_pos(geometry, offset=slide * remaining + drift * graph.max(frame - slide_time.x, 0.0) + slide_out * leaving)
     return graph.mat(geometry, M.get("CIN.OverlayInk"))
@@ -208,7 +219,7 @@ def _lettered(name, doc, key):
     bounds = graph.bound_box(face)
     low, high = bounds["Min"], bounds["Max"]
     anchor = graph.vec(low.x + (high.x - low.x) * align, (low.y + high.y) * 0.5, 0.0)
-    graph.result(_inked(graph, _placed(graph, graph.set_pos(face, offset=anchor * -1.0), position, angle)))
+    graph.result(_inked(graph, _placed(graph, graph.set_pos(face, offset=anchor * -1.0), position, angle), position))
     return graph
 
 
@@ -231,8 +242,12 @@ def rect():
     size = graph.inp("Size", "VECTOR", default=(1.0, 0.1, 0.0))
     position = graph.inp("Position", "VECTOR", default=(0.0, 0.0, 0.0))
     angle = graph.inp("Angle", default=0.0, subtype="ANGLE")
-    sheet = graph.n("GeometryNodeMeshGrid", Size_X=size.x, Size_Y=size.y, Vertices_X=2, Vertices_Y=2)["Mesh"]
-    graph.result(_inked(graph, _placed(graph, sheet, position, angle)))
+    slant = graph.inp("Slant", default=0.0, desc="How far its top edge stands to the right of its foot")
+    corner = graph.inp("Round", default=0.0, min=0.0, desc="Its corners' radius")
+    outline = graph.n("GeometryNodeCurvePrimitiveQuadrilateral", Width=size.x, Height=size.y, Offset=slant,
+                      props={"mode": "PARALLELOGRAM"}).o
+    sheet = graph.fill(graph.fillet(outline, radius=corner, count=CINEMATICS["corner_segments"]))
+    graph.result(_inked(graph, _placed(graph, sheet, position, angle), position))
     return graph
 
 
@@ -262,7 +277,7 @@ def emblems():
     row = graph.n("GeometryNodeMeshLine", Count=count, Offset=graph.vec(spacing, 0.0, 0.0)).o
     row = graph.set_pos(row, offset=graph.vec(spacing * (count - 1) * -0.5, 0.0, 0.0) + position)
     graph.result(_inked(graph, graph.realize(graph.iop(graph.n("GeometryNodeMeshToPoints", Mesh=row).o, blades,
-                                                       scale=graph.vec(size, size, 1.0)))))
+                                                       scale=graph.vec(size, size, 1.0))), position))
     return graph
 
 
