@@ -1,15 +1,46 @@
 {
- "note": "Her cloth as the RuriClothPhysics add-on sets it up, written into the add-on's own payload (LaPluma.cloth.json) by calibration/author_cloth.py against her rig as it stands: the coat's hem woven into an open sheet round her, the hood, the sleeve flaps, the hair and the earrings as free chains, against capsules on her body's bones (radius in metres). The hair's chains are whatever hangs from her head by a name of hair, strand or ahoge, so a hair rig remade needs only the payload written again.",
+ "note": "Her cloth as the RuriClothPhysics add-on sets it up, written into the add-on's own payload (LaPluma.cloth.json) by calibration/author_cloth.py against her rig as it stands: the coat's hem woven into an open sheet round her, the hood, the sleeve flaps and the earrings as free chains, against capsules on her body's bones (radius in metres). Her hair is not simulated while its rig is being remade: blown about, the new chains of her fringe swept it off her forehead.",
  "rig": "Avatar_LaPluma",
- "capsules": {"Pelvis": 0.13, "Spine": 0.12, "Spine1": 0.12, "Spine2": 0.12, "Neck": 0.05, "Head": 0.1,
-              "UpperArm_L": 0.05, "UpperArm_R": 0.05, "Forearm_L": 0.04, "Forearm_R": 0.04,
-              "Thigh_L": 0.075, "Thigh_R": 0.075, "Calf_L": 0.05, "Calf_R": 0.05},
+ "capsules": {
+  "Pelvis": 0.13,
+  "Spine": 0.12,
+  "Spine1": 0.12,
+  "Spine2": 0.12,
+  "Neck": 0.05,
+  "Head": 0.1,
+  "UpperArm_L": 0.05,
+  "UpperArm_R": 0.05,
+  "Forearm_L": 0.04,
+  "Forearm_R": 0.04,
+  "Thigh_L": 0.075,
+  "Thigh_R": 0.075,
+  "Calf_L": 0.05,
+  "Calf_R": 0.05
+ },
  "chains": [
-  {"name": "外套衣摆", "mode": "SEQUENTIAL_NON_LOOP_MESH", "capsules": "all",
-   "roots": ["Yibai_01_01_L", "Yibai_02_01_L", "Yibai_03_01_L", "Yibai_Center_01", "Yibai_03_01_R", "Yibai_02_01_R", "Yibai_01_01_R"]},
-  {"name": "外套兜帽", "mode": "LINE", "capsules": ["Neck", "Head", "Spine2"], "roots": ["Hat_Center_01"]},
-  {"name": "外套袖口", "mode": "LINE", "capsules": ["UpperArm_L", "UpperArm_R", "Spine2"], "roots": ["Sleeve_01_01_L", "Sleeve_01_01_R"]},
-  {"name": "头发", "mode": "LINE", "capsules": ["Head", "Neck", "Spine2"], "roots": {"children_of": "Head", "matching": "hair|strand|ahoge"}},
-  {"name": "耳坠", "mode": "LINE", "capsules": ["Neck", "Head"], "roots": ["Earring_01_Jnt_L", "Earring_01_Jnt_R"]}
+  {
+   "name": "外套衣摆",
+   "mode": "SEQUENTIAL_NON_LOOP_MESH",
+   "capsules": "all",
+   "roots": ["Yibai_01_01_L", "Yibai_02_01_L", "Yibai_03_01_L", "Yibai_Center_01", "Yibai_03_01_R", "Yibai_02_01_R", "Yibai_01_01_R"]
+  },
+  {
+   "name": "外套兜帽",
+   "mode": "LINE",
+   "capsules": ["Neck", "Head", "Spine2"],
+   "roots": ["Hat_Center_01"]
+  },
+  {
+   "name": "外套袖口",
+   "mode": "LINE",
+   "capsules": ["UpperArm_L", "UpperArm_R", "Spine2"],
+   "roots": ["Sleeve_01_01_L", "Sleeve_01_01_R"]
+  },
+  {
+   "name": "耳坠",
+   "mode": "LINE",
+   "capsules": ["Neck", "Head"],
+   "roots": ["Earring_01_Jnt_L", "Earring_01_Jnt_R"]
+  }
  ]
 }
