@@ -19,12 +19,23 @@ turns within a body's reach): a pose that only fits the picture from the
 camera, folding a knee sideways or backwards, cannot be reached.
 
 Every frame of the shot is fitted at once: the whole-body keypoints of the
-reference (``keypoints.py``) pull the rig's joints onto them through the
-shot's solved camera, a silhouette (``--masks``, and ``--occluders``: what
-may hide her, her scythe) keeps the rig inside the character's outline, and
+reference (``keypoints.py``) pull the rig onto them through the shot's
+solved camera, a silhouette (``--masks``, and ``--occluders``: what may hide
+her, her scythe) keeps the rig inside the character's outline, and
 smoothness ties neighbouring frames together.  A keypoint the detector puts
 outside that outline (grown by ``KEYPOINT_MARGIN`` pixels) is its mistake --
-seen from behind it finds a face in her coat -- and is not used.
+seen from behind it finds a face in her coat -- and is not used; nor is one
+within ``--edge-margin`` pixels of the frame's edge: what lies beyond the
+frame the detector still places, on its edge (her ankles below a shot cut at
+her knees), and a leg pulled up to it kneels.
+
+The reference is an AI film: its character's proportions are not the
+model's, so only the torso's keypoints (those without a parent in the
+profile's ``segments``) are pulled onto their places.  A limb is fitted by
+its segments' angles: each segment (a keypoint from its parent keypoint)
+turns as the picture turns it, and is shortened only as far as the picture
+shortens it beyond ``PROPORTION_TOLERANCE`` -- matching the places of a
+limb the model draws shorter would reach it towards the camera.
 
 Keypoints and an outline place her limbs on the picture but not which is
 nearer: a leg folded towards the camera and the same leg folded away look
@@ -95,6 +106,7 @@ parser.add_argument("--prop", default=None, help="the mesh of a prop she holds")
 parser.add_argument("--grip", default=None, help="which of the prop's grips (the profile's props.<prop>.grips) holds it")
 parser.add_argument("--grip-weight", type=float, default=40.0)
 parser.add_argument("--hand-weight", type=float, default=0.4, help="the hand keypoints' weight against the body's")
+parser.add_argument("--edge-margin", type=float, default=24.0, help="keypoints this near the frame's edge are not used (px)")
 parser.add_argument("--width", type=int, default=1920)
 parser.add_argument("--height", type=int, default=1080)
 args = parser.parse_args()
@@ -124,6 +136,8 @@ TORSO = set(profile["torso"])
 BODY_KEYS = profile["body"]
 SWAP_GROUPS = list(profile["swap_groups"])
 GROUP_OF = {key: g for g, name in enumerate(SWAP_GROUPS) for first, last in profile["swap_groups"][name]["keys"] for key in range(first, last + 1)}
+SEGMENT_OF = {int(child): int(parent) for child, parent in profile["segments"].items()}
+PROPORTION_TOLERANCE = float(np.log(1.3))
 LEFT_KEYS = {left for left, _ in profile["mirror"]}
 RIGHT_KEYS = {right for _, right in profile["mirror"]}
 
@@ -156,6 +170,10 @@ if args.masks:
     worst = sorted(((int(dropped[slot].sum()), frame) for slot, frame in enumerate(frames)), reverse=True)[:8]
     print("keypoints outside her outline, not used:", int(dropped.sum()), "of", int((data["scores"][selected] > 1.5).sum()),
           "-- most on", [(frame, n) for n, frame in worst if n], flush=True)
+edge = ((observed[..., 0] < args.edge_margin) | (observed[..., 0] > args.width - args.edge_margin)
+        | (observed[..., 1] < args.edge_margin) | (observed[..., 1] > args.height - args.edge_margin))
+print("keypoints on the frame's edge, not used:", int((edge & (scores > 1.5)).sum()), flush=True)
+scores = torch.where(edge, torch.zeros_like(scores), scores)
 
 camera = Camera(args.camera, frames, args.width, args.height, device)
 focal = camera.focal
@@ -284,6 +302,10 @@ def keypoint_positions(world):
 
 
 keypoint_ids = torch.tensor(sorted(KEYPOINTS), device=device)
+column_of = {key: k for k, key in enumerate(sorted(KEYPOINTS))}
+segment_columns = torch.tensor([column_of[key] for key in sorted(KEYPOINTS) if key in SEGMENT_OF], device=device)
+parent_columns = torch.tensor([column_of[SEGMENT_OF[key]] for key in sorted(KEYPOINTS) if key in SEGMENT_OF], device=device)
+is_segment = torch.zeros(len(KEYPOINTS), dtype=torch.bool, device=device).index_fill_(0, segment_columns, True)
 keypoint_groups = torch.tensor([GROUP_OF[key] for key in sorted(KEYPOINTS)], device=device)
 mirrored_ids = torch.tensor([MIRRORED.get(key, key) for key in sorted(KEYPOINTS)], device=device)
 weights = torch.tensor([args.hand_weight if key >= BODY_KEYS else 1.0 for key in sorted(KEYPOINTS)], device=device)
@@ -338,8 +360,13 @@ print(f"[gpu] {frames_at_once} frames at a time", flush=True)
 
 
 def robust(residual, scale):
-    squared = (residual / scale) ** 2
-    return squared / (squared + 1.0)
+    return robust_squared(residual ** 2, scale)
+
+
+def robust_squared(squared, scale):
+    """``robust`` of a residual given as its square (smooth where the residual itself is not)."""
+    ratio = squared / scale ** 2
+    return ratio / (ratio + 1.0)
 
 
 if prop is not None:
@@ -412,19 +439,43 @@ def grouped(per_key):
     return torch.zeros(per_key.shape[0], len(SWAP_GROUPS), device=device).index_add_(1, keypoint_groups, per_key)
 
 
+def segment_misfit(pixels, target):
+    """Per segment (B, S): how far the rig's segment turns from the picture's (the squared chord between their
+    directions, the turn's square for small turns), how much more than the proportions differ it is shortened or
+    lengthened against it (log of the lengths' ratio beyond the tolerance), and the picture's segment's length (0
+    where it has none: a keypoint not found sits at the origin)."""
+    rig = pixels[:, segment_columns] - pixels[:, parent_columns]
+    seen = target[:, segment_columns] - target[:, parent_columns]
+    usable = seen.norm(dim=-1) > 1.0
+    seen = torch.where(usable[..., None], seen, torch.ones_like(seen))
+    seen_length = seen.norm(dim=-1)
+    rig_length = torch.sqrt((rig ** 2).sum(-1) + 1e-6)
+    chord = ((rig / rig_length[..., None] - seen / seen_length[..., None]) ** 2).sum(-1)
+    ratio = torch.log(rig_length.clamp(min=1.0)) - torch.log(seen_length.clamp(min=1.0))
+    return chord, torch.relu(ratio.abs() - PROPORTION_TOLERANCE), seen_length * usable
+
+
+def keypoint_misfit(pixels, ids, slots):
+    """Per keypoint (B, K), read against the detector's keypoints ``ids`` (as detected or mirrored): a torso
+    keypoint's distance from its place, a limb keypoint's segment's turn and shortening, each robust and
+    weighted by how sure the detector is of what it needs."""
+    target = observed[slots][:, ids]
+    confidence = ((scores[slots][:, ids] - 1.5) / 3.0).clamp(0.0, 1.0)
+    placed = robust((pixels - target).norm(dim=-1), 25.0) * confidence
+    chord, shortening, length = segment_misfit(pixels, target)
+    sure = torch.minimum(confidence[:, segment_columns], confidence[:, parent_columns]) * (length / 30.0).clamp(0.0, 1.0)
+    angled = torch.zeros_like(placed).index_copy(1, segment_columns, (robust_squared(chord, 0.25) + robust(shortening, 0.2)) * sure)
+    return torch.where(is_segment[None], angled, placed)
+
+
 def frame_terms(stage, slots):
     """The terms each frame answers for alone, on the frames ``slots``: parts of the shot's sums."""
     joint_angles = angles_of(joint_parameters[slots])
     world = pose(joint_angles, root_rotation[slots], root_location[slots])
     pixels, depth = project_frames(keypoint_positions(world), slots)
-    target = observed[slots][:, keypoint_ids]
-    confidence = ((scores[slots][:, keypoint_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
     active = stage_active[stage]
-    error = (pixels - target).norm(dim=-1)
-    mirrored_error = (pixels - observed[slots][:, mirrored_ids]).norm(dim=-1)
-    mirrored_confidence = ((scores[slots][:, mirrored_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
-    direct = grouped(robust(error, 25.0) * confidence * active)
-    swapped = grouped(robust(mirrored_error, 25.0) * mirrored_confidence * active)
+    direct = grouped(keypoint_misfit(pixels, keypoint_ids, slots) * active)
+    swapped = grouped(keypoint_misfit(pixels, mirrored_ids, slots) * active)
     read = reading[slots]
     chosen = torch.where(read == 0, direct, torch.where(read == 1, swapped, torch.minimum(direct, swapped)))
     terms = {"keypoints": chosen.sum() / count, "behind": torch.relu(0.3 - depth).sum()}
@@ -491,25 +542,32 @@ with torch.no_grad():
     joint_angles = angles_of(joint_parameters)
     world = pose(joint_angles, root_rotation, root_location)
     pixels, _ = project(keypoint_positions(world))
-    target = observed[:, keypoint_ids]
-    confidence = scores[:, keypoint_ids]
-    direct = (pixels - target).norm(dim=-1)
-    mirrored = (pixels - observed[:, mirrored_ids]).norm(dim=-1)
-    weight = ((confidence - 1.5) / 3.0).clamp(0.0, 1.0)
-    mirrored_weight = ((scores[:, mirrored_ids] - 1.5) / 3.0).clamp(0.0, 1.0)
-    better = grouped(robust(mirrored, 25.0) * mirrored_weight) < grouped(robust(direct, 25.0) * weight)
+    everything = torch.arange(count, device=device)
+    better = grouped(keypoint_misfit(pixels, mirrored_ids, everything)) < grouped(keypoint_misfit(pixels, keypoint_ids, everything))
     use_mirror = torch.where(reading == -1, better, reading == 1)[:, keypoint_groups]
-    error = torch.where(use_mirror, mirrored, direct)
     for g, name in enumerate(SWAP_GROUPS):
         print(f"frames whose {name} are fitted with left and right swapped:",
               [frames[k] for k in range(count) if bool(use_mirror[k, (keypoint_groups == g).nonzero()[0, 0]])])
+    ids = torch.where(use_mirror, mirrored_ids[None], keypoint_ids[None])
+    target = torch.gather(observed, 1, ids[..., None].expand(-1, -1, 2))
+    confidence = torch.gather(scores, 1, ids)
+    error = (pixels - target).norm(dim=-1)
     good = confidence > 3.0
     body = keypoint_ids < BODY_KEYS
-    per_frame = [float(error[k][good[k] & body].median()) if (good[k] & body).any() else float("nan") for k in range(count)]
-    print("median keypoint error (px, confident body):", float(error[:, body][good[:, body]].median()),
-          " hands:", float(error[:, ~body][good[:, ~body]].median()) if good[:, ~body].any() else None)
-    print("frames whose confident body keypoints miss by over 20 px (median):",
+    torso = body & ~is_segment
+    per_frame = [float(error[k][good[k] & torso].median()) if (good[k] & torso).any() else float("nan") for k in range(count)]
+    print("median torso keypoint error (px, confident):", float(error[:, torso][good[:, torso]].median()))
+    print("frames whose confident torso keypoints miss by over 20 px (median):",
           [(frames[k], round(value)) for k, value in enumerate(per_frame) if value > 20.0])
+    chord, shortening, length = segment_misfit(pixels, target)
+    limb = body[segment_columns]
+    sure = (good[:, segment_columns] & good[:, parent_columns] & (length > 30.0))
+    turned = torch.rad2deg(2.0 * torch.asin((chord.sqrt() / 2.0).clamp(max=1.0)))
+    print("median limb segment turn (deg, confident body):", float(turned[:, limb][sure[:, limb]].median()) if sure[:, limb].any() else None,
+          " hands:", float(turned[:, ~limb][sure[:, ~limb]].median()) if sure[:, ~limb].any() else None)
+    per_frame = [float(turned[k][sure[k] & limb].median()) if (sure[k] & limb).any() else float("nan") for k in range(count)]
+    print("frames whose confident limb segments turn by over 15 deg (median):",
+          [(frames[k], round(value)) for k, value in enumerate(per_frame) if value > 15.0])
     at_limit = ((joint_angles - low).abs() < 0.01) | ((high - joint_angles).abs() < 0.01)
     held_at_limit = {}
     for j, name in enumerate(FITTED):
@@ -519,7 +577,6 @@ with torch.no_grad():
                 held_at_limit[name] = round(share, 2)
     print("joints held at a limit (share of frames):", held_at_limit)
     if part_names:
-        everything = torch.arange(count, device=device)
         sample_pixels, sample_depth = project(skeleton.skin(world, samples, sample_bones, sample_weights, count))
         for name in part_names:
             gaps = part_silhouettes[name].gaps(sample_pixels[:, part_samples[name]], everything).median(1).values

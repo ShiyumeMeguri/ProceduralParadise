@@ -63,6 +63,14 @@ def blend_digest(path):
     return digest.hexdigest()
 
 
+def _rename(obj, name):
+    """Name ``obj`` ``name``, which nothing else may hold: Blender would quietly give it ``name.001``, and whatever
+    finds a character's parts by name would find another's."""
+    obj.name = name
+    if obj.name != name:
+        raise ValueError(f"'{name}' is taken: two casts share a prefix")
+
+
 def _descendants(root, objects):
     children = {}
     for obj in objects:
@@ -126,7 +134,7 @@ def append_character(path, armature, collection, hidden=(), prefix=None):
         source_name = source_names[obj]
         collection.objects.link(obj)
         if prefix:
-            obj.name = f"{prefix}.{source_name}"
+            _rename(obj, f"{prefix}.{source_name}")
         if source_name in hidden:
             obj.hide_render = True
             obj.hide_viewport = True
@@ -180,7 +188,7 @@ def instance_character(rig, objects, collection, prefix, original_prefix):
     for original, copy in copies.items():
         if not original.name.startswith(f"{original_prefix}."):
             raise ValueError(f"'{original.name}' is not named '{original_prefix}.<name>'")
-        copy.name = f"{prefix}.{original.name[len(original_prefix) + 1:]}"
+        _rename(copy, f"{prefix}.{original.name[len(original_prefix) + 1:]}")
         collection.objects.link(copy)
         if copy.parent in copies:
             inverse = copy.matrix_parent_inverse.copy()

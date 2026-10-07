@@ -379,8 +379,10 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     hand's frame and its scale: the bone's own pose is its rest inverted
     times the grip, so the constraint lands it exactly there.  A prop's
     object (the profile's ``props``: an object of the cast by that name)
-    rides its bone alone -- where the cast's file happens to leave the
-    object itself is set aside, as the fits took the prop at rest."""
+    rides its bone alone -- where the cast's file happens to move the object
+    itself (its location, rotation and scale) is set aside, as the fits took
+    the prop at rest; its parenting (the inverse the file keeps to stand it
+    in the rig's frame) is the prop's own and stays."""
     path = os.path.join(folder, entry["performance"])
     performance = jsonio.load(path)
     relative = entry.get("relative_to")
@@ -393,7 +395,6 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     previous = {}
     for obj in collection_objects:
         if any(obj.name.endswith(f".{prop}") for prop in profile.get("props", {})):
-            obj.matrix_parent_inverse = Matrix.Identity(4)
             obj.location = (0.0, 0.0, 0.0)
             obj.rotation_mode = "QUATERNION"
             obj.rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
@@ -584,7 +585,7 @@ def build_shot(folder, film, shot, built_set, args):
     blow_wind(shot, scene)
     for name, entry in shot.get("cast", {}).items():
         character = built_set["characters"][name]
-        rig, objects = CAST.instance_character(character["rig"], character["objects"], cast, f"{shot['id']}.{name}",
+        rig, objects = CAST.instance_character(character["rig"], character["objects"], cast, f"Shot.{shot['id']}.{name}",
                                                character["prefix"])
         profile_path = os.path.join(folder, film["cast"][name]["rig"])
         sources += perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices) + [profile_path]
