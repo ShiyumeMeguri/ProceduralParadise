@@ -111,19 +111,39 @@ def facade():
     return S.material("CIN.Facade", build)
 
 
+DUST_OCTAVES = 3
+
+
 @register("CIN.Dust")
 def dust():
     """Dust of a breach, a volume (``CIN.FX.Plume``, whose puffs billow of themselves): the plume's
     ``density`` times ``CIN.Dust.density`` per metre, scattering the ``dust`` colour a little more
-    forwards (``CIN.Dust.anisotropy``), and glowing its own colour by ``CIN.Dust.ambient`` as thick
-    as it is: the light that bounces about inside a sunlit cloud of dust, which the engine's single
-    scattering leaves out (its heart would go black)."""
+    forwards (``CIN.Dust.anisotropy``) as much of the sun as reaches it through the plume's
+    ``shade`` (the dust between it and the sun) -- straight through, and spread round in
+    :data:`DUST_OCTAVES` octaves each half as strong and seeing half the shade, as a cloud's light
+    does -- and glowing its own colour by ``CIN.Dust.ambient`` (the sky's light on it) as thick as
+    it is, as much of that light as gets down through its ``cover`` (the dust above it), spread
+    round the same way: its tops light, its creases and underside grey.  Where it is used the
+    engine's own volume shadows are off: the shade is them."""
     def build(tree: Tree):
-        grid = tree.n("ShaderNodeAttribute", props={"attribute_name": "density", "attribute_type": "GEOMETRY"})["Fac"]
-        density = tree.math("MULTIPLY", grid, param("CIN.Dust.density", 3.0))
-        return {"Volume": tree.n("ShaderNodeVolumePrincipled", Color=color("dust"), Density=density, Density_Attribute="",
-                                 Anisotropy=param("CIN.Dust.anisotropy", 0.25), Emission_Color=color("dust"),
-                                 Emission_Strength=density * param("CIN.Dust.ambient", 0.0))["Volume"]}
+        def attribute(name):
+            return tree.n("ShaderNodeAttribute", props={"attribute_name": name, "attribute_type": "GEOMETRY"})["Fac"]
+        thickness = param("CIN.Dust.density", 3.0)
+        density = tree.math("MULTIPLY", attribute("density"), thickness)
+
+        def reach(name):
+            depth = tree.math("MULTIPLY", attribute(name), thickness)
+            total = 0.0
+            for octave in range(DUST_OCTAVES):
+                total = total + tree.math("EXPONENT", depth * -(0.5 ** octave)) * (0.5 ** octave)
+            return total * (1.0 / sum(0.5 ** octave for octave in range(DUST_OCTAVES)))
+        lit = tree.mix(reach("shade"), (0.0, 0.0, 0.0, 1.0), color("dust"), "RGBA", blend="MULTIPLY")
+        scatter = tree.n("ShaderNodeVolumeScatter", Color=lit, Density=density, Anisotropy=param("CIN.Dust.anisotropy", 0.25))["Volume"]
+        absorb = tree.n("ShaderNodeVolumeAbsorption", Color=lit, Density=density)["Volume"]
+        glow = tree.n("ShaderNodeEmission", Color=color("dust"),
+                      Strength=density * reach("cover") * param("CIN.Dust.ambient", 0.0))["Emission"]
+        volume = tree.n("ShaderNodeAddShader", tree.n("ShaderNodeAddShader", scatter, absorb)["Shader"], glow)["Shader"]
+        return {"Volume": volume}
     return S.material("CIN.Dust", build)
 
 
@@ -188,6 +208,34 @@ def hall_window():
 def hall_glow():
     """The light of a hall's ring and panels: the ``hall_glow`` colour at ``CIN.HallGlow.strength``."""
     return S.emission_mat("CIN.HallGlow", color=color("hall_glow"), strength=param("CIN.HallGlow.strength", 12.0))
+
+
+@register("CIN.HallStrip")
+def hall_strip():
+    """The strips of light along a hall's coves: the ``hall_strip`` colour at ``CIN.HallStrip.strength``."""
+    return S.emission_mat("CIN.HallStrip", color=color("hall_strip"), strength=param("CIN.HallStrip.strength", 4.0))
+
+
+@register("CIN.HallRecess")
+def hall_recess():
+    """The lit hollow over a saucer's hole: the ``hall_recess`` colour at ``CIN.HallRecess.strength``."""
+    return S.emission_mat("CIN.HallRecess", color=color("hall_recess"), strength=param("CIN.HallRecess.strength", 1.5))
+
+
+@register("CIN.HallNet")
+def hall_net():
+    """A gold net over a dark core: strands of ``gold`` round cells ``CIN.HallNet.cell`` metres across, a share
+    ``CIN.HallNet.strand`` of a cell wide, as rough as ``CIN.HallNet.roughness``; the ``hall_core`` between them."""
+    def build(tree: Tree):
+        place = tree.n("ShaderNodeTexCoord")["Object"]
+        edge = tree.n("ShaderNodeTexVoronoi", Vector=place, Scale=1.0 / param("CIN.HallNet.cell", 0.04),
+                      props={"feature": "DISTANCE_TO_EDGE", "voronoi_dimensions": "3D"})["Distance"]
+        strand = param("CIN.HallNet.strand", 0.12)
+        gilt = tree.map_range(edge, strand * 0.6, strand, 1.0, 0.0)
+        gold = S.bsdf(tree, Base_Color=color("gold"), Roughness=param("CIN.HallNet.roughness", 0.3), Metallic=1.0)["BSDF"]
+        core = S.bsdf(tree, Base_Color=color("hall_core"), Roughness=0.2, Metallic=0.5)["BSDF"]
+        return tree.n("ShaderNodeMixShader", gilt, core, gold)["Shader"]
+    return S.material("CIN.HallNet", build)
 
 
 @register("CIN.Air")

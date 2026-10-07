@@ -1,0 +1,34 @@
+{
+ "notes": [
+  "The breach's dust fitted to the reference (fit_set.py) on frames where it fills the picture's left: the sky's light on it, its colour, how thick it is and how much more it throws forwards; she and her scythe are masked, the worst tenth of the blocks left out (the crows and the shards in front of it)."
+ ],
+ "frames": [
+  110,
+  130,
+  150,
+  170
+ ],
+ "scale": 0.25,
+ "samples": 16,
+ "trim": 0.1,
+ "rounds": 4,
+ "parameters": [
+  {
+   "material": "CIN.Dust.ambient",
+   "step": 1.0
+  },
+  {
+   "material": "color:dust",
+   "step": 0.1
+  },
+  {
+   "material": "CIN.Dust.density",
+   "step": 0.6
+  },
+  {
+   "material": "CIN.Dust.anisotropy",
+   "step": 0.15,
+   "start": 0.25
+  }
+ ]
+}

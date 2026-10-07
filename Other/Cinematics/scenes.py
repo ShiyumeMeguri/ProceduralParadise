@@ -22,7 +22,9 @@ item that is only there for a while -- what a breach throws into the air,
 gone by the time another shot looks -- names its frames (``shown``:
 [first, last]); outside them it is not rendered.  An item with ``shadows``
 false casts none (debris by the hundred would comb the dust with shadows
-the reference does not show).
+the reference does not show).  An item that lights itself (its asset has an
+input ``Sun Direction``: a plume's dust shading its own billows) is told
+where the set's sun is, its lamp's ``direction``, unless it gives one.
 Inputs are data: degrees for angles, palette names for colours, library
 names for materials.  A lamp is ``{"name", "light": "SUN" | "AREA" |
 "POINT" | "SPOT", "power", "color", "angle" (a sun's disc, degrees),
@@ -137,6 +139,9 @@ def _activate(scene):
     bpy.context.window.scene = scene
 
 
+SUN_INPUT = "Sun Direction"
+
+
 def _converted(group, values):
     sockets = {entry.name: entry for entry in group.interface.items_tree
                if getattr(entry, "in_out", None) == "INPUT" and entry.item_type == "SOCKET"}
@@ -150,6 +155,12 @@ def _converted(group, values):
         else:
             result[name] = V.socket_value(socket, value, PALETTE)
     return result
+
+
+def set_item_inputs(obj, inputs):
+    """Set inputs of a built item (an object with its asset's modifier) given as set data."""
+    modifier = obj.modifiers[0]
+    SC.set_gn_inputs(modifier, _converted(modifier.node_group, inputs))
 
 
 def _place(obj, item):
@@ -239,14 +250,25 @@ def hide_set_items(shot, set_collection):
         _hide_over(obj, first, last)
 
 
-def build_item(item, collection):
+def build_item(item, collection, sun=None):
     obj = _build_item(item, collection)
+    if sun is not None:
+        _face_sun(obj, item, sun)
     if "shown" in item:
         _show_between(obj, *item["shown"])
     if not item.get("shadows", True):
         for part in [obj] + list(obj.children_recursive):
             part.visible_shadow = False
     return obj
+
+
+def _face_sun(obj, item, sun):
+    """An item that lights itself is told where the sun (a lamp spec) is, unless it says."""
+    for modifier in obj.modifiers:
+        names = {entry.name for entry in modifier.node_group.interface.items_tree
+                 if getattr(entry, "in_out", None) == "INPUT" and entry.item_type == "SOCKET"}
+        if SUN_INPUT in names and SUN_INPUT not in item.get("inputs", {}):
+            SC.set_gn_inputs(modifier, {SUN_INPUT: tuple(_vector(sun["direction"]).normalized())})
 
 
 def _build_item(item, collection):
@@ -338,7 +360,7 @@ def build_set(folder, set_name, film, args):
     world, sky_collection, sky_files = build_sky(folder, spec["sky"], sun, set_name, scene.collection)
     collection = SC.collection(set_name, parent=scene.collection)
     for item in spec.get("items", []):
-        build_item(item, collection)
+        build_item(item, collection, sun)
     lights = SC.collection(f"{set_name}.Lights", parent=collection)
     for lamp in spec.get("lights", []):
         build_lamp(lamp, lights)
@@ -598,11 +620,12 @@ def build_overlays(shot, camera, scene, items, kind):
     return overlays
 
 
-def build_shot_items(shot, camera, scene):
-    """The shot's own items (see the module notes), each named after the shot, in a collection of the shot."""
+def build_shot_items(shot, camera, scene, sun):
+    """The shot's own items (see the module notes), each named after the shot, in a collection of the shot, under the
+    set's ``sun``."""
     collection = SC.collection(f"Shot.{shot['id']}.Items", parent=scene.collection)
     for item in shot.get("items", []):
-        obj = build_item({**item, "name": f"Shot.{shot['id']}.{item['name']}"}, collection)
+        obj = build_item({**item, "name": f"Shot.{shot['id']}.{item['name']}"}, collection, sun)
         if "camera_frame" in item:
             scene.frame_set(item["camera_frame"])
             obj.matrix_basis = camera.matrix_world @ obj.matrix_basis
@@ -677,7 +700,7 @@ def build_shot(folder, film, shot, built_set, args):
     camera, sources, camera_matrices = build_camera(f"Shot.{shot['id']}.Camera", folder, shot["camera"], film, cameras)
     sources += sky_files
     scene.camera = camera
-    build_shot_items(shot, camera, scene)
+    build_shot_items(shot, camera, scene, built_set["sun"])
     hide_set_items(shot, built_set["collection"])
     settings = shot["render"]
     engine = settings["engine"]

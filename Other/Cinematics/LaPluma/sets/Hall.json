@@ -2,50 +2,74 @@
  "id": "Hall",
  "notes": [
   "Set metres: she stands at the origin, the camera (level, 1.06 m up, calibration/Hall.place.json) looks into the hall along +Y.",
-  "Laid out round that camera from the reference's frame 700 (calibration in the session's layout of the hall): the left wall where its foot meets the floor in the picture, the lockers where their corners' rays meet that wall, the ring, its glowing hole, the gold crystal and its two cables at the depth chosen for them (9 m: the picture alone does not fix it), sized and raised to their pixels; a curved soffit round the ring under a 4.6 m ceiling, windows of light to the right, a terminal at the far right, two lanes painted on the floor along the wall.",
+  "Laid out round that camera from the reference (its frames 600-713 are one still picture behind her; their median is the plate): the left wall where its foot meets the floor in the picture, the lockers where their corners' rays meet that wall; the saucer hung over the hall, its two hoops and the cove round them are circles about one upright axis 9 m from the camera (the crystal's, the picture alone does not fix the depth), each fitted to the plate's lines of light and edges (the cove's foot 2.73 m up and its top 3.96 m, 4.28 m round, running on straight towards the camera past the axis's left; the saucer's rim 3.03 m round, its hoops 3.72 m and 2.45 m, the glowing foot of its hollow 2.03 m round 3.21 m up); the crystal hangs from the hollow to just above the floor, its chains and the rod before it where the plate shows them; windows of light to the right, a terminal at the far right, two lanes painted on the floor along the wall.",
   "As the picture comes in out of the glitch (frames 543-560) crows fly through the hall round her and out (Crows).",
   "Her name, LA PLUMA, behind her is the shot's underlay (shots/Hall.json), not the set's.",
-  "The windows on the right glow at 0.9: seen through the shot's exposure they come to the light grey the reference shows there (a display value of about 170), not white; the window lamp lights the hall."
+  "The windows on the right glow at 0.9: seen through the shot's exposure they come to the light grey the reference shows there (a display value of about 170), not white; the window lamp lights the hall.",
+  "The deck's edge is a strip of light (Deck Light, warm): the reference's lockers and wall warm towards their feet."
  ],
  "materials": {
-  "CIN.HallGlow.strength": 1.25,
-  "CIN.HallWindow.strength": 1.25,
+  "CIN.HallGlow.strength": 7.625,
+  "CIN.HallWindow.strength": 1.525,
   "color:hall_wall": [
    0.8375,
    0.8250000000000001,
    0.78
   ],
   "color:hall_floor": [
-   0.15374999999999997,
-   0.21062500000000003,
-   0.615
+   0.1625,
+   0.225,
+   0.42500000000000004
   ],
   "color:hall_paint": [
-   0.834375,
-   0.9225000000000001,
-   0.96375
+   0.79375,
+   0.8725000000000002,
+   0.9231250000000001
   ],
   "color:hall_metal": [
-   0.595,
-   0.6106250000000001,
-   1.02125
+   0.62,
+   0.62,
+   0.64
   ],
   "color:gold": [
-   1.125,
-   0.9468750000000001,
-   0.15937499999999993
+   1.0,
+   0.8875,
+   0.24062499999999998
   ],
   "color:hall_glow": [
+   1.0,
+   0.86,
+   0.62
+  ],
+  "CIN.HallStrip.strength": 3.75,
+  "CIN.HallRecess.strength": 0.6999999999999998,
+  "color:hall_shell": [
+   0.7062500000000002,
+   0.81,
+   1.054375
+  ],
+  "color:hall_vent": [
+   0.5,
+   0.52,
+   0.55
+  ],
+  "color:hall_core": [
+   0.07625000000000001,
+   0.08,
+   0.04575
+  ],
+  "color:hall_recess": [
    1.15,
-   0.95375,
-   0.5950000000000001
-  ]
+   0.9975,
+   0.5537500000000001
+  ],
+  "CIN.HallNet.strand": 0.07
  },
  "sky": {
   "zenith": [
-   0.6531250000000001,
-   0.5449999999999999,
-   0.51875
+   0.8250000000000001,
+   0.741875,
+   0.4156250000000001
   ],
   "horizon": [
    0.62,
@@ -57,7 +81,7 @@
    0.21,
    0.22
   ],
-  "strength": 0.33124999999999993,
+  "strength": 0.5624999999999998,
   "haze": 30.0
  },
  "items": [
@@ -109,7 +133,7 @@
    "name": "Left Wall",
    "asset": "CIN.Box",
    "loc": [
-    -3.879,
+    -4.979,
     4.707,
     0.0
    ],
@@ -136,9 +160,9 @@
    "name": "Lockers",
    "asset": "CIN.Hall.Lockers",
    "loc": [
-    -3.667,
-    5.133,
-    0.446
+    -4.2395,
+    6.1933,
+    0.3492
    ],
    "rot": [
     0,
@@ -149,22 +173,37 @@
     "Columns": 4,
     "Rows": 2,
     "Door": [
-     0.314,
-     1.259,
+     0.3634,
+     1.457,
      0.0
     ],
-    "Gap": 0.03,
-    "Relief": 0.04,
-    "Material": "CIN.HallPaint"
+    "Gap": 0.014,
+    "Relief": 0.0463,
+    "Material": "CIN.HallPaint",
+    "Vent": [
+     0.0868,
+     0.0868,
+     0.0
+    ],
+    "Vent Inset": [
+     0.0289,
+     0.1157,
+     0.1736
+    ],
+    "Slot": [
+     0.0231,
+     0.1042,
+     0.0
+    ]
    }
   },
   {
    "name": "Locker Backing",
    "asset": "CIN.Box",
    "loc": [
-    -3.667,
-    5.133,
-    0.446
+    -4.2395,
+    6.1933,
+    0.3492
    ],
    "rot": [
     0,
@@ -178,11 +217,11 @@
      0.0
     ],
     "Max": [
-     1.256,
-     0.01,
-     2.518
+     1.4536,
+     0.0116,
+     2.914
     ],
-    "Material": "CIN.HallMetal"
+    "Material": "CIN.HallVent"
    }
   },
   {
@@ -252,51 +291,57 @@
    }
   },
   {
-   "name": "Disc",
-   "asset": "CIN.Hall.Halo",
+   "name": "Saucer",
+   "asset": "CIN.Hall.Saucer",
    "loc": [
     1.342,
     7.392,
-    4.038
+    3.95
    ],
    "inputs": {
-    "Outer": 2.97,
-    "Inner": 1.242,
-    "Depth": 0.5,
-    "Glow Width": 0.0,
-    "Material": "CIN.HallPaint"
+    "Radius": 2.85,
+    "Rim": 0.45,
+    "Round": 0.15,
+    "Underside": 2.52,
+    "Drop": 0.55,
+    "Band": 0.19,
+    "Hole": 2.03,
+    "Recess": 0.3,
+    "Glow Width": 0.06
    }
   },
   {
-   "name": "Disc Rim",
+   "name": "Outer Hoop",
    "asset": "CIN.Hall.Halo",
    "loc": [
     1.342,
     7.392,
-    3.848
+    3.8
    ],
    "inputs": {
-    "Outer": 3.01,
-    "Inner": 2.97,
-    "Depth": 0.12,
+    "Outer": 3.04,
+    "Inner": 3.0,
+    "Depth": 0.14,
     "Cap": false,
-    "Glow Width": 0.1
+    "Glow Width": 0.0,
+    "Material": "CIN.HallShell"
    }
   },
   {
-   "name": "Halo",
+   "name": "Lower Hoop",
    "asset": "CIN.Hall.Halo",
    "loc": [
     1.342,
     7.392,
-    3.255
+    3.08
    ],
    "inputs": {
-    "Outer": 1.692,
-    "Inner": 1.242,
-    "Depth": 0.5,
-    "Glow Width": 0.45,
-    "Material": "CIN.HallGlow"
+    "Outer": 2.47,
+    "Inner": 2.44,
+    "Depth": 0.14,
+    "Cap": false,
+    "Glow Width": 0.0,
+    "Material": "CIN.HallShell"
    }
   },
   {
@@ -305,31 +350,99 @@
    "loc": [
     1.342,
     7.392,
-    3.419
+    3.51
    ],
    "inputs": {
-    "Length": 2.495,
-    "Radius": 0.322,
-    "Facets": 7,
+    "Length": 3.45,
+    "Radius": 0.41,
+    "Taper": 0.7,
+    "Hem": 0.6,
+    "Wobble": 0.06,
+    "Crumple": 0.015,
     "Seed": 3
    }
   },
   {
-   "name": "Soffit",
-   "asset": "CIN.Hall.Halo",
+   "name": "Cove",
+   "asset": "CIN.Hall.Cove",
    "loc": [
     1.342,
     7.392,
-    3.967
+    2.73
    ],
    "inputs": {
-    "Outer": 8.2,
-    "Inner": 7.0,
-    "Depth": 0.7,
-    "Start": -250.0,
-    "End": 70.0,
-    "Cap": false,
-    "Glow Width": 0.12
+    "Radius": 4.28,
+    "Height": 1.23,
+    "Thickness": 0.08,
+    "Start": -40.0,
+    "End": 180.0,
+    "Run": 9.0,
+    "Glow Width": 0.05,
+    "Glow Material": "CIN.HallStrip"
+   }
+  },
+  {
+   "name": "Chain 1",
+   "asset": "CIN.Hall.Chain",
+   "loc": [
+    2.081,
+    7.392,
+    3.51
+   ],
+   "inputs": {
+    "Length": 3.13,
+    "Bead": 0.008,
+    "Pitch": 0.022
+   }
+  },
+  {
+   "name": "Chain 2",
+   "asset": "CIN.Hall.Chain",
+   "loc": [
+    2.3,
+    7.392,
+    3.51
+   ],
+   "inputs": {
+    "Length": 3.13,
+    "Bead": 0.008,
+    "Pitch": 0.022
+   }
+  },
+  {
+   "name": "Chain 3",
+   "asset": "CIN.Hall.Chain",
+   "loc": [
+    0.897,
+    7.392,
+    3.51
+   ],
+   "inputs": {
+    "Length": 2.585,
+    "Bead": 0.008,
+    "Pitch": 0.022
+   }
+  },
+  {
+   "name": "Rod",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     1.286,
+     6.182,
+     0.0
+    ],
+    "Max": [
+     1.306,
+     6.202,
+     3.5
+    ],
+    "Material": "CIN.HallMetal"
    }
   },
   {
@@ -355,21 +468,67 @@
    }
   },
   {
+   "name": "Deck",
+   "asset": "CIN.Box",
+   "loc": [
+    -4.979,
+    4.707,
+    0.0
+   ],
+   "rot": [
+    0,
+    0,
+    63.55
+   ],
+   "inputs": {
+    "Min": [
+     -9.69,
+     -2.5,
+     0.0
+    ],
+    "Max": [
+     9.69,
+     0.0,
+     0.08
+    ],
+    "Material": "CIN.HallFloor"
+   }
+  },
+  {
+   "name": "Deck Edge",
+   "asset": "CIN.Hall.Stripe",
+   "loc": [
+    -7.0568,
+    -5.0822,
+    0.08
+   ],
+   "rot": [
+    0,
+    0,
+    63.55
+   ],
+   "inputs": {
+    "Radius": 0.0,
+    "Length": 19.38,
+    "Width": 0.04
+   }
+  },
+  {
    "name": "Lane Near",
    "asset": "CIN.Hall.Stripe",
    "loc": [
-    -4.561,
-    -4.152,
+    -2.738,
+    -4.7,
     0.001
    ],
    "rot": [
     0,
     0,
-    66.77
+    82.3
    ],
    "inputs": {
     "Radius": 0.0,
-    "Length": 24.098,
+    "Length": 25.0,
     "Width": 0.1
    }
   },
@@ -377,63 +536,19 @@
    "name": "Lane Far",
    "asset": "CIN.Hall.Stripe",
    "loc": [
-    -3.66,
-    -4.707,
+    -2.271,
+    -4.7,
     0.001
    ],
    "rot": [
     0,
     0,
-    71.31
+    83.42
    ],
    "inputs": {
     "Radius": 0.0,
-    "Length": 24.024,
+    "Length": 25.0,
     "Width": 0.1
-   }
-  },
-  {
-   "name": "Cable 1",
-   "asset": "CIN.Box",
-   "loc": [
-    0,
-    0,
-    0
-   ],
-   "inputs": {
-    "Min": [
-     2.028,
-     7.38,
-     0.377
-    ],
-    "Max": [
-     2.052,
-     7.404,
-     3.005
-    ],
-    "Material": "CIN.Gold"
-   }
-  },
-  {
-   "name": "Cable 2",
-   "asset": "CIN.Box",
-   "loc": [
-    0,
-    0,
-    0
-   ],
-   "inputs": {
-    "Min": [
-     2.267,
-     7.38,
-     0.377
-    ],
-    "Max": [
-     2.291,
-     7.404,
-     3.005
-    ],
-    "Material": "CIN.Gold"
    }
   },
   {
@@ -479,10 +594,10 @@
   {
    "name": "Window Light",
    "light": "AREA",
-   "power": 4500.0,
+   "power": 3625.0,
    "color": [
-    0.9906250000000001,
-    0.97,
+    0.9718750000000002,
+    0.9199999999999999,
     0.975
    ],
    "shape": "RECTANGLE",
@@ -504,11 +619,11 @@
   {
    "name": "Ceiling Light",
    "light": "AREA",
-   "power": 512.5,
+   "power": 1056.25,
    "color": [
-    0.8662499999999997,
-    0.8612500000000001,
-    1.0937499999999998
+    0.7568749999999996,
+    1.0081250000000002,
+    1.015625
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -529,11 +644,11 @@
   {
    "name": "Back Light",
    "light": "AREA",
-   "power": 200.0,
+   "power": 50.0,
    "color": [
-    0.89375,
-    1.2437500000000001,
-    0.43749999999999994
+    1.0,
+    1.0,
+    1.0
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -549,6 +664,31 @@
     0.3,
     1.0,
     0.5
+   ]
+  },
+  {
+   "name": "Deck Light",
+   "light": "AREA",
+   "power": 300.0,
+   "color": [
+    0.9937499999999999,
+    0.9825000000000002,
+    0.7812500000000001
+   ],
+   "shape": "RECTANGLE",
+   "size": [
+    19.0,
+    0.2
+   ],
+   "loc": [
+    -2.7407,
+    3.5935,
+    0.12
+   ],
+   "direction": [
+    0.4004,
+    -0.1992,
+    -0.8944
    ]
   }
  ]

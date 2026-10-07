@@ -74,9 +74,10 @@ class ShotSky:
         SCN.set_materials(self.spec)
         self.set_collection = SC.collection("Sky Reads Set", parent=bpy.context.scene.collection)
         hidden = self.shot.get("hidden", ())
+        sun = next((lamp for lamp in self.spec.get("lights", []) if lamp["light"] == "SUN"), None)
         for item in self.spec.get("items", []):
             if whole or ("shown" not in item and item["name"] not in hidden):
-                SCN.build_item(item, self.set_collection)
+                SCN.build_item(item, self.set_collection, sun)
         if whole:
             SCN.hide_set_items(self.shot, self.set_collection)
         depsgraph = bpy.context.evaluated_depsgraph_get()

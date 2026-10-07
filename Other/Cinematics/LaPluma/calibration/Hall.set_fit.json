@@ -1,6 +1,6 @@
 {
  "notes": [
-  "The hall's lamps, finishes and sky fitted to the reference (fit_set.py): its background stands still from frame 563, so two frames of her standing in it are enough; her name and card are drawn over the picture, the worst sixteenth of the blocks left out (what they cover, no more: the blown windows must count). Steps are wide: the reference's hall is warm where the start was cold."
+  "The hall's lamps, finishes, sky and the lens's bloom fitted to the reference (fit_set.py): its background stands still from frame 563, so two frames of her standing in it are enough; her name and card are drawn over the picture, the worst sixteenth of the blocks left out (what they cover, no more: the blown windows must count).  Lamps stay white, their tints turned a little; vents, glow and trim keep their own colours (a few pixels each: a fit would spend them on what they do not show)."
  ],
  "frames": [
   640,
@@ -9,62 +9,90 @@
  "scale": 0.25,
  "samples": 16,
  "trim": 0.06,
- "rounds": 5,
+ "rounds": 4,
  "parameters": [
   {
    "light": "Window Light",
-   "power": 2000.0,
-   "color": 0.15
+   "power": 1500.0,
+   "color": 0.05
   },
   {
    "light": "Ceiling Light",
    "power": 300.0,
-   "color": 0.15
+   "color": 0.05
   },
   {
    "light": "Back Light",
-   "power": 200.0,
-   "color": 0.15
+   "power": 100.0
+  },
+  {
+   "light": "Deck Light",
+   "power": 150.0,
+   "color": 0.05
   },
   {
    "material": "CIN.HallGlow.strength",
-   "step": 6.0
+   "step": 3.0
   },
   {
    "material": "CIN.HallWindow.strength",
    "step": 0.4
   },
   {
+   "material": "CIN.HallStrip.strength",
+   "step": 1.0
+  },
+  {
+   "material": "CIN.HallRecess.strength",
+   "step": 0.4
+  },
+  {
    "material": "color:hall_wall",
-   "step": 0.15
+   "step": 0.1
+  },
+  {
+   "material": "color:hall_shell",
+   "step": 0.1
   },
   {
    "material": "color:hall_floor",
-   "step": 0.15
+   "step": 0.1
   },
   {
    "material": "color:hall_paint",
-   "step": 0.15
-  },
-  {
-   "material": "color:hall_metal",
-   "step": 0.15
+   "step": 0.1
   },
   {
    "material": "color:gold",
-   "step": 0.15
+   "step": 0.1
   },
   {
-   "material": "color:hall_glow",
-   "step": 0.15
+   "material": "color:hall_core",
+   "step": 0.03
+  },
+  {
+   "material": "color:hall_recess",
+   "step": 0.1
   },
   {
    "sky": "zenith",
-   "step": 0.15
+   "step": 0.1
   },
   {
    "sky": "strength",
    "step": 0.1
+  },
+  {
+   "look": "bloom.threshold",
+   "step": 0.2
+  },
+  {
+   "look": "bloom.strength",
+   "step": 0.15
+  },
+  {
+   "look": "bloom.size",
+   "step": 2.0
   }
  ]
 }

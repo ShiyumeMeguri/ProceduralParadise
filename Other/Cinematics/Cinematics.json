@@ -24,7 +24,12 @@
     "hall_metal": [0.62, 0.62, 0.64],
     "gold": [0.95, 0.7, 0.3],
     "hall_glow": [1.0, 0.86, 0.62],
-    "hall_window": [0.93, 0.96, 1.0]
+    "hall_window": [0.93, 0.96, 1.0],
+    "hall_shell": [0.8, 0.81, 0.82],
+    "hall_core": [0.025, 0.03, 0.032],
+    "hall_vent": [0.5, 0.52, 0.55],
+    "hall_recess": [1.0, 0.86, 0.56],
+    "hall_strip": [0.95, 0.97, 1.0]
   },
   "fonts": {
     "ui": "Dengb.ttf",
@@ -104,6 +109,9 @@
       "streaks": [0.0, 1.0],
       "note": "brushed metal of handles and trim"
     },
+    "CIN.HallShell": {"color": "hall_shell", "grime_color": "hall_shell", "roughness": 0.3, "metallic": 0.0, "grime": [0.0, 1.0], "streaks": [0.0, 1.0], "note": "the smooth white shell of a hall's hung saucer, its hoops and the cove round them"},
+    "CIN.HallCore": {"color": "hall_core", "grime_color": "hall_core", "roughness": 0.15, "metallic": 0.4, "grime": [0.0, 1.0], "streaks": [0.0, 1.0], "note": "the dark glassy core of a hanging crystal"},
+    "CIN.HallVent": {"color": "hall_vent", "grime_color": "hall_vent", "roughness": 0.5, "metallic": 0.0, "grime": [0.0, 1.0], "streaks": [0.0, 1.0], "note": "the grey grilles and slots of a hall's lockers"},
     "CIN.Gold": {
       "color": "gold",
       "grime_color": "gold",

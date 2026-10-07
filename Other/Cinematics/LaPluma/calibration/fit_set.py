@@ -17,8 +17,11 @@ what is turned and by how much a step::
                     {"sky": "zenith", "step": 0.05}, ...]}
 
 a colour turned channel by channel; a material parameter the set does not give starts from the entry's ``start``
-(the library's own value), a colour from the palette's.  With ``write`` the best lamps and materials (and sky, if
-fitted) are written into the set.
+(the library's own value), a colour from the palette's.  ``{"look": "glow.strength", "step": 0.1}`` turns a field of
+one of the shot's look's glares (``glow``, ``bloom``: the light the lens spreads round what is bright), which the shot
+must have.  ``{"item": "Breach Cloud", "input": "Growth", "step": 0.2}`` turns an input the set gives one of its
+items (a vector input channel by channel; ``lowest``, 0 by default, bounds it below).  With ``write`` the best lamps,
+materials and items' inputs (and sky, if fitted) are written into the set, the look's glares into the shot.
 """
 import argparse
 import copy
@@ -66,6 +69,13 @@ def _parameters(spec, state):
             value = state["sky"][entry["sky"]]
             channels = range(len(value)) if isinstance(value, list) else [None]
             keys += [(("sky", entry["sky"], None, channel), entry["step"], 0.0) for channel in channels]
+        elif "look" in entry:
+            glare, field = entry["look"].split(".")
+            keys.append((("look", glare, field, None), entry["step"], 0.0))
+        elif "item" in entry:
+            value = state["items"][entry["item"]][entry["input"]]
+            channels = range(len(value)) if isinstance(value, list) else [None]
+            keys += [(("items", entry["item"], entry["input"], channel), entry["step"], entry.get("lowest", 0.0)) for channel in channels]
     return keys
 
 
@@ -73,6 +83,8 @@ def _read(state, key):
     part, name, field, channel = key
     if part == "lights":
         value = next(lamp for lamp in state["lights"] if lamp["name"] == name)[field]
+    elif part in ("look", "items"):
+        value = state[part][name][field]
     else:
         value = state[part][name]
     return value[channel] if channel is not None else value
@@ -81,7 +93,12 @@ def _read(state, key):
 def _changed(state, key, value):
     state = copy.deepcopy(state)
     part, name, field, channel = key
-    holder, slot = (next(lamp for lamp in state["lights"] if lamp["name"] == name), field) if part == "lights" else (state[part], name)
+    if part == "lights":
+        holder, slot = next(lamp for lamp in state["lights"] if lamp["name"] == name), field
+    elif part in ("look", "items"):
+        holder, slot = state[part][name], field
+    else:
+        holder, slot = state[part], name
     if channel is None:
         holder[slot] = value
     else:
@@ -111,7 +128,7 @@ class Fit:
             lens.focus_object = self.reads.performer(dof["focus"]["cast"])
             lens.focus_subtarget = dof["focus"]["bone"]
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), 0.0)
-        RND.compositor(shot.get("look", {}))
+        self.look = None
         self.folder = tempfile.mkdtemp(prefix="fit_set_")
         self.frames = spec["frames"]
         pictures, weights = {}, {}
@@ -122,6 +139,11 @@ class Fit:
         self.sky = None
 
     def _apply(self, state):
+        if state["look"] != self.look:
+            RND.compositor(state["look"])
+            self.look = copy.deepcopy(state["look"])
+        for name, inputs in state["items"].items():
+            SCN.set_item_inputs(self.reads.set_collection.all_objects[name], inputs)
         for lamp in state["lights"]:
             data = self.lamps[lamp["name"]].data
             data.energy = lamp["power"]
@@ -163,7 +185,12 @@ def main():
     fit = Fit(args, spec)
     set_spec = fit.reads.spec
     state = {"lights": copy.deepcopy(set_spec.get("lights", [])), "materials": copy.deepcopy(set_spec.get("materials", {})),
-             "sky": copy.deepcopy(fit.reads.sky)}
+             "sky": copy.deepcopy(fit.reads.sky), "look": copy.deepcopy(fit.reads.shot.get("look", {})), "items": {}}
+    items = {item["name"]: item for item in set_spec.get("items", [])}
+    for entry in spec["parameters"]:
+        if "item" in entry:
+            inputs = state["items"].setdefault(entry["item"], {})
+            inputs[entry["input"]] = copy.deepcopy(items[entry["item"]]["inputs"][entry["input"]])
     for entry in spec["parameters"]:
         key = entry.get("material")
         if key is not None and key not in state["materials"]:
@@ -181,11 +208,22 @@ def main():
         data = json.load(open(path, encoding="utf-8"))
         data["lights"] = state["lights"]
         data["materials"] = state["materials"]
+        for item in data.get("items", []):
+            item.get("inputs", {}).update(state["items"].get(item["name"], {}))
         if any("sky" in entry for entry in spec["parameters"]):
             data["sky"] = state["sky"]
         with open(path, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(data, indent=1, ensure_ascii=False) + "\n")
         print(f"[fit set] written into {path}", flush=True)
+        glares = sorted({entry["look"].split(".")[0] for entry in spec["parameters"] if "look" in entry})
+        if glares:
+            shot_path = os.path.join(sky_reads.FILM, "shots", f"{args.shot}.json")
+            shot = json.load(open(shot_path, encoding="utf-8"))
+            for glare in glares:
+                shot["look"][glare] = state["look"][glare]
+            with open(shot_path, "w", encoding="utf-8", newline="\n") as handle:
+                handle.write(json.dumps(shot, indent=1, ensure_ascii=False) + "\n")
+            print(f"[fit set] {glares} written into {shot_path}", flush=True)
 
 
 if __name__ == "__main__":

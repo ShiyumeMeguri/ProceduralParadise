@@ -14,7 +14,10 @@ out by up to ``Billows`` of its radius in rounded lumps ``Billow Size`` of its r
 creased where they meet (the folds of a cauliflower), a pattern of its own that it carries
 along, that grows with it and that churns as it ages (``Churn`` turns of the pattern a
 second).  A puff that has not left yet is not there;
-before the first one leaves there is no plume.
+before the first one leaves there is no plume.  Beside its ``density`` the plume keeps two
+grids, the density gathered from each voxel over :data:`SHADE_STEPS` metres: towards the sun
+(``shade``; ``Sun Direction``, which the set fills in from its sun) and straight up (``cover``),
+density-metres the dust's material dims the sun's and the sky's light by.
 
 ``CIN.FX.Debris``: fragments thrown out of a breach.  ``Count`` pieces leave ``Source`` +-
 ``Source Size`` between the frame ``Start`` and ``Burst`` frames after it, along
@@ -29,11 +32,13 @@ from __future__ import annotations
 import math
 
 from Core.gn import GN, asset
+from Core.nodes import Node
 from . import materials as M
 
 CHUNKS = 6
 PLATES = 3
 SWELL = 1.0
+SHADE_STEPS = [0.06, 0.12, 0.24, 0.48, 0.96, 1.92]
 SEEDS = {"leave": 1.0, "x": 2.0, "y": 3.0, "z": 4.0, "aim x": 5.0, "aim y": 6.0, "aim z": 7.0, "speed": 8.0, "radius": 9.0,
          "turn": 10.0, "spin": 11.0, "size": 12.0, "flat": 13.0, "shape": 14.0, "variant": 15.0, "axis x": 16.0,
          "axis y": 17.0, "axis z": 18.0, "pattern x": 19.0, "pattern y": 20.0, "pattern z": 21.0}
@@ -79,6 +84,7 @@ def plume():
     billow_size = graph.inp("Billow Size", default=0.35, min=0.01, desc="Billows across, as a share of a puff's radius")
     churn = graph.inp("Churn", default=0.4, min=0.0, desc="Turns of a puff's billows a second")
     fps = graph.inp("FPS", default=30.0, min=1.0)
+    sun = graph.inp("Sun Direction", "VECTOR", default=(0.0, 0.0, 1.0), desc="Towards the sun: the set fills it in from its sun")
     material = graph.inp("Material", "MATERIAL", default=M.get("CIN.Dust"))
     draw = _draws(graph, seed, 59)
     leave = start + draw("leave") * duration
@@ -112,8 +118,37 @@ def plume():
     cloud = graph.n("GeometryNodeVolumeCube", Density=density, Background=0.0, Min=bounds["Min"], Max=bounds["Max"],
                     Resolution_X=cells[0], Resolution_Y=cells[1], Resolution_Z=cells[2]).o
     present = graph.compare(graph.domain_size(puffs, "POINTCLOUD")["Point Count"], 0, "GREATER_THAN", "INT")
-    graph.result(graph.switch(present, graph.n("GeometryNodeMeshLine", Count=0)["Mesh"], graph.mat(cloud, material)))
+    graph.result(graph.switch(present, graph.n("GeometryNodeMeshLine", Count=0)["Mesh"], graph.mat(_shaded(graph, cloud, sun), material)))
     return graph
+
+
+def _gathered(graph, density, toward):
+    """The density of the grid ``density`` gathered from the field's position along ``toward`` over :data:`SHADE_STEPS`
+    (density-metres)."""
+    gathered = 0.0
+    travelled = 0.0
+    for step in SHADE_STEPS:
+        middle = graph.position() + toward * (travelled + step * 0.5)
+        sample = graph.n("GeometryNodeSampleGrid", Grid=density, Position=middle, props={"data_type": "FLOAT"})["Value"]
+        gathered = gathered + sample * step
+        travelled += step
+    return gathered
+
+
+def _shaded(graph, volume, sun):
+    """``volume`` with grids ``shade`` and ``cover`` beside its ``density``: the density gathered from every voxel towards
+    ``sun`` and straight up."""
+    density = graph.n("GeometryNodeGetNamedGrid", Volume=volume, Name="density", props={"data_type": "FLOAT"})["Grid"]
+    gather = graph.ng.nodes.new("GeometryNodeFieldToGrid")
+    gather.data_type = "FLOAT"
+    graph.assign(gather.inputs["Topology"], density)
+    for name, toward in (("shade", graph.vmath("NORMALIZE", sun)), ("cover", graph.constant_vector((0.0, 0.0, 1.0)))):
+        gather.grid_items.new("FLOAT", name)
+        graph.assign(gather.inputs[name], _gathered(graph, density, toward))
+    for name in ("shade", "cover"):
+        volume = graph.n("GeometryNodeStoreNamedGrid", Volume=volume, Name=name, Grid=Node(graph, gather)[name],
+                         props={"data_type": "FLOAT"}).o
+    return volume
 
 
 def _chunk(graph, variant):

@@ -73,7 +73,7 @@ def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_i
 def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resolution="1", trace_quality=0.75,
                 trace_max_roughness=0.5, fast_gi=True, volume_range=None, volume_tile="8", volume_samples=64,
                 volume_distribution=0.8, volume_shadows=False, shadow_pool="512", reflection_resolution="512",
-                light_threshold=0.01, shadow_resolution=1.0):
+                light_threshold=0.01, shadow_resolution=1.0, shadow_rays=1, shadow_steps=6):
     """EEVEE with screen-space ray tracing (reflections and refraction) at
     full resolution and fast global illumination.  Volumes are evaluated on
     froxels from the camera out to ``volume_range`` ([start, end] metres;
@@ -87,7 +87,10 @@ def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resoluti
     ``light_threshold``: a studio of many faint lights, each fitted as if it
     reached everywhere, needs it near zero.  ``shadow_resolution`` scales
     every shadow map: a studio of hundreds of soft boxes casts soft shadows
-    that coarse maps hold, and fine ones would overflow the shadow pages."""
+    that coarse maps hold, and fine ones would overflow the shadow pages.
+    A soft shadow is traced with ``shadow_rays`` rays of ``shadow_steps``
+    steps a pixel a sample: one ray a sample under wide area lamps leaves
+    lit walls grainy at a film's few samples."""
     sc = bpy.context.scene
     sc.render.engine = "BLENDER_EEVEE"
     ee = sc.eevee
@@ -113,6 +116,8 @@ def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resoluti
     ee.gi_cubemap_resolution = reflection_resolution
     ee.light_threshold = light_threshold
     ee.shadow_resolution_scale = shadow_resolution
+    ee.shadow_ray_count = shadow_rays
+    ee.shadow_step_count = shadow_steps
     return sc
 
 

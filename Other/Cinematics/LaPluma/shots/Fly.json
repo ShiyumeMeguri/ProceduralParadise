@@ -40,7 +40,7 @@
    ],
    "volume_tile": "4",
    "volume_samples": 192,
-   "volume_shadows": true,
+   "volume_shadows": false,
    "volume_distribution": 1.0
   },
   "view": "Standard",
