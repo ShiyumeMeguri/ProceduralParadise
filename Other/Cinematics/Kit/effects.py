@@ -143,7 +143,8 @@ def _shaded(graph, volume, sun):
     gather = graph.ng.nodes.new("GeometryNodeFieldToGrid")
     gather.data_type = "FLOAT"
     graph.assign(gather.inputs["Topology"], density)
-    for name, toward in (("shade", graph.vmath("NORMALIZE", sun)), ("cover", graph.constant_vector((0.0, 0.0, 1.0)))):
+    upward = graph.n("FunctionNodeInputVector", props={"vector": (0.0, 0.0, 1.0)}).o
+    for name, toward in (("shade", graph.vmath("NORMALIZE", sun)), ("cover", upward)):
         gather.grid_items.new("FLOAT", name)
         graph.assign(gather.inputs[name], _gathered(graph, density, toward))
     for name in ("shade", "cover"):
