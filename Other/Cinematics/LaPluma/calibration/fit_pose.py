@@ -40,7 +40,11 @@ keypoint still pulls (its robust scale) starts wide and narrows stage by
 stage (``REACH``): a pose that starts far from its keypoints is first drawn
 near them, then fitted closely, a detector's stray keypoint let go again.
 Frames whose keypoints were set by hand (the keypoints file's ``annotated``)
-are read left and right as given.  Without a ``--start`` she starts on each
+are read left and right as given, and a keypoint set by hand (its ``by_hand``)
+is the picture's truth: neither the outline (under a coat the mask leaves
+out) nor the frame's edge drops it, and its misfit grows without bound
+(:func:`firm`) where a detection's levels off -- a grip or a silhouette
+cannot pull her away from it.  Without a ``--start`` she starts on each
 frame where her torso's keypoints are seen standing on them, turned the way
 they face; a frame where they are not seen starts between the nearest two
 that are.
@@ -159,6 +163,7 @@ selected = [k for k, f in enumerate(frame_list) if args.first <= f <= args.last]
 frames = [frame_list[k] for k in selected]
 observed = torch.tensor(data["points"][selected], dtype=torch.float32, device=device)
 scores = torch.tensor(data["scores"][selected], dtype=torch.float32, device=device)
+by_hand = torch.tensor(data["by_hand"][selected] if "annotated" in data else np.zeros(data["scores"][selected].shape, bool), device=device)
 count = len(frames)
 KEYPOINT_MARGIN = 40
 if args.masks:
@@ -177,13 +182,14 @@ if args.masks:
         u = np.clip(np.round(pixels[slot, :, 0]).astype(int), 0, grown.shape[1] - 1)
         v = np.clip(np.round(pixels[slot, :, 1]).astype(int), 0, grown.shape[0] - 1)
         outside[slot] = ~grown[v, u]
+    outside &= ~by_hand.cpu().numpy()
     dropped = outside & (data["scores"][selected] > 1.5)
     scores = torch.where(torch.tensor(outside, device=device), torch.zeros_like(scores), scores)
     worst = sorted(((int(dropped[slot].sum()), frame) for slot, frame in enumerate(frames)), reverse=True)[:8]
     print("keypoints outside her outline, not used:", int(dropped.sum()), "of", int((data["scores"][selected] > 1.5).sum()),
           "-- most on", [(frame, n) for n, frame in worst if n], flush=True)
 edge = ((observed[..., 0] < args.edge_margin) | (observed[..., 0] > args.width - args.edge_margin)
-        | (observed[..., 1] < args.edge_margin) | (observed[..., 1] > args.height - args.edge_margin))
+        | (observed[..., 1] < args.edge_margin) | (observed[..., 1] > args.height - args.edge_margin)) & ~by_hand
 print("keypoints on the frame's edge, not used:", int((edge & (scores > 1.5)).sum()), flush=True)
 scores = torch.where(edge, torch.zeros_like(scores), scores)
 
@@ -404,6 +410,16 @@ def robust_squared(squared, scale):
     return ratio / (ratio + 1.0)
 
 
+def firm(residual, scale):
+    return firm_squared(residual ** 2, scale)
+
+
+def firm_squared(squared, scale):
+    """A misfit like :func:`robust_squared` near zero that keeps growing (as the residual over ``scale``) far off: what a
+    keypoint set by hand costs."""
+    return torch.sqrt(1.0 + squared / scale ** 2) - 1.0
+
+
 if prop is not None:
     if start is None or prop.name not in start.get("film_scales", {}):
         raise SystemExit(f"--prop needs a --start performance with {prop.name}'s placements (fit_prop.py)")
@@ -493,14 +509,18 @@ def segment_misfit(pixels, target):
 def keypoint_misfit(pixels, ids, slots, reach=1.0):
     """Per keypoint (B, K), read against the detector's keypoints ``ids`` (as detected or mirrored): a torso
     keypoint's distance from its place, a limb keypoint's segment's turn and shortening, each robust (its
-    scale ``reach`` times its own) and weighted by how sure the detector is of what it needs."""
+    scale ``reach`` times its own; firm where set by hand) and weighted by how sure the detector is of what it needs."""
     target = observed[slots][:, ids]
     confidence = ((scores[slots][:, ids] - 1.5) / 3.0).clamp(0.0, 1.0)
-    placed = robust((pixels - target).norm(dim=-1), 25.0 * reach) * confidence
+    hand = by_hand[slots][:, ids]
+    distance = (pixels - target).norm(dim=-1)
+    placed = torch.where(hand, firm(distance, 25.0 * reach), robust(distance, 25.0 * reach)) * confidence
     chord, shortening, length = segment_misfit(pixels, target)
     sure = torch.minimum(confidence[:, segment_columns], confidence[:, parent_columns]) * (length / 30.0).clamp(0.0, 1.0)
-    angled = torch.zeros_like(placed).index_copy(1, segment_columns,
-                                                 (robust_squared(chord, 0.25 * reach) + robust(shortening, 0.2 * reach)) * sure)
+    hand_segment = hand[:, segment_columns] & hand[:, parent_columns]
+    turned = torch.where(hand_segment, firm_squared(chord, 0.25 * reach) + firm(shortening, 0.2 * reach),
+                         robust_squared(chord, 0.25 * reach) + robust(shortening, 0.2 * reach))
+    angled = torch.zeros_like(placed).index_copy(1, segment_columns, turned * sure)
     return torch.where(is_segment[None], angled, placed)
 
 
