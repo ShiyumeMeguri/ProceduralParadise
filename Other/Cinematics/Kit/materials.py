@@ -115,7 +115,9 @@ def facade():
 def dust():
     """Dust of a breach, a volume (``CIN.FX.Plume``): the plume's ``density`` broken into billows
     ``CIN.Dust.billow`` metres across, ``CIN.Dust.density`` per metre at its thickest,
-    scattering the ``dust`` colour a little more forwards (``CIN.Dust.anisotropy``)."""
+    scattering the ``dust`` colour a little more forwards (``CIN.Dust.anisotropy``), and glowing
+    its own colour by ``CIN.Dust.ambient`` as thick as it is: the light that bounces about inside a
+    sunlit cloud of dust, which the engine's single scattering leaves out (its heart would go grey)."""
     def build(tree: Tree):
         grid = tree.n("ShaderNodeAttribute", props={"attribute_name": "density", "attribute_type": "GEOMETRY"})["Fac"]
         position = tree.n("ShaderNodeNewGeometry")["Position"]
@@ -124,7 +126,8 @@ def dust():
         breakup = tree.map_range(billows, 0.38, 0.62, 0.0, 1.0, interp="SMOOTHSTEP")
         density = tree.math("MULTIPLY", grid * breakup, param("CIN.Dust.density", 3.0))
         return {"Volume": tree.n("ShaderNodeVolumePrincipled", Color=color("dust"), Density=density, Density_Attribute="",
-                                 Anisotropy=param("CIN.Dust.anisotropy", 0.25))["Volume"]}
+                                 Anisotropy=param("CIN.Dust.anisotropy", 0.25), Emission_Color=color("dust"),
+                                 Emission_Strength=density * param("CIN.Dust.ambient", 0.0))["Volume"]}
     return S.material("CIN.Dust", build)
 
 
@@ -193,6 +196,12 @@ def overlay_contours():
         clear = tree.n("ShaderNodeBsdfTransparent")["BSDF"]
         return tree.n("ShaderNodeMixShader", tree.clamp01(alpha * line), clear, light)["Shader"]
     return S.material("CIN.OverlayContours", build, settings={"surface_render_method": "BLENDED"})
+
+
+@register("CIN.HallWindow")
+def hall_window():
+    """Daylight through a hall's windows: the ``hall_window`` colour at ``CIN.HallWindow.strength``."""
+    return S.emission_mat("CIN.HallWindow", color=color("hall_window"), strength=param("CIN.HallWindow.strength", 6.0))
 
 
 @register("CIN.HallGlow")

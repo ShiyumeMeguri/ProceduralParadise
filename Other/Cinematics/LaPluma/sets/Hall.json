@@ -194,7 +194,7 @@
      22.0,
      4.3
     ],
-    "Material": "CIN.HallGlow"
+    "Material": "CIN.HallWindow"
    }
   },
   {
@@ -264,7 +264,7 @@
     "Inner": 1.242,
     "Depth": 0.5,
     "Glow Width": 0.45,
-    "Material": "CIN.HallPaint"
+    "Material": "CIN.HallGlow"
    }
   },
   {
@@ -449,9 +449,9 @@
    "light": "AREA",
    "power": 4500.0,
    "color": [
-    1.0,
     0.95,
-    0.86
+    0.97,
+    1.0
    ],
    "shape": "RECTANGLE",
    "size": [
