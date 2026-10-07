@@ -24,8 +24,11 @@ through the cloud sampled at the ``light_steps`` towards it (shuffled sample by 
 three octaves of ever fainter, ever further-reaching and ever less forward light (what a cloud
 scatters on many times over), seen through a phase mixing a forward lobe (``forward``) with a
 share ``back_share`` of a backward one (``backward``) and scattered in the ``color`` of the
-cloud; the sky fills its shade with the ``shade`` colour, from ``shade_low`` at the deck's
-floor to ``shade_high`` at its top.
+cloud; the sky fills its shade with its own light -- its colour between the horizon's and the
+zenith's (:data:`SKYLIGHT` of the way up), as strong as the sky shines -- the share
+``shade_low`` of it at the deck's floor, ``shade_high`` at its top: under a pale haze a cloud's
+underside is nearly as bright as the sky round it, under a deep blue sky it is bluer and
+darker.
 """
 from __future__ import annotations
 
@@ -41,9 +44,9 @@ from .. import PALETTE
 
 CLOUDS = {"cell": 2500.0, "lump": 450.0, "stretch": 1.6, "threshold": 0.57, "climb": 0.12, "gather": 0.6, "soft": 0.06,
           "billow": 110.0, "erode": 0.6, "density": 0.04, "light_steps": [20.0, 50.0, 120.0, 300.0], "forward": 0.6,
-          "backward": 0.3, "back_share": 0.3, "color": list(PALETTE["cloud"]), "shade": list(PALETTE["cloud_shade"]),
-          "shade_low": 0.25, "shade_high": 0.6}
+          "backward": 0.3, "back_share": 0.3, "color": list(PALETTE["cloud"]), "shade_low": 0.25, "shade_high": 0.6}
 OCTAVES = 3
+SKYLIGHT = 0.6
 
 
 @asset("CIN.Clouds.Deck", "Clouds")
@@ -112,10 +115,16 @@ def _phase(tree: Tree, cosine, g):
     return (1.0 - g * g) / (4.0 * math.pi) / tree.math("POWER", tree.max(1.0 + g * g - 2.0 * g * cosine, 0.0001), 1.5)
 
 
-def cloud_material(name, clouds, sun, measured=None):
+def skylight(sky):
+    """The light a sky spec (``zenith``, ``horizon``, ``strength``) sheds on its clouds' shade."""
+    return [(horizon + (zenith - horizon) * SKYLIGHT) * sky.get("strength", 1.0) for horizon, zenith in zip(sky["horizon"], sky["zenith"])]
+
+
+def cloud_material(name, clouds, sun, sky, measured=None):
     """The material ``name`` of the cumulus ``clouds`` (a sky's spec, :data:`CLOUDS` filling in) lit by ``sun``
-    (a SUN lamp's spec: ``direction`` towards it, ``power``, ``color``), gathered by the cloud map ``measured`` (the
-    content of the file its ``map`` names) where given."""
+    (a SUN lamp's spec: ``direction`` towards it, ``power``, ``color``) and in their shade by the ``sky`` they are
+    part of (:func:`skylight`), gathered by the cloud map ``measured`` (the content of the file its ``map`` names)
+    where given."""
     if sun is None:
         raise ValueError(f"{name}: clouds need the set's SUN lamp to light them")
     unknown = sorted(set(clouds) - set(CLOUDS) - {"loc", "scale", "map"})
@@ -146,7 +155,7 @@ def cloud_material(name, clouds, sun, measured=None):
                              _phase(tree, cosine, -spec["backward"] * fading))
             lit = lit + tree.math("EXPONENT", depth * (-sigma * fading)) * phase * fading
         height = tree.clamp01((tree.sep(tree.n("ShaderNodeTexCoord")["Object"])[2] + 1.0) * 0.5)
-        shade = tree.vec(*spec["shade"]) * tree.mix(height, spec["shade_low"], spec["shade_high"])
+        shade = tree.vec(*skylight(sky)) * tree.mix(height, spec["shade_low"], spec["shade_high"])
         extinction = _density(tree, spec, position, coverage) * sigma
         absorbed = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=extinction)["Volume"]
         glow = tree.n("ShaderNodeEmission", Color=tree.vec(*sunlight) * lit + shade, Strength=extinction)["Emission"]

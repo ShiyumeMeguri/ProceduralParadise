@@ -299,7 +299,7 @@ def build_sky(folder, sky, sun, name, parent):
     measured = jsonio.load(files[0]) if files else None
     collection = SC.collection(f"{name}.Clouds", parent=parent)
     deck = _modified_object(f"{name}.Clouds", bpy.data.meshes.new(f"{name}.Clouds"), "CIN.Clouds.Deck", {}, collection)
-    SC.set_gn_inputs(deck.modifiers[0], {"Material": CL.cloud_material(f"{name}.Clouds", clouds, sun, measured)})
+    SC.set_gn_inputs(deck.modifiers[0], {"Material": CL.cloud_material(f"{name}.Clouds", clouds, sun, sky, measured)})
     deck.location = _vector(clouds["loc"])
     deck.scale = _vector(clouds["scale"])
     return world, collection, files

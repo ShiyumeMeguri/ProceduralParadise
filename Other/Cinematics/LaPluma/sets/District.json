@@ -13,7 +13,7 @@
   "Inside the tower's frame below its crown stands its dark core (Tower Core, set 2.5 m back from the face): the reference sees a dark interior through the facade (frames 76-92), never the sky through the building.",
   "The bay she breaks out through (storey 18, between x -8.2 and 0.0) is left open in the tower and stands as a panel of its own (Breach Panel: its braces and mullions, inside ghosts of the tower's own column and beams) until the frame before she breaks it (95); its pieces are the Breach Debris.",
   "Before she breaks out the sill of the breach smokes: small grey puffs on the edge beam of its floor, 4-7 m from the camera, between x -5 and -1.8 (Ledge Dust, frames 68-100), where the reference's puffs on 76-94 lie on the facade's plane.",
-  "What the breach throws is mostly shards and slabs of pale concrete and glass, a few chunks among them (Breach Debris, Falling Debris: color:debris 0.6, seven in ten flat, two thousand of them a hand across and smaller), as the reference's pieces glint grey against the sky."
+  "What the breach throws is mostly shards and slabs of pale concrete and glass, a few chunks among them (Breach Debris, Falling Debris: color:debris 0.75, seven in ten flat, two thousand of them a hand across and smaller), as the reference's pieces glint grey against the sky."
  ],
  "materials": {
   "CIN.Air.density": 0.004,
@@ -31,9 +31,9 @@
   ],
   "CIN.Dust.ambient": 0.2,
   "color:debris": [
-   0.6,
-   0.6,
-   0.62
+   0.75,
+   0.76,
+   0.78
   ],
   "color:steel_paint": [
    0.51375,
@@ -1190,7 +1190,7 @@
     206
    ],
    "inputs": {
-    "Count": 240,
+    "Count": 160,
     "Seed": 7,
     "Source": [
      -2.0,
@@ -1221,11 +1221,11 @@
     "Growth": 0.65,
     "Start": 96.0,
     "Duration": 36.0,
-    "Voxel": 0.18,
+    "Voxel": 0.1,
     "Softness": 0.45,
-    "Thickness": 2.5,
-    "Billows": 0.35,
-    "Billow Size": 0.4,
+    "Thickness": 3.0,
+    "Billows": 0.45,
+    "Billow Size": 0.3,
     "Churn": 0.3
    }
   },

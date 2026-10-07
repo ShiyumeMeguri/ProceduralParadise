@@ -1,8 +1,268 @@
 {
  "notes": [
-  "The crow that crosses the lens as the flight ends (frames 377-379)."
+  "The crows that cross the lens as she falls under the camera and turns to it (frames 299-371, found as big dark blots outside the mask of all of her, Fly.whole.roto.json), and the one as the flight ends (377-379)."
  ],
  "crows": [
+  {
+   "name": "F2",
+   "frames": [
+    324,
+    331
+   ],
+   "frame": 328,
+   "guess": {
+    "center": [
+     437,
+     540
+    ],
+    "width": 690,
+    "motion": [
+     0,
+     -60,
+     1.05
+    ]
+   }
+  },
+  {
+   "name": "F3",
+   "frames": [
+    327,
+    337
+   ],
+   "frame": 332,
+   "guess": {
+    "center": [
+     1246,
+     503
+    ],
+    "width": 700,
+    "motion": [
+     30,
+     20,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F4",
+   "frames": [
+    339,
+    341
+   ],
+   "frame": 340,
+   "guess": {
+    "center": [
+     912,
+     303
+    ],
+    "width": 500,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F5",
+   "frames": [
+    341,
+    351
+   ],
+   "frame": 346,
+   "guess": {
+    "center": [
+     1686,
+     178
+    ],
+    "width": 450,
+    "motion": [
+     20,
+     10,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F6",
+   "frames": [
+    343,
+    357
+   ],
+   "frame": 350,
+   "guess": {
+    "center": [
+     230,
+     386
+    ],
+    "width": 460,
+    "motion": [
+     40,
+     -10,
+     1.05
+    ]
+   }
+  },
+  {
+   "name": "F7",
+   "frames": [
+    361,
+    371
+   ],
+   "frame": 366,
+   "guess": {
+    "center": [
+     804,
+     435
+    ],
+    "width": 790,
+    "motion": [
+     110,
+     -20,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F8",
+   "frames": [
+    361,
+    363
+   ],
+   "frame": 362,
+   "guess": {
+    "center": [
+     1635,
+     726
+    ],
+    "width": 500,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F9a",
+   "frames": [
+    299,
+    301
+   ],
+   "frame": 300,
+   "guess": {
+    "center": [
+     1414,
+     253
+    ],
+    "width": 830,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F9b",
+   "frames": [
+    301,
+    303
+   ],
+   "frame": 302,
+   "guess": {
+    "center": [
+     964,
+     828
+    ],
+    "width": 550,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F9c",
+   "frames": [
+    301,
+    303
+   ],
+   "frame": 302,
+   "guess": {
+    "center": [
+     532,
+     296
+    ],
+    "width": 500,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F9d",
+   "frames": [
+    303,
+    305
+   ],
+   "frame": 304,
+   "guess": {
+    "center": [
+     778,
+     186
+    ],
+    "width": 530,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F9e",
+   "frames": [
+    303,
+    305
+   ],
+   "frame": 304,
+   "guess": {
+    "center": [
+     1306,
+     880
+    ],
+    "width": 310,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "F10",
+   "frames": [
+    309,
+    311
+   ],
+   "frame": 310,
+   "guess": {
+    "center": [
+     1669,
+     705
+    ],
+    "width": 270,
+    "motion": [
+     0,
+     0,
+     1.0
+    ]
+   }
+  },
   {
    "name": "F1",
    "frames": [

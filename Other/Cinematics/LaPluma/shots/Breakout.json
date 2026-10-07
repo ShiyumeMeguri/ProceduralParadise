@@ -10,7 +10,7 @@
   "The film comes in on this shot through a lattice of diamonds shrinking from the right (frames 68-76); the camera holds its frame-70 place on 68 and 69.",
   "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 68-206).",
   "Its crows are the reference's own (calibration/track_crows.py from frame 112 -- before she breaks out a dark blot is the building --, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out.",
-  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [80, 110, 131, 150, 180, 200]."
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [110, 131, 150, 180, 200]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -82,63 +82,63 @@
      ],
      [
       0.125,
-      0.04017432418990484
+      0.04552874023951213
      ],
      [
       0.1875,
-      0.10219525295454027
+      0.08281427632928526
      ],
      [
       0.25,
-      0.13629914841102153
+      0.11479420795245376
      ],
      [
       0.3125,
-      0.15817414841102154
+      0.13769301511634785
      ],
      [
       0.375,
-      0.18004914841102154
+      0.15956801511634786
      ],
      [
       0.4375,
-      0.20655212002561915
+      0.18144301511634786
      ],
      [
       0.5,
-      0.26209889373224726
+      0.22263952637021625
      ],
      [
       0.5625,
-      0.2924697925383536
+      0.2544282978232156
      ],
      [
       0.625,
-      0.33762325906032176
+      0.3064472775474114
      ],
      [
       0.6875,
-      0.42730650419889
+      0.41774623660253263
      ],
      [
       0.75,
-      0.5541013000492009
+      0.5519621286856096
      ],
      [
       0.8125,
-      0.7051452729437239
+      0.6949072613208085
      ],
      [
       0.875,
-      0.8574166376138461
+      0.8516772935712251
      ],
      [
       0.9375,
-      0.9344677462931081
+      0.9320537860135912
      ],
      [
       1.0,
-      0.9887029960558936
+      0.9882777575948964
      ]
     ]
    },
@@ -169,15 +169,15 @@
  ],
  "sky": {
   "zenith": [
-   0.5275,
-   0.6975000000000001,
-   0.7337500000000001
+   0.6024999999999999,
+   0.7462500000000001,
+   0.7587500000000001
   ],
   "clouds": {
    "color": [
-    1.0407499999999996,
-    1.0520624999999997,
-    1.0746874999999996
+    1.0752499999999998,
+    1.0869375,
+    1.1103124999999996
    ],
    "loc": [
     0.0,
@@ -193,20 +193,20 @@
    "climb": 0.1825,
    "gather": 0.44999999999999996,
    "soft": 0.08249999999999999,
-   "billow": 38.75,
-   "erode": 0.8125,
+   "billow": 53.75,
+   "erode": 0.6625,
    "density": 0.0225,
    "map": "calibration/Breakout.clouds.json",
-   "shade_low": 0.5125,
-   "shade_high": 0.7125,
-   "forward": 0.675
+   "shade_low": 0.39999999999999997,
+   "shade_high": 0.7000000000000001,
+   "forward": 0.5499999999999999
   },
   "horizon": [
-   0.6799999999999999,
-   0.69,
-   0.8699999999999999
+   0.6299999999999999,
+   0.7,
+   0.9299999999999999
   ],
-  "strength": 0.9187500000000001
+  "strength": 0.9375000000000001
  },
  "wind": [
   {
