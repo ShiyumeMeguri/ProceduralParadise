@@ -41,13 +41,15 @@ its head travelling from the left edge to the right one between the frames ``Gro
 
 ``CIN.Overlay.Curtain``: an aurora of ``Count`` upright streaks of light across the picture
 between ``Across`` (left and right ends; 0, 0: all of it), each its own width, drifting sideways
-at ``Drift``; their colours pass from ``Color A`` through
-``Color B`` and ``Color C`` to ``Color D`` at the frames ``Times`` (x, y, z, w), each streak a
-little ahead or behind (``Stagger`` frames), brighter at its foot (``Foot``) or its head; the
-whole curtain comes in over ``Fade In`` and goes out over ``Fade Out`` (start frame, frames).
+at ``Drift``; the colours of their heads pass from ``Color A`` through ``Color B`` and
+``Color C`` to ``Color D``, of their feet from ``Foot A`` to ``Foot D``, at the frames ``First``
+and ``Times``, each streak a little ahead or behind (``Stagger`` frames), the colour running from
+foot to head up each streak (passing from one to the other round its middle), as bright all the way
+up, soft at its sides; the whole curtain comes in over ``Fade In`` and goes out over ``Fade Out``
+(start frame, frames).
 
-``CIN.Overlay.Contours``: an inverted triangle ``Size`` across about ``Position`` filled with
-the contour lines of a landscape (``CIN.OverlayContours``).
+``CIN.Overlay.Contours``: an inverted triangle ``Size`` across about ``Position``: a landscape
+with its contour lines cut out (``CIN.OverlayContours``).
 """
 from __future__ import annotations
 
@@ -75,9 +77,10 @@ def font(key):
 def _inked(graph, geometry):
     """Store ``ink``, ``glow``, ``alpha``, ``hatch`` and ``place`` (from the inputs Color, Glow, Fade In, Fade Out, Falloff,
     Hatch) on ``geometry``, moved as it slides in, drifts and slides out (Slide In, Slide Time, Slide Ease, Drift, Slide Out, Slide Out Time), in
-    CIN.OverlayInk.  A part of ``geometry`` carrying an ``opacity`` of its own is drawn at that share of the item's."""
+    CIN.OverlayInk, at ``Opacity``.  A part of ``geometry`` carrying an ``opacity`` of its own is drawn at that share of the item's."""
     color = graph.inp("Color", "COLOR", default=(1.0, 1.0, 1.0, 1.0))
     glow = graph.inp("Glow", default=1.0, min=0.0)
+    opacity_input = graph.inp("Opacity", default=1.0, min=0.0, max=1.0)
     fade_in = graph.inp("Fade In", "VECTOR", default=(0.0, 0.0, 0.0), desc="Start frame, frames")
     fade_out = graph.inp("Fade Out", "VECTOR", default=(100000.0, 0.0, 0.0), desc="Start frame, frames")
     slide = graph.inp("Slide In", "VECTOR", default=(0.0, 0.0, 0.0), desc="Where it comes in from, from its place")
@@ -100,7 +103,7 @@ def _inked(graph, geometry):
     geometry = graph.store(geometry, "glow", glow)
     own = graph.n("GeometryNodeInputNamedAttribute", Name="opacity", props={"data_type": "FLOAT"})
     opacity = graph.switch(own["Exists"], 1.0, own["Attribute"], input_type="FLOAT")
-    geometry = graph.store(geometry, "alpha", coming * going * (1.0 - falloff * (1.0 - rise)) * opacity)
+    geometry = graph.store(geometry, "alpha", coming * going * (1.0 - falloff * (1.0 - rise)) * opacity * opacity_input)
     geometry = graph.store(geometry, "hatch", hatch, "FLOAT_VECTOR")
     geometry = graph.store(geometry, "place", graph.position(), "FLOAT_VECTOR")
     leaving = graph.math("POWER", graph.clamp01((frame - slide_out_time.x) / graph.max(slide_out_time.y, 0.001)), ease)
@@ -253,7 +256,8 @@ def curtain():
     stagger = graph.inp("Stagger", default=3.0, min=0.0)
     colors = [graph.inp(f"Color {name}", "COLOR", default=default) for name, default in
               (("A", (0.1, 0.8, 0.3, 1.0)), ("B", (0.2, 0.8, 0.9, 1.0)), ("C", (1.0, 0.9, 0.4, 1.0)), ("D", (0.9, 0.3, 0.1, 1.0)))]
-    foot = graph.inp("Foot", default=0.6, min=0.0, max=1.0)
+    feet = [graph.inp(f"Foot {name}", "COLOR", default=default) for name, default in
+            (("A", (0.1, 0.8, 0.3, 1.0)), ("B", (0.2, 0.8, 0.9, 1.0)), ("C", (1.0, 0.9, 0.4, 1.0)), ("D", (0.9, 0.3, 0.1, 1.0)))]
     fade_in = graph.inp("Fade In", "VECTOR", default=(0.0, 0.0, 0.0), desc="Start frame, frames")
     fade_out = graph.inp("Fade Out", "VECTOR", default=(100000.0, 0.0, 0.0), desc="Start frame, frames")
     frame = graph.scene_frame()
@@ -270,20 +274,27 @@ def curtain():
     across = left + (right - left) * draw(2) + graph.scene_frame() * drift * draw(3, 0.5, 1.5)
     streaks = graph.set_pos(streaks, pos=graph.vec(across, 0.0, draw(4, -0.01, 0.0)))
     stops = [first, times.x, times.y, times.z]
-    blend = colors[0]
-    for k in range(1, 4):
-        share = graph.clamp01((clock - stops[k - 1]) / graph.max(stops[k] - stops[k - 1], 0.001))
-        blend = graph.mix(share, blend, colors[k], "RGBA")
-    streak = graph.n("GeometryNodeMeshGrid", Size_X=1.0, Size_Y=2.4, Vertices_X=2, Vertices_Y=6)["Mesh"]
-    streak = graph.store(streak, "rise", (graph.position().y + 1.2) / 2.4)
-    streaks = graph.store(streaks, "tint", blend, "FLOAT_COLOR")
-    streaks = graph.store(streaks, "strength", draw(5, 0.4, 1.0))
+
+    def passing(track):
+        blend = track[0]
+        for k in range(1, 4):
+            share = graph.clamp01((clock - stops[k - 1]) / graph.max(stops[k] - stops[k - 1], 0.001))
+            blend = graph.mix(share, blend, track[k], "RGBA")
+        return blend
+
+    streak = graph.n("GeometryNodeMeshGrid", Size_X=1.0, Size_Y=3.0, Vertices_X=5, Vertices_Y=13)["Mesh"]
+    streak = graph.store(streak, "rise", (graph.position().y + 1.0) / 2.0)
+    streak = graph.store(streak, "edge", graph.abs(graph.position().x) * 2.0)
+    streaks = graph.store(streaks, "tint", passing(colors), "FLOAT_COLOR")
+    streaks = graph.store(streaks, "foot tint", passing(feet), "FLOAT_COLOR")
+    streaks = graph.store(streaks, "strength", draw(5, 0.7, 1.0))
     sheets = graph.realize(graph.iop(streaks, streak, scale=graph.vec(draw(6, 0.05, 0.4), 1.0, 1.0)))
     rise = graph.named("rise")
-    fall = 1.0 - graph.abs(rise - (1.0 - foot)) * 1.2
-    sheets = graph.store(sheets, "ink", graph.named("tint", "FLOAT_COLOR"), "FLOAT_COLOR")
-    sheets = graph.store(sheets, "glow", graph.named("strength") * graph.clamp01(fall) * 1.5 * present)
-    sheets = graph.store(sheets, "alpha", graph.named("strength") * graph.clamp01(fall) * 0.55 * present)
+    turn = graph.n("ShaderNodeMapRange", Value=rise, From_Min=0.3, From_Max=0.7, To_Min=0.0, To_Max=1.0, props={"interpolation_type": "SMOOTHSTEP"})["Result"]
+    sheets = graph.store(sheets, "ink", graph.mix(turn, graph.named("foot tint", "FLOAT_COLOR"), graph.named("tint", "FLOAT_COLOR"), "RGBA"),
+                         "FLOAT_COLOR")
+    sheets = graph.store(sheets, "glow", graph.named("strength") * present)
+    sheets = graph.store(sheets, "alpha", graph.named("strength") * present)
     graph.result(graph.mat(sheets, M.get("CIN.OverlayInk")))
     return graph
 

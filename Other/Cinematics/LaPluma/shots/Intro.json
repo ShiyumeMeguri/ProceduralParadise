@@ -8,7 +8,10 @@
  "notes": [
   "The recruitment's opening on black: a line of light shoots across from the left (frames 4-8) over the company's logo in gold, a curtain of light floods the picture -- green on the left and sea blue on the right, then yellow-green to white, then gold under a darkening top -- with six rarity emblems on the line, and dies away (frames 8-48); then the logo in grey with the six emblems in white (frames 49-67).",
   "Measured on the reference in pixels and written in the picture's units (half its height = 1): the emblems 82 px apart round the middle, the logo 590 px wide just above it, the contour triangle 640 px across.",
-  "Measured on the reference (display values): the curtain holds to frame 48, a fifth darker by then, and the picture cuts to black on 49 with the grey logo and the six white emblems already there; the logo fades out from 61 to black by 67 and the emblems blink out on 65, back on 66 at four fifths and out on 67."
+  "Measured on the reference (display values): the curtain holds to frame 48, a fifth darker by then, and the picture cuts to black on 49 with the grey logo and the six white emblems already there; the logo fades out from 61 to black by 67 and the emblems blink out on 65, back on 66 at four fifths and out on 67.",
+  "The curtain's colours are the reference's (linear, median over thirds of the picture's width at its top and bottom): its heads dark green, green and grey-teal from left to right and its feet green to cyan (12), all pale yellow-white in the flash (25), olive, green and pale yellow over yellow feet (33), then near black over feet of brown-orange, yellow going orange and pale yellow (44); a few ember-red streaks rise in the middle from 30.",
+  "The grey logo is as the reference draws it: the contour triangle's fill at a display value of about 52 (linear 0.034), the characters a little brighter (62, linear 0.055) in front of it.",
+  "The logo's characters are drawn as wide as the reference's (590 px, 130 px tall), the emblems across their lower half; its contour triangle is a filled landscape with the contour lines cut out, fading out towards its point."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -54,46 +57,45 @@
  "cast": {},
  "overlays": [
   {
-   "name": "Curtain",
+   "name": "Curtain Left",
    "asset": "CIN.Overlay.Curtain",
    "shown": [
     6,
     48
    ],
    "inputs": {
-    "Count": 120,
+    "Count": 45,
     "Seed": 3,
-    "First": 8.0,
+    "First": 12.0,
     "Times": [
-     20.0,
-     29.0,
-     41.0
+     25.0,
+     33.0,
+     44.0
     ],
     "Stagger": 3.0,
     "Drift": 0.006,
-    "Foot": 0.85,
     "Color A": [
-     0.12,
-     0.5,
-     0.2,
+     0.04,
+     0.08,
+     0.02,
      1.0
     ],
     "Color B": [
-     0.54,
-     0.85,
-     0.25,
+     0.9,
+     0.92,
+     0.3,
      1.0
     ],
     "Color C": [
-     0.94,
-     0.89,
+     0.26,
      0.22,
+     0.05,
      1.0
     ],
     "Color D": [
-     0.96,
-     0.85,
-     0.1,
+     0.02,
+     0.015,
+     0.0,
      1.0
     ],
     "Fade In": [
@@ -105,6 +107,118 @@
      44.0,
      20.0,
      0.0
+    ],
+    "Across": [
+     -1.85,
+     -0.55,
+     0.0
+    ],
+    "Foot A": [
+     0.08,
+     0.15,
+     0.04,
+     1.0
+    ],
+    "Foot B": [
+     0.96,
+     0.96,
+     0.8,
+     1.0
+    ],
+    "Foot C": [
+     0.96,
+     0.91,
+     0.2,
+     1.0
+    ],
+    "Foot D": [
+     0.55,
+     0.38,
+     0.01,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "Curtain Middle",
+   "asset": "CIN.Overlay.Curtain",
+   "shown": [
+    6,
+    48
+   ],
+   "inputs": {
+    "Count": 40,
+    "Seed": 5,
+    "First": 12.0,
+    "Times": [
+     25.0,
+     33.0,
+     44.0
+    ],
+    "Stagger": 3.0,
+    "Drift": 0.006,
+    "Color A": [
+     0.08,
+     0.32,
+     0.14,
+     1.0
+    ],
+    "Color B": [
+     0.88,
+     0.94,
+     0.5,
+     1.0
+    ],
+    "Color C": [
+     0.34,
+     0.49,
+     0.12,
+     1.0
+    ],
+    "Color D": [
+     0.01,
+     0.05,
+     0.01,
+     1.0
+    ],
+    "Fade In": [
+     7.0,
+     3.0,
+     0.0
+    ],
+    "Fade Out": [
+     44.0,
+     20.0,
+     0.0
+    ],
+    "Across": [
+     -0.55,
+     0.55,
+     0.0
+    ],
+    "Foot A": [
+     0.06,
+     0.4,
+     0.2,
+     1.0
+    ],
+    "Foot B": [
+     0.96,
+     0.96,
+     0.65,
+     1.0
+    ],
+    "Foot C": [
+     0.96,
+     0.93,
+     0.27,
+     1.0
+    ],
+    "Foot D": [
+     0.96,
+     0.75,
+     0.1,
+     1.0
     ]
    }
   },
@@ -116,39 +230,38 @@
     48
    ],
    "inputs": {
-    "Count": 50,
+    "Count": 45,
     "Seed": 9,
-    "First": 8.0,
+    "First": 12.0,
     "Times": [
-     20.0,
-     29.0,
-     41.0
+     25.0,
+     33.0,
+     44.0
     ],
     "Stagger": 3.0,
     "Drift": 0.006,
-    "Foot": 0.85,
     "Color A": [
-     0.16,
-     0.81,
-     0.84,
+     0.15,
+     0.25,
+     0.23,
      1.0
     ],
     "Color B": [
-     0.51,
-     0.93,
-     0.91,
+     0.96,
+     0.96,
+     0.8,
      1.0
     ],
     "Color C": [
-     0.96,
-     0.94,
-     0.45,
+     0.75,
+     0.9,
+     0.4,
      1.0
     ],
     "Color D": [
-     0.9,
-     0.9,
-     0.35,
+     0.04,
+     0.09,
+     0.08,
      1.0
     ],
     "Fade In": [
@@ -163,8 +276,115 @@
     ],
     "Across": [
      0.55,
-     2.13,
+     1.95,
      0.0
+    ],
+    "Foot A": [
+     0.2,
+     0.88,
+     0.91,
+     1.0
+    ],
+    "Foot B": [
+     0.96,
+     0.95,
+     0.5,
+     1.0
+    ],
+    "Foot C": [
+     0.96,
+     0.94,
+     0.35,
+     1.0
+    ],
+    "Foot D": [
+     0.96,
+     0.94,
+     0.4,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "Curtain Embers",
+   "asset": "CIN.Overlay.Curtain",
+   "shown": [
+    6,
+    48
+   ],
+   "inputs": {
+    "Count": 6,
+    "Seed": 21,
+    "First": 12.0,
+    "Times": [
+     25.0,
+     33.0,
+     44.0
+    ],
+    "Stagger": 3.0,
+    "Drift": 0.006,
+    "Color A": [
+     0.7,
+     0.15,
+     0.03,
+     1.0
+    ],
+    "Color B": [
+     0.7,
+     0.15,
+     0.03,
+     1.0
+    ],
+    "Color C": [
+     0.7,
+     0.15,
+     0.03,
+     1.0
+    ],
+    "Color D": [
+     0.7,
+     0.15,
+     0.03,
+     1.0
+    ],
+    "Fade In": [
+     30.0,
+     8.0,
+     0.0
+    ],
+    "Fade Out": [
+     44.0,
+     20.0,
+     0.0
+    ],
+    "Across": [
+     -0.2,
+     1.1,
+     0.0
+    ],
+    "Foot A": [
+     1.0,
+     0.45,
+     0.04,
+     1.0
+    ],
+    "Foot B": [
+     1.0,
+     0.45,
+     0.04,
+     1.0
+    ],
+    "Foot C": [
+     1.0,
+     0.45,
+     0.04,
+     1.0
+    ],
+    "Foot D": [
+     1.0,
+     0.45,
+     0.04,
+     1.0
     ]
    }
   },
@@ -198,7 +418,9 @@
      14.0,
      8.0,
      0.0
-    ]
+    ],
+    "Falloff": 1.0,
+    "Opacity": 0.2
    }
   },
   {
@@ -210,8 +432,8 @@
    ],
    "inputs": {
     "Text": "终末地",
-    "Size": 0.17,
-    "Stretch": 1.9,
+    "Size": 0.27,
+    "Stretch": 1.45,
     "Position": [
      0.0,
      0.02,
@@ -311,9 +533,9 @@
      -0.002
     ],
     "Color": [
-     0.32,
-     0.32,
-     0.34,
+     0.048,
+     0.048,
+     0.051,
      1.0
     ],
     "Glow": 0.7,
@@ -321,7 +543,8 @@
      61.0,
      6.2,
      0.0
-    ]
+    ],
+    "Falloff": 1.0
    }
   },
   {
@@ -333,17 +556,17 @@
    ],
    "inputs": {
     "Text": "终末地",
-    "Size": 0.17,
-    "Stretch": 1.9,
+    "Size": 0.27,
+    "Stretch": 1.45,
     "Position": [
      0.0,
      0.02,
      0.001
     ],
     "Color": [
-     0.3,
-     0.3,
-     0.32,
+     0.055,
+     0.055,
+     0.058,
      1.0
     ],
     "Glow": 1.0,
@@ -371,9 +594,9 @@
      0.001
     ],
     "Color": [
-     0.3,
-     0.3,
-     0.32,
+     0.055,
+     0.055,
+     0.058,
      1.0
     ],
     "Glow": 1.0,

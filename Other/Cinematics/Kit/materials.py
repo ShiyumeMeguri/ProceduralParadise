@@ -184,8 +184,8 @@ def overlay_ink():
 
 @register("CIN.OverlayContours")
 def overlay_contours():
-    """The contour lines of a landscape in an overlay's ink: lines ``CIN.OverlayContours.width`` of a step
-    apart, ``CIN.OverlayContours.levels`` steps over the landscape's height."""
+    """A landscape in an overlay's ink with its contour lines cut out of it: lines ``CIN.OverlayContours.width``
+    of a step apart, ``CIN.OverlayContours.levels`` steps over the landscape's height."""
     def build(tree: Tree):
         color, glow, alpha = _ink(tree)
         place = tree.n("ShaderNodeAttribute", props={"attribute_name": "landscape", "attribute_type": "GEOMETRY"})["Vector"]
@@ -194,7 +194,7 @@ def overlay_contours():
         line = tree.map_range(tree.abs(step - 0.5), 0.5 - param("CIN.OverlayContours.width", 0.12), 0.5, 0.0, 1.0)
         light = tree.n("ShaderNodeEmission", Color=color, Strength=glow)["Emission"]
         clear = tree.n("ShaderNodeBsdfTransparent")["BSDF"]
-        return tree.n("ShaderNodeMixShader", tree.clamp01(alpha * line), clear, light)["Shader"]
+        return tree.n("ShaderNodeMixShader", tree.clamp01(alpha * (1.0 - line)), clear, light)["Shader"]
     return S.material("CIN.OverlayContours", build, settings={"surface_render_method": "BLENDED"})
 
 
