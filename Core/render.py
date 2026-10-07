@@ -762,6 +762,20 @@ def frame_output(prefix, fps=30):
     return prefix
 
 
+def render_linear(path, scene=None):
+    """Render the scene's current frame to ``path`` as an OpenEXR of its scene-linear light, the compositor off (the
+    light it shows, nothing mapped); its output settings are put back."""
+    sc = scene or bpy.context.scene
+    im = _output_kind("IMAGE", sc)
+    kept = (im.file_format, im.color_depth, sc.render.use_compositing, sc.render.filepath)
+    im.file_format = "OPEN_EXR"
+    im.color_depth = "32"
+    sc.render.use_compositing = False
+    sc.render.filepath = path
+    bpy.ops.render.render(write_still=True, scene=sc.name)
+    im.file_format, im.color_depth, sc.render.use_compositing, sc.render.filepath = kept
+
+
 def frame_paths(scene=None):
     """{frame: absolute file path} of the scene's frame range."""
     sc = scene or bpy.context.scene

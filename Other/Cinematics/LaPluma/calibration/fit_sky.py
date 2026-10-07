@@ -12,9 +12,10 @@ other), the buildings left out -- is rendered at ``scale`` on the ``frames`` and
 blocks too left out, and the picture's ``exclude`` boxes: what the sky alone cannot draw, the dust a breach throws).
 The parameters (:data:`PARAMETERS`: the zenith's and the horizon's colours, the sky's
 strength; the clouds' shade below and on top, their whiteness -- no less than half the palette's: a cloud is white
---, density, softness, threshold, gathering, height, thinning with height, billows, erosion and how much they throw
-forwards) are turned one after another (:func:`picture_fit.descend`).  With
-``write`` the best are written into the shot's sky.
+--, density, softness, threshold, gathering, height (a flat deck's top over its floor, a shell's thickness), thinning
+with height, billows, erosion and how much they throw forwards) are turned one after another (:func:`picture_fit.descend`).  The light the fitted sky sheds on the set (its
+``ambient``) is then measured: the mean scene-linear colour of its sky blocks, rendered unmapped, over the frames -- the
+sky as the set sees it, clouds and all.  With ``write`` the best and the ambient are written into the shot's sky.
 """
 import argparse
 import copy
@@ -24,6 +25,7 @@ import sys
 import tempfile
 
 import bpy
+import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -63,6 +65,8 @@ def _read(sky, key):
         field = name.split(".", 1)[1]
         clouds = {**CL.CLOUDS, **sky["clouds"]}
         if field == "height":
+            if "shell" in sky["clouds"]:
+                return (1.0 - sky["clouds"]["shell"]) * sky["clouds"]["scale"][0]
             return sky["clouds"]["scale"][2] * 2.0
         if field == "whiteness":
             return clouds["color"][0] / CL.CLOUDS["color"][0]
@@ -76,7 +80,9 @@ def _changed(sky, key, value):
     if name.startswith("clouds."):
         field = name.split(".", 1)[1]
         clouds = sky["clouds"]
-        if field == "height":
+        if field == "height" and "shell" in clouds:
+            clouds["shell"] = 1.0 - value / clouds["scale"][0]
+        elif field == "height":
             floor = clouds["loc"][2] - clouds["scale"][2]
             clouds["loc"] = [clouds["loc"][0], clouds["loc"][1], floor + value / 2.0]
             clouds["scale"] = [clouds["scale"][0], clouds["scale"][1], value / 2.0]
@@ -129,6 +135,7 @@ class Fit:
             weights[frame] = (~blocked).astype(float)
             print(f"[fit sky] {args.shot} {frame}: {int(weights[frame].sum())} sky blocks of {blocked.size}", flush=True)
         self.measure = picture_fit.Measure(pictures, weights, spread=args.spread, texture=args.texture)
+        self.weights = weights
         self.built = None
 
     def _apply(self, sky):
@@ -152,6 +159,19 @@ class Fit:
             parts.append(self.measure.distance(frame, sky_reads.image(scene.render.filepath)))
         return sum(parts) / len(parts), parts
 
+    def ambient(self, sky):
+        """The light ``sky`` sheds on the set: the mean scene-linear colour its sky blocks show over the frames."""
+        self._apply(sky)
+        total, weight = np.zeros(3), 0.0
+        for frame in self.frames:
+            bpy.context.scene.frame_set(frame)
+            path = os.path.join(self.folder, f"a{frame}.exr")
+            RND.render_linear(path)
+            light = sky_reads.image(path) / 255.0
+            total += (light * self.weights[frame][..., None]).sum(axis=(0, 1))
+            weight += self.weights[frame].sum()
+        return [round(float(value), 4) for value in total / weight]
+
 
 def main():
     args = _arguments()
@@ -160,13 +180,15 @@ def main():
     sky["clouds"] = {"color": CL.CLOUDS["color"], **sky["clouds"]}
     sky, best = picture_fit.descend(sky, PARAMETERS, fit.score, args.rounds, _read, _changed,
                                     lambda line: print(f"[fit sky] {line}", flush=True))
-    print(f"[fit sky] best {best:.3f}: {json.dumps({key: sky[key] for key in ('zenith', 'horizon', 'strength', 'clouds') if key in sky})}",
+    sky.pop("ambient", None)
+    sky["ambient"] = fit.ambient(sky)
+    print(f"[fit sky] best {best:.3f}: {json.dumps({key: sky[key] for key in ('zenith', 'horizon', 'strength', 'ambient', 'clouds') if key in sky})}",
           flush=True)
     if args.write:
         path = os.path.join(sky_reads.FILM, "shots", f"{args.shot}.json")
         data = json.load(open(path, encoding="utf-8"))
         set_sky = fit.reads.spec["sky"]
-        changes = {key: sky[key] for key in ("zenith", "horizon", "strength") if sky.get(key) != set_sky.get(key)}
+        changes = {key: sky[key] for key in ("zenith", "horizon", "strength", "ambient") if sky.get(key) != set_sky.get(key)}
         clouds = {key: value for key, value in sky["clouds"].items() if set_sky.get("clouds", {}).get(key) != value}
         data["sky"] = {**data.get("sky", {}), **changes, "clouds": clouds}
         with open(path, "w", encoding="utf-8", newline="\n") as handle:
