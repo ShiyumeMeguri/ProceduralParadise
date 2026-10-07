@@ -7,7 +7,7 @@
  ],
  "notes": [
   "Close on her right hand raised with the scythe against the sky, crows wheeling round; the camera turns with her (the sky's measured turn, calibration/sky_rotation.py) where the place stands it beside the tower, the tower's top storeys leaving the lower left.",
-  "Fitted with the camera at the origin (calibration/fit_prop.py, fit_pose.py): the performance is the camera's own, and moves with it.",
+  "Fitted with the camera at the origin (calibration/fit_prop.py, fit_pose.py): the performance is the camera's own, and moves with it.  The scythe is placed on frames 219-278 and carried back over 207-218 at its own pace (calibration/extend_placements.py: the search reads its shaft end for end on the opening frames); her arm fills the sleeve's outline lightly (--cover-weight 0.3: the sleeve in the picture is the coat's, wider than her arm) and the rest of her is kept out of the picture, which shows none of her but the arm (--silhouette-weight 20).",
   "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [215, 230, 250, 270]."
  ],
  "camera": {
