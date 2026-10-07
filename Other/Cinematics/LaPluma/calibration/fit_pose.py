@@ -105,6 +105,7 @@ parser.add_argument("--masks", default=None)
 parser.add_argument("--occluders", default=None, help="masks of what may hide her (her scythe)")
 parser.add_argument("--parts", default=None, help="a roto.py folder: a mask folder per profile part")
 parser.add_argument("--cover-weight", type=float, default=1.0, help="a part filling its mask")
+parser.add_argument("--silhouette-weight", type=float, default=2.0, help="her surface staying inside her outline (and out of the picture where it shows none of her)")
 parser.add_argument("--order-weight", type=float, default=20.0, help="a part seen in front of another")
 parser.add_argument("--part-samples", type=int, default=700, help="surface samples per part for coverage and order")
 parser.add_argument("--start", default=None)
@@ -516,7 +517,7 @@ def frame_terms(stage, slots):
     if (silhouette is not None or part_names) and stage >= 1:
         sample_pixels, sample_depth = project_frames(skeleton.skin(world, samples, sample_bones, sample_weights, len(slots)), slots)
     if silhouette is not None and stage >= 1:
-        terms["silhouette"] = 2.0 * (silhouette.precision(sample_pixels, slots) * silhouette.present[slots]).sum() / count
+        terms["silhouette"] = args.silhouette_weight * (silhouette.precision(sample_pixels, slots) * silhouette.present[slots]).sum() / count
     if part_names and stage >= 1:
         pixels = {name: sample_pixels[:, part_samples[name]] for name in part_names}
         depth = {name: sample_depth[:, part_samples[name]] for name in part_names}
