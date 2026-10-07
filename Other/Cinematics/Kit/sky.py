@@ -17,7 +17,9 @@ Sky kit -- the world a set stands under, procedural (no images).
 The deck is a plane at ``height``: a ray climbing towards it meets the
 cloud pattern where it crosses the plane, so clouds keep their place in
 the sky whatever the camera does and shrink towards the horizon.  The
-same sky lights the set; a set's sun is a lamp of its own.
+same sky lights the set; a set's sun is a lamp of its own.  The haze of
+the air between the set's buildings is an object of the set
+(``CIN.Env.Air``), thick low down and thinning upwards.
 """
 from __future__ import annotations
 

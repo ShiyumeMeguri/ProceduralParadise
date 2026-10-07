@@ -17,7 +17,10 @@ is pure data::
 
 An item is one object: ``name``, ``loc``, ``rot`` (degrees), ``scale`` and
 either a ``frame`` (a frame building, see :mod:`frames`) or an ``asset``
-with its ``inputs`` (one geometry-nodes modifier on an empty mesh).
+with its ``inputs`` (one geometry-nodes modifier on an empty mesh).  An
+item that is only there for a while -- what a breach throws into the air,
+gone by the time another shot looks -- names its frames (``shown``:
+[first, last]); outside them it is not rendered.
 Inputs are data: degrees for angles, palette names for colours, library
 names for materials.  A lamp is ``{"name", "light": "SUN" | "AREA" |
 "POINT" | "SPOT", "power", "color", "angle" (a sun's disc, degrees),
@@ -129,7 +132,22 @@ def build_frame(item, collection):
     return root
 
 
+def _show_between(obj, first, last):
+    """Key ``obj`` (and what hangs under it) rendered on the frames ``first``..``last`` alone."""
+    for part in [obj] + list(obj.children_recursive):
+        for frame, hidden in ((first - 1, True), (first, False), (last, False), (last + 1, True)):
+            part.hide_render = hidden
+            part.keyframe_insert("hide_render", frame=frame)
+
+
 def build_item(item, collection):
+    obj = _build_item(item, collection)
+    if "shown" in item:
+        _show_between(obj, *item["shown"])
+    return obj
+
+
+def _build_item(item, collection):
     if "frame" in item:
         return build_frame(item, collection)
     obj = _modified_object(item["name"], bpy.data.meshes.new(item["name"]), item["asset"], item.get("inputs", {}), collection)

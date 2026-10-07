@@ -3,9 +3,9 @@
   "name": "Cinematics (影片)",
   "notes": ["Colours are linear RGB.  In set data a colour input may name a palette entry instead of giving RGB.", "A finish is a palette colour with its roughness, metallicness and weathering: the grime that darkens it in broad patches ('grime': strength, size in metres) and the streaks that run down vertical faces ('streaks': strength, spacing in metres).", "Everything is built for EEVEE; a film's sets may override any finish parameter through their 'materials' (\"<finish>.<parameter>\" or \"color:<palette key>\").", "A module is a facade panel in unit coordinates (u across the bay between its columns' faces, v up the storey from the floor to the underside of the beam above): its members ({from, to, section}) and glazing ([u0, v0, u1, v1] panes); a frame's own 'modules' add to or replace these.  A panel code joins modules with '+'."],
   "palette": {
-    "concrete": [0.62, 0.63, 0.64],
+    "concrete": [0.48, 0.49, 0.5],
     "concrete_grime": [0.29, 0.3, 0.31],
-    "steel_paint": [0.68, 0.69, 0.7],
+    "steel_paint": [0.52, 0.53, 0.54],
     "steel_grime": [0.34, 0.35, 0.36],
     "interior": [0.16, 0.165, 0.17],
     "pipe": [0.16, 0.04, 0.03],
@@ -13,7 +13,11 @@
     "facade_far": [0.42, 0.44, 0.47],
     "window_far": [0.11, 0.12, 0.14],
     "crow": [0.012, 0.012, 0.014],
-    "cloud": [0.92, 0.93, 0.95]
+    "cloud": [0.92, 0.93, 0.95],
+    "roof_far": [0.3, 0.31, 0.32],
+    "dust": [0.7, 0.71, 0.72],
+    "debris": [0.3, 0.3, 0.31],
+    "air": [0.86, 0.89, 0.93]
   },
   "finishes": {
     "CIN.Concrete": {
@@ -47,14 +51,6 @@
       "grime": [0.0, 1.0],
       "streaks": [0.0, 1.0],
       "note": "service pipes under a ceiling"
-    },
-    "CIN.FacadeFar": {
-      "color": "facade_far",
-      "grime_color": "window_far",
-      "roughness": 0.7,
-      "grime": [0.25, 6.0],
-      "streaks": [0.0, 1.0],
-      "note": "the walls of the distant towers"
     }
   },
   "modules": {

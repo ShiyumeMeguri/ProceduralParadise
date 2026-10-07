@@ -4,27 +4,37 @@
   "Set metres: the main tower's front column line is Y = 0 (its face looks out along -Y), X runs along that face with column C1 at X = 0, Z up from the tower's foot.",
   "Measured on the Breakout shot (calibration/stereo.py, orthophoto.py) in solve units of 11 m: bays 0.747 (8.2 m), storeys 0.38 (4.18 m), columns 0.08 square; she breaks out of storey 18 through the bay left of C1.",
   "The sky's cumulus are solid (CIN.Clouds.Field), bases 600 m up all round the district; crows (CIN.Birds.Flock) wheel round the tower where she breaks out and wider over the district.",
-  "The tower is 26 storeys and its roof (108.7 m): Breakout's camera sees its face up to 95 m, never its top; the hand shot sees the roof edge at the lower left."
+  "The tower is 26 storeys under its roof (108.7 m): Breakout's camera sees its face up to 95 m, never its top; the hand shot sees the roof edge at the lower left.",
+  "Round the tower stands the district's high-rise (CIN.City.Field, blocks 45-140 m, clear within 72 m of the tower) and, past its right end along its face, the skeletal Annex: Breakout's frame 180 sees its top 114 m up some 80 m away (its storeys 65 px apart) and everything else in the picture above 76 m.  The breach throws dust (Breach Dust, from frame 96, rolling along the face towards +X and down: Breakout's camera hovers 4 m in front of the breach the whole shot and the reference keeps the dust at the left of the picture, off the lens) and debris (Breach Debris, Falling Debris); dust fills the storey behind the glass before it (Room Dust).",
+  "The district's air is hazy low down (CIN.Air: 0.0025 per metre at the ground, thinning to 1/e every 140 m): Breakout's far towers fade, the hand shot's sky overhead stays clear.",
+  "Above the breach storey the tower is its front frame alone (Tower Crown, storeys 19-26: columns, edge beams and braces, no floors, no mullions, roof 108.7 m up): from frame 116 on the reference shows sky through big braces over her, while the breach storey keeps its mullions and the floor over it (frames 76-92).",
+  "What the breach throws into the air is shown only while Breakout looks at it (frames up to 206): the hand shot that cuts in at 207 shows clear sky and crows."
  ],
- "materials": {},
+ "materials": {
+  "CIN.Air.density": 0.0025,
+  "CIN.Air.height": 140.0,
+  "CIN.Dust.density": 2.0,
+  "CIN.Dust.billow": 1.5,
+  "CIN.Cloud.glow": 0.6
+ },
  "sky": {
   "zenith": [
-   0.42,
-   0.52,
-   0.66
+   0.07,
+   0.17,
+   0.4
   ],
   "horizon": [
-   0.86,
-   0.87,
-   0.88
+   0.85,
+   0.9,
+   0.95
   ],
   "ground": [
-   0.5,
-   0.51,
-   0.52
+   0.07,
+   0.075,
+   0.08
   ],
   "strength": 1.2,
-  "haze": 14.0
+  "haze": 25.0
  },
  "items": [
   {
@@ -53,7 +63,7 @@
     "z": {
      "start": 0.0,
      "step": 4.18,
-     "count": 27
+     "count": 19
     },
     "sections": {
      "column": {
@@ -251,6 +261,201 @@
    }
   },
   {
+   "name": "Tower Crown",
+   "loc": [
+    0.0,
+    0.0,
+    79.42
+   ],
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "frame": {
+    "x": {
+     "start": -32.8,
+     "step": 8.2,
+     "count": 9
+    },
+    "y": {
+     "start": 0.0,
+     "step": 8.2,
+     "count": 0
+    },
+    "z": {
+     "start": 0.0,
+     "step": 4.18,
+     "count": 7
+    },
+    "sections": {
+     "column": {
+      "shape": "box",
+      "width": 0.88,
+      "depth": 0.88,
+      "finish": "concrete"
+     },
+     "edge_beam": {
+      "shape": "box",
+      "width": 0.77,
+      "depth": 0.5,
+      "finish": "concrete",
+      "offset": -0.14
+     },
+     "ibeam": {
+      "shape": "I",
+      "width": 0.55,
+      "depth": 0.3,
+      "finish": "steel",
+      "offset": -0.18
+     },
+     "brace_front": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.39
+     },
+     "brace_back": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.88
+     },
+     "post": {
+      "shape": "box",
+      "width": 0.16,
+      "depth": 0.16,
+      "finish": "steel",
+      "offset": -0.77
+     },
+     "brace": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.6
+     }
+    },
+    "columns": "column",
+    "beams": "edge_beam",
+    "slab": 0.0,
+    "beam_drop": 0.605,
+    "modules": {
+     "V": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         1.0
+        ],
+        "to": [
+         0.327,
+         0.0
+        ],
+        "section": "brace_back"
+       },
+       {
+        "from": [
+         0.655,
+         0.0
+        ],
+        "to": [
+         1.0,
+         1.0
+        ],
+        "section": "brace_front"
+       }
+      ]
+     },
+     "A": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         0.0
+        ],
+        "to": [
+         0.333,
+         1.0
+        ],
+        "section": "brace"
+       },
+       {
+        "from": [
+         0.667,
+         1.0
+        ],
+        "to": [
+         1.0,
+         0.0
+        ],
+        "section": "brace"
+       }
+      ]
+     },
+     "P": {
+      "members": [
+       {
+        "from": [
+         0.38,
+         0
+        ],
+        "to": [
+         0.38,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.43,
+         0
+        ],
+        "to": [
+         0.43,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.48,
+         0
+        ],
+        "to": [
+         0.48,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.6,
+         0
+        ],
+        "to": [
+         0.6,
+         1
+        ],
+        "section": "post"
+       }
+      ]
+     }
+    },
+    "faces": {
+     "front": {
+      "cycle": [
+       "A A A A A A A A A",
+       "V V V V V V V V V"
+      ]
+     }
+    },
+    "slab_edge": 0.11
+   }
+  },
+  {
    "name": "Clouds",
    "loc": [
     0,
@@ -351,19 +556,561 @@
     "Glide": 0.3,
     "Start": 160
    }
+  },
+  {
+   "name": "Annex",
+   "loc": [
+    58.2,
+    8.25,
+    0.0
+   ],
+   "rot": [
+    0.0,
+    0.0,
+    -90.0
+   ],
+   "frame": {
+    "x": {
+     "start": 0.0,
+     "step": 5.0,
+     "count": 3
+    },
+    "y": {
+     "start": 0.0,
+     "step": 5.0,
+     "count": 2
+    },
+    "z": {
+     "start": 0.0,
+     "step": 3.6,
+     "count": 31
+    },
+    "sections": {
+     "column": {
+      "shape": "box",
+      "width": 0.62,
+      "depth": 0.62,
+      "finish": "concrete"
+     },
+     "edge_beam": {
+      "shape": "box",
+      "width": 0.5,
+      "depth": 0.35,
+      "finish": "concrete",
+      "offset": 0.0
+     },
+     "rail": {
+      "shape": "box",
+      "width": 0.07,
+      "depth": 0.07,
+      "finish": "steel",
+      "offset": 0.55
+     },
+     "baluster": {
+      "shape": "box",
+      "width": 0.05,
+      "depth": 0.05,
+      "finish": "steel",
+      "offset": 0.55
+     },
+     "brace": {
+      "shape": "box",
+      "width": 0.22,
+      "depth": 0.22,
+      "finish": "steel",
+      "offset": -0.1
+     }
+    },
+    "columns": "column",
+    "beams": "edge_beam",
+    "slab": 0.25,
+    "beam_drop": 0.45,
+    "slab_edge": 0.6,
+    "modules": {
+     "R": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         0.3
+        ],
+        "to": [
+         1.0,
+         0.3
+        ],
+        "section": "rail"
+       },
+       {
+        "from": [
+         0.0,
+         0.03
+        ],
+        "to": [
+         1.0,
+         0.03
+        ],
+        "section": "rail"
+       },
+       {
+        "from": [
+         0.25,
+         0.03
+        ],
+        "to": [
+         0.25,
+         0.3
+        ],
+        "section": "baluster"
+       },
+       {
+        "from": [
+         0.5,
+         0.03
+        ],
+        "to": [
+         0.5,
+         0.3
+        ],
+        "section": "baluster"
+       },
+       {
+        "from": [
+         0.75,
+         0.03
+        ],
+        "to": [
+         0.75,
+         0.3
+        ],
+        "section": "baluster"
+       }
+      ]
+     },
+     "X": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         0.0
+        ],
+        "to": [
+         1.0,
+         1.0
+        ],
+        "section": "brace"
+       },
+       {
+        "from": [
+         0.0,
+         1.0
+        ],
+        "to": [
+         1.0,
+         0.0
+        ],
+        "section": "brace"
+       }
+      ]
+     }
+    },
+    "faces": {
+     "front": {
+      "default": "R R R",
+      "rows": [
+       "- - -",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "X R X",
+       "X - X",
+       "- X -"
+      ]
+     },
+     "back": {
+      "default": "R R R",
+      "rows": [
+       "- - -",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "R R R",
+       "X R X",
+       "X - X",
+       "- X -"
+      ]
+     },
+     "left": {
+      "default": "R R",
+      "rows": [
+       "- -",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "X X",
+       "X -",
+       "- X"
+      ]
+     },
+     "right": {
+      "default": "R R",
+      "rows": [
+       "- -",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "R R",
+       "X X",
+       "- X",
+       "X -"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "name": "City",
+   "asset": "CIN.City.Field",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Count": 1400,
+    "Seed": 4,
+    "Origin": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Extent": [
+     1500.0,
+     1500.0,
+     0.0
+    ],
+    "Spacing": 56.0,
+    "Street": 16.0,
+    "Keep": [
+     4.0,
+     12.0,
+     0.0
+    ],
+    "Clear": 72.0,
+    "Low": 45.0,
+    "High": 140.0,
+    "Skew": 1.3,
+    "Narrow": 0.55,
+    "Crown": 0.35,
+    "Storey": 3.6
+   }
+  },
+  {
+   "name": "Breach Dust",
+   "asset": "CIN.FX.Plume",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Count": 1500,
+    "Seed": 1,
+    "Source": [
+     -4.1,
+     -0.4,
+     77.0
+    ],
+    "Source Size": [
+     2.5,
+     0.2,
+     1.2
+    ],
+    "Direction": [
+     1.0,
+     -0.08,
+     -0.2
+    ],
+    "Spread": 10.0,
+    "Speed": 12.0,
+    "Speed Spread": 0.3,
+    "Drag": 1.0,
+    "Sink": 0.8,
+    "Wind": [
+     2.5,
+     0.0,
+     -0.2
+    ],
+    "Radius": 0.6,
+    "Growth": 1.6,
+    "Start": 96.0,
+    "Duration": 20.0,
+    "Voxel": 0.3,
+    "Softness": 0.5
+   },
+   "shown": [
+    0,
+    206
+   ]
+  },
+  {
+   "name": "Room Dust",
+   "asset": "CIN.FX.Plume",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Count": 40,
+    "Seed": 2,
+    "Source": [
+     -4.1,
+     5.0,
+     75.9
+    ],
+    "Source Size": [
+     3.5,
+     2.5,
+     0.4
+    ],
+    "Direction": [
+     0.0,
+     -1.0,
+     0.0
+    ],
+    "Spread": 80.0,
+    "Speed": 0.2,
+    "Speed Spread": 0.5,
+    "Drag": 2.0,
+    "Sink": 0.05,
+    "Wind": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Radius": 0.6,
+    "Growth": 0.35,
+    "Start": 40.0,
+    "Duration": 30.0,
+    "Voxel": 0.25,
+    "Softness": 0.6
+   },
+   "shown": [
+    0,
+    206
+   ]
+  },
+  {
+   "name": "Breach Debris",
+   "asset": "CIN.FX.Debris",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Count": 1200,
+    "Seed": 1,
+    "Source": [
+     -4.1,
+     -1.0,
+     77.3
+    ],
+    "Source Size": [
+     3.5,
+     0.6,
+     1.8
+    ],
+    "Direction": [
+     0.8,
+     -0.5,
+     0.5
+    ],
+    "Spread": 60.0,
+    "Speed": 5.0,
+    "Speed Spread": 0.7,
+    "Gravity": 1.2,
+    "Spin": 1.5,
+    "Size": 0.3,
+    "Size Power": 3.0,
+    "Flat": 0.4,
+    "Start": 96.0,
+    "Burst": 8.0
+   },
+   "shown": [
+    0,
+    206
+   ]
+  },
+  {
+   "name": "Falling Debris",
+   "asset": "CIN.FX.Debris",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Count": 400,
+    "Seed": 2,
+    "Source": [
+     -4.1,
+     -0.8,
+     76.5
+    ],
+    "Source Size": [
+     3.8,
+     0.4,
+     1.2
+    ],
+    "Direction": [
+     0.5,
+     -1.0,
+     0.2
+    ],
+    "Spread": 50.0,
+    "Speed": 1.5,
+    "Speed Spread": 0.6,
+    "Gravity": 1.0,
+    "Spin": 1.0,
+    "Size": 0.25,
+    "Size Power": 2.5,
+    "Flat": 0.5,
+    "Start": 100.0,
+    "Burst": 110.0
+   },
+   "shown": [
+    0,
+    206
+   ]
+  },
+  {
+   "name": "Air",
+   "asset": "CIN.Env.Air",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     -1700.0,
+     -1700.0,
+     0.0
+    ],
+    "Max": [
+     1700.0,
+     1700.0,
+     450.0
+    ]
+   }
   }
  ],
  "lights": [
   {
    "name": "Sun",
    "light": "SUN",
-   "power": 2.5,
+   "power": 6.0,
    "color": [
-    1.0,
     0.97,
-    0.93
+    0.98,
+    1.0
    ],
-   "angle": 3.0,
+   "angle": 6.0,
    "direction": [
     0.4,
     -0.6,
