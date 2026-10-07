@@ -55,8 +55,11 @@ def _arguments():
 def _blurred(values, sigma):
     radius = int(np.ceil(sigma * 3.0))
     kernel = np.exp(-0.5 * (np.arange(-radius, radius + 1) / sigma) ** 2)
-    rows = np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 1, values)
-    return np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 0, rows)
+
+    def along(line):
+        return np.convolve(line, kernel)[radius:radius + len(line)]
+    rows = np.apply_along_axis(along, 1, values)
+    return np.apply_along_axis(along, 0, rows)
 
 
 def _filled(total, count, least):
