@@ -39,6 +39,8 @@ A shot (``shots/<id>.json``)::
      "look": {...},                                 (Core.render.compositor)
      "cast": {"LaPluma": {"performance": "performances/Breakout.json"}},
      "items": [item, ...],                          (optional)
+     "sky": {...},                                  (optional: the set's sky with these changes)
+     "wind": [{"direction": [x, y, z], "strength": 5.0, "turbulence": 1.0}, ...],   (optional)
      "overlays": [{"name", "asset", "inputs", "shown": [first, last]}, ...],   (optional)
      "underlays": {"depth": 2.5, "items": [overlay, ...]}}                    (optional)
 
@@ -55,8 +57,17 @@ root on every frame is in the frame's camera's frame).  A camera with
 lens open at ``fstop``.  The film's
 ``resolution`` and ``fps`` apply to every shot.
 
-A shot's own ``items`` are set items only its camera sees -- a crow
-passing its lens.  One with a ``camera_frame`` is placed in the frame of
+A cast member with ``cloth`` (film.json: ``{"file": <RuriClothPhysics
+payload>, "settle": frames}``) wears cloth simulated on its bones -- the
+coat, the hair -- by the RuriClothPhysics add-on (which must be enabled):
+the payload (the add-on's own configuration file: the chains, their
+parameters and the colliders on the body) is set on the shot's performer,
+the shot's ``wind`` zones blow (each a global wind along ``direction``, as
+strong and as gusty as given) and the cloth is baked into keys over the
+shot's frames, from ``settle`` frames before its first so it has hung
+still before the shot begins.  A shot's ``sky`` changes the set's for its frames alone (the weather of a
+picture: one shot under a pale haze, the next under cloud).  A shot's own
+``items`` are set items only its camera sees -- a crow passing its lens.  One with a ``camera_frame`` is placed in the frame of
 the shot's camera on that frame (looking along its -Z, +Y up): where the
 camera stood then, wherever the shot's camera is solved to stand.
 
@@ -252,7 +263,7 @@ def build_set(folder, set_name, film, args):
         characters[name] = dict(rig=rig, objects=objects, prefix=prefix)
         cast_files.append(path)
         _rebuild_shading(entry)
-    return dict(id=set_name, scene=scene, world=world, collection=collection, characters=characters,
+    return dict(id=set_name, scene=scene, world=world, sky=spec["sky"], collection=collection, characters=characters,
                 cast_files=cast_files, source=os.path.join(folder, "sets", f"{set_name}.json"))
 
 
@@ -366,7 +377,10 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     A held prop's bone (``held``: prop bone -> hand bone) hangs on the hand
     by a Child Of constraint and is keyed with its grip, the prop in the
     hand's frame and its scale: the bone's own pose is its rest inverted
-    times the grip, so the constraint lands it exactly there."""
+    times the grip, so the constraint lands it exactly there.  A prop's
+    object (the profile's ``props``: an object of the cast by that name)
+    rides its bone alone -- where the cast's file happens to leave the
+    object itself is set aside, as the fits took the prop at rest."""
     path = os.path.join(folder, entry["performance"])
     performance = jsonio.load(path)
     relative = entry.get("relative_to")
@@ -377,6 +391,13 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     first, last = frames
     keyed = [item for item in performance["frames"] if first <= item["frame"] <= last]
     previous = {}
+    for obj in collection_objects:
+        if any(obj.name.endswith(f".{prop}") for prop in profile.get("props", {})):
+            obj.matrix_parent_inverse = Matrix.Identity(4)
+            obj.location = (0.0, 0.0, 0.0)
+            obj.rotation_mode = "QUATERNION"
+            obj.rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
+            obj.scale = (1.0, 1.0, 1.0)
     for held, hand in performance.get("held", {}).items():
         constraint = rig.pose.bones[held].constraints.new("CHILD_OF")
         constraint.name = f"Held by {hand}"
@@ -478,12 +499,58 @@ def build_shot_items(shot, camera, scene):
     return collection
 
 
+def blow_wind(shot, scene):
+    """The shot's wind zones (see the module notes), registered with the scene's cloth."""
+    from RuriClothPhysics.blender_host import world
+    if not shot.get("wind"):
+        return
+    collection = SC.collection(f"Shot.{shot['id']}.Wind", parent=scene.collection)
+    for index, wind in enumerate(shot["wind"]):
+        zone = bpy.data.objects.new(f"Shot.{shot['id']}.Wind.{index + 1}", None)
+        collection.objects.link(zone)
+        zone.rotation_mode = "QUATERNION"
+        zone.rotation_quaternion = _vector(wind["direction"]).normalized().to_track_quat("Z", "Y")
+        settings = zone.ruri_cloth_physics_wind
+        settings.mode = "GLOBAL_DIRECTION"
+        settings.main = wind["strength"]
+        settings.turbulence = wind.get("turbulence", 1.0)
+        world.enroll_wind(scene, zone)
+
+
+def simulate_cloth(rig, scene, folder, cloth, frames, set_collection):
+    """Simulate the cloth of the cast member performed by ``rig`` (see the module notes) and bake it into
+    its action.  The set is left out of the view layer while the cloth runs: the cloth reads only the
+    rig and the colliders on it."""
+    from types import SimpleNamespace
+    from RuriClothPhysics.blender_host import config_io
+    path = os.path.join(folder, cloth["file"])
+    view_layer = scene.view_layers[0]
+    report = config_io.deserialize(rig.ruri_cloth_physics, jsonio.load(path), config_io.MODE_REPLACE,
+                                   SimpleNamespace(scene=scene, view_layer=view_layer))
+    problems = {key: value for key, value in report.items() if key in ("error", "missing_bones", "missing_colliders", "unresolved_bones")}
+    if problems:
+        raise ValueError(f"{path} on {rig.name}: {problems}")
+    first, last = frames
+    set_layer = next(child for child in view_layer.layer_collection.children if child.collection == set_collection)
+    excluded = set_layer.exclude
+    set_layer.exclude = True
+    try:
+        with bpy.context.temp_override(scene=scene, view_layer=view_layer, object=rig, active_object=rig):
+            result = bpy.ops.ruri_cloth_physics.bake(frame_start=first - int(cloth["settle"]), frame_end=last,
+                                                     mute_existing=True, disable_live=True)
+    finally:
+        set_layer.exclude = excluded
+    if result != {"FINISHED"}:
+        raise RuntimeError(f"cloth of {rig.name}: the bake ended {result}")
+    return [path]
+
+
 def build_shot(folder, film, shot, built_set, args):
     scene = bpy.data.scenes.new(f"Shot.{shot['id']}")
     _activate(scene)
     scene.collection.children.link(built_set["collection"])
     cast = SC.collection(f"Shot.{shot['id']}.Cast", parent=scene.collection)
-    scene.world = built_set["world"]
+    scene.world = SKY.sky_world({**built_set["sky"], **shot["sky"]}, f"Shot.{shot['id']}.Sky") if "sky" in shot else built_set["world"]
     first, last = shot["frames"]
     scene.frame_start, scene.frame_end = first, last
     scene.render.fps, scene.render.fps_base = film["fps"], 1.0
@@ -514,12 +581,15 @@ def build_shot(folder, film, shot, built_set, args):
         if overlays is not None or underlay is not None:
             RND.compositor({}, overlay_scene=overlays, underlay=underlay)
     performers = {}
+    blow_wind(shot, scene)
     for name, entry in shot.get("cast", {}).items():
         character = built_set["characters"][name]
         rig, objects = CAST.instance_character(character["rig"], character["objects"], cast, f"{shot['id']}.{name}",
                                                character["prefix"])
         profile_path = os.path.join(folder, film["cast"][name]["rig"])
         sources += perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices) + [profile_path]
+        if film["cast"][name].get("cloth"):
+            sources += simulate_cloth(rig, scene, folder, film["cast"][name]["cloth"], (first, last), built_set["collection"])
         performers[name] = rig
     dof = shot["camera"].get("dof")
     if dof:

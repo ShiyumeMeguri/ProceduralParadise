@@ -5,10 +5,11 @@ A shot's look: the tone curve that carries its renders onto the reference.
 
 The renders (``<render pattern>`` with ``{frame}``, e.g. ``renders/raw_{frame}.png``, made
 with the shot's view transform and no grade) and the reference frames are compared as
-distributions of brightness (``Core.grade.fit_grade_hist`` on their luminance): a tone curve,
-the same for red, green and blue, so the render keeps its own colours while taking the
-reference's contrast and key -- a curve per channel would push colours the two pictures do not
-share (her skin, where the reference shows her coat) wherever the other has more of one.
+distributions of brightness (``Core.grade.fit_grade_hist`` on their luminance): a tone curve
+on brightness alone (``curves`` ``"L"``), so the render keeps its own hues and saturation while
+taking the reference's contrast and key -- a curve per channel would push colours the two
+pictures do not share (her skin) wherever the other has more of one, and even one curve on each
+channel saturates what its steep midtones pass.
 What is the character's in the reference (``<mask dir>``, ``roto.py``: her coat is not on the
 model yet) and the film's watermark are left out of both.  The grade is written into the
 shot's ``look`` (``Core.render.compositor``).
@@ -42,7 +43,7 @@ for frame in frames:
     renders.append(render[keep] @ WEIGHTS)
 luminance = fit_grade_hist(np.repeat(np.concatenate(renders)[:, None, None], 3, 2), np.repeat(np.concatenate(references)[:, None, None], 3, 2))
 curve = luminance["curves"]["G"]
-grade = {"matrix": np.eye(3).tolist(), "offset": [0.0, 0.0, 0.0], "curves": {name: curve for name in "RGB"}, "highlight_rolloff": True}
+grade = {"matrix": np.eye(3).tolist(), "offset": [0.0, 0.0, 0.0], "curves": {"L": curve}, "highlight_rolloff": True}
 shot = json.load(open(shot_path, encoding="utf-8"))
 shot.setdefault("look", {})["grade"] = grade
 shot.setdefault("notes", []).append(f"Its look (look.grade) is the tone curve of calibration/fit_look.py on frames {frames}.")

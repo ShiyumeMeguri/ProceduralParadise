@@ -7,7 +7,8 @@
  ],
  "notes": [
   "The recruitment result: she stands in the hall holding the scythe down by her left side; the camera stands still in front of her.  The picture comes in breaking up out of the dark the crows made of the title shot (543-560), crows crossing the lens, the result card comes in (564-578) and the film fades to black (714-726).",
-  "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py: the lens the best of a scan of focal lengths, the scythe in her left hand), placed so she stands upright (calibration/Hall.place.json)."
+  "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py: the lens the best of a scan of focal lengths, the scythe in her left hand), placed so she stands upright (calibration/Hall.place.json).",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [600, 640, 680, 700]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -95,7 +96,104 @@
     726.4,
     0.0
    ]
-  ]
+  ],
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0037317850447243146
+     ],
+     [
+      0.0625,
+      0.02638928596241077
+     ],
+     [
+      0.125,
+      0.067481460475357
+     ],
+     [
+      0.1875,
+      0.10365883515527832
+     ],
+     [
+      0.25,
+      0.13404268668996056
+     ],
+     [
+      0.3125,
+      0.20007644156936233
+     ],
+     [
+      0.375,
+      0.2616927420405897
+     ],
+     [
+      0.4375,
+      0.3068768419955801
+     ],
+     [
+      0.5,
+      0.37145400746492446
+     ],
+     [
+      0.5625,
+      0.4514276243524413
+     ],
+     [
+      0.625,
+      0.5061480820658326
+     ],
+     [
+      0.6875,
+      0.5729861237483479
+     ],
+     [
+      0.75,
+      0.6616517611771298
+     ],
+     [
+      0.8125,
+      0.7268904379845593
+     ],
+     [
+      0.875,
+      0.7528624397406889
+     ],
+     [
+      0.9375,
+      0.8003968658736385
+     ],
+     [
+      1.0,
+      0.9603016708543958
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
  },
  "cast": {
   "LaPluma": {
@@ -615,6 +713,17 @@
     "Size Spread": 0.0,
     "Start": 543.0
    }
+  }
+ ],
+ "wind": [
+  {
+   "direction": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "strength": 0.3,
+   "turbulence": 0.3
   }
  ]
 }

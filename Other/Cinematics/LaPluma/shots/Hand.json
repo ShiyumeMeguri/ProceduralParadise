@@ -7,7 +7,8 @@
  ],
  "notes": [
   "Close on her right hand raised with the scythe against the sky, crows wheeling round; the camera turns with her (the sky's measured turn, calibration/sky_rotation.py) where the place stands it beside the tower, the tower's top storeys leaving the lower left.",
-  "Fitted with the camera at the origin (calibration/fit_prop.py, fit_pose.py): the performance is the camera's own, and moves with it."
+  "Fitted with the camera at the origin (calibration/fit_prop.py, fit_pose.py): the performance is the camera's own, and moves with it.",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [215, 230, 250, 270]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -44,12 +45,127 @@
   "motion_blur": 0.5
  },
  "look": {
-  "exposure": 0.0
+  "exposure": 0.0,
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.009544323813460428
+     ],
+     [
+      0.125,
+      0.08087085011092132
+     ],
+     [
+      0.1875,
+      0.12019241831151399
+     ],
+     [
+      0.25,
+      0.14206741831151398
+     ],
+     [
+      0.3125,
+      0.163942418311514
+     ],
+     [
+      0.375,
+      0.185817418311514
+     ],
+     [
+      0.4375,
+      0.207692418311514
+     ],
+     [
+      0.5,
+      0.229567418311514
+     ],
+     [
+      0.5625,
+      0.251442418311514
+     ],
+     [
+      0.625,
+      0.40143176399101066
+     ],
+     [
+      0.6875,
+      0.5889317639910107
+     ],
+     [
+      0.75,
+      0.7764317639910107
+     ],
+     [
+      0.8125,
+      0.9242753095726537
+     ],
+     [
+      0.875,
+      0.9516357887404605
+     ],
+     [
+      0.9375,
+      0.9757895638433249
+     ],
+     [
+      1.0,
+      0.9976645638433249
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
  },
  "cast": {
   "LaPluma": {
    "performance": "performances/Hand.json",
    "relative_to": "camera"
   }
- }
+ },
+ "sky": {
+  "zenith": [
+   0.3,
+   0.42,
+   0.6
+  ]
+ },
+ "wind": [
+  {
+   "direction": [
+    -1.0,
+    0.0,
+    0.3
+   ],
+   "strength": 3.0,
+   "turbulence": 0.8
+  }
+ ]
 }

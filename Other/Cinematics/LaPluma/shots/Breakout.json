@@ -7,7 +7,8 @@
  ],
  "notes": [
   "Low-angle shot at the facade: a slow drift, then the window bursts (94) and the camera pans after her out over the district.",
-  "The film comes in on this shot through a lattice of diamonds shrinking from the right (frames 68-76); the camera holds its frame-70 place on 68 and 69."
+  "The film comes in on this shot through a lattice of diamonds shrinking from the right (frames 68-76); the camera holds its frame-70 place on 68 and 69.",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [90, 110, 131, 150, 180, 200]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -43,7 +44,104 @@
   "motion_blur": 0.5
  },
  "look": {
-  "exposure": 0.0
+  "exposure": 0.0,
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.006960952916926896
+     ],
+     [
+      0.125,
+      0.05348072452804148
+     ],
+     [
+      0.1875,
+      0.11587416649032199
+     ],
+     [
+      0.25,
+      0.15632654544144148
+     ],
+     [
+      0.3125,
+      0.1940487501255333
+     ],
+     [
+      0.375,
+      0.22114456954962225
+     ],
+     [
+      0.4375,
+      0.27198488411814076
+     ],
+     [
+      0.5,
+      0.41391204733098197
+     ],
+     [
+      0.5625,
+      0.5968418901689055
+     ],
+     [
+      0.625,
+      0.7618644441475705
+     ],
+     [
+      0.6875,
+      0.8491262437929601
+     ],
+     [
+      0.75,
+      0.8992096081503502
+     ],
+     [
+      0.8125,
+      0.9456529816660139
+     ],
+     [
+      0.875,
+      0.9762528848438597
+     ],
+     [
+      0.9375,
+      0.9981278848438597
+     ],
+     [
+      1.0,
+      1.0
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
  },
  "cast": {
   "LaPluma": {
@@ -65,6 +163,24 @@
     "Sweep": 5.0,
     "Edge": 0.0
    }
+  }
+ ],
+ "sky": {
+  "zenith": [
+   0.6,
+   0.66,
+   0.74
+  ]
+ },
+ "wind": [
+  {
+   "direction": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "strength": 2.5,
+   "turbulence": 0.8
   }
  ]
 }

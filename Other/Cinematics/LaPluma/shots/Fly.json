@@ -7,7 +7,8 @@
  ],
  "notes": [
   "She flies on past the tower, the scythe held high, and the camera swings round and under her until it looks up at her from behind; crows all round.  The camera turns with the sky (calibration/sky_rotation.py) where the place stands it.",
-  "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py): her body by its keypoints and outline, the scythe by its outline, her hand held to its shaft lightly (--grip-weight 4) -- the joint fit at full weight pulled her off her keypoints, the picture's scythe and hand disagreeing in depth -- and the scythe hung in her hand at its model size."
+  "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py): her body by its keypoints and outline, the scythe by its outline, her hand held to its shaft lightly (--grip-weight 4) -- the joint fit at full weight pulled her off her keypoints, the picture's scythe and hand disagreeing in depth -- and the scythe hung in her hand at its model size.",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [290, 303, 330, 350, 370]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -44,7 +45,104 @@
   "motion_blur": 0.5
  },
  "look": {
-  "exposure": 0.0
+  "exposure": 0.0,
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.01601365276163187
+     ],
+     [
+      0.125,
+      0.06679538962184374
+     ],
+     [
+      0.1875,
+      0.10347792308304603
+     ],
+     [
+      0.25,
+      0.1284786646675008
+     ],
+     [
+      0.3125,
+      0.1503536646675008
+     ],
+     [
+      0.375,
+      0.1722286646675008
+     ],
+     [
+      0.4375,
+      0.20420256438901785
+     ],
+     [
+      0.5,
+      0.2584137396566185
+     ],
+     [
+      0.5625,
+      0.29450525329237476
+     ],
+     [
+      0.625,
+      0.4069975983350628
+     ],
+     [
+      0.6875,
+      0.5944975983350629
+     ],
+     [
+      0.75,
+      0.7819975983350629
+     ],
+     [
+      0.8125,
+      0.893912733067396
+     ],
+     [
+      0.875,
+      0.9202469848947217
+     ],
+     [
+      0.9375,
+      0.958563372910403
+     ],
+     [
+      1.0,
+      0.9930938954850671
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
  },
  "cast": {
   "LaPluma": {
@@ -137,6 +235,24 @@
     "Size Spread": 0.0,
     "Start": 379.0
    }
+  }
+ ],
+ "sky": {
+  "zenith": [
+   0.36,
+   0.46,
+   0.6
+  ]
+ },
+ "wind": [
+  {
+   "direction": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "strength": 2.5,
+   "turbulence": 0.8
   }
  ]
 }

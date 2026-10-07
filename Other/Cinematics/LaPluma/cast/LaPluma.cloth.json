@@ -1,0 +1,2230 @@
+{
+ "addon": "RuriClothPhysics",
+ "colliders": [
+  {
+   "display_size": 0.12999999523162842,
+   "enabled": true,
+   "end": {
+    "display_size": 0.12999999523162842,
+    "follow": {
+     "bone": "Pelvis",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -1.0,
+      -9.089327477340703e-07,
+      -6.719535008414823e-07,
+      8.215650382226158e-15
+     ],
+     [
+      6.719578209413157e-07,
+      -4.727421128336573e-06,
+      -1.0,
+      0.07579994946718216
+     ],
+     [
+      9.089295076591952e-07,
+      -1.0,
+      4.727418399852468e-06,
+      -3.1441873410420484e-11
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Pelvis.02"
+   },
+   "follow": {
+    "bone": "Pelvis",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -1.0,
+     -9.089327477340703e-07,
+     -6.719535008414823e-07,
+     2.353672812205332e-14
+    ],
+    [
+     6.719578209413157e-07,
+     -4.727421128336573e-06,
+     -1.0,
+     1.0211039125351817e-08
+    ],
+    [
+     9.089295076591952e-07,
+     -1.0,
+     4.727418399852468e-06,
+     -1.9664738587499286e-11
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Pelvis.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.11999999731779099,
+   "enabled": true,
+   "end": {
+    "display_size": 0.11999999731779099,
+    "follow": {
+     "bone": "Spine",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      1.0,
+      -7.172710758673873e-10,
+      6.719542966493464e-07,
+      1.0580078479982546e-13
+     ],
+     [
+      -6.719542966493464e-07,
+      4.727421128336573e-06,
+      1.0,
+      0.0802292674779892
+     ],
+     [
+      -7.204979390884603e-10,
+      -1.0,
+      4.727417945105117e-06,
+      -9.47692924135879e-10
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Spine.02"
+   },
+   "follow": {
+    "bone": "Spine",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     1.0,
+     -7.172710758673873e-10,
+     6.719542966493464e-07,
+     1.0607313638555382e-13
+    ],
+    [
+     -6.719542966493464e-07,
+     4.727421128336573e-06,
+     1.0,
+     -1.4488701793879954e-08
+    ],
+    [
+     -7.204979390884603e-10,
+     -1.0,
+     4.727417945105117e-06,
+     -2.4556306987832954e-10
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Spine.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.11999999731779099,
+   "enabled": true,
+   "end": {
+    "display_size": 0.11999999731779099,
+    "follow": {
+     "bone": "Spine1",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      1.0,
+      2.5014781357413085e-08,
+      9.287260240853357e-07,
+      2.2926105458509483e-13
+     ],
+     [
+      -9.287521152145928e-07,
+      0.0010634075151756406,
+      0.999999463558197,
+      0.08022934198379517
+     ],
+     [
+      2.4027109191138152e-08,
+      -0.999999463558197,
+      0.0010634075151756406,
+      -1.5134191677645958e-09
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Spine1.02"
+   },
+   "follow": {
+    "bone": "Spine1",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     1.0,
+     2.5014781357413085e-08,
+     9.287260240853357e-07,
+     1.9828583219805296e-13
+    ],
+    [
+     -9.287521152145928e-07,
+     0.0010634075151756406,
+     0.999999463558197,
+     -1.5279803733392328e-07
+    ],
+    [
+     2.4027109191138152e-08,
+     -0.999999463558197,
+     0.0010634075151756406,
+     -1.3970020695808216e-09
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Spine1.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.11999999731779099,
+   "enabled": true,
+   "end": {
+    "display_size": 0.11999999731779099,
+    "follow": {
+     "bone": "Spine2",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      1.0,
+      -1.4636668765888317e-07,
+      1.3384587873588316e-06,
+      1.7275070263167436e-13
+     ],
+     [
+      -1.3384589010456693e-06,
+      -1.923995569086401e-06,
+      0.9999998807907104,
+      0.08906465023756027
+     ],
+     [
+      -1.463641865484533e-07,
+      -1.0,
+      -1.923996251207427e-06,
+      1.2190044113014054e-11
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Spine2.02"
+   },
+   "follow": {
+    "bone": "Spine2",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     1.0,
+     -1.4636668765888317e-07,
+     1.3384587873588316e-06,
+     2.615685446016869e-13
+    ],
+    [
+     -1.3384589010456693e-06,
+     -1.923995569086401e-06,
+     0.9999998807907104,
+     5.424967497447142e-08
+    ],
+    [
+     -1.463641865484533e-07,
+     -1.0,
+     -1.923996251207427e-06,
+     8.761991132644198e-12
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Spine2.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.05000000074505806,
+   "enabled": true,
+   "end": {
+    "display_size": 0.05000000074505806,
+    "follow": {
+     "bone": "Neck",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      1.0,
+      -1.6454147555577947e-07,
+      1.8334720834900509e-06,
+      5.21027665456586e-13
+     ],
+     [
+      -1.8334718561163754e-06,
+      1.9526178220985457e-06,
+      0.9999998807907104,
+      0.06630661338567734
+     ],
+     [
+      -1.6454511353458656e-07,
+      -1.0,
+      1.952616912603844e-06,
+      -1.5942366871080083e-10
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Neck.02"
+   },
+   "follow": {
+    "bone": "Neck",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     1.0,
+     -1.6454147555577947e-07,
+     1.8334720834900509e-06,
+     5.42343947529389e-13
+    ],
+    [
+     -1.8334718561163754e-06,
+     1.9526178220985457e-06,
+     0.9999998807907104,
+     2.20293898678392e-08
+    ],
+    [
+     -1.6454511353458656e-07,
+     -1.0,
+     1.952616912603844e-06,
+     -1.7695143961216075e-10
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Neck.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.10000000149011612,
+   "enabled": true,
+   "end": {
+    "display_size": 0.10000000149011612,
+    "follow": {
+     "bone": "Head",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      1.0,
+      2.1281744011503179e-07,
+      2.5600936481851022e-08,
+      1.0247358517290195e-13
+     ],
+     [
+      -2.56012420152274e-08,
+      1.832094994824729e-06,
+      0.9999998807907104,
+      0.06181884557008743
+     ],
+     [
+      2.128173548499035e-07,
+      -1.0,
+      1.8320943127037026e-06,
+      1.057102738677429e-10
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Head.02"
+   },
+   "follow": {
+    "bone": "Head",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     1.0,
+     2.1281744011503179e-07,
+     2.5600936481851022e-08,
+     8.903988657493755e-14
+    ],
+    [
+     -2.56012420152274e-08,
+     1.832094994824729e-06,
+     0.9999998807907104,
+     6.169255328813961e-09
+    ],
+    [
+     2.128173548499035e-07,
+     -1.0,
+     1.8320943127037026e-06,
+     3.1650858149656624e-12
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Head.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.05000000074505806,
+   "enabled": true,
+   "end": {
+    "display_size": 0.05000000074505806,
+    "follow": {
+     "bone": "UpperArm_L",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -0.7480823397636414,
+      3.420971950163221e-07,
+      -0.6636055707931519,
+      2.2341396288538817e-08
+     ],
+     [
+      0.6605143547058105,
+      0.09641025215387344,
+      -0.7445974349975586,
+      0.20438209176063538
+     ],
+     [
+      0.06397812813520432,
+      -0.995341420173645,
+      -0.07212304323911667,
+      -9.313225746154785e-10
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.UpperArm_L.02"
+   },
+   "follow": {
+    "bone": "UpperArm_L",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -0.7480823397636414,
+     3.420971950163221e-07,
+     -0.6636055707931519,
+     2.3038703389488546e-08
+    ],
+    [
+     0.6605143547058105,
+     0.09641025215387344,
+     -0.7445974349975586,
+     -1.496955519542098e-07
+    ],
+    [
+     0.06397812813520432,
+     -0.995341420173645,
+     -0.07212304323911667,
+     1.862645149230957e-09
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.UpperArm_L.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.05000000074505806,
+   "enabled": true,
+   "end": {
+    "display_size": 0.05000000074505806,
+    "follow": {
+     "bone": "UpperArm_R",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -0.7480772137641907,
+      6.85080885887146e-06,
+      0.6636114716529846,
+      -4.4991381287218246e-08
+     ],
+     [
+      -0.6605200171470642,
+      0.09640862047672272,
+      -0.7445929050445557,
+      0.20438386499881744
+     ],
+     [
+      -0.0639830082654953,
+      -0.9953418970108032,
+      -0.07211656868457794,
+      1.0244548320770264e-08
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.UpperArm_R.02"
+   },
+   "follow": {
+    "bone": "UpperArm_R",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -0.7480772137641907,
+     6.85080885887146e-06,
+     0.6636114716529846,
+     -6.077281966554438e-08
+    ],
+    [
+     -0.6605200171470642,
+     0.09640862047672272,
+     -0.7445929050445557,
+     1.619919203221798e-07
+    ],
+    [
+     -0.0639830082654953,
+     -0.9953418970108032,
+     -0.07211656868457794,
+     8.614733815193176e-09
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.UpperArm_R.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.03999999910593033,
+   "enabled": true,
+   "end": {
+    "display_size": 0.03999999910593033,
+    "follow": {
+     "bone": "Forearm_L",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -0.7468370795249939,
+      1.3166420842480875e-07,
+      -0.6650067567825317,
+      6.267821817118602e-08
+     ],
+     [
+      0.6649906635284424,
+      0.006976261269301176,
+      -0.7468187212944031,
+      0.2432354986667633
+     ],
+     [
+      0.004639154765754938,
+      -0.9999755024909973,
+      -0.0052102236077189445,
+      6.51925802230835e-09
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Forearm_L.02"
+   },
+   "follow": {
+    "bone": "Forearm_L",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -0.7468370795249939,
+     1.3166420842480875e-07,
+     -0.6650067567825317,
+     3.265306602884266e-08
+    ],
+    [
+     0.6649906635284424,
+     0.006976261269301176,
+     -0.7468187212944031,
+     6.883055903017521e-09
+    ],
+    [
+     0.004639154765754938,
+     -0.9999755024909973,
+     -0.0052102236077189445,
+     8.381903171539307e-09
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Forearm_L.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.03999999910593033,
+   "enabled": true,
+   "end": {
+    "display_size": 0.03999999910593033,
+    "follow": {
+     "bone": "Forearm_R",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -0.7468371987342834,
+      -2.6919033757621946e-07,
+      0.6650069355964661,
+      2.02316542186054e-07
+     ],
+     [
+      -0.6649909615516663,
+      0.0069761318154633045,
+      -0.7468189597129822,
+      0.24323546886444092
+     ],
+     [
+      -0.004638987593352795,
+      -0.9999757409095764,
+      -0.005210209172219038,
+      -3.841705620288849e-09
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Forearm_R.02"
+   },
+   "follow": {
+    "bone": "Forearm_R",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -0.7468371987342834,
+     -2.6919033757621946e-07,
+     0.6650069355964661,
+     1.878720894410435e-07
+    ],
+    [
+     -0.6649909615516663,
+     0.0069761318154633045,
+     -0.7468189597129822,
+     -1.0049552656710148e-07
+    ],
+    [
+     -0.004638987593352795,
+     -0.9999757409095764,
+     -0.005210209172219038,
+     -4.190951585769653e-09
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Forearm_R.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.07500000298023224,
+   "enabled": true,
+   "end": {
+    "display_size": 0.07500000298023224,
+    "follow": {
+     "bone": "Thigh_L",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -1.0,
+      -1.3266181895232876e-06,
+      -1.2447719655028777e-06,
+      1.8108741173250564e-08
+     ],
+     [
+      1.2419802715157857e-06,
+      0.0021024972666054964,
+      -0.9999978542327881,
+      0.3908063471317291
+     ],
+     [
+      1.3292324183566961e-06,
+      -0.9999977946281433,
+      -0.0021024970337748528,
+      9.994494121201569e-11
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Thigh_L.02"
+   },
+   "follow": {
+    "bone": "Thigh_L",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -1.0,
+     -1.3266181895232876e-06,
+     -1.2447719655028777e-06,
+     1.7022760090412703e-08
+    ],
+    [
+     1.2419802715157857e-06,
+     0.0021024972666054964,
+     -0.9999978542327881,
+     -3.7701369137721485e-08
+    ],
+    [
+     1.3292324183566961e-06,
+     -0.9999977946281433,
+     -0.0021024970337748528,
+     2.1572077457676642e-10
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Thigh_L.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.07500000298023224,
+   "enabled": true,
+   "end": {
+    "display_size": 0.07500000298023224,
+    "follow": {
+     "bone": "Thigh_R",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -1.0,
+      1.1517853408804513e-06,
+      1.238847062268178e-06,
+      -1.371544122719115e-08
+     ],
+     [
+      -1.2364225767669268e-06,
+      0.0021024972666054964,
+      -0.9999978542327881,
+      0.3908063471317291
+     ],
+     [
+      -1.1543874052222236e-06,
+      -0.9999977946281433,
+      -0.0021024970337748528,
+      3.218332267351798e-10
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Thigh_R.02"
+   },
+   "follow": {
+    "bone": "Thigh_R",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -1.0,
+     1.1517853408804513e-06,
+     1.238847062268178e-06,
+     -1.4801377901108026e-08
+    ],
+    [
+     -1.2364225767669268e-06,
+     0.0021024972666054964,
+     -0.9999978542327881,
+     -3.8149885028815333e-08
+    ],
+    [
+     -1.1543874052222236e-06,
+     -0.9999977946281433,
+     -0.0021024970337748528,
+     2.0486368157435209e-10
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Thigh_R.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.05000000074505806,
+   "enabled": true,
+   "end": {
+    "display_size": 0.05000000074505806,
+    "follow": {
+     "bone": "Calf_L",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -1.0,
+      2.2441781766247004e-10,
+      -0.00010744255996542051,
+      1.0265738259462864e-09
+     ],
+     [
+      0.00010739092977019027,
+      0.030997995287179947,
+      -0.9995194673538208,
+      0.4000934958457947
+     ],
+     [
+      3.3302790143352468e-06,
+      -0.9995194673538208,
+      -0.030997997149825096,
+      1.8917489796876907e-10
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Calf_L.02"
+   },
+   "follow": {
+    "bone": "Calf_L",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -1.0,
+     2.2441781766247004e-10,
+     -0.00010744255996542051,
+     2.10972728176273e-09
+    ],
+    [
+     0.00010739092977019027,
+     0.030997995287179947,
+     -0.9995194673538208,
+     -4.3941327021457255e-08
+    ],
+    [
+     3.3302790143352468e-06,
+     -0.9995194673538208,
+     -0.030997997149825096,
+     -1.1180532055732328e-09
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Calf_L.01",
+   "shape": "CAPSULE"
+  },
+  {
+   "display_size": 0.05000000074505806,
+   "enabled": true,
+   "end": {
+    "display_size": 0.05000000074505806,
+    "follow": {
+     "bone": "Calf_R",
+     "kind": "BONE"
+    },
+    "matrix": [
+     [
+      -1.0000001192092896,
+      -1.7507069571820466e-07,
+      0.00010744257451733574,
+      -2.9572926329990423e-09
+     ],
+     [
+      -0.00010739636491052806,
+      0.030997995287179947,
+      -0.9995194673538208,
+      0.4000934958457947
+     ],
+     [
+      -3.1555175610264996e-06,
+      -0.9995194673538208,
+      -0.030997997149825096,
+      -2.660272002685815e-11
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "name": "Capsule.Calf_R.02"
+   },
+   "follow": {
+    "bone": "Calf_R",
+    "kind": "BONE"
+   },
+   "matrix": [
+    [
+     -1.0000001192092896,
+     -1.7507069571820466e-07,
+     0.00010744257451733574,
+     -1.86470971996755e-09
+    ],
+    [
+     -0.00010739636491052806,
+     0.030997995287179947,
+     -0.9995194673538208,
+     -4.393768904265016e-08
+    ],
+    [
+     -3.1555175610264996e-06,
+     -0.9995194673538208,
+     -0.030997997149825096,
+     -1.0934968486253638e-09
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "name": "Capsule.Calf_R.01",
+   "shape": "CAPSULE"
+  }
+ ],
+ "format": 6,
+ "scope": "OBJECT",
+ "settings": {
+  "configs": [
+   {
+    "angle_limit": {
+     "axis_ratio": 1.0,
+     "limit_angle": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 60.0
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use": true
+    },
+    "angle_restoration": {
+     "gravity_falloff": 0.0,
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 0.35
+     },
+     "use": true,
+     "velocity_attenuation": 0.800000011920929
+    },
+    "animation_pose_ratio": 0.0,
+    "attribute_overrides": [],
+    "blend_weight": 1.0,
+    "cloth_type": "BONE_CLOTH",
+    "collider_collision": {
+     "collider_references": [
+      {
+       "collider": "Capsule.Pelvis.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Spine.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Spine1.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Spine2.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Neck.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Head.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.UpperArm_L.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.UpperArm_R.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Forearm_L.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Forearm_R.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Thigh_L.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Thigh_R.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Calf_L.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Calf_R.01",
+       "name": ""
+      }
+     ],
+     "collision_bones": [],
+     "friction": 0.05000000074505806,
+     "limit_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.05000000074505806
+     },
+     "mode": "POINT",
+     "name": ""
+    },
+    "connection_mode": "SEQUENTIAL_NON_LOOP_MESH",
+    "culling": {
+     "camera_culling_mode": "OFF",
+     "distance_culling_fade_ratio": 0.20000000298023224,
+     "distance_culling_length": {
+      "name": "",
+      "use": false,
+      "value": 30.0
+     },
+     "distance_culling_reference_object": null,
+     "name": ""
+    },
+    "custom_skinning_enable": false,
+    "damping": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.1
+    },
+    "disable_mode": "RESET",
+    "distance": {
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 1.0
+     }
+    },
+    "enabled": true,
+    "gizmos": {
+     "always": false,
+     "animated_axis": false,
+     "animated_position": false,
+     "animated_shape": false,
+     "axis": false,
+     "base_line": false,
+     "depth": false,
+     "enable": false,
+     "inertia_center": true,
+     "name": "",
+     "position": true,
+     "shape": false,
+     "ztest": false
+    },
+    "gravity": 5.0,
+    "gravity_direction": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "gravity_falloff": 0.0,
+    "inertia": {
+     "anchor_bone": "",
+     "anchor_inertia": 0.0,
+     "anchor_object": null,
+     "centrifugal_acceleration": 0.0,
+     "depth_inertia": 0.0,
+     "local_inertia": 1.0,
+     "local_movement_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 5.0
+     },
+     "local_rotation_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 720.0
+     },
+     "movement_inertia_smoothing": 0.4000000059604645,
+     "movement_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 5.0
+     },
+     "name": "",
+     "particle_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 4.0
+     },
+     "rotation_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 720.0
+     },
+     "teleport_distance": 0.5,
+     "teleport_mode": "NONE",
+     "teleport_rotation": 90.0,
+     "world_inertia": 0.3
+    },
+    "motion": {
+     "backstop_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.0
+     },
+     "backstop_radius": 10.0,
+     "max_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.30000001192092896
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use_backstop": false,
+     "use_max_distance": false
+    },
+    "name": "外套衣摆",
+    "normal_alignment_bone": "",
+    "normal_alignment_mode": "NONE",
+    "normal_alignment_object": null,
+    "normal_axis": "UP",
+    "radius": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.019999999552965164
+    },
+    "root_bones": [
+     {
+      "bone": "Yibai_01_01_L",
+      "name": ""
+     },
+     {
+      "bone": "Yibai_02_01_L",
+      "name": ""
+     },
+     {
+      "bone": "Yibai_03_01_L",
+      "name": ""
+     },
+     {
+      "bone": "Yibai_Center_01",
+      "name": ""
+     },
+     {
+      "bone": "Yibai_03_01_R",
+      "name": ""
+     },
+     {
+      "bone": "Yibai_02_01_R",
+      "name": ""
+     },
+     {
+      "bone": "Yibai_01_01_R",
+      "name": ""
+     }
+    ],
+    "root_rotation": 0.5,
+    "rotational_interpolation": 0.5,
+    "self_collision": {
+     "cloth_mass": 0.0,
+     "name": "",
+     "self_mode": "NONE",
+     "surface_thickness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.004999999888241291
+     },
+     "sync_mode": "NONE",
+     "sync_partner": ""
+    },
+    "skinning_bones": [],
+    "spring": {
+     "limit_distance": 0.10000000149011612,
+     "name": "",
+     "noise": 0.0,
+     "normal_limit_ratio": 1.0,
+     "spring_power": 0.03999999910593033,
+     "use_spring": true
+    },
+    "stablization_time": 0.10000000149011612,
+    "tether": {
+     "distance_compression": 0.4000000059604645,
+     "name": ""
+    },
+    "time_scale": 1.0,
+    "triangle_bending": {
+     "name": "",
+     "stiffness": 1.0
+    },
+    "wind": {
+     "blend": 0.699999988079071,
+     "depth_weight": 0.0,
+     "frequency": 1.0,
+     "influence": 1.0,
+     "moving_wind": 0.0,
+     "name": "",
+     "synchronization": 0.699999988079071,
+     "turbulence": 1.0
+    }
+   },
+   {
+    "angle_limit": {
+     "axis_ratio": 1.0,
+     "limit_angle": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 60.0
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use": true
+    },
+    "angle_restoration": {
+     "gravity_falloff": 0.0,
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 0.35
+     },
+     "use": true,
+     "velocity_attenuation": 0.800000011920929
+    },
+    "animation_pose_ratio": 0.0,
+    "attribute_overrides": [],
+    "blend_weight": 1.0,
+    "cloth_type": "BONE_CLOTH",
+    "collider_collision": {
+     "collider_references": [
+      {
+       "collider": "Capsule.Neck.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Head.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Spine2.01",
+       "name": ""
+      }
+     ],
+     "collision_bones": [],
+     "friction": 0.05000000074505806,
+     "limit_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.05000000074505806
+     },
+     "mode": "POINT",
+     "name": ""
+    },
+    "connection_mode": "LINE",
+    "culling": {
+     "camera_culling_mode": "OFF",
+     "distance_culling_fade_ratio": 0.20000000298023224,
+     "distance_culling_length": {
+      "name": "",
+      "use": false,
+      "value": 30.0
+     },
+     "distance_culling_reference_object": null,
+     "name": ""
+    },
+    "custom_skinning_enable": false,
+    "damping": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.1
+    },
+    "disable_mode": "RESET",
+    "distance": {
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 1.0
+     }
+    },
+    "enabled": true,
+    "gizmos": {
+     "always": false,
+     "animated_axis": false,
+     "animated_position": false,
+     "animated_shape": false,
+     "axis": false,
+     "base_line": false,
+     "depth": false,
+     "enable": false,
+     "inertia_center": true,
+     "name": "",
+     "position": true,
+     "shape": false,
+     "ztest": false
+    },
+    "gravity": 5.0,
+    "gravity_direction": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "gravity_falloff": 0.0,
+    "inertia": {
+     "anchor_bone": "",
+     "anchor_inertia": 0.0,
+     "anchor_object": null,
+     "centrifugal_acceleration": 0.0,
+     "depth_inertia": 0.0,
+     "local_inertia": 1.0,
+     "local_movement_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 5.0
+     },
+     "local_rotation_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 720.0
+     },
+     "movement_inertia_smoothing": 0.4000000059604645,
+     "movement_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 5.0
+     },
+     "name": "",
+     "particle_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 4.0
+     },
+     "rotation_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 720.0
+     },
+     "teleport_distance": 0.5,
+     "teleport_mode": "NONE",
+     "teleport_rotation": 90.0,
+     "world_inertia": 0.3
+    },
+    "motion": {
+     "backstop_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.0
+     },
+     "backstop_radius": 10.0,
+     "max_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.30000001192092896
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use_backstop": false,
+     "use_max_distance": false
+    },
+    "name": "外套兜帽",
+    "normal_alignment_bone": "",
+    "normal_alignment_mode": "NONE",
+    "normal_alignment_object": null,
+    "normal_axis": "UP",
+    "radius": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.019999999552965164
+    },
+    "root_bones": [
+     {
+      "bone": "Hat_Center_01",
+      "name": ""
+     }
+    ],
+    "root_rotation": 0.5,
+    "rotational_interpolation": 0.5,
+    "self_collision": {
+     "cloth_mass": 0.0,
+     "name": "",
+     "self_mode": "NONE",
+     "surface_thickness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.004999999888241291
+     },
+     "sync_mode": "NONE",
+     "sync_partner": ""
+    },
+    "skinning_bones": [],
+    "spring": {
+     "limit_distance": 0.10000000149011612,
+     "name": "",
+     "noise": 0.0,
+     "normal_limit_ratio": 1.0,
+     "spring_power": 0.03999999910593033,
+     "use_spring": true
+    },
+    "stablization_time": 0.10000000149011612,
+    "tether": {
+     "distance_compression": 0.4000000059604645,
+     "name": ""
+    },
+    "time_scale": 1.0,
+    "triangle_bending": {
+     "name": "",
+     "stiffness": 1.0
+    },
+    "wind": {
+     "blend": 0.699999988079071,
+     "depth_weight": 0.0,
+     "frequency": 1.0,
+     "influence": 1.0,
+     "moving_wind": 0.0,
+     "name": "",
+     "synchronization": 0.699999988079071,
+     "turbulence": 1.0
+    }
+   },
+   {
+    "angle_limit": {
+     "axis_ratio": 1.0,
+     "limit_angle": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 60.0
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use": true
+    },
+    "angle_restoration": {
+     "gravity_falloff": 0.0,
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 0.35
+     },
+     "use": true,
+     "velocity_attenuation": 0.800000011920929
+    },
+    "animation_pose_ratio": 0.0,
+    "attribute_overrides": [],
+    "blend_weight": 1.0,
+    "cloth_type": "BONE_CLOTH",
+    "collider_collision": {
+     "collider_references": [
+      {
+       "collider": "Capsule.UpperArm_L.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.UpperArm_R.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Spine2.01",
+       "name": ""
+      }
+     ],
+     "collision_bones": [],
+     "friction": 0.05000000074505806,
+     "limit_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.05000000074505806
+     },
+     "mode": "POINT",
+     "name": ""
+    },
+    "connection_mode": "LINE",
+    "culling": {
+     "camera_culling_mode": "OFF",
+     "distance_culling_fade_ratio": 0.20000000298023224,
+     "distance_culling_length": {
+      "name": "",
+      "use": false,
+      "value": 30.0
+     },
+     "distance_culling_reference_object": null,
+     "name": ""
+    },
+    "custom_skinning_enable": false,
+    "damping": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.1
+    },
+    "disable_mode": "RESET",
+    "distance": {
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 1.0
+     }
+    },
+    "enabled": true,
+    "gizmos": {
+     "always": false,
+     "animated_axis": false,
+     "animated_position": false,
+     "animated_shape": false,
+     "axis": false,
+     "base_line": false,
+     "depth": false,
+     "enable": false,
+     "inertia_center": true,
+     "name": "",
+     "position": true,
+     "shape": false,
+     "ztest": false
+    },
+    "gravity": 5.0,
+    "gravity_direction": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "gravity_falloff": 0.0,
+    "inertia": {
+     "anchor_bone": "",
+     "anchor_inertia": 0.0,
+     "anchor_object": null,
+     "centrifugal_acceleration": 0.0,
+     "depth_inertia": 0.0,
+     "local_inertia": 1.0,
+     "local_movement_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 5.0
+     },
+     "local_rotation_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 720.0
+     },
+     "movement_inertia_smoothing": 0.4000000059604645,
+     "movement_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 5.0
+     },
+     "name": "",
+     "particle_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 4.0
+     },
+     "rotation_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 720.0
+     },
+     "teleport_distance": 0.5,
+     "teleport_mode": "NONE",
+     "teleport_rotation": 90.0,
+     "world_inertia": 0.3
+    },
+    "motion": {
+     "backstop_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.0
+     },
+     "backstop_radius": 10.0,
+     "max_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.30000001192092896
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use_backstop": false,
+     "use_max_distance": false
+    },
+    "name": "外套袖口",
+    "normal_alignment_bone": "",
+    "normal_alignment_mode": "NONE",
+    "normal_alignment_object": null,
+    "normal_axis": "UP",
+    "radius": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.019999999552965164
+    },
+    "root_bones": [
+     {
+      "bone": "Sleeve_01_01_L",
+      "name": ""
+     },
+     {
+      "bone": "Sleeve_01_01_R",
+      "name": ""
+     }
+    ],
+    "root_rotation": 0.5,
+    "rotational_interpolation": 0.5,
+    "self_collision": {
+     "cloth_mass": 0.0,
+     "name": "",
+     "self_mode": "NONE",
+     "surface_thickness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.004999999888241291
+     },
+     "sync_mode": "NONE",
+     "sync_partner": ""
+    },
+    "skinning_bones": [],
+    "spring": {
+     "limit_distance": 0.10000000149011612,
+     "name": "",
+     "noise": 0.0,
+     "normal_limit_ratio": 1.0,
+     "spring_power": 0.03999999910593033,
+     "use_spring": true
+    },
+    "stablization_time": 0.10000000149011612,
+    "tether": {
+     "distance_compression": 0.4000000059604645,
+     "name": ""
+    },
+    "time_scale": 1.0,
+    "triangle_bending": {
+     "name": "",
+     "stiffness": 1.0
+    },
+    "wind": {
+     "blend": 0.699999988079071,
+     "depth_weight": 0.0,
+     "frequency": 1.0,
+     "influence": 1.0,
+     "moving_wind": 0.0,
+     "name": "",
+     "synchronization": 0.699999988079071,
+     "turbulence": 1.0
+    }
+   },
+   {
+    "angle_limit": {
+     "axis_ratio": 1.0,
+     "limit_angle": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 60.0
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use": true
+    },
+    "angle_restoration": {
+     "gravity_falloff": 0.0,
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 0.35
+     },
+     "use": true,
+     "velocity_attenuation": 0.800000011920929
+    },
+    "animation_pose_ratio": 0.0,
+    "attribute_overrides": [],
+    "blend_weight": 1.0,
+    "cloth_type": "BONE_CLOTH",
+    "collider_collision": {
+     "collider_references": [
+      {
+       "collider": "Capsule.Head.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Neck.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Spine2.01",
+       "name": ""
+      }
+     ],
+     "collision_bones": [],
+     "friction": 0.05000000074505806,
+     "limit_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.05000000074505806
+     },
+     "mode": "POINT",
+     "name": ""
+    },
+    "connection_mode": "LINE",
+    "culling": {
+     "camera_culling_mode": "OFF",
+     "distance_culling_fade_ratio": 0.20000000298023224,
+     "distance_culling_length": {
+      "name": "",
+      "use": false,
+      "value": 30.0
+     },
+     "distance_culling_reference_object": null,
+     "name": ""
+    },
+    "custom_skinning_enable": false,
+    "damping": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.1
+    },
+    "disable_mode": "RESET",
+    "distance": {
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 1.0
+     }
+    },
+    "enabled": true,
+    "gizmos": {
+     "always": false,
+     "animated_axis": false,
+     "animated_position": false,
+     "animated_shape": false,
+     "axis": false,
+     "base_line": false,
+     "depth": false,
+     "enable": false,
+     "inertia_center": true,
+     "name": "",
+     "position": true,
+     "shape": false,
+     "ztest": false
+    },
+    "gravity": 5.0,
+    "gravity_direction": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "gravity_falloff": 0.0,
+    "inertia": {
+     "anchor_bone": "",
+     "anchor_inertia": 0.0,
+     "anchor_object": null,
+     "centrifugal_acceleration": 0.0,
+     "depth_inertia": 0.0,
+     "local_inertia": 1.0,
+     "local_movement_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 5.0
+     },
+     "local_rotation_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 720.0
+     },
+     "movement_inertia_smoothing": 0.4000000059604645,
+     "movement_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 5.0
+     },
+     "name": "",
+     "particle_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 4.0
+     },
+     "rotation_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 720.0
+     },
+     "teleport_distance": 0.5,
+     "teleport_mode": "NONE",
+     "teleport_rotation": 90.0,
+     "world_inertia": 0.3
+    },
+    "motion": {
+     "backstop_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.0
+     },
+     "backstop_radius": 10.0,
+     "max_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.30000001192092896
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use_backstop": false,
+     "use_max_distance": false
+    },
+    "name": "头发",
+    "normal_alignment_bone": "",
+    "normal_alignment_mode": "NONE",
+    "normal_alignment_object": null,
+    "normal_axis": "UP",
+    "radius": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.019999999552965164
+    },
+    "root_bones": [
+     {
+      "bone": "HairA_01_Jnt",
+      "name": ""
+     },
+     {
+      "bone": "HairB_01_Jnt_L",
+      "name": ""
+     },
+     {
+      "bone": "HairB_01_Jnt_R",
+      "name": ""
+     },
+     {
+      "bone": "HairC_01_Jnt_L",
+      "name": ""
+     },
+     {
+      "bone": "HairC_01_Jnt_R",
+      "name": ""
+     },
+     {
+      "bone": "StrandA_01_Jnt",
+      "name": ""
+     },
+     {
+      "bone": "StrandB_01_Jnt",
+      "name": ""
+     }
+    ],
+    "root_rotation": 0.5,
+    "rotational_interpolation": 0.5,
+    "self_collision": {
+     "cloth_mass": 0.0,
+     "name": "",
+     "self_mode": "NONE",
+     "surface_thickness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.004999999888241291
+     },
+     "sync_mode": "NONE",
+     "sync_partner": ""
+    },
+    "skinning_bones": [],
+    "spring": {
+     "limit_distance": 0.10000000149011612,
+     "name": "",
+     "noise": 0.0,
+     "normal_limit_ratio": 1.0,
+     "spring_power": 0.03999999910593033,
+     "use_spring": true
+    },
+    "stablization_time": 0.10000000149011612,
+    "tether": {
+     "distance_compression": 0.4000000059604645,
+     "name": ""
+    },
+    "time_scale": 1.0,
+    "triangle_bending": {
+     "name": "",
+     "stiffness": 1.0
+    },
+    "wind": {
+     "blend": 0.699999988079071,
+     "depth_weight": 0.0,
+     "frequency": 1.0,
+     "influence": 1.0,
+     "moving_wind": 0.0,
+     "name": "",
+     "synchronization": 0.699999988079071,
+     "turbulence": 1.0
+    }
+   },
+   {
+    "angle_limit": {
+     "axis_ratio": 1.0,
+     "limit_angle": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 60.0
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use": true
+    },
+    "angle_restoration": {
+     "gravity_falloff": 0.0,
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": true,
+      "value": 0.35
+     },
+     "use": true,
+     "velocity_attenuation": 0.800000011920929
+    },
+    "animation_pose_ratio": 0.0,
+    "attribute_overrides": [],
+    "blend_weight": 1.0,
+    "cloth_type": "BONE_CLOTH",
+    "collider_collision": {
+     "collider_references": [
+      {
+       "collider": "Capsule.Neck.01",
+       "name": ""
+      },
+      {
+       "collider": "Capsule.Head.01",
+       "name": ""
+      }
+     ],
+     "collision_bones": [],
+     "friction": 0.05000000074505806,
+     "limit_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.05000000074505806
+     },
+     "mode": "POINT",
+     "name": ""
+    },
+    "connection_mode": "LINE",
+    "culling": {
+     "camera_culling_mode": "OFF",
+     "distance_culling_fade_ratio": 0.20000000298023224,
+     "distance_culling_length": {
+      "name": "",
+      "use": false,
+      "value": 30.0
+     },
+     "distance_culling_reference_object": null,
+     "name": ""
+    },
+    "custom_skinning_enable": false,
+    "damping": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.1
+    },
+    "disable_mode": "RESET",
+    "distance": {
+     "name": "",
+     "stiffness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 1.0
+     }
+    },
+    "enabled": true,
+    "gizmos": {
+     "always": false,
+     "animated_axis": false,
+     "animated_position": false,
+     "animated_shape": false,
+     "axis": false,
+     "base_line": false,
+     "depth": false,
+     "enable": false,
+     "inertia_center": true,
+     "name": "",
+     "position": true,
+     "shape": false,
+     "ztest": false
+    },
+    "gravity": 5.0,
+    "gravity_direction": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "gravity_falloff": 0.0,
+    "inertia": {
+     "anchor_bone": "",
+     "anchor_inertia": 0.0,
+     "anchor_object": null,
+     "centrifugal_acceleration": 0.0,
+     "depth_inertia": 0.0,
+     "local_inertia": 1.0,
+     "local_movement_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 5.0
+     },
+     "local_rotation_speed_limit": {
+      "name": "",
+      "use": false,
+      "value": 720.0
+     },
+     "movement_inertia_smoothing": 0.4000000059604645,
+     "movement_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 5.0
+     },
+     "name": "",
+     "particle_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 4.0
+     },
+     "rotation_speed_limit": {
+      "name": "",
+      "use": true,
+      "value": 720.0
+     },
+     "teleport_distance": 0.5,
+     "teleport_mode": "NONE",
+     "teleport_rotation": 90.0,
+     "world_inertia": 0.3
+    },
+    "motion": {
+     "backstop_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.0
+     },
+     "backstop_radius": 10.0,
+     "max_distance": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.30000001192092896
+     },
+     "name": "",
+     "stiffness": 1.0,
+     "use_backstop": false,
+     "use_max_distance": false
+    },
+    "name": "耳坠",
+    "normal_alignment_bone": "",
+    "normal_alignment_mode": "NONE",
+    "normal_alignment_object": null,
+    "normal_axis": "UP",
+    "radius": {
+     "name": "",
+     "points_serialized": "",
+     "use_curve": false,
+     "value": 0.019999999552965164
+    },
+    "root_bones": [
+     {
+      "bone": "Earring_01_Jnt_L",
+      "name": ""
+     },
+     {
+      "bone": "Earring_01_Jnt_R",
+      "name": ""
+     }
+    ],
+    "root_rotation": 0.5,
+    "rotational_interpolation": 0.5,
+    "self_collision": {
+     "cloth_mass": 0.0,
+     "name": "",
+     "self_mode": "NONE",
+     "surface_thickness": {
+      "name": "",
+      "points_serialized": "",
+      "use_curve": false,
+      "value": 0.004999999888241291
+     },
+     "sync_mode": "NONE",
+     "sync_partner": ""
+    },
+    "skinning_bones": [],
+    "spring": {
+     "limit_distance": 0.10000000149011612,
+     "name": "",
+     "noise": 0.0,
+     "normal_limit_ratio": 1.0,
+     "spring_power": 0.03999999910593033,
+     "use_spring": true
+    },
+    "stablization_time": 0.10000000149011612,
+    "tether": {
+     "distance_compression": 0.4000000059604645,
+     "name": ""
+    },
+    "time_scale": 1.0,
+    "triangle_bending": {
+     "name": "",
+     "stiffness": 1.0
+    },
+    "wind": {
+     "blend": 0.699999988079071,
+     "depth_weight": 0.0,
+     "frequency": 1.0,
+     "influence": 1.0,
+     "moving_wind": 0.0,
+     "name": "",
+     "synchronization": 0.699999988079071,
+     "turbulence": 1.0
+    }
+   }
+  ],
+  "display_depth": false,
+  "display_scope": "ACTIVE",
+  "gizmo_size": 5.909999847412109,
+  "name": "",
+  "show_bones": false,
+  "show_colliders": true,
+  "show_collision_radius": false,
+  "sync_list_selection": true
+ }
+}

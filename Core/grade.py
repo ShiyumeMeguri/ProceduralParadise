@@ -120,7 +120,11 @@ def grade_nodes(t, img, g):
     [0, 1] images, so over-range values are then first rolled off towards
     white -- c / m + (1 - 1 / m) with m the largest channel -- which keeps
     their hue and never lets one channel's curve extrapolate on its own
-    (bright saturated lamps would otherwise turn pink)."""
+    (bright saturated lamps would otherwise turn pink).  A grade whose
+    ``curves`` hold one ``"L"`` curve instead of R, G and B maps brightness
+    alone: the encoded luminance through the curve, each pixel's colour
+    scaled by what that did to it, so hue and saturation stay the render's
+    (the same curve on each channel would saturate the steep midtones)."""
     gamma = t.resolve("CompositorNodeGamma", "ShaderNodeGamma")
     rolloff = bool(g.get("highlight_rolloff", False))
     if rolloff:
@@ -139,12 +143,17 @@ def grade_nodes(t, img, g):
     for i in range(3):
         v = r * M[i][0] + gg * M[i][1] + b * M[i][2] + o[i]
         ch.append(v)
-    comb = t.n("CompositorNodeCombineColor", ch[0], ch[1], ch[2], 1.0).o
+    luminance_only = "L" in g["curves"]
+    if luminance_only:
+        luminance = ch[0] * 0.2126 + ch[1] * 0.7152 + ch[2] * 0.0722
+        comb = t.n("CompositorNodeCombineColor", luminance, luminance, luminance, 1.0).o
+    else:
+        comb = t.n("CompositorNodeCombineColor", ch[0], ch[1], ch[2], 1.0).o
     cv = t.n("CompositorNodeCurveRGB")
     t.link(comb, cv.n.inputs["Image"])
     mapping = cv.n.mapping
     for idx, name in ((0, "R"), (1, "G"), (2, "B")):
-        pts = g["curves"][name]
+        pts = g["curves"]["L" if luminance_only else name]
         curve = mapping.curves[idx]
         while len(curve.points) > 2:
             curve.points.remove(curve.points[1])
@@ -155,7 +164,11 @@ def grade_nodes(t, img, g):
     if rolloff and hasattr(mapping, "extend"):
         mapping.extend = "HORIZONTAL"
     mapping.update()
-    dec = t.n(gamma, cv.o, 2.2).o
+    graded = cv.o
+    if luminance_only:
+        ratio = t.math("DIVIDE", t.n("CompositorNodeSeparateColor", graded)[0], t.math("MAXIMUM", luminance, 0.0001))
+        graded = t.n("CompositorNodeCombineColor", ch[0] * ratio, ch[1] * ratio, ch[2] * ratio, 1.0).o
+    dec = t.n(gamma, graded, 2.2).o
     return dec
 
 
