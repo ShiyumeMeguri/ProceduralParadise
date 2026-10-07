@@ -1,0 +1,31 @@
+{
+ "notes": [
+  "The district air fitted to Breakout (fit_set.py) on frames whose far towers stand in it: how thick it is near the ground, how fast it thins with height and its colour -- the reference fades its far towers to a pale blue-grey; she and her scythe are masked, the worst tenth of the blocks left out (crows, shards)."
+ ],
+ "frames": [
+  150,
+  170,
+  185,
+  200
+ ],
+ "scale": 0.25,
+ "samples": 16,
+ "trim": 0.1,
+ "rounds": 3,
+ "spread": 3.0,
+ "texture": 3.0,
+ "parameters": [
+  {
+   "material": "CIN.Air.density",
+   "step": 0.002
+  },
+  {
+   "material": "CIN.Air.height",
+   "step": 20.0
+  },
+  {
+   "material": "color:air",
+   "step": 0.05
+  }
+ ]
+}

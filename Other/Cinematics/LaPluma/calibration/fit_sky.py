@@ -2,7 +2,7 @@
 A shot's sky fitted to its reference: the colours of its world and the look of its clouds.
 
     blender -b --factory-startup -P fit_sky.py -- <frames dir> <shot> [<masks dir> ...] --frames 214,230,262
-            [--scale 0.25] [--samples 16] [--rounds 3] [--exclude x0,y0,x1,y1 ...] [--spread 3] [--write]
+            [--scale 0.25] [--samples 16] [--rounds 3] [--exclude x0,y0,x1,y1 ...] [--spread 3] [--texture 5] [--write]
 
 The shot's sky alone -- its world, its cloud deck, the set's air and sun, through the shot's camera (focused as the
 film focuses it: on its performer's bone, the performer posed but not drawn), render settings and look, the
@@ -51,6 +51,7 @@ def _arguments():
     parser.add_argument("--rounds", type=int, default=3)
     parser.add_argument("--exclude", action="append", default=[])
     parser.add_argument("--spread", type=float, default=3.0)
+    parser.add_argument("--texture", type=float, default=5.0)
     parser.add_argument("--write", action="store_true")
     return parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
 
@@ -98,9 +99,10 @@ class Fit:
         for obj in self.reads.set_collection.all_objects:
             obj.hide_render = obj not in self.reads.air
         lights = sky_reads.SC.collection("Fit Lights", parent=scene.collection)
-        for lamp in spec.get("lights", []):
+        lamps = SCN.shot_lights(spec.get("lights", []), shot)
+        for lamp in lamps:
             SCN.build_lamp(lamp, lights)
-        self.sun = next((lamp for lamp in spec.get("lights", []) if lamp["light"] == "SUN"), None)
+        self.sun = next((lamp for lamp in lamps if lamp["light"] == "SUN"), None)
         settings = shot["render"]
         RND.ENGINES[settings["engine"]](samples=args.samples, **settings.get(settings["engine"].lower(), {}))
         scene.render.resolution_x, scene.render.resolution_y = self.reads.width, self.reads.height
@@ -125,7 +127,7 @@ class Fit:
             blocked |= self.reads.hidden_by_set(origin, rays, ~blocked, 8000.0)
             weights[frame] = (~blocked).astype(float)
             print(f"[fit sky] {args.shot} {frame}: {int(weights[frame].sum())} sky blocks of {blocked.size}", flush=True)
-        self.measure = picture_fit.Measure(pictures, weights, spread=args.spread)
+        self.measure = picture_fit.Measure(pictures, weights, spread=args.spread, texture=args.texture)
         self.built = None
 
     def _apply(self, sky):

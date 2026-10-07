@@ -8,7 +8,9 @@ The shot's set as the shot renders it -- its items (what is there for a while to
 through the shot's camera (focused as the film focuses it, on its performer's bone, the performer posed but not
 drawn), render settings and look -- is rendered at the spec's ``scale`` on its ``frames`` and compared with the
 reference on the blocks the masks leave (the cast and what it holds) by eye (:mod:`picture_fit`, leaving out the
-worst ``trim`` of the blocks: the shot's titles and cards, drawn over the picture, are not the set's).  The spec names
+worst ``trim`` of the blocks: the shot's titles and cards, drawn over the picture, are not the set's; the spread of
+colours weighed by the spec's ``spread``, 3 unless it says, the picture's detail by its ``texture``, none unless it
+says).  The spec names
 what is turned and by how much a step::
 
     {"frames": [700], "scale": 0.25, "trim": 0.15, "rounds": 4,
@@ -40,6 +42,8 @@ from Core import render as RND  # noqa: E402
 from Cinematics import scenes as SCN  # noqa: E402
 from Cinematics.Kit import materials as M  # noqa: E402
 
+
+SPREAD = 3.0
 
 def _arguments():
     parser = argparse.ArgumentParser()
@@ -113,8 +117,13 @@ class Fit:
         shot, set_spec = self.reads.shot, self.reads.spec
         scene = bpy.context.scene
         lights = sky_reads.SC.collection("Fit Lights", parent=scene.collection)
-        self.lamps = {lamp["name"]: SCN.build_lamp(lamp, lights) for lamp in set_spec.get("lights", [])}
-        self.sun = next((lamp for lamp in set_spec.get("lights", []) if lamp["light"] == "SUN"), None)
+        self.changes = shot.get("lights", {})
+        fitted = {entry["light"] for entry in spec["parameters"] if "light" in entry} & set(self.changes)
+        if fitted:
+            raise ValueError(f"{args.shot} lights {sorted(fitted)} its own way: fit them in the shot, not into the set")
+        lamps = SCN.shot_lights(set_spec.get("lights", []), shot)
+        self.lamps = {lamp["name"]: SCN.build_lamp(lamp, lights) for lamp in lamps}
+        self.sun = next((lamp for lamp in lamps if lamp["light"] == "SUN"), None)
         settings = shot["render"]
         RND.ENGINES[settings["engine"]](samples=spec.get("samples", 16), **settings.get(settings["engine"].lower(), {}))
         scene.render.resolution_x, scene.render.resolution_y = self.reads.width, self.reads.height
@@ -135,7 +144,8 @@ class Fit:
         for frame in self.frames:
             pictures[frame], blocked = self.reads.read(args.frames_dir, args.masks, frame)
             weights[frame] = (~blocked).astype(float)
-        self.measure = picture_fit.Measure(pictures, weights, spec.get("trim", 0.0))
+        self.measure = picture_fit.Measure(pictures, weights, spec.get("trim", 0.0), spec.get("spread", SPREAD),
+                                           spec.get("texture", 0.0))
         self.sky = None
 
     def _apply(self, state):
@@ -146,8 +156,9 @@ class Fit:
             SCN.set_item_inputs(self.reads.set_collection.all_objects[name], inputs)
         for lamp in state["lights"]:
             data = self.lamps[lamp["name"]].data
-            data.energy = lamp["power"]
-            data.color = lamp["color"]
+            shown = {**lamp, **self.changes.get(lamp["name"], {})}
+            data.energy = shown["power"]
+            data.color = shown["color"]
         SCN.set_materials({"materials": state["materials"]})
         for name, builder in M.LIBRARY.builders.items():
             material = bpy.data.materials.get(name)

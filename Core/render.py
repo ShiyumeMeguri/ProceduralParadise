@@ -242,11 +242,12 @@ def _band_hash(t, band, salt):
 
 
 def glitch_nodes(t, img, g):
-    """A picture breaking up (``look["glitch"]``): of its horizontal ``bands`` the keyed share is slid
-    sideways, each by up to ``shift`` of its width -- the red slid a little further and the blue a little
-    less, the picture's edge smeared into what a band leaves bare -- the bands drawn afresh as the share
-    moves.  ``keys`` are [frame, share] (0 leaves the picture
-    as it is)."""
+    """A picture breaking up (``look["glitch"]``): of its horizontal ``bands`` the keyed share is smeared
+    sideways -- each such band's rows stretched about a place of their own, drawn anywhere across, so that
+    what lay between ``smear`` and the whole of the width of them about it spans the picture (what the band
+    shows streaks along it), and slid by up to ``shift`` of the width, the picture's edge smeared into what a
+    band leaves bare -- the bands drawn afresh as the share moves.  ``keys`` are [frame, share] (0 leaves the
+    picture as it is)."""
     share = _keyed_value(t, "Glitch Share", g["keys"])
     coordinates = t.n("CompositorNodeImageCoordinates")
     t.link(img, coordinates.n.inputs[0])
@@ -255,16 +256,16 @@ def glitch_nodes(t, img, g):
     width = pixel_x / x
     band = t.math("FLOOR", y * float(g.get("bands", 48))) + share * 97.0
     chosen = t.math("LESS_THAN", _band_hash(t, band, 78.233), share)
-    slide = (_band_hash(t, band, 12.9898) - 0.5) * (2.0 * float(g.get("shift", 0.12))) * chosen * width
-    channels = []
-    for index, spread in ((0, 1.15), (1, 1.0), (2, 0.85)):
-        moved = t.n("CompositorNodeDisplace")
-        t.link(img, moved.n.inputs["Image"])
-        t.link(t.vec(slide * spread, 0.0, 0.0), moved.n.inputs["Displacement"])
-        _set(moved, "Extension X", "Extend")
-        channels.append(t.n("CompositorNodeSeparateColor", moved.o)[index])
-    alpha = t.n("CompositorNodeSeparateColor", img)[3]
-    return t.n("CompositorNodeCombineColor", channels[0], channels[1], channels[2], alpha).o
+    slide = (_band_hash(t, band, 12.9898) - 0.5) * (2.0 * float(g.get("shift", 0.12))) * width
+    anchor = _band_hash(t, band, 39.3467) * width
+    smear = float(g.get("smear", 1.0))
+    kept = (_band_hash(t, band, 51.731) ** 2.0) * (1.0 - smear) + smear
+    source = anchor + (pixel_x - anchor) * kept - slide
+    moved = t.n("CompositorNodeDisplace")
+    t.link(img, moved.n.inputs["Image"])
+    t.link(t.vec((pixel_x - source) * chosen, 0.0, 0.0), moved.n.inputs["Displacement"])
+    _set(moved, "Extension X", "Extend")
+    return moved.o
 
 
 def fade_nodes(t, img, keys, display):
@@ -339,7 +340,7 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
          "hue_sat": {"hue": 0.5, "saturation": 1.0, "value": 1.0},
          "curves": {"C": [[x,y],...], "R": [...], "G": [...], "B": [...]},
          "grade": {...}, "engine_transfer": {...},   (Core.grade dicts)
-         "glitch": {"bands": 48, "shift": 0.12, "keys": [[frame, share], ...]},
+         "glitch": {"bands": 48, "shift": 0.12, "smear": 0.05, "keys": [[frame, share], ...]},
          "backdrop": [r, g, b],
          "fade": [[frame, level], ...]}
 

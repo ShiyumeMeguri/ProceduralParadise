@@ -44,6 +44,7 @@ A shot (``shots/<id>.json``)::
      "cast": {"LaPluma": {"performance": "performances/Breakout.json"}},
      "items": [item, ...],                          (optional)
      "hidden": ["Annex", ...],                      (optional: set items it leaves out)
+     "lights": {"Sun": {"power": 3.0}},             (optional: the set's lamps as it lights them)
      "sky": {...},                                  (optional: the set's sky with these changes)
      "wind": [{"direction": [x, y, z], "strength": 5.0, "turbulence": 1.0}, ...],   (optional)
      "overlays": [{"name", "asset", "inputs", "shown": [first, last],          (optional)
@@ -80,7 +81,9 @@ camera stood then, wherever the shot's camera is solved to stand.  The set
 items a shot's ``hidden`` names are not rendered over its frames: the
 reference leaves a building out of one picture that another shows, or flies
 crows of its own (fitted to its picture, calibration/fit_crows.py) where the
-set's flocks would wheel.
+set's flocks would wheel.  A shot's ``lights`` change the set's lamps over its
+frames alone, keyed on them as ``hidden`` is (:func:`shot_lights`: a sun the
+picture's clouds hold back), and its sky's clouds are lit by its sun.
 
 An overlay is an asset the shot's camera carries in front of its lens --
 a wipe, a title card -- drawn in the picture's own units: across from
@@ -240,6 +243,60 @@ def _hide_over(obj, first, last):
             part.keyframe_insert("hide_render", frame=frame)
 
 
+def shot_lights(set_lights, shot):
+    """The set's lamps (specs) as the shot lights them: each its ``lights`` names changed field by field."""
+    changes = shot.get("lights", {})
+    unknown = sorted(set(changes) - {lamp["name"] for lamp in set_lights})
+    if unknown:
+        raise KeyError(f"shot {shot['id']} lights {unknown}, which its set has no lamps of")
+    return [{**lamp, **changes.get(lamp["name"], {})} for lamp in set_lights]
+
+
+def _key_over(data, path, value, first, last):
+    """Key ``data``'s ``path`` to ``value`` on the frames ``first``..``last``, as it was before and after them, held."""
+    from Core.anim import fcurves_of
+    current = getattr(data, path)
+    width = len(current) if hasattr(current, "__len__") else 0
+    for channel in range(max(width, 1)):
+        index = channel if width else -1
+        curve = next((curve for curve in fcurves_of(data) if curve.data_path == path and curve.array_index == max(index, 0)), None)
+        held = current[channel] if width else current
+        before = curve.evaluate(first - 1) if curve else held
+        after = curve.evaluate(last + 1) if curve else held
+        if curve is not None:
+            for point in [point for point in curve.keyframe_points if first - 1 < point.co.x < last + 1]:
+                curve.keyframe_points.remove(point)
+        for frame, keyed in ((first - 1, before), (first, value[channel] if width else value), (last, value[channel] if width else value),
+                             (last + 1, after)):
+            if width:
+                vector = list(getattr(data, path))
+                vector[channel] = keyed
+                setattr(data, path, vector)
+            else:
+                setattr(data, path, keyed)
+            data.keyframe_insert(path, index=index, frame=frame)
+    for curve in fcurves_of(data):
+        if curve.data_path == path:
+            for point in curve.keyframe_points:
+                point.interpolation = "CONSTANT"
+
+
+def light_set_lamps(shot, set_collection):
+    """Key the set's lamps the shot's ``lights`` change over its frames (see the module notes)."""
+    first, last = shot["frames"]
+    for name, change in shot.get("lights", {}).items():
+        obj = set_collection.all_objects.get(name)
+        if obj is None or obj.type != "LIGHT":
+            raise KeyError(f"shot {shot['id']} lights '{name}', which its set has no lamp of")
+        if "power" in change:
+            _key_over(obj.data, "energy", change["power"], first, last)
+        if "color" in change:
+            _key_over(obj.data, "color", change["color"], first, last)
+        unknown = sorted(set(change) - {"power", "color"})
+        if unknown:
+            raise KeyError(f"shot {shot['id']} changes {unknown} of lamp '{name}': only power and color")
+
+
 def hide_set_items(shot, set_collection):
     """Leave the set items the shot's ``hidden`` names out of its frames (see the module notes)."""
     first, last = shot["frames"]
@@ -379,7 +436,8 @@ def build_set(folder, set_name, film, args):
         characters[name] = dict(rig=rig, objects=objects, prefix=prefix)
         cast_files.append(path)
         _rebuild_shading(entry)
-    return dict(id=set_name, scene=scene, world=world, sky=spec["sky"], sun=sun, sky_collection=sky_collection, sky_files=sky_files,
+    return dict(id=set_name, scene=scene, world=world, sky=spec["sky"], sun=sun, lights=spec.get("lights", []),
+                sky_collection=sky_collection, sky_files=sky_files,
                 collection=collection, characters=characters,
                 cast_files=cast_files, source=os.path.join(folder, "sets", f"{set_name}.json"))
 
@@ -684,8 +742,9 @@ def build_shot(folder, film, shot, built_set, args):
     _activate(scene)
     scene.collection.children.link(built_set["collection"])
     cast = SC.collection(f"Shot.{shot['id']}.Cast", parent=scene.collection)
+    sun = next((lamp for lamp in shot_lights(built_set["lights"], shot) if lamp["light"] == "SUN"), None)
     if "sky" in shot:
-        scene.world, _clouds, sky_files = build_sky(folder, shot_sky(built_set["sky"], shot["sky"]), built_set["sun"], f"Shot.{shot['id']}",
+        scene.world, _clouds, sky_files = build_sky(folder, shot_sky(built_set["sky"], shot["sky"]), sun, f"Shot.{shot['id']}",
                                                     scene.collection)
     else:
         scene.world, sky_files = built_set["world"], built_set["sky_files"]
@@ -700,8 +759,9 @@ def build_shot(folder, film, shot, built_set, args):
     camera, sources, camera_matrices = build_camera(f"Shot.{shot['id']}.Camera", folder, shot["camera"], film, cameras)
     sources += sky_files
     scene.camera = camera
-    build_shot_items(shot, camera, scene, built_set["sun"])
+    build_shot_items(shot, camera, scene, sun)
     hide_set_items(shot, built_set["collection"])
+    light_set_lamps(shot, built_set["collection"])
     settings = shot["render"]
     engine = settings["engine"]
     RND.ENGINES[engine](samples=args.samples or settings.get("samples", 64), **settings.get(engine.lower(), {}))

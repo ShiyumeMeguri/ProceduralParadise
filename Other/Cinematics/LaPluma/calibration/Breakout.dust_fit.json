@@ -1,6 +1,6 @@
 {
  "notes": [
-  "The breach's dust fitted to the reference (fit_set.py) on frames where it fills the picture's left: the sky's light on it, its colour, how thick it is and how much more it throws forwards; she and her scythe are masked, the worst tenth of the blocks left out (the crows and the shards in front of it)."
+  "The breach's dust fitted to the reference (fit_set.py) on frames where it fills the picture's left: how its cloud is thrown, spreads and billows (Breach Cloud: growth, size, speed, drag, direction, wind, thickness, softness, billows, spread), the sky's light on it, its colour and how thick it is; she and her scythe are masked, the worst tenth of the blocks left out (the crows and the shards in front of it); the spread of its colours and its detail weighed in (a fit without them draws one grey mass, the mean of the reference's white billows and their shaded creases)."
  ],
  "frames": [
   110,
@@ -11,24 +11,81 @@
  "scale": 0.25,
  "samples": 16,
  "trim": 0.1,
- "rounds": 4,
+ "rounds": 3,
  "parameters": [
   {
-   "material": "CIN.Dust.ambient",
-   "step": 1.0
+   "item": "Breach Cloud",
+   "input": "Growth",
+   "step": 0.15
   },
   {
-   "material": "color:dust",
+   "item": "Breach Cloud",
+   "input": "Radius",
    "step": 0.1
   },
   {
-   "material": "CIN.Dust.density",
-   "step": 0.6
+   "item": "Breach Cloud",
+   "input": "Speed",
+   "step": 1.0
   },
   {
-   "material": "CIN.Dust.anisotropy",
-   "step": 0.15,
-   "start": 0.25
+   "item": "Breach Cloud",
+   "input": "Drag",
+   "step": 0.2,
+   "lowest": 0.05
+  },
+  {
+   "item": "Breach Cloud",
+   "input": "Direction",
+   "step": 0.2,
+   "lowest": -2.0
+  },
+  {
+   "item": "Breach Cloud",
+   "input": "Wind",
+   "step": 0.4,
+   "lowest": -5.0
+  },
+  {
+   "item": "Breach Cloud",
+   "input": "Spread",
+   "step": 8.0
+  },
+  {
+   "item": "Breach Cloud",
+   "input": "Thickness",
+   "step": 0.5
+  },
+  {
+   "item": "Breach Cloud",
+   "input": "Billows",
+   "step": 0.1
+  },
+  {
+   "item": "Breach Cloud",
+   "input": "Billow Size",
+   "step": 0.1,
+   "lowest": 0.15
+  },
+  {
+   "item": "Breach Cloud",
+   "input": "Softness",
+   "step": 0.08,
+   "lowest": 0.08
+  },
+  {
+   "material": "CIN.Dust.ambient",
+   "step": 0.4
+  },
+  {
+   "material": "color:dust",
+   "step": 0.06
+  },
+  {
+   "material": "CIN.Dust.density",
+   "step": 0.3
   }
- ]
+ ],
+ "spread": 3.0,
+ "texture": 5.0
 }

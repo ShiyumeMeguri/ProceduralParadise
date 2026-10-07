@@ -7,13 +7,19 @@ is a little wrong rather than wholly), the mean distance over the blocks -- leav
 what the fit cannot be asked to draw (a title over the picture, a fold of her coat the masks missed) -- plus how
 its colours are spread (the :data:`QUANTILES` of each of L, a and b over the blocks: as bright, as blue, as much
 cloud wherever it stands), the mean distance of the quantiles summed over L, a and b, times ``spread`` (a sky whose
-clouds cannot stand exactly where the picture's do is drawn grey to spare them unless its spread of colours counts).  Parameters are turned one
-after another (:func:`descend`), each to the better of a step either way, the steps halving round by round.
+clouds cannot stand exactly where the picture's do is drawn grey to spare them unless its spread of colours counts),
+plus how much detail it has (:func:`detail`: the energy of its lightness's bands at :data:`TEXTURE_SCALES` blocks
+where the band's whole reach is fitted, the absolute log of each band's ratio to the reference's summed) times
+``texture`` (a sky of small torn cloudlets and one of big soft clouds blur to the same blocks).  Parameters are turned
+one after another (:func:`descend`), each to the better of a step either way, the steps halving round by round.
 """
 import numpy as np
 
 BLUR = 2.0
 QUANTILES = [10, 30, 50, 70, 90]
+TEXTURE_SCALES = [1.0, 2.0, 4.0]
+TEXTURE_REACH = 0.9
+TEXTURE_FLOOR = 0.05
 
 
 def lab(rgb):
@@ -26,26 +32,43 @@ def lab(rgb):
     return np.stack([116.0 * f[..., 1] - 16.0, 500.0 * (f[..., 0] - f[..., 1]), 200.0 * (f[..., 1] - f[..., 2])], axis=-1)
 
 
-def blurred(values, weight, sigma=BLUR):
-    """``values`` (rows x columns x channels) blurred within ``weight``."""
+def blur(field, sigma):
+    """``field`` (rows x columns) blurred by a Gaussian ``sigma`` blocks wide."""
     radius = int(np.ceil(sigma * 3.0))
     kernel = np.exp(-0.5 * (np.arange(-radius, radius + 1) / sigma) ** 2)
+    rows = np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 1, field)
+    return np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 0, rows)
 
-    def blur(field):
-        rows = np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 1, field)
-        return np.apply_along_axis(lambda line: np.convolve(line, kernel, mode="same"), 0, rows)
-    total = np.stack([blur(values[..., channel] * weight) for channel in range(values.shape[-1])], axis=-1)
-    return total / np.maximum(blur(weight), 1e-6)[..., None]
+
+def blurred(values, weight, sigma=BLUR):
+    """``values`` (rows x columns x channels) blurred within ``weight``."""
+    total = np.stack([blur(values[..., channel] * weight, sigma) for channel in range(values.shape[-1])], axis=-1)
+    return total / np.maximum(blur(weight, sigma), 1e-6)[..., None]
+
+
+def detail(lightness, weight):
+    """How much detail ``lightness`` (rows x columns) has within ``weight``: for each of :data:`TEXTURE_SCALES` the mean
+    size of its band between a blur that wide and one twice as wide, over the blocks whose whole reach (twice the scale)
+    is at least :data:`TEXTURE_REACH` fitted."""
+    energies = []
+    for sigma in TEXTURE_SCALES:
+        fine = blurred(lightness[..., None], weight, sigma)[..., 0]
+        coarse = blurred(lightness[..., None], weight, 2.0 * sigma)[..., 0]
+        counted = (weight > 0.5) & (blur(weight, 2.0 * sigma) / blur(np.ones_like(weight), 2.0 * sigma) >= TEXTURE_REACH)
+        energies.append(float(np.abs(fine - coarse)[counted].mean()) if counted.any() else 0.0)
+    return np.array(energies)
 
 
 class Measure:
     """The reference frames to fit to: ``pictures`` {frame: blocks RGB 0..255}, ``weights`` {frame: 0/1 blocks}."""
 
-    def __init__(self, pictures, weights, trim=0.0, spread=1.0):
+    def __init__(self, pictures, weights, trim=0.0, spread=1.0, texture=0.0):
         self.weights = weights
         self.trim = trim
         self.spread = spread
+        self.texture = texture
         self.references = {frame: blurred(lab(picture), weights[frame]) for frame, picture in pictures.items()}
+        self.reference_details = {frame: detail(lab(picture)[..., 0], weights[frame]) for frame, picture in pictures.items()}
 
     def distance(self, frame, picture):
         weight = self.weights[frame]
@@ -57,7 +80,11 @@ class Measure:
         if self.trim > 0.0:
             differences = np.sort(differences)[:max(1, int(round(differences.size * (1.0 - self.trim))))]
         spread = np.abs(np.percentile(ours[kept], QUANTILES, axis=0) - np.percentile(reference[kept], QUANTILES, axis=0))
-        return float(differences.mean()) + self.spread * float(spread.sum(axis=1).mean())
+        score = float(differences.mean()) + self.spread * float(spread.sum(axis=1).mean())
+        if self.texture > 0.0:
+            ours_detail = detail(lab(picture[:rows, :columns])[..., 0], weight)
+            score += self.texture * float(np.abs(np.log((ours_detail + TEXTURE_FLOOR) / (self.reference_details[frame] + TEXTURE_FLOOR))).sum())
+        return score
 
 
 def descend(state, parameters, score, rounds, read, changed, log):

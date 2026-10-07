@@ -12,6 +12,8 @@ their own place.  A film's set may override parameters and palette colours
 """
 from __future__ import annotations
 
+import math
+
 from Core import shaders as S
 from Core.nodes import Tree
 from .. import FINISHES, PALETTE
@@ -224,14 +226,20 @@ def hall_recess():
 
 @register("CIN.HallNet")
 def hall_net():
-    """A gold net over a dark core: strands of ``gold`` round cells ``CIN.HallNet.cell`` metres across, a share
-    ``CIN.HallNet.strand`` of a cell wide, as rough as ``CIN.HallNet.roughness``; the ``hall_core`` between them."""
+    """A gold net over a dark core: a diamond mesh round the object's Z axis -- two families of strands winding the
+    opposite ways, ``CIN.HallNet.around`` cells round (a whole number: the mesh closes on itself) and
+    ``CIN.HallNet.height`` metres a cell up, each strand a share ``CIN.HallNet.strand`` of a cell wide -- of ``gold``, as
+    rough as ``CIN.HallNet.roughness``; the ``hall_core`` between them."""
     def build(tree: Tree):
-        place = tree.n("ShaderNodeTexCoord")["Object"]
-        edge = tree.n("ShaderNodeTexVoronoi", Vector=place, Scale=1.0 / param("CIN.HallNet.cell", 0.04),
-                      props={"feature": "DISTANCE_TO_EDGE", "voronoi_dimensions": "3D"})["Distance"]
+        x, y, z = tree.sep(tree.n("ShaderNodeTexCoord")["Object"])
+        around = tree.math("ARCTAN2", y, x) * (param("CIN.HallNet.around", 24.0) / (2.0 * math.pi))
+        up = z * (1.0 / param("CIN.HallNet.height", 0.08))
         strand = param("CIN.HallNet.strand", 0.12)
-        gilt = tree.map_range(edge, strand * 0.6, strand, 1.0, 0.0)
+
+        def on_strand(winding):
+            offset = tree.abs(tree.math("FRACT", winding) - 0.5)
+            return tree.map_range(offset, 0.5 - strand * 0.5, 0.5 - strand * 0.3, 0.0, 1.0)
+        gilt = tree.max(on_strand(around + up), on_strand(around - up))
         gold = S.bsdf(tree, Base_Color=color("gold"), Roughness=param("CIN.HallNet.roughness", 0.3), Metallic=1.0)["BSDF"]
         core = S.bsdf(tree, Base_Color=color("hall_core"), Roughness=0.2, Metallic=0.5)["BSDF"]
         return tree.n("ShaderNodeMixShader", gilt, core, gold)["Shader"]

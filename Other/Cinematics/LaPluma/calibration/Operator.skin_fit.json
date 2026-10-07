@@ -1,0 +1,19 @@
+{
+ "notes": [
+  "Her face where the reference shows it lit by the overcast (fit_skin.py)."
+ ],
+ "lamp": "Sun",
+ "frames": [
+  430,
+  450,
+  470,
+  500
+ ],
+ "points": [
+  [
+   "Nose01Joint_M"
+  ]
+ ],
+ "radius": 0.012,
+ "rounds": 7
+}

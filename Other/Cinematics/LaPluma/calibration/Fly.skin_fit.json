@@ -1,0 +1,18 @@
+{
+ "notes": [
+  "Her face where the reference shows it lit (fit_skin.py): not 290, in her own shadow."
+ ],
+ "lamp": "Sun",
+ "frames": [
+  310,
+  320,
+  375
+ ],
+ "points": [
+  [
+   "Nose01Joint_M"
+  ]
+ ],
+ "radius": 0.012,
+ "rounds": 7
+}

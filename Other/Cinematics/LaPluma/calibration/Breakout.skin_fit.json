@@ -1,0 +1,23 @@
+{
+ "notes": [
+  "Her bare shins as she flies out (fit_skin.py)."
+ ],
+ "lamp": "Sun",
+ "frames": [
+  150,
+  170,
+  185
+ ],
+ "points": [
+  [
+   "Calf_L",
+   "Foot_L"
+  ],
+  [
+   "Calf_R",
+   "Foot_R"
+  ]
+ ],
+ "radius": 0.02,
+ "rounds": 7
+}

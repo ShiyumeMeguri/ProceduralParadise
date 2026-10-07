@@ -21,8 +21,9 @@ density-metres the dust's material dims the sun's and the sky's light by.
 
 ``CIN.FX.Debris``: fragments thrown out of a breach.  ``Count`` pieces leave ``Source`` +-
 ``Source Size`` between the frame ``Start`` and ``Burst`` frames after it, along
-``Direction`` within ``Spread`` at about ``Speed`` m/s, falling under ``Gravity`` and turning
-about axes of their own at up to ``Spin`` turns a second.  Sizes run from ``Size`` down by the
+``Direction`` within ``Spread`` at about ``Speed`` m/s, slowed by the air (the speed falls to 1/e
+in ``Drag`` seconds), falling under ``Gravity`` (to no faster than gravity times the drag) and
+turning about axes of their own at up to ``Spin`` turns a second.  Sizes run from ``Size`` down by the
 power ``Size Power`` of a draw (a few large pieces, many small ones); a share ``Flat`` of them
 are slabs and shards, the rest chunks.  Every piece carries a draw of its own (``variant``)
 for its shading.
@@ -181,6 +182,7 @@ def debris():
     speed = graph.inp("Speed", default=12.0, min=0.0, desc="m/s")
     speed_spread = graph.inp("Speed Spread", default=0.6, min=0.0, max=1.0)
     gravity = graph.inp("Gravity", default=9.81, min=0.0, desc="m/s²")
+    drag = graph.inp("Drag", default=3.0, min=0.01, desc="Seconds for the speed to fall to 1/e")
     spin = graph.inp("Spin", default=1.5, min=0.0, desc="Turns a second at most")
     size = graph.inp("Size", default=0.6, min=0.0, subtype="DISTANCE")
     size_power = graph.inp("Size Power", default=3.0, min=0.1, desc="Above 1: many small pieces, few large ones")
@@ -194,7 +196,8 @@ def debris():
     age = graph.max((graph.scene_frame() - leave) * (1.0 / fps), 0.0)
     pieces = graph.new_points(count)
     origin, velocity = _thrown(graph, draw, source, source_size, direction, spread, speed, speed_spread)
-    place = origin + velocity * age + graph.vec(0.0, 0.0, -0.5) * (gravity * age * age)
+    slowed = drag * (1.0 - graph.math("EXPONENT", age * -1.0 / drag))
+    place = origin + velocity * slowed + graph.vec(0.0, 0.0, -1.0) * (gravity * drag * (age - slowed))
     pieces = graph.set_pos(pieces, pos=place)
     pieces = graph.store(pieces, "variant", draw("variant"))
     pieces = graph.delete(pieces, graph.compare(graph.scene_frame(), leave, "LESS_THAN"))

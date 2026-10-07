@@ -31,6 +31,11 @@
    "color": 0.05
   },
   {
+   "light": "Fill Light",
+   "power": 100.0,
+   "color": 0.05
+  },
+  {
    "material": "CIN.HallGlow.strength",
    "step": 3.0
   },
@@ -93,6 +98,10 @@
   {
    "look": "bloom.size",
    "step": 2.0
+  },
+  {
+   "material": "color:hall_trim",
+   "step": 0.1
   }
  ]
 }
