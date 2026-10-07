@@ -2,7 +2,7 @@
 Where a shot's reference shows cloud, as a map over the floor of its sky's cloud deck (the clouds' ``map``).
 
     blender -b --factory-startup -P cloud_map.py -- <frames dir> <shot> <out.json> [<masks dir> ...]
-            [--every 3] [--block 4] [--cell 20] [--above 100] [--darkest 55] [--margin 2] [--least 12]
+            [--every 3] [--block 4] [--cell 20] [--degrees 1] [--above 100] [--darkest 55] [--margin 2] [--least 12]
 
 The shot's camera -- built by the film's own builder from its keys and place -- looks at the reference frame by
 frame (every ``every`` frames, ``<frames dir>/f####.png``) in blocks of ``block`` pixels; what of it shows sky is
@@ -15,6 +15,13 @@ a cell is read wider -- and cells further from every ray stay empty.  The map co
 
     {"plane": metres up, "cell": metres, "box": [x0, y0, x1, y1], "frames": [first, last, every],
      "shares": [[percent or null, ...], ...]}   (rows from y0 upwards, columns from x0)
+
+A deck that is a shell (its ``shell``, :mod:`Kit.clouds`) is mapped by direction instead: where a block's ray meets the
+sphere half way through the shell, as an azimuth (degrees from east towards north) and elevation from its middle, in
+cells of ``degrees`` -- laid on a plane, the sky of a camera turning where it stands streaks out wherever its rays run
+low:
+
+    {"centre": [x, y, z], "radius": metres, "cell": degrees, "box": [azimuth0, elevation0, azimuth1, elevation1], ...}
 """
 import argparse
 import json
@@ -37,6 +44,7 @@ def _arguments():
     parser.add_argument("--every", type=int, default=3)
     parser.add_argument("--block", type=int, default=4)
     parser.add_argument("--cell", type=float, default=20.0)
+    parser.add_argument("--degrees", type=float, default=1.0)
     parser.add_argument("--above", type=float, default=100.0)
     parser.add_argument("--darkest", type=float, default=55.0)
     parser.add_argument("--margin", type=int, default=2)
@@ -66,7 +74,10 @@ def main():
     reads = sky_reads.ShotSky(args.shot, args.block, args.darkest, args.margin)
     deck = reads.sky["clouds"]
     middle, reach = np.array(deck["loc"], float), np.array(deck["scale"], float)
+    shell = deck.get("shell")
     plane = middle[2] - reach[2] + args.above
+    radius = reach[0] * (shell + 1.0) / 2.0 if shell is not None else None
+    cell = args.degrees if shell is not None else args.cell
     first, last = reads.shot["frames"]
     found = []
     for frame in range(first, last + 1, args.every):
@@ -74,11 +85,20 @@ def main():
         brightest, dullest = colour.max(axis=2), colour.min(axis=2)
         saturation = (brightest - dullest) / np.maximum(brightest, 1.0)
         origin, rays = reads.rays(frame)
-        climbing = rays[..., 2] > 0.02
-        distance = np.where(climbing, (plane - origin[2]) / np.where(climbing, rays[..., 2], 1.0), 0.0)
-        hits = origin[:2] + rays[..., :2] * distance[..., None]
-        within = np.all(np.abs(hits - middle[:2]) < reach[:2], axis=-1)
-        keep = climbing & within & ~blocked
+        if shell is not None:
+            offset = origin - middle
+            along = rays @ offset
+            distance = -along + np.sqrt(np.maximum(along * along - (offset @ offset - radius * radius), 0.0))
+            points = (origin + rays * distance[..., None] - middle) / radius
+            hits = np.stack([np.degrees(np.arctan2(points[..., 1], points[..., 0])), np.degrees(np.arcsin(np.clip(points[..., 2], -1.0, 1.0)))],
+                            axis=-1)
+            keep = (distance > 0.0) & ~blocked
+        else:
+            climbing = rays[..., 2] > 0.02
+            distance = np.where(climbing, (plane - origin[2]) / np.where(climbing, rays[..., 2], 1.0), 0.0)
+            hits = origin[:2] + rays[..., :2] * distance[..., None]
+            within = np.all(np.abs(hits - middle[:2]) < reach[:2], axis=-1)
+            keep = climbing & within & ~blocked
         keep &= ~reads.hidden_by_set(origin, rays, keep, distance)
         found.append((hits[keep], saturation[keep]))
         print(f"[cloud map] {args.shot} {frame}: {int(keep.sum())} sky blocks of {keep.size}", flush=True)
@@ -86,17 +106,18 @@ def main():
     blue, cloud = np.percentile(every_saturation, 85), np.percentile(every_saturation, 10)
     points = np.concatenate([hits for hits, _ in found])
     shares = np.concatenate([np.clip((blue - saturation) / max(blue - cloud, 1e-6), 0.0, 1.0) for _, saturation in found])
-    low = np.floor(points.min(axis=0) / args.cell) * args.cell
-    high = np.ceil(points.max(axis=0) / args.cell) * args.cell
-    cells = np.round((high - low) / args.cell).astype(int)
-    index = np.clip(((points - low) / args.cell).astype(int), 0, cells - 1)
+    low = np.floor(points.min(axis=0) / cell) * cell
+    high = np.ceil(points.max(axis=0) / cell) * cell
+    cells = np.round((high - low) / cell).astype(int)
+    index = np.clip(((points - low) / cell).astype(int), 0, cells - 1)
     total = np.zeros((cells[1], cells[0]))
     count = np.zeros((cells[1], cells[0]))
     np.add.at(total, (index[:, 1], index[:, 0]), shares)
     np.add.at(count, (index[:, 1], index[:, 0]), 1.0)
     mean = _filled(total, count, args.least)
     rows = [[None if np.isnan(value) else int(round(value * 100.0)) for value in row] for row in mean]
-    result = {"plane": plane, "cell": args.cell, "box": [float(low[0]), float(low[1]), float(high[0]), float(high[1])],
+    placed = {"centre": [float(value) for value in middle], "radius": float(radius)} if shell is not None else {"plane": plane}
+    result = {**placed, "cell": cell, "box": [float(low[0]), float(low[1]), float(high[0]), float(high[1])],
               "frames": [first, last, args.every], "blue": round(float(blue), 3), "cloud": round(float(cloud), 3), "shares": rows}
     with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(result, separators=(",", ":")) + "\n")

@@ -4,18 +4,22 @@ Clouds kit (``CIN.Clouds.*``): the sky's cumulus, a volume that lights itself.
 ``CIN.Clouds.Deck``: the layer of sky the cumulus fill -- a box from -1 to +1 along every
 axis, which its object's placement lays over the district (its location the middle of the
 layer, its scale how far the layer reaches each way), filled with ``Material``, a cloud
-material (:func:`cloud_material`).
+material (:func:`cloud_material`).  A deck with a ``shell`` is the hollow between two spheres
+about its location instead -- the outer as far as its scale reaches, the inner ``shell`` of
+that -- for a camera that turns where it stands and sees the cumulus all round it.
 
 :func:`cloud_material` makes the cumulus of a sky's ``clouds`` (:data:`CLOUDS` holds what a
 spec leaves out).  There is cloud where a slow 3D noise -- lumps ``lump`` metres across,
 squashed upright by ``stretch`` -- rises over a ``threshold`` that climbs with the height in
 the deck (``climb``) and falls where a broad weather pattern, cells ``cell`` metres across,
-gathers cloud (``gather``), going from none to full over ``soft``: flat on the deck's floor,
-thinning out over the outer seventh of its sides, its edges eaten into billows ``billow``
-metres across (``erode``), ``density`` per metre at its thickest.  A sky whose clouds were
-measured on its picture (``map``: a file of the film, ``calibration/cloud_map.py``) gathers
-them by its measure where it has one -- each cell's share of cloud standing in for the weather
-over the cell -- and by the broad pattern beyond it.
+gathers cloud (``gather``), going from none to full over ``soft``: flat on the deck's floor
+(a shell's inner sphere), thinning out over the outer seventh of its sides (a shell's outer
+sphere ends it), its edges eaten into billows ``billow`` metres across (``erode``), ``density``
+per metre at its thickest.  A sky whose clouds were measured on its picture (``map``: a file
+of the film, ``calibration/cloud_map.py``) gathers them by its measure where it has one --
+each cell's share of cloud standing in for the weather over the cell, a flat deck's cells
+laid over the ground, a shell's by direction from its middle -- and by the broad pattern
+beyond it.
 
 It glows with the light it scatters, worked out in its own shading rather than by the
 renderer, whose froxels -- tens of metres deep a kilometre out -- cannot hold the sunlit skin
@@ -77,17 +81,30 @@ def coverage_image(name, coverage):
     return image
 
 
-def _weather(tree: Tree, spec, x, y, coverage):
-    """How much the weather gathers cloud over (``x``, ``y``): the broad pattern, or the measured share where measured."""
+def _weather(tree: Tree, spec, x, y, coverage, direction):
+    """How much the weather gathers cloud over (``x``, ``y``): the broad pattern, or the measured share where measured
+    (a shell's map read by the ``direction`` from its middle)."""
     weather = tree.n("ShaderNodeTexNoise", Vector=tree.vec(x, y, 0.0), Scale=1.0 / spec["cell"], Detail=1.0, Roughness=0.5,
                      props={"noise_dimensions": "2D"})["Fac"]
     if coverage is None:
         return weather
     image, box = coverage
+    if direction is not None:
+        east, north, up = tree.sep(direction)
+        x = tree.math("ARCTAN2", north, east) * (180.0 / math.pi)
+        y = tree.math("ARCSINE", tree.math("MAXIMUM", tree.math("MINIMUM", up, 1.0), -1.0)) * (180.0 / math.pi)
     place = tree.vec((x - box[0]) / (box[2] - box[0]), (y - box[1]) / (box[3] - box[1]), 0.0)
     measured = tree.n("ShaderNodeTexImage", Vector=place, props={"image": image, "interpolation": "Linear", "extension": "CLIP"})["Color"]
     share, known, _ = tree.sep(measured)
     return tree.mix(known, weather, share)
+
+
+def _height(tree: Tree, spec, local):
+    """How far up the deck the object-space point ``local`` stands, 0 its floor to 1 its top (a shell's inner sphere to
+    its outer)."""
+    if "shell" in spec:
+        return tree.clamp01((tree.vmath("LENGTH", local) - spec["shell"]) / (1.0 - spec["shell"]))
+    return tree.clamp01((tree.sep(local)[2] + 1.0) * 0.5)
 
 
 def _density(tree: Tree, spec, point, coverage):
@@ -95,15 +112,19 @@ def _density(tree: Tree, spec, point, coverage):
     local = tree.n("ShaderNodeVectorTransform", Vector=point,
                    props={"vector_type": "POINT", "convert_from": "WORLD", "convert_to": "OBJECT"})["Vector"]
     across, along, up = tree.sep(local)
-    height = tree.clamp01((up + 1.0) * 0.5)
+    height = _height(tree, spec, local)
     x, y, z = tree.sep(point)
-    weather = _weather(tree, spec, x, y, coverage)
+    shell = "shell" in spec
+    weather = _weather(tree, spec, x, y, coverage, tree.vmath("NORMALIZE", local) if shell else None)
     body = tree.n("ShaderNodeTexNoise", Vector=tree.vec(x, y, z * spec["stretch"]), Scale=1.0 / spec["lump"], Detail=2.0,
                   Roughness=0.5, props={"noise_dimensions": "3D"})["Fac"]
     threshold = spec["threshold"] + height * spec["climb"] - (weather - 0.5) * spec["gather"]
     shape = tree.map_range(body, threshold, threshold + spec["soft"], 0.0, 1.0, interp="SMOOTHSTEP")
     floor = tree.map_range(height, 0.0, 0.03, 0.0, 1.0, interp="SMOOTHSTEP")
-    sides = tree.map_range(tree.max(tree.abs(across), tree.abs(along)), 0.85, 1.0, 1.0, 0.0, interp="SMOOTHSTEP")
+    if shell:
+        sides = tree.map_range(tree.vmath("LENGTH", local), 0.97, 1.0, 1.0, 0.0, interp="SMOOTHSTEP")
+    else:
+        sides = tree.map_range(tree.max(tree.abs(across), tree.abs(along)), 0.85, 1.0, 1.0, 0.0, interp="SMOOTHSTEP")
     billows = tree.n("ShaderNodeTexNoise", Vector=point, Scale=1.0 / spec["billow"], Detail=3.0, Roughness=0.55,
                      props={"noise_dimensions": "3D"})["Fac"]
     erosion = (1.0 - billows) * spec["erode"]
@@ -127,11 +148,13 @@ def cloud_material(name, clouds, sun, sky, measured=None):
     where given."""
     if sun is None:
         raise ValueError(f"{name}: clouds need the set's SUN lamp to light them")
-    unknown = sorted(set(clouds) - set(CLOUDS) - {"loc", "scale", "map"})
+    unknown = sorted(set(clouds) - set(CLOUDS) - {"loc", "scale", "map", "shell"})
     if unknown:
-        raise KeyError(f"{name}: unknown cloud keys {unknown} (known: {sorted(CLOUDS)}, loc, scale, map)")
+        raise KeyError(f"{name}: unknown cloud keys {unknown} (known: {sorted(CLOUDS)}, loc, scale, map, shell)")
     if ("map" in clouds) != (measured is not None):
         raise ValueError(f"{name}: a cloud map is named and handed over together")
+    if measured is not None and ("shell" in clouds) != ("centre" in measured):
+        raise ValueError(f"{name}: a shell's map is read by direction (a map with a centre), a flat deck's over the ground")
     coverage = (coverage_image(f"{name}.Map", measured), measured["box"]) if measured is not None else None
     spec = {**CLOUDS, **clouds}
     length = math.sqrt(sum(component * component for component in sun["direction"]))
@@ -154,7 +177,7 @@ def cloud_material(name, clouds, sun, sky, measured=None):
             phase = tree.mix(spec["back_share"], _phase(tree, cosine, spec["forward"] * fading),
                              _phase(tree, cosine, -spec["backward"] * fading))
             lit = lit + tree.math("EXPONENT", depth * (-sigma * fading)) * phase * fading
-        height = tree.clamp01((tree.sep(tree.n("ShaderNodeTexCoord")["Object"])[2] + 1.0) * 0.5)
+        height = _height(tree, spec, tree.n("ShaderNodeTexCoord")["Object"])
         shade = tree.vec(*skylight(sky)) * tree.mix(height, spec["shade_low"], spec["shade_high"])
         extinction = _density(tree, spec, position, coverage) * sigma
         absorbed = tree.n("ShaderNodeVolumeAbsorption", Color=(0.0, 0.0, 0.0, 1.0), Density=extinction)["Volume"]
