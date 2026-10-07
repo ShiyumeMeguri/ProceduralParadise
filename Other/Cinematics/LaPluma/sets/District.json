@@ -13,10 +13,11 @@
   "Inside the tower's frame below its crown stands its dark core (Tower Core, set 2.5 m back from the face): the reference sees a dark interior through the facade (frames 76-92), never the sky through the building.",
   "The bay she breaks out through (storey 18, between x -8.2 and 0.0) is left open in the tower and stands as a panel of its own (Breach Panel: its braces and mullions, inside ghosts of the tower's own column and beams) until the frame before she breaks it (95); its pieces are the Breach Debris.",
   "Before she breaks out the sill of the breach smokes: small grey puffs on the edge beam of its floor, 4-7 m from the camera, between x -5 and -1.8 (Ledge Dust, frames 68-100), where the reference's puffs on 76-94 lie on the facade's plane.",
-  "What the breach throws is mostly shards and slabs of pale concrete and glass, a few chunks among them (Breach Debris, Falling Debris: color:debris 0.75, seven in ten flat, two thousand of them a hand across and smaller), as the reference's pieces glint grey against the sky."
+  "What the breach throws is mostly shards and slabs of pale concrete and glass, a few chunks among them (Breach Debris, Falling Debris: color:debris 0.75, seven in ten flat, two thousand of them a hand across and smaller), as the reference's pieces glint grey against the sky; thrown fast and slowed by the air (Breach Debris: 14 m/s, a third of a second to slow), they streak out of the breach and hang round her, sinking slowly.",
+  "The sun lights the set (lighting: set); her own key (Key: the sun's direction and colour, lighting her alone) is as strong as each shot's reference shows her skin lit (the shots' lights, calibration/fit_skin.py): under the set's sun her toon-shaded skin clips white."
  ],
  "materials": {
-  "CIN.Air.density": 0.004,
+  "CIN.Air.density": 0.0075,
   "CIN.Air.height": 60.0,
   "CIN.Dust.density": 1.475,
   "color:interior": [
@@ -25,11 +26,11 @@
    0.0375
   ],
   "color:dust": [
-   0.4325,
-   0.545,
-   0.665
+   0.515,
+   0.62,
+   0.745
   ],
-  "CIN.Dust.ambient": 1.9500000000000002,
+  "CIN.Dust.ambient": 1.6,
   "color:debris": [
    0.75,
    0.76,
@@ -63,7 +64,12 @@
   "CIN.SteelPaint.roughness": 0.6475000000000001,
   "CIN.Concrete.roughness": 0.7050000000000001,
   "CIN.Glass.reflect": 1.0,
-  "CIN.Dust.anisotropy": 0.25
+  "CIN.Dust.anisotropy": 0.25,
+  "color:air": [
+   0.7725,
+   0.8775,
+   1.0175
+  ]
  },
  "sky": {
   "zenith": [
@@ -1204,29 +1210,29 @@
      1.2
     ],
     "Direction": [
-     1.0,
-     -0.25,
-     0.0
+     1.15,
+     -0.35,
+     -0.05
     ],
-    "Spread": 35.0,
-    "Speed": 4.0,
+    "Spread": 27.0,
+    "Speed": 3.5,
     "Speed Spread": 0.4,
-    "Drag": 0.6,
+    "Drag": 0.45,
     "Sink": 0.05,
     "Wind": [
-     1.6,
-     0.25,
-     0.0
+     1.7,
+     0.35,
+     -0.4
     ],
-    "Radius": 0.55,
-    "Growth": 0.65,
+    "Radius": 0.7250000000000001,
+    "Growth": 0.6124999999999999,
     "Start": 96.0,
     "Duration": 36.0,
-    "Voxel": 0.1,
-    "Softness": 0.45,
-    "Thickness": 3.0,
-    "Billows": 0.45,
-    "Billow Size": 0.3,
+    "Voxel": 0.08,
+    "Softness": 0.08000000000000002,
+    "Thickness": 2.125,
+    "Billows": 0.6250000000000001,
+    "Billow Size": 0.19999999999999998,
     "Churn": 0.3
    }
   },
@@ -1409,15 +1415,16 @@
      0.5
     ],
     "Spread": 80.0,
-    "Speed": 6.0,
+    "Speed": 14.0,
     "Speed Spread": 0.7,
-    "Gravity": 1.2,
+    "Gravity": 3.0,
     "Spin": 1.5,
     "Size": 0.15,
     "Size Power": 3.0,
     "Flat": 0.7,
     "Start": 96.0,
-    "Burst": 8.0
+    "Burst": 8.0,
+    "Drag": 0.3
    },
    "shown": [
     0,
@@ -1460,7 +1467,8 @@
     "Size Power": 2.5,
     "Flat": 0.75,
     "Start": 100.0,
-    "Burst": 110.0
+    "Burst": 110.0,
+    "Drag": 1.5
    },
    "shown": [
     0,
@@ -1543,7 +1551,25 @@
     0.4,
     -0.6,
     0.7
-   ]
+   ],
+   "lighting": "set"
+  },
+  {
+   "name": "Key",
+   "light": "SUN",
+   "power": 2.0,
+   "color": [
+    0.97,
+    0.98,
+    1.0
+   ],
+   "angle": 6.0,
+   "direction": [
+    0.4,
+    -0.6,
+    0.7
+   ],
+   "lighting": "cast"
   }
  ],
  "views": {

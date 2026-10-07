@@ -28,7 +28,12 @@ where the set's sun is, its lamp's ``direction``, unless it gives one.
 Inputs are data: degrees for angles, palette names for colours, library
 names for materials.  A lamp is ``{"name", "light": "SUN" | "AREA" |
 "POINT" | "SPOT", "power", "color", "angle" (a sun's disc, degrees),
-"size", "loc", "direction" (towards the light)}``.
+"size", "loc", "direction" (towards the light), "lighting"}``: a lamp with
+``lighting`` "cast" lights the cast alone, one with "set" all but the cast
+(light linking) -- the cast's materials are the character's own, toon-shaded,
+and want a key of their own (a shot's ``lights``, from her skin:
+calibration/fit_skin.py) where the set's sun lights the set as its fits found
+it.  The set's sky is lit by the sun that lights the set (:func:`sky_sun`).
 
 A shot (``shots/<id>.json``)::
 
@@ -57,7 +62,9 @@ solved against nothing in the set -- the sky, which only shows it turning
 -- is solved about the origin, and its ``place`` says where it stands in
 the set: the ``location`` of the origin and the direction it looks
 (``look``, or a ``target`` it looks at) with how far it turns about that
-direction from upright (``roll``, degrees).  A performance fitted against
+direction from upright (``roll``, degrees), travelling from its first key at
+``velocity`` (set metres a second, none without one: the sky shows a camera
+turning, a building beside it shows it flying on).  A performance fitted against
 such a camera's picture moves with it (``"relative_to": "camera"``: her
 root on every frame is in the frame's camera's frame).  A camera with
 ``dof`` focuses on a bone of the shot's performer of a cast member, the
@@ -406,6 +413,39 @@ def _rebuild_shading(entry):
         raise RuntimeError(f"{shading['module']}: {error}")
 
 
+def set_lamps(lamps):
+    """The lamps (specs) that light the set: all but those that light the cast alone."""
+    return [lamp for lamp in lamps if lamp.get("lighting") != "cast"]
+
+
+def sky_sun(lamps):
+    """The SUN lamp (spec) that lights the set and its sky, or None."""
+    return next((lamp for lamp in set_lamps(lamps) if lamp["light"] == "SUN"), None)
+
+
+def _link_cast_lighting(lamps, objects, lit, unlit):
+    """Light-link the lamps (objects by spec) with ``lighting`` to the cast collections: ``lit`` holds what a "cast" lamp
+    lights, ``unlit`` what a "set" lamp leaves out."""
+    for spec, obj in zip(lamps, objects):
+        lighting = spec.get("lighting")
+        if lighting is None:
+            continue
+        if lighting not in ("cast", "set"):
+            raise ValueError(f"lamp {spec['name']}: lighting is 'cast' or 'set', not '{lighting}'")
+        obj.light_linking.receiver_collection = lit if lighting == "cast" else unlit
+
+
+def _add_to_cast_lighting(objects, lit, unlit):
+    """The cast's ``objects`` lit by the "cast" lamps and left out by the "set" lamps."""
+    for obj in objects:
+        if obj.type == "ARMATURE":
+            continue
+        for collection, state in ((lit, "INCLUDE"), (unlit, "EXCLUDE")):
+            collection.objects.link(obj)
+            member = collection.collection_objects[list(collection.objects).index(obj)]
+            member.light_linking.link_state = state
+
+
 def build_set(folder, set_name, film, args):
     spec = jsonio.load(os.path.join(folder, "sets", f"{set_name}.json"))
     scene = bpy.data.scenes.new(set_name)
@@ -413,14 +453,15 @@ def build_set(folder, set_name, film, args):
     scene.render.resolution_x, scene.render.resolution_y = film["resolution"]
     scene.render.fps = film["fps"]
     set_materials(spec)
-    sun = next((lamp for lamp in spec.get("lights", []) if lamp["light"] == "SUN"), None)
+    sun = sky_sun(spec.get("lights", []))
     world, sky_collection, sky_files = build_sky(folder, spec["sky"], sun, set_name, scene.collection)
     collection = SC.collection(set_name, parent=scene.collection)
     for item in spec.get("items", []):
         build_item(item, collection, sun)
     lights = SC.collection(f"{set_name}.Lights", parent=collection)
-    for lamp in spec.get("lights", []):
-        build_lamp(lamp, lights)
+    lamps = [build_lamp(lamp, lights) for lamp in spec.get("lights", [])]
+    cast_lit, cast_unlit = bpy.data.collections.new(f"{set_name}.Cast Lit"), bpy.data.collections.new(f"{set_name}.Cast Unlit")
+    _link_cast_lighting(spec.get("lights", []), lamps, cast_lit, cast_unlit)
     for name, view in spec.get("views", {}).items():
         from Core import camera as CAM
         camera = CAM.look_camera(f"{set_name}.View.{name}", _vector(view["location"]), _vector(view["target"]),
@@ -437,7 +478,7 @@ def build_set(folder, set_name, film, args):
         cast_files.append(path)
         _rebuild_shading(entry)
     return dict(id=set_name, scene=scene, world=world, sky=spec["sky"], sun=sun, lights=spec.get("lights", []),
-                sky_collection=sky_collection, sky_files=sky_files,
+                cast_lighting=(cast_lit, cast_unlit), sky_collection=sky_collection, sky_files=sky_files,
                 collection=collection, characters=characters,
                 cast_files=cast_files, source=os.path.join(folder, "sets", f"{set_name}.json"))
 
@@ -451,9 +492,10 @@ def _camera_keys(folder, camera):
 
 
 def _shot_place(folder, camera):
-    """The matrix carrying a camera solved about the origin to where its ``place`` stands it (identity without one)."""
+    """The matrix carrying a camera solved about the origin to where its ``place`` stands it (identity without one), and
+    its ``velocity`` (set metres a second; none without one)."""
     if "place" not in camera:
-        return Matrix.Identity(4), []
+        return Matrix.Identity(4), Vector((0.0, 0.0, 0.0)), []
     path = os.path.join(folder, camera["place"])
     place = jsonio.load(path)
     location = _vector(place["location"])
@@ -464,7 +506,7 @@ def _shot_place(folder, camera):
     backward = -look
     right = upright.cross(backward)
     rotation = Matrix((right, upright, backward)).transposed() @ Matrix.Rotation(math.radians(place.get("roll", 0.0)), 3, "Z")
-    return Matrix.Translation(location) @ rotation.to_4x4(), [path]
+    return Matrix.Translation(location) @ rotation.to_4x4(), _vector(place.get("velocity", (0.0, 0.0, 0.0))), [path]
 
 
 def _key_matrix(location, rotation):
@@ -484,11 +526,13 @@ def build_camera(name, folder, camera, film, collection):
     collection.objects.link(obj)
     obj.rotation_mode = "QUATERNION"
     keys, sources = _camera_keys(folder, camera)
-    place, place_sources = _shot_place(folder, camera)
+    place, velocity, place_sources = _shot_place(folder, camera)
     matrices = {}
     previous = {}
+    first = min(key["frame"] for key in keys)
     for key in keys:
-        matrix = place @ _key_matrix(key["location"], key["rotation"])
+        travelled = Matrix.Translation(velocity * ((key["frame"] - first) / film["fps"]))
+        matrix = travelled @ place @ _key_matrix(key["location"], key["rotation"])
         matrices[key["frame"]] = matrix
         location, rotation, _scale = matrix.decompose()
         obj.location = location
@@ -742,7 +786,7 @@ def build_shot(folder, film, shot, built_set, args):
     _activate(scene)
     scene.collection.children.link(built_set["collection"])
     cast = SC.collection(f"Shot.{shot['id']}.Cast", parent=scene.collection)
-    sun = next((lamp for lamp in shot_lights(built_set["lights"], shot) if lamp["light"] == "SUN"), None)
+    sun = sky_sun(shot_lights(built_set["lights"], shot))
     if "sky" in shot:
         scene.world, _clouds, sky_files = build_sky(folder, shot_sky(built_set["sky"], shot["sky"]), sun, f"Shot.{shot['id']}",
                                                     scene.collection)
@@ -791,6 +835,7 @@ def build_shot(folder, film, shot, built_set, args):
         character = built_set["characters"][name]
         rig, objects = CAST.instance_character(character["rig"], character["objects"], cast, f"Shot.{shot['id']}.{name}",
                                                character["prefix"])
+        _add_to_cast_lighting(objects, *built_set["cast_lighting"])
         profile_path = os.path.join(folder, film["cast"][name]["rig"])
         sources += perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices) + [profile_path]
         if film["cast"][name].get("cloth"):

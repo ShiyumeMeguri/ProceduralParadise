@@ -1,0 +1,18 @@
+{
+ "note": "The damage class mark on the result card: a white blade on the card's dark grey box. Read off the reference's frames 600-713.",
+ "frames": [
+  600,
+  713
+ ],
+ "box": [
+  1769,
+  711,
+  1807,
+  749
+ ],
+ "square": [
+  0,
+  0
+ ],
+ "ground": 64.0
+}

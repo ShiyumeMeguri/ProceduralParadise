@@ -34,7 +34,7 @@
     "hall_device": [0.13, 0.14, 0.15]
   },
   "fonts": {
-    "ui": "Dengb.ttf",
+    "ui": "msyhbd.ttc",
     "title": "impact.ttf"
   },
   "emblem": {

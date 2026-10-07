@@ -1,0 +1,19 @@
+{
+ "note": "The weapon class mark on the result card: a black sword striking down to the right on the card's white box. Read off the reference's frames 600-713, where the hall stands still behind the card.",
+ "frames": [
+  600,
+  713
+ ],
+ "box": [
+  1261,
+  708,
+  1335,
+  782
+ ],
+ "square": [
+  0,
+  0
+ ],
+ "ink": "dark",
+ "ground": 4.0
+}

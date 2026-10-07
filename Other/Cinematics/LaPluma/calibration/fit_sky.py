@@ -5,8 +5,9 @@ A shot's sky fitted to its reference: the colours of its world and the look of i
             [--scale 0.25] [--samples 16] [--rounds 3] [--exclude x0,y0,x1,y1 ...] [--spread 3] [--texture 5] [--write]
 
 The shot's sky alone -- its world, its cloud deck, the set's air and sun, through the shot's camera (focused as the
-film focuses it: on its performer's bone, the performer posed but not drawn), render settings and look, the
-buildings left out -- is rendered at ``scale`` on the ``frames`` and compared with the reference by eye
+film focuses it: on its performer's bone, the performer posed but not drawn), render settings and look but its grade
+(the tone curve ``fit_look.py`` fits after, on renders without it: fitted through it, the sky and the curve chase each
+other), the buildings left out -- is rendered at ``scale`` on the ``frames`` and compared with the reference by eye
 (:mod:`picture_fit`) on the blocks that show sky (:mod:`sky_reads`, blocks of 1 / ``scale`` pixels, the buildings'
 blocks too left out, and the picture's ``exclude`` boxes: what the sky alone cannot draw, the dust a breach throws).
 The parameters (:data:`PARAMETERS`: the zenith's and the horizon's colours, the sky's
@@ -100,9 +101,9 @@ class Fit:
             obj.hide_render = obj not in self.reads.air
         lights = sky_reads.SC.collection("Fit Lights", parent=scene.collection)
         lamps = SCN.shot_lights(spec.get("lights", []), shot)
-        for lamp in lamps:
+        for lamp in SCN.set_lamps(lamps):
             SCN.build_lamp(lamp, lights)
-        self.sun = next((lamp for lamp in lamps if lamp["light"] == "SUN"), None)
+        self.sun = SCN.sky_sun(lamps)
         settings = shot["render"]
         RND.ENGINES[settings["engine"]](samples=args.samples, **settings.get(settings["engine"].lower(), {}))
         scene.render.resolution_x, scene.render.resolution_y = self.reads.width, self.reads.height
@@ -116,7 +117,7 @@ class Fit:
             lens.focus_object = self.reads.performer(dof["focus"]["cast"])
             lens.focus_subtarget = dof["focus"]["bone"]
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), 0.0)
-        RND.compositor(shot.get("look", {}))
+        RND.compositor({key: value for key, value in shot.get("look", {}).items() if key != "grade"})
         self.folder = tempfile.mkdtemp(prefix="fit_sky_")
         self.frames = [int(value) for value in args.frames.split(",")]
         pictures, weights = {}, {}

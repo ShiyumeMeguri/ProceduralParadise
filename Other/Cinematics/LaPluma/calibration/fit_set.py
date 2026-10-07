@@ -122,8 +122,8 @@ class Fit:
         if fitted:
             raise ValueError(f"{args.shot} lights {sorted(fitted)} its own way: fit them in the shot, not into the set")
         lamps = SCN.shot_lights(set_spec.get("lights", []), shot)
-        self.lamps = {lamp["name"]: SCN.build_lamp(lamp, lights) for lamp in lamps}
-        self.sun = next((lamp for lamp in lamps if lamp["light"] == "SUN"), None)
+        self.lamps = {lamp["name"]: SCN.build_lamp(lamp, lights) for lamp in SCN.set_lamps(lamps)}
+        self.sun = SCN.sky_sun(lamps)
         settings = shot["render"]
         RND.ENGINES[settings["engine"]](samples=spec.get("samples", 16), **settings.get(settings["engine"].lower(), {}))
         scene.render.resolution_x, scene.render.resolution_y = self.reads.width, self.reads.height
@@ -154,7 +154,7 @@ class Fit:
             self.look = copy.deepcopy(state["look"])
         for name, inputs in state["items"].items():
             SCN.set_item_inputs(self.reads.set_collection.all_objects[name], inputs)
-        for lamp in state["lights"]:
+        for lamp in SCN.set_lamps(state["lights"]):
             data = self.lamps[lamp["name"]].data
             shown = {**lamp, **self.changes.get(lamp["name"], {})}
             data.energy = shown["power"]

@@ -74,7 +74,7 @@ class ShotSky:
         SCN.set_materials(self.spec)
         self.set_collection = SC.collection("Sky Reads Set", parent=bpy.context.scene.collection)
         hidden = self.shot.get("hidden", ())
-        sun = next((lamp for lamp in self.spec.get("lights", []) if lamp["light"] == "SUN"), None)
+        sun = SCN.sky_sun(self.spec.get("lights", []))
         for item in self.spec.get("items", []):
             if whole or ("shown" not in item and item["name"] not in hidden):
                 SCN.build_item(item, self.set_collection, sun)

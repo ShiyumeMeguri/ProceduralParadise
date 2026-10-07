@@ -7,7 +7,9 @@ on black.
 ``spec.json`` names the frames whose median is the artwork (``frames``: [first, last]), boxes of it covered on all of them
 read instead off one other frame brought up to the same brightness (``patches``: [{"frame", "gain", "box": [x0, y0, x1, y1]}]),
 the box the artwork lies in (``box``) and the band of rows whose nearly level or upright edges are set square (``square``:
-[top, bottom]).  The ink's brightness about a point is that of the solid ink there (what is near the brightest about it,
+[top, bottom]).  Artwork on a ground of its own -- a glyph on a card's box -- is read off it: a dark glyph on a light box
+with ``"ink": "dark"`` (the picture turned over first), and the box's own brightness (``ground``, after turning) taken
+off, the ``box`` lying inside the card's.  The ink's brightness about a point is that of the solid ink there (what is near the brightest about it,
 not the soft edges of thin lines); ink is what is brighter than half of it, its outline followed at a quarter of a pixel and
 simplified, each point carrying the brightness of the ink about it as a share of the brightest (``tone``).  The loops are
 kept as shapes, an outline and the holes in it, in the picture's units (half its height is 1, the middle 0); a shape whose
@@ -70,6 +72,9 @@ for patch in spec.get("patches", []):
     source = cv2.medianBlur(np.clip(grey(folder, patch["frame"]) * patch["gain"], 0, 255).astype(np.uint8), 3).astype(np.float32)
     artwork[y0:y1, x0:x1] = source[y0:y1, x0:x1]
 left, top, right, bottom = spec["box"]
+if spec.get("ink", "light") == "dark":
+    artwork = 255.0 - artwork
+artwork = np.maximum(artwork - spec.get("ground", 0.0), 0.0)
 image = cv2.GaussianBlur(artwork[top:bottom, left:right], (0, 0), 0.8)
 peak = cv2.GaussianBlur(cv2.dilate(image, np.ones((7, 7), np.uint8)), (0, 0), 2.0)
 solid = ((image > FLOOR) & (image > SOLID * peak)).astype(np.float32)
