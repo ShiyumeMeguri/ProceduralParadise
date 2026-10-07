@@ -1,0 +1,7 @@
+{
+ "note": "The company's logo as the recruitment opens on it: an inverted triangle of contour lines split by a cleft, the name in its lettering across it and the company's name under that. Read off the reference's frames 50-61, where it stands grey on black; the lettering the emblems cover there off frame 65, when they are out and the logo is at a quarter of its brightness.",
+ "frames": [50, 61],
+ "patches": [{"frame": 65, "gain": 4.0, "box": [698, 493, 1217, 598]}],
+ "box": [560, 215, 1360, 780],
+ "square": [462, 616]
+}

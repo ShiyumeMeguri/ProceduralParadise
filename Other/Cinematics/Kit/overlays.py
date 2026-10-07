@@ -3,13 +3,18 @@ Overlays kit (``CIN.Overlay.*``): what a shot's camera carries in front of its l
 picture's units -- across from -``Aspect`` to +``Aspect``, up from -1 to +1 (``scenes`` overlays).
 
 Every piece but the wipe is drawn in ink (``CIN.OverlayInk``): its ``Color``, brightened by its
-``Glow``, coming in over ``Fade In`` and going out over ``Fade Out`` (each a start frame and a
-number of frames; a length of 0 is no fade) -- stored on it as ``ink``, ``glow`` and ``alpha``.
+``Glow``, at ``Opacity``, coming in over ``Fade In`` and going out over ``Fade Out`` (each a start
+frame and a number of frames; a length of 0 is no fade) -- stored on it as ``ink``, ``glow`` and
+``alpha``.
 It slides from ``Slide In`` away to its place over ``Slide Time`` (start frame, frames), slowing
 as it arrives (the share of the way still to go is the share of the time left to the power
 ``Slide Ease``), and from that start drifts on by ``Drift`` a frame; it leaves sliding away by
 ``Slide Out`` over ``Slide Out Time``, gathering speed the same way; its opacity falls by
-``Falloff`` from its top to its foot.  With a ``Hatch`` (period, angle in degrees, share) its ink
+``Falloff`` from its top to its foot.  A light front may cross it along ``Sweep Angle`` (degrees,
+0 rightwards) over ``Sweep`` (start frame, frames, soft width), the share of it lit going from
+``Sweep Span.x`` to ``Sweep Span.y`` and slowing as it stops as a slide does (``Sweep Span.z``):
+what the front has not reached is unlit, and behind it the light fades over ``Trail`` (0: it
+does not fade).  With a ``Hatch`` (period, angle in degrees, share) its ink
 is laid in stripes ``period`` apart along the picture's direction ``angle``, ``share`` of each
 inked, the stripes moving with it.  A piece is a picture's overlay or, in
 metres, an item of a set (a title standing behind her).
@@ -36,20 +41,31 @@ apart, each ``Size`` across: the design system's ``emblem``, three folded blades
 of a turn apart round a point, the shaded face of each drawn at its ``shade_opacity``.
 
 ``CIN.Overlay.Beam``: a line of light across the picture at height ``Height``, ``Width`` thick,
-its head travelling from the left edge to the right one between the frames ``Grow``
-(start, frames), a soft halo ``Halo`` times as thick round it.
+its head travelling from the left edge to the right one over ``Grow`` (start frame, frames) and
+its tail after it over ``Retract`` (start frame, frames, gathering speed as the power ``z`` of the
+time gone), a soft halo ``Halo`` times as thick round it; its ends curl up towards the picture's
+edges (``Curl``: the rise at an edge, the distance in which it falls to 1/e of that).
 
-``CIN.Overlay.Curtain``: an aurora of ``Count`` upright streaks of light across the picture
-between ``Across`` (left and right ends; 0, 0: all of it), each its own width, drifting sideways
-at ``Drift``; the colours of their heads pass from ``Color A`` through ``Color B`` and
-``Color C`` to ``Color D``, of their feet from ``Foot A`` to ``Foot D``, at the frames ``First``
-and ``Times``, each streak a little ahead or behind (``Stagger`` frames), the colour running from
-foot to head up each streak (passing from one to the other round its middle), as bright all the way
-up, soft at its sides; the whole curtain comes in over ``Fade In`` and goes out over ``Fade Out``
-(start frame, frames).
+``CIN.Overlay.Curtain``: a curtain of light hanging across the picture between ``Across`` (left
+and right ends; 0, 0: all of it), fading out over ``Feather`` at its left end and at its right
+(a curtain laid over a neighbour fades in over it alone, the one beneath staying whole) -- upright streaks,
+the brightness of every column a noise across the picture (``Streaks``: streaks to a unit across,
+octaves of finer ones, their roughness), the spread of the brightness's logarithm its ``Contrast``
+at the head and at the foot, the noise drifting sideways by ``Drift`` and changing by ``Evolve`` a
+frame.  Up every column the colour passes from
+the ``Foot`` colour to the ``Head`` colour about a height (``Turn``: its mean as a share of the
+picture's height from the foot, the spread of the height across the picture, how softly it
+passes), each colour's alpha the curtain's opacity there.  The median column is drawn in the
+colours themselves.  With a ``Coverage`` (threshold, softness, both in spreads of the noise; a
+softness of 0: every streak) only the streaks the threshold passes are drawn.  A film keys the
+colours and the turn frame by frame (``scenes``: an overlay's ``keys``).
 
-``CIN.Overlay.Contours``: an inverted triangle ``Size`` across about ``Position``: a landscape
-with its contour lines cut out (``CIN.OverlayContours``).
+``CIN.Overlay.Drawing``: a drawing (its mesh handed to it: ``drawings``) ``Size`` times its own
+size about ``Position``, each point inked at its ``tone`` to the power ``Contrast`` of the
+piece's opacity, its lettering at ``Lettering`` times that.
+
+``CIN.Overlay.Haze``: a haze across the picture, its ink's opacity a noise of ``Scale`` (to a
+unit) and ``Detail`` octaves to the power ``Contrast``, drifting by ``Drift`` a frame.
 """
 from __future__ import annotations
 
@@ -61,6 +77,12 @@ import bpy
 from Core.gn import GN, asset
 from .. import CINEMATICS
 from . import materials as M
+
+BEAM_COLUMNS = 241
+CURTAIN_COLUMNS = 280
+CURTAIN_ROWS = 49
+HAZE_COLUMNS = 97
+HAZE_ROWS = 55
 
 
 def font(key):
@@ -90,6 +112,10 @@ def _inked(graph, geometry):
     slide_out = graph.inp("Slide Out", "VECTOR", default=(0.0, 0.0, 0.0), desc="Where it leaves to, from its place")
     slide_out_time = graph.inp("Slide Out Time", "VECTOR", default=(100000.0, 0.0, 0.0), desc="Start frame, frames")
     falloff = graph.inp("Falloff", default=0.0, min=0.0, max=1.0, desc="Opacity lost from its top to its foot")
+    sweep = graph.inp("Sweep", "VECTOR", default=(0.0, 0.0, 0.1), desc="A light front crossing it: start frame, frames, soft width")
+    sweep_span = graph.inp("Sweep Span", "VECTOR", default=(1.0, 1.0, 2.0), desc="Share of it lit as the front sets out and as it stops, ease")
+    sweep_angle = graph.inp("Sweep Angle", default=0.0, desc="Direction the front travels in, degrees (0: rightwards)")
+    trail = graph.inp("Trail", default=0.0, min=0.0, desc="Distance the light fades over behind the front (0: no fading)")
     hatch = graph.inp("Hatch", "VECTOR", default=(0.0, 0.0, 0.5), desc="Stripes: period (0: solid), angle (degrees), inked share")
     frame = graph.scene_frame()
     coming = graph.clamp01((frame - fade_in.x) / graph.max(fade_in.y, 0.001))
@@ -103,12 +129,29 @@ def _inked(graph, geometry):
     geometry = graph.store(geometry, "glow", glow)
     own = graph.n("GeometryNodeInputNamedAttribute", Name="opacity", props={"data_type": "FLOAT"})
     opacity = graph.switch(own["Exists"], 1.0, own["Attribute"], input_type="FLOAT")
-    geometry = graph.store(geometry, "alpha", coming * going * (1.0 - falloff * (1.0 - rise)) * opacity * opacity_input)
+    lit = _swept(graph, low, high, sweep, sweep_span, sweep_angle, trail)
+    geometry = graph.store(geometry, "alpha", coming * going * (1.0 - falloff * (1.0 - rise)) * opacity * opacity_input * lit)
     geometry = graph.store(geometry, "hatch", hatch, "FLOAT_VECTOR")
     geometry = graph.store(geometry, "place", graph.position(), "FLOAT_VECTOR")
     leaving = graph.math("POWER", graph.clamp01((frame - slide_out_time.x) / graph.max(slide_out_time.y, 0.001)), ease)
     geometry = graph.set_pos(geometry, offset=slide * remaining + drift * graph.max(frame - slide_time.x, 0.0) + slide_out * leaving)
     return graph.mat(geometry, M.get("CIN.OverlayInk"))
+
+
+def _swept(graph, low, high, sweep, span, angle, trail):
+    """The share of the light a light front crossing the piece (bounds ``low``, ``high``) leaves at each point."""
+    turn = graph.math("RADIANS", angle)
+    cosine, sine = graph.math("COSINE", turn), graph.math("SINE", turn)
+    along = graph.position().x * cosine + graph.position().y * sine
+    nearest = graph.min(low.x * cosine, high.x * cosine) + graph.min(low.y * sine, high.y * sine)
+    farthest = graph.max(low.x * cosine, high.x * cosine) + graph.max(low.y * sine, high.y * sine)
+    progress = graph.clamp01((graph.scene_frame() - sweep.x) / graph.max(sweep.y, 0.001))
+    share = span.x + (span.y - span.x) * (1.0 - graph.math("POWER", 1.0 - progress, span.z))
+    soft = graph.max(sweep.z, 0.0001)
+    front = nearest + share * (farthest - nearest + soft)
+    fading = graph.math("EXPONENT", graph.max(front - soft - along, 0.0) * -1.0 / graph.max(trail, 0.0001))
+    fading = graph.switch(graph.compare(trail, 0.0, "GREATER_THAN"), 1.0, fading, "FLOAT")
+    return graph.clamp01((front - along) / soft) * fading
 
 
 def _placed(graph, geometry, position, angle):
@@ -232,83 +275,104 @@ def beam():
     width = graph.inp("Width", default=0.012, min=0.0)
     halo = graph.inp("Halo", default=6.0, min=1.0)
     grow = graph.inp("Grow", "VECTOR", default=(0.0, 4.0, 0.0), desc="Start frame, frames")
-    reach = graph.clamp01((graph.scene_frame() - grow.x) / graph.max(grow.y, 0.001))
-    length = graph.max(reach * aspect * 2.0, 0.0001)
-    core = graph.n("GeometryNodeMeshGrid", Size_X=length, Size_Y=width, Vertices_X=2, Vertices_Y=2)["Mesh"]
-    glow = graph.n("GeometryNodeMeshGrid", Size_X=length, Size_Y=width * halo, Vertices_X=2, Vertices_Y=3)["Mesh"]
+    retract = graph.inp("Retract", "VECTOR", default=(100000.0, 4.0, 1.0), desc="Start frame, frames, gathering (power of the time gone)")
+    curl = graph.inp("Curl", "VECTOR", default=(0.0, 0.1, 0.0), desc="Rise at the picture's edges, distance it falls to 1/e in")
+    frame = graph.scene_frame()
+    head = graph.clamp01((frame - grow.x) / graph.max(grow.y, 0.001))
+    tail = graph.math("POWER", graph.clamp01((frame - retract.x) / graph.max(retract.y, 0.001)), retract.z)
+    start = aspect * -1.0 + tail * aspect * 2.0
+    length = graph.max((head - tail) * aspect * 2.0, 0.0001)
+    core = graph.n("GeometryNodeMeshGrid", Size_X=1.0, Size_Y=width, Vertices_X=BEAM_COLUMNS, Vertices_Y=2)["Mesh"]
+    glow = graph.n("GeometryNodeMeshGrid", Size_X=1.0, Size_Y=width * halo, Vertices_X=BEAM_COLUMNS, Vertices_Y=3)["Mesh"]
     glow = graph.store(glow, "edge", graph.abs(graph.position().y) / (width * halo * 0.5))
     line = graph.join(graph.move(core, z=0.0005), glow)
-    graph.result(_inked(graph, graph.set_pos(line, offset=graph.vec(aspect * -1.0 + length * 0.5, height, 0.0))))
+    across = start + (graph.position().x + 0.5) * length
+    to_edge = graph.min(across + aspect, aspect - across)
+    rise = curl.x * graph.math("EXPONENT", to_edge * -1.0 / graph.max(curl.y, 0.0001))
+    line = graph.set_pos(line, pos=graph.vec(across, graph.position().y + height + rise, graph.position().z))
+    graph.result(_inked(graph, line))
     return graph
 
 
 @asset("CIN.Overlay.Curtain", "Overlays")
 def curtain():
-    """An aurora of upright streaks of light (see the module notes)."""
+    """A curtain of light hanging across the picture (see the module notes)."""
     graph = GN("CIN.Overlay.Curtain", curtain.__doc__)
     aspect = graph.inp("Aspect", default=16.0 / 9.0, min=0.1)
-    count = graph.inp("Count", "INT", default=90, min=1)
-    across_range = graph.inp("Across", "VECTOR", default=(0.0, 0.0, 0.0), desc="Left and right ends of the streaks (0, 0: the whole picture)")
-    seed = graph.inp("Seed", "INT", default=0)
+    across_range = graph.inp("Across", "VECTOR", default=(0.0, 0.0, 0.0), desc="Left and right ends (0, 0: the whole picture)")
+    feather = graph.inp("Feather", "VECTOR", default=(0.0, 0.0, 0.0), desc="Picture units its left and right ends fade out over")
+    seed = graph.inp("Seed", default=0.0)
+    streaks = graph.inp("Streaks", "VECTOR", default=(6.0, 4.0, 0.6), desc="Streaks to a unit across, octaves of finer ones, roughness")
+    contrast = graph.inp("Contrast", "VECTOR", default=(1.0, 1.0, 0.0), desc="Spread of log brightness at the head and at the foot")
     drift = graph.inp("Drift", default=0.004, desc="Picture units a frame")
-    times = graph.inp("Times", "VECTOR", default=(0.0, 10.0, 20.0), desc="Frames of colours B, C and D")
-    first = graph.inp("First", default=0.0, desc="Frame of colour A")
-    stagger = graph.inp("Stagger", default=3.0, min=0.0)
-    colors = [graph.inp(f"Color {name}", "COLOR", default=default) for name, default in
-              (("A", (0.1, 0.8, 0.3, 1.0)), ("B", (0.2, 0.8, 0.9, 1.0)), ("C", (1.0, 0.9, 0.4, 1.0)), ("D", (0.9, 0.3, 0.1, 1.0)))]
-    feet = [graph.inp(f"Foot {name}", "COLOR", default=default) for name, default in
-            (("A", (0.1, 0.8, 0.3, 1.0)), ("B", (0.2, 0.8, 0.9, 1.0)), ("C", (1.0, 0.9, 0.4, 1.0)), ("D", (0.9, 0.3, 0.1, 1.0)))]
-    fade_in = graph.inp("Fade In", "VECTOR", default=(0.0, 0.0, 0.0), desc="Start frame, frames")
-    fade_out = graph.inp("Fade Out", "VECTOR", default=(100000.0, 0.0, 0.0), desc="Start frame, frames")
+    evolve = graph.inp("Evolve", default=0.02, desc="How fast the streaks change, a frame")
+    turn = graph.inp("Turn", "VECTOR", default=(0.5, 0.0, 0.1), desc="Height the foot's colour passes to the head's at, its spread across, softness")
+    coverage = graph.inp("Coverage", "VECTOR", default=(0.0, 0.0, 0.0), desc="Threshold and softness of the streaks drawn (softness 0: all)")
+    head = graph.inp("Head", "COLOR", default=(0.2, 0.8, 0.4, 1.0))
+    foot = graph.inp("Foot", "COLOR", default=(0.2, 0.8, 0.4, 1.0))
     frame = graph.scene_frame()
-    present = graph.clamp01((frame - fade_in.x) / graph.max(fade_in.y, 0.001)) * (1.0 - graph.clamp01((frame - fade_out.x) / graph.max(fade_out.y, 0.001)))
-
-    def draw(salt, low=0.0, high=1.0):
-        return graph.random(low, high, seed * 13 + salt, ID=graph.index())
-
-    streaks = graph.new_points(count)
-    clock = graph.scene_frame() + draw(1, -1.0, 1.0) * stagger
     whole = graph.compare(graph.abs(across_range.x) + graph.abs(across_range.y), 0.0, "EQUAL")
-    left = graph.switch(whole, across_range.x, aspect * -1.2, "FLOAT")
-    right = graph.switch(whole, across_range.y, aspect * 1.2, "FLOAT")
-    across = left + (right - left) * draw(2) + graph.scene_frame() * drift * draw(3, 0.5, 1.5)
-    streaks = graph.set_pos(streaks, pos=graph.vec(across, 0.0, draw(4, -0.01, 0.0)))
-    stops = [first, times.x, times.y, times.z]
+    left = graph.switch(whole, across_range.x, aspect * -1.0, "FLOAT")
+    right = graph.switch(whole, across_range.y, aspect, "FLOAT")
+    columns = graph.to_int((right - left) * CURTAIN_COLUMNS + 2.0, "CEILING")
+    sheet = graph.n("GeometryNodeMeshGrid", Size_X=1.0, Size_Y=2.0, Vertices_X=columns, Vertices_Y=CURTAIN_ROWS)["Mesh"]
+    sheet = graph.set_pos(sheet, pos=graph.vec(left + (graph.position().x + 0.5) * (right - left), graph.position().y, 0.0))
+    across = graph.position().x
+    rise = (graph.position().y + 1.0) * 0.5
 
-    def passing(track):
-        blend = track[0]
-        for k in range(1, 4):
-            share = graph.clamp01((clock - stops[k - 1]) / graph.max(stops[k] - stops[k - 1], 0.001))
-            blend = graph.mix(share, blend, track[k], "RGBA")
-        return blend
+    def noise(salt, scale):
+        place = graph.vec((across + frame * drift) * scale, frame * evolve, seed * 7.31 + salt)
+        raw = graph.n("ShaderNodeTexNoise", Vector=place, Scale=1.0, Detail=streaks.y, Roughness=streaks.z, props={"noise_dimensions": "3D"})["Fac"]
+        spread = graph.statistic(sheet, raw)
+        return (raw - spread["Mean"]) / graph.max(spread["Standard Deviation"], 0.0001)
 
-    streak = graph.n("GeometryNodeMeshGrid", Size_X=1.0, Size_Y=3.0, Vertices_X=5, Vertices_Y=13)["Mesh"]
-    streak = graph.store(streak, "rise", (graph.position().y + 1.0) / 2.0)
-    streak = graph.store(streak, "edge", graph.abs(graph.position().x) * 2.0)
-    streaks = graph.store(streaks, "tint", passing(colors), "FLOAT_COLOR")
-    streaks = graph.store(streaks, "foot tint", passing(feet), "FLOAT_COLOR")
-    streaks = graph.store(streaks, "strength", draw(5, 0.7, 1.0))
-    sheets = graph.realize(graph.iop(streaks, streak, scale=graph.vec(draw(6, 0.05, 0.4), 1.0, 1.0)))
-    rise = graph.named("rise")
-    turn = graph.n("ShaderNodeMapRange", Value=rise, From_Min=0.3, From_Max=0.7, To_Min=0.0, To_Max=1.0, props={"interpolation_type": "SMOOTHSTEP"})["Result"]
-    sheets = graph.store(sheets, "ink", graph.mix(turn, graph.named("foot tint", "FLOAT_COLOR"), graph.named("tint", "FLOAT_COLOR"), "RGBA"),
-                         "FLOAT_COLOR")
-    sheets = graph.store(sheets, "glow", graph.named("strength") * present)
-    sheets = graph.store(sheets, "alpha", graph.named("strength") * present)
-    graph.result(graph.mat(sheets, M.get("CIN.OverlayInk")))
+    shine = noise(0.0, streaks.x)
+    height = turn.x + turn.y * graph.max(graph.min(noise(31.7, streaks.x * 0.5), 2.5), -2.5)
+    passing_up = graph.map_range(rise, height - turn.z, height + turn.z, 0.0, 1.0, interp="SMOOTHSTEP")
+    brightness = graph.math("EXPONENT", shine * graph.mix(passing_up, contrast.y, contrast.x))
+    head_parts = graph.n("FunctionNodeSeparateColor", Color=head)
+    foot_parts = graph.n("FunctionNodeSeparateColor", Color=foot)
+    opacity = graph.mix(passing_up, foot_parts["Alpha"], head_parts["Alpha"])
+    covered = graph.clamp01((shine - coverage.x) / graph.max(coverage.y, 0.0001))
+    covered = graph.switch(graph.compare(coverage.y, 0.0, "GREATER_THAN"), 1.0, covered, "FLOAT")
+    ends = graph.clamp01((across - left) / graph.max(feather.x, 0.0001)) * graph.clamp01((right - across) / graph.max(feather.y, 0.0001))
+    sheet = graph.store(sheet, "ink", graph.mix(passing_up, foot, head, "RGBA"), "FLOAT_COLOR")
+    sheet = graph.store(sheet, "glow", brightness)
+    sheet = graph.store(sheet, "alpha", opacity * ends * covered)
+    graph.result(graph.mat(sheet, M.get("CIN.OverlayInk")))
     return graph
 
 
-@asset("CIN.Overlay.Contours", "Overlays")
-def contours():
-    """An inverted triangle of contour lines (see the module notes)."""
-    graph = GN("CIN.Overlay.Contours", contours.__doc__)
-    size = graph.inp("Size", default=1.2, min=0.0)
+@asset("CIN.Overlay.Drawing", "Overlays")
+def drawing():
+    """A drawing (see the module notes)."""
+    graph = GN("CIN.Overlay.Drawing", drawing.__doc__)
+    sheet = graph.inp("Geometry", "GEOMETRY")
+    size = graph.inp("Size", default=1.0, min=0.0)
     position = graph.inp("Position", "VECTOR", default=(0.0, 0.0, 0.0))
-    triangle = graph.fill(graph.polyline([(-0.5, 0.29, 0.0), (0.5, 0.29, 0.0), (0.0, -0.58, 0.0)], cyclic=True))
-    triangle = graph.n("GeometryNodeSubdivideMesh", Mesh=triangle, Level=5).o
-    triangle = graph.store(triangle, "landscape", graph.position(), "FLOAT_VECTOR")
-    sheet = graph.set_pos(graph.transform(triangle, s=graph.vec(size, size, 1.0)), offset=position)
-    sheet = _inked(graph, sheet)
-    graph.result(graph.mat(sheet, M.get("CIN.OverlayContours")))
+    contrast = graph.inp("Contrast", default=1.0, min=0.01, desc="Power its tones are raised to")
+    lettering = graph.inp("Lettering", default=1.0, min=0.0, desc="Its lettering's opacity against the rest's")
+    strength = graph.mix(graph.named("lettering"), 1.0, lettering)
+    sheet = graph.store(sheet, "opacity", graph.math("POWER", graph.named("tone"), contrast) * strength)
+    sheet = graph.set_pos(graph.transform(sheet, s=graph.vec(size, size, 1.0)), offset=position)
+    graph.result(_inked(graph, sheet))
+    return graph
+
+
+@asset("CIN.Overlay.Haze", "Overlays")
+def haze():
+    """A haze across the picture (see the module notes)."""
+    graph = GN("CIN.Overlay.Haze", haze.__doc__)
+    aspect = graph.inp("Aspect", default=16.0 / 9.0, min=0.1)
+    scale = graph.inp("Scale", default=1.5, min=0.0)
+    detail = graph.inp("Detail", default=2.0, min=0.0)
+    contrast = graph.inp("Contrast", default=2.0, min=0.01)
+    seed = graph.inp("Seed", default=0.0)
+    drift = graph.inp("Drift", "VECTOR", default=(0.0, 0.0, 0.0), desc="Picture units a frame")
+    sheet = graph.n("GeometryNodeMeshGrid", Size_X=aspect * 2.0, Size_Y=2.0, Vertices_X=HAZE_COLUMNS, Vertices_Y=HAZE_ROWS)["Mesh"]
+    place = graph.position() - drift * graph.scene_frame()
+    density = graph.n("ShaderNodeTexNoise", Vector=place, W=seed, Scale=scale, Detail=detail, Roughness=0.5,
+                      props={"noise_dimensions": "4D"})["Fac"]
+    sheet = graph.store(sheet, "opacity", graph.math("POWER", graph.clamp01(density), contrast))
+    graph.result(_inked(graph, sheet))
     return graph

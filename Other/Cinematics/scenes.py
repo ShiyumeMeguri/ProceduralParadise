@@ -41,7 +41,8 @@ A shot (``shots/<id>.json``)::
      "items": [item, ...],                          (optional)
      "sky": {...},                                  (optional: the set's sky with these changes)
      "wind": [{"direction": [x, y, z], "strength": 5.0, "turbulence": 1.0}, ...],   (optional)
-     "overlays": [{"name", "asset", "inputs", "shown": [first, last]}, ...],   (optional)
+     "overlays": [{"name", "asset", "inputs", "shown": [first, last],          (optional)
+                   "keys": {input: [[frame, value], ...]}, "drawing": name, "layer": 0}, ...],
      "underlays": {"depth": 2.5, "items": [overlay, ...]}}                    (optional)
 
 Camera keys are the solved camera of every frame in set metres: Blender's
@@ -76,14 +77,21 @@ a wipe, a title card -- drawn in the picture's own units: across from
 -aspect to +aspect, up from -1 to +1 (``OVERLAY_DISTANCE`` in front of the
 lens), each a hair nearer the lens than the one listed before it
 (``OVERLAY_LAYER``), so later ones are drawn over earlier ones.  The
-overlays are a scene of their own (``Shot.<id>.Overlays``): the shot's
-camera moving the same way but in focus everywhere (a lens focused on her
-would blur a card held at the lens), rendered on a transparent film and
-laid over the shot's finished picture, the look and all
-(``Core.render.compositor``).  Underlays are overlays standing ``depth``
+overlays of a ``layer`` (0 unless given) are a scene of their own
+(``Shot.<id>.Overlays <layer>``), blending in light as the scene renders them:
+the shot's camera moving the same way but in focus everywhere (a lens
+focused on her would blur a card held at the lens), rendered on a
+transparent film; the layers are laid over the shot's finished picture,
+the look and all, the lowest first, each in display space as an editor
+lays titles (``Core.render.compositor``) -- pieces whose half-transparent
+parts lie over one another as an editor stacks them go in layers of their
+own.  Underlays are overlays standing ``depth``
 metres from the lens -- a title behind her: their own scene again, laid
 over the picture only where it shows something beyond that depth, so she
-and what she holds hide them, and sharp wherever the lens is focused.
+and what she holds hide them, and sharp wherever the lens is focused.  An
+overlay's ``keys`` set some of its inputs frame by frame, each value held
+until the next (a light blinking as the reference's does), and a
+``drawing`` hands its asset the mesh of a drawing (:mod:`drawings`).
 """
 from __future__ import annotations
 
@@ -96,7 +104,7 @@ from mathutils import Matrix, Quaternion, Vector
 from Core import cast as CAST, jsonio, scene as SC, values as V
 from Core import render as RND
 from Core.gn import get_asset
-from . import CINEMATICS, PALETTE, frames as FR
+from . import CINEMATICS, PALETTE, drawings as DR, frames as FR
 from .Kit import materials as M, sky as SKY
 
 __all__ = ["build_film", "load_scene", "build_scene"]
@@ -169,6 +177,19 @@ def build_frame(item, collection):
     for part in parts:
         part.parent = root
     return root
+
+
+def _key_inputs(obj, keys):
+    """Key the inputs ``keys`` names on ``obj``'s modifier, each [frame, value] held until the next."""
+    from Core.anim import fcurves_of
+    modifier = obj.modifiers[0]
+    for name, track in keys.items():
+        for frame, value in track:
+            SC.key_gn_input(modifier, name, _converted(modifier.node_group, {name: value})[name], frame)
+    for curve in fcurves_of(obj):
+        if curve.data_path.startswith("modifiers["):
+            for point in curve.keyframe_points:
+                point.interpolation = "CONSTANT"
 
 
 def _show_between(obj, first, last):
@@ -478,7 +499,10 @@ def build_overlays(shot, camera, scene, items, kind):
     half_height = OVERLAY_DISTANCE * lens.sensor_width / (2.0 * lens.lens) * height / width
     for layer, item in enumerate(items):
         name = f"Shot.{shot['id']}.{item['name']}"
-        obj = _modified_object(name, bpy.data.meshes.new(name), item["asset"], item.get("inputs", {}), overlays.collection)
+        mesh = DR.drawing_mesh(name, item["drawing"]) if "drawing" in item else bpy.data.meshes.new(name)
+        obj = _modified_object(name, mesh, item["asset"], item.get("inputs", {}), overlays.collection)
+        if "keys" in item:
+            _key_inputs(obj, item["keys"])
         obj.parent = viewer
         distance = OVERLAY_DISTANCE - layer * OVERLAY_LAYER
         obj.location = (0.0, 0.0, -distance)
@@ -569,18 +593,20 @@ def build_shot(folder, film, shot, built_set, args):
     if blur:
         scene.render.motion_blur_shutter = blur
     look = shot.get("look")
-    overlays = build_overlays(shot, camera, scene, shot.get("overlays", []), "Overlays")
+    layers = sorted({item.get("layer", 0) for item in shot.get("overlays", [])})
+    overlays = [build_overlays(shot, camera, scene, [item for item in shot["overlays"] if item.get("layer", 0) == layer], f"Overlays {layer}")
+                for layer in layers]
     underlay = None
     if shot.get("underlays"):
         underlay = (build_overlays(shot, camera, scene, shot["underlays"]["items"], "Underlays"), shot["underlays"]["depth"])
         scene.view_layers[0].use_pass_z = True
     if look and not args.no_look:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), 0.0)
-        RND.compositor(look, overlay_scene=overlays, underlay=underlay)
+        RND.compositor(look, overlay_scenes=overlays, underlay=underlay)
     else:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), settings.get("exposure", 0.0))
-        if overlays is not None or underlay is not None:
-            RND.compositor({}, overlay_scene=overlays, underlay=underlay)
+        if overlays or underlay is not None:
+            RND.compositor({}, overlay_scenes=overlays, underlay=underlay)
     performers = {}
     blow_wind(shot, scene)
     for name, entry in shot.get("cast", {}).items():

@@ -322,7 +322,7 @@ def underlay_nodes(t, img, depth, scene, distance, display):
     return display_over(t, img, held, display)
 
 
-def compositor(look: dict | None = None, lines_layer: str | None = None, ink_layer: str | None = None, overlay_scene=None,
+def compositor(look: dict | None = None, lines_layer: str | None = None, ink_layer: str | None = None, overlay_scenes=(),
                underlay=None):
     """Build the compositor graph from a ``look`` dict::
 
@@ -342,10 +342,11 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
     after it carries the render engine's own response onto the look the
     grade was made for (a shot fitted on another engine's renders).
 
-    An ``overlay_scene`` (a scene rendered on a transparent film through the
-    same camera: titles, wipes) is laid over everything, so the look never
-    touches it, in display space as an editor lays titles (:func:`display_over`);
-    only the ``fade`` comes after it, the whole picture going to black together.  An ``underlay`` (scene, metres) is laid under it,
+    The ``overlay_scenes`` (scenes rendered on a transparent film through the
+    same camera: titles, wipes) are laid over everything, one after another, so
+    the look never touches them, each in display space as an editor lays titles
+    (:func:`display_over`); only the ``fade`` comes after them, the whole picture
+    going to black together.  An ``underlay`` (scene, metres) is laid under them,
     over what the picture shows beyond that distance (:func:`underlay_nodes`).
 
     A ``backdrop`` is the sheet a transparent render is laid on (the shot's
@@ -496,7 +497,7 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
     if underlay is not None:
         img = underlay_nodes(t, img, rl["Depth"], *underlay, display)
 
-    if overlay_scene is not None:
+    for overlay_scene in overlay_scenes:
         layer = t.n("CompositorNodeRLayers")
         layer.n.scene = overlay_scene
         layer.n.layer = overlay_scene.view_layers[0].name

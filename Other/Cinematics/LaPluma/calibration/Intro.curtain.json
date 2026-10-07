@@ -1,0 +1,9 @@
+{
+ "name": "Curtain",
+ "bands": 12,
+ "frames": [8, 48],
+ "head_rows": [0, 180],
+ "foot_rows": [900, 1080],
+ "feather": 0.15,
+ "hidden": 0.12
+}

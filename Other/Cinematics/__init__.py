@@ -6,6 +6,8 @@ Sub-packages
 Kit      geometry-node assets: the architecture of the sets (frame towers
          built from modular facade panels, the skyline), the sky, the
          effects (birds, debris, dust) and the material library (EEVEE)
+Drawings flat artwork kept as data (a company's logo), made into meshes
+         for the overlays by :mod:`drawings`
 <Film>/  one folder per film: ``film.json`` (cast, sets, shots, cadence),
          its sets, shots and performances, the calibration that measured
          them on the reference video, renders and README

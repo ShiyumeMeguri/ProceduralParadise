@@ -182,22 +182,6 @@ def overlay_ink():
     return S.material("CIN.OverlayInk", build, settings={"surface_render_method": "BLENDED"})
 
 
-@register("CIN.OverlayContours")
-def overlay_contours():
-    """A landscape in an overlay's ink with its contour lines cut out of it: lines ``CIN.OverlayContours.width``
-    of a step apart, ``CIN.OverlayContours.levels`` steps over the landscape's height."""
-    def build(tree: Tree):
-        color, glow, alpha = _ink(tree)
-        place = tree.n("ShaderNodeAttribute", props={"attribute_name": "landscape", "attribute_type": "GEOMETRY"})["Vector"]
-        height = tree.n("ShaderNodeTexNoise", Vector=place, Scale=2.2, Detail=2.0, Roughness=0.5, props={"noise_dimensions": "3D"})["Fac"]
-        step = tree.math("FRACT", height * param("CIN.OverlayContours.levels", 14.0))
-        line = tree.map_range(tree.abs(step - 0.5), 0.5 - param("CIN.OverlayContours.width", 0.12), 0.5, 0.0, 1.0)
-        light = tree.n("ShaderNodeEmission", Color=color, Strength=glow)["Emission"]
-        clear = tree.n("ShaderNodeBsdfTransparent")["BSDF"]
-        return tree.n("ShaderNodeMixShader", tree.clamp01(alpha * (1.0 - line)), clear, light)["Shader"]
-    return S.material("CIN.OverlayContours", build, settings={"surface_render_method": "BLENDED"})
-
-
 @register("CIN.HallWindow")
 def hall_window():
     """Daylight through a hall's windows: the ``hall_window`` colour at ``CIN.HallWindow.strength``."""
