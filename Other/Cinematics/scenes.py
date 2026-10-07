@@ -554,7 +554,8 @@ def simulate_cloth(rig, scene, folder, cloth, frames, set_collection):
                                    SimpleNamespace(scene=scene, view_layer=view_layer))
     problems = {key: value for key, value in report.items() if key in ("error", "missing_bones", "missing_colliders", "unresolved_bones")}
     if problems:
-        raise ValueError(f"{path} on {rig.name}: {problems}")
+        raise ValueError(f"{path} on {rig.name}: {problems} -- a rig remade since it was written: write it again from its spec "
+                         f"(LaPluma/calibration/author_cloth.py)")
     first, last = frames
     set_layer = next(child for child in view_layer.layer_collection.children if child.collection == set_collection)
     excluded = set_layer.exclude
@@ -602,7 +603,8 @@ def build_shot(folder, film, shot, built_set, args):
         scene.view_layers[0].use_pass_z = True
     if look and not args.no_look:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), 0.0)
-        RND.compositor(look, overlay_scenes=overlays, underlay=underlay)
+        RND.compositor({key: value for key, value in look.items() if not (args.no_grade and key == "grade")}, overlay_scenes=overlays,
+                       underlay=underlay)
     else:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), settings.get("exposure", 0.0))
         if overlays or underlay is not None:

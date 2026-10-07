@@ -45,6 +45,8 @@ Command line (after ``--``)::
     --video                      cut the rendered frames into the video
     --scale S --samples N        preview size and quality
     --no-look                    leave every compositor look out
+    --no-grade                   keep the looks but leave out their grades (the
+                                 picture a grade is fitted on)
     --cast NAME=PATH             the .blend of a cast member (else its environment variable)
     --out PATH / --no-save       where the .blend goes / do not save it
 """
@@ -97,6 +99,7 @@ def parse(argv):
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--samples", type=int, default=None)
     parser.add_argument("--no-look", action="store_true")
+    parser.add_argument("--no-grade", action="store_true")
     parser.add_argument("--cast", action="append", default=[])
     parser.add_argument("--out", default=None)
     parser.add_argument("--no-save", action="store_true")
@@ -131,7 +134,7 @@ def shot_fingerprint(shot, root, script_path, args, cast_digests):
     """Identity of everything a shot's frames depend on: the Blender build,
     the options that change the picture, the project's code, the data files
     the shot was built from and the content of every cast member's file."""
-    options = [f"scale={args.scale}", f"samples={args.samples}", f"look={not args.no_look}"]
+    options = [f"scale={args.scale}", f"samples={args.samples}", f"look={not args.no_look}", f"grade={not args.no_grade}"]
     files = _code_files(root) | {os.path.abspath(script_path)} | set(shot["sources"])
     return _digest(files, options + sorted(cast_digests))[:16]
 

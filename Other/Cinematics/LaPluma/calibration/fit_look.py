@@ -4,7 +4,8 @@ A shot's look: the tone curve that carries its renders onto the reference.
     python fit_look.py <frames dir> <shot.json> <render pattern> <mask dir> frame [frame ...]
 
 The renders (``<render pattern>`` with ``{frame}``, e.g. ``renders/raw_{frame}.png``, made
-with the shot's view transform and no grade) and the reference frames are compared as
+with the shot's look but no grade: ``Core/film.py --no-grade``, so its exposure is in them) and
+the reference frames are compared as
 distributions of brightness (``Core.grade.fit_grade_hist`` on their luminance): a tone curve
 on brightness alone (``curves`` ``"L"``), so the render keeps its own hues and saturation while
 taking the reference's contrast and key -- a curve per channel would push colours the two
@@ -46,6 +47,7 @@ curve = luminance["curves"]["G"]
 grade = {"matrix": np.eye(3).tolist(), "offset": [0.0, 0.0, 0.0], "curves": {"L": curve}, "highlight_rolloff": True}
 shot = json.load(open(shot_path, encoding="utf-8"))
 shot.setdefault("look", {})["grade"] = grade
-shot.setdefault("notes", []).append(f"Its look (look.grade) is the tone curve of calibration/fit_look.py on frames {frames}.")
+NOTE = "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames"
+shot["notes"] = [note for note in shot.get("notes", []) if not note.startswith(NOTE)] + [f"{NOTE} {frames}."]
 open(shot_path, "w", encoding="utf-8", newline="\n").write(json.dumps(shot, indent=1, ensure_ascii=False) + "\n")
 print("tone curve", [round(y, 3) for _x, y in curve], "->", shot_path)
