@@ -3,7 +3,8 @@
   "name": "La Pluma (羽毛笔) -- recruitment film",
   "notes": [
     "Rebuilt from the reference video named by the environment variable LAPLUMA_REFERENCE (1920 x 1080, 30 fps); frame numbers are the video's own.",
-    "The cast's .blend is named by the environment variable LAPLUMA_BLEND (or --cast LaPluma=<path>).  Its shading is runtime data of the RuriRipperImporter add-on, which must be enabled in the Blender that builds the film."
+    "The cast's .blend is named by the environment variable LAPLUMA_BLEND (or --cast LaPluma=<path>).  Its shading is runtime data of the RuriRipperImporter add-on, which must be enabled in the Blender that builds the film.",
+    "The soundtrack is the game's recruitment music (its sound bank's stream 76944955, decoded by its owner), named by the environment variable LAPLUMA_MUSIC; the reference's frame 0 plays it from 1.62 s in."
   ],
   "fps": 30,
   "resolution": [
@@ -12,7 +13,7 @@
   ],
   "frames": [
     0,
-    724
+    726
   ],
   "reference": {
     "video": {
@@ -35,23 +36,31 @@
       "armature": "Avatar_LaPluma",
       "rig": "cast/LaPluma.json",
       "hidden": [
-        "S_actor_lapluma_cloth_02_lod0.001",
-        "S_actor_lapluma_cloth_02_lod0.002",
-        "S_actor_lapluma_cloth_03_lod0.001",
-        "S_actor_lapluma_cloth_03_lod0.002",
-        "Avatar_LaPluma_Edges"
+        "Avatar_LaPluma_Edges.002",
+        "S_actor_lapluma_cloth_03_lod0.003",
+        "S_actor_lapluma_cloth_04_lod0"
       ],
-      "note": "The coat -- its shell, sleeves and iridescent lining, and the proxy meshes its rig is being built on -- is not rigged yet and stays hidden until it is.",
       "shading": {
         "module": "RuriRipperImporter.Host.Blender.derived_state",
         "call": "flush",
         "error": "LAST_ERROR"
-      }
+      },
+      "sets": [
+        "District",
+        "Hall"
+      ],
+      "notes": [
+        "The coat is rigged (10-07); its two pieces with no bone weights would stand in the rest pose beside her and stay hidden, as does the edge helper."
+      ]
     }
   },
   "shots": [
+    "Intro",
     "Breakout",
-    "Hand"
+    "Hand",
+    "Fly",
+    "Operator",
+    "Hall"
   ],
   "holds": [
     1,
@@ -89,5 +98,9 @@
     515,
     591,
     714
-  ]
+  ],
+  "audio": {
+    "environment": "LAPLUMA_MUSIC",
+    "offset": 1.62
+  }
 }

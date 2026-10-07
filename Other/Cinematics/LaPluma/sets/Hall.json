@@ -1,0 +1,523 @@
+{
+ "id": "Hall",
+ "notes": [
+  "Set metres: she stands at the origin, the camera (level, 1.06 m up, calibration/Hall.place.json) looks into the hall along +Y.",
+  "Laid out round that camera from the reference's frame 700 (calibration in the session's layout of the hall): the left wall where its foot meets the floor in the picture, the lockers where their corners' rays meet that wall, the ring, its glowing hole, the gold crystal and its two cables at the depth chosen for them (9 m: the picture alone does not fix it), sized and raised to their pixels; a curved soffit round the ring under a 4.6 m ceiling, windows of light to the right, a terminal at the far right, two lanes painted on the floor along the wall.",
+  "As the picture comes in out of the glitch (frames 543-560) crows fly through the hall round her and out (Crows).",
+  "Her name, LA PLUMA, behind her is the shot's underlay (shots/Hall.json), not the set's."
+ ],
+ "materials": {
+  "CIN.HallGlow.strength": 14.0
+ },
+ "sky": {
+  "zenith": [
+   0.55,
+   0.57,
+   0.6
+  ],
+  "horizon": [
+   0.62,
+   0.62,
+   0.6
+  ],
+  "ground": [
+   0.2,
+   0.21,
+   0.22
+  ],
+  "strength": 0.35,
+  "haze": 30.0
+ },
+ "items": [
+  {
+   "name": "Floor",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     -14.0,
+     -8.0,
+     -0.3
+    ],
+    "Max": [
+     14.0,
+     26.0,
+     0.0
+    ],
+    "Material": "CIN.HallFloor"
+   }
+  },
+  {
+   "name": "Ceiling",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     -14.0,
+     -8.0,
+     4.6
+    ],
+    "Max": [
+     14.0,
+     26.0,
+     4.8999999999999995
+    ],
+    "Material": "CIN.HallWall"
+   }
+  },
+  {
+   "name": "Left Wall",
+   "asset": "CIN.Box",
+   "loc": [
+    -3.879,
+    4.707,
+    0.0
+   ],
+   "rot": [
+    0,
+    0,
+    63.55
+   ],
+   "inputs": {
+    "Min": [
+     -9.69,
+     0.0,
+     0.0
+    ],
+    "Max": [
+     9.69,
+     0.3,
+     4.6
+    ],
+    "Material": "CIN.HallWall"
+   }
+  },
+  {
+   "name": "Lockers",
+   "asset": "CIN.Hall.Lockers",
+   "loc": [
+    -3.667,
+    5.133,
+    0.446
+   ],
+   "rot": [
+    0,
+    0,
+    63.55
+   ],
+   "inputs": {
+    "Columns": 4,
+    "Rows": 2,
+    "Door": [
+     0.314,
+     1.259,
+     0.0
+    ],
+    "Gap": 0.03,
+    "Relief": 0.04,
+    "Material": "CIN.HallPaint"
+   }
+  },
+  {
+   "name": "Locker Backing",
+   "asset": "CIN.Box",
+   "loc": [
+    -3.667,
+    5.133,
+    0.446
+   ],
+   "rot": [
+    0,
+    0,
+    63.55
+   ],
+   "inputs": {
+    "Min": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Max": [
+     1.256,
+     0.01,
+     2.518
+    ],
+    "Material": "CIN.HallMetal"
+   }
+  },
+  {
+   "name": "Back Wall",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     -14.0,
+     22.0,
+     0.0
+    ],
+    "Max": [
+     14.0,
+     22.3,
+     4.6
+    ],
+    "Material": "CIN.HallWall"
+   }
+  },
+  {
+   "name": "Windows",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     7.5,
+     -8.0,
+     0.3
+    ],
+    "Max": [
+     7.6,
+     22.0,
+     4.3
+    ],
+    "Material": "CIN.HallGlow"
+   }
+  },
+  {
+   "name": "Partition",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     6.0,
+     -6.0,
+     0.0
+    ],
+    "Max": [
+     6.04,
+     20.0,
+     3.4
+    ],
+    "Material": "CIN.Glass"
+   }
+  },
+  {
+   "name": "Disc",
+   "asset": "CIN.Hall.Halo",
+   "loc": [
+    1.342,
+    7.392,
+    4.038
+   ],
+   "inputs": {
+    "Outer": 2.97,
+    "Inner": 1.242,
+    "Depth": 0.5,
+    "Glow Width": 0.0,
+    "Material": "CIN.HallPaint"
+   }
+  },
+  {
+   "name": "Disc Rim",
+   "asset": "CIN.Hall.Halo",
+   "loc": [
+    1.342,
+    7.392,
+    3.848
+   ],
+   "inputs": {
+    "Outer": 3.01,
+    "Inner": 2.97,
+    "Depth": 0.12,
+    "Cap": false,
+    "Glow Width": 0.1
+   }
+  },
+  {
+   "name": "Halo",
+   "asset": "CIN.Hall.Halo",
+   "loc": [
+    1.342,
+    7.392,
+    3.255
+   ],
+   "inputs": {
+    "Outer": 1.692,
+    "Inner": 1.242,
+    "Depth": 0.5,
+    "Glow Width": 0.45,
+    "Material": "CIN.HallPaint"
+   }
+  },
+  {
+   "name": "Crystal",
+   "asset": "CIN.Hall.Crystal",
+   "loc": [
+    1.342,
+    7.392,
+    3.419
+   ],
+   "inputs": {
+    "Length": 2.495,
+    "Radius": 0.322,
+    "Facets": 7,
+    "Seed": 3
+   }
+  },
+  {
+   "name": "Soffit",
+   "asset": "CIN.Hall.Halo",
+   "loc": [
+    1.342,
+    7.392,
+    3.967
+   ],
+   "inputs": {
+    "Outer": 8.2,
+    "Inner": 7.0,
+    "Depth": 0.7,
+    "Start": -250.0,
+    "End": 70.0,
+    "Cap": false,
+    "Glow Width": 0.12
+   }
+  },
+  {
+   "name": "Terminal",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     4.39,
+     8.342,
+     0.301
+    ],
+    "Max": [
+     5.29,
+     8.442,
+     1.137
+    ],
+    "Material": "CIN.HallMetal"
+   }
+  },
+  {
+   "name": "Lane Near",
+   "asset": "CIN.Hall.Stripe",
+   "loc": [
+    -4.561,
+    -4.152,
+    0.001
+   ],
+   "rot": [
+    0,
+    0,
+    66.77
+   ],
+   "inputs": {
+    "Radius": 0.0,
+    "Length": 24.098,
+    "Width": 0.1
+   }
+  },
+  {
+   "name": "Lane Far",
+   "asset": "CIN.Hall.Stripe",
+   "loc": [
+    -3.66,
+    -4.707,
+    0.001
+   ],
+   "rot": [
+    0,
+    0,
+    71.31
+   ],
+   "inputs": {
+    "Radius": 0.0,
+    "Length": 24.024,
+    "Width": 0.1
+   }
+  },
+  {
+   "name": "Cable 1",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     2.028,
+     7.38,
+     0.377
+    ],
+    "Max": [
+     2.052,
+     7.404,
+     3.005
+    ],
+    "Material": "CIN.Gold"
+   }
+  },
+  {
+   "name": "Cable 2",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     2.267,
+     7.38,
+     0.377
+    ],
+    "Max": [
+     2.291,
+     7.404,
+     3.005
+    ],
+    "Material": "CIN.Gold"
+   }
+  },
+  {
+   "name": "Crows",
+   "asset": "CIN.Birds.Flock",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "shown": [
+    543,
+    612
+   ],
+   "inputs": {
+    "Count": 26,
+    "Seed": 7,
+    "Origin": [
+     0.0,
+     2.5,
+     2.6
+    ],
+    "Extent": [
+     6.0,
+     4.0,
+     1.6
+    ],
+    "Heading": [
+     1.0,
+     0.25,
+     0.1
+    ],
+    "Spread": 50.0,
+    "Climb": 15.0,
+    "Speed": 5.5,
+    "Beat": 4.5,
+    "Glide": 0.2,
+    "Start": 556.0
+   }
+  }
+ ],
+ "lights": [
+  {
+   "name": "Window Light",
+   "light": "AREA",
+   "power": 4500.0,
+   "color": [
+    1.0,
+    0.95,
+    0.86
+   ],
+   "shape": "RECTANGLE",
+   "size": [
+    24.0,
+    4.0
+   ],
+   "loc": [
+    7.3,
+    8.0,
+    2.3
+   ],
+   "direction": [
+    1.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Ceiling Light",
+   "light": "AREA",
+   "power": 700.0,
+   "color": [
+    0.96,
+    0.98,
+    1.0
+   ],
+   "shape": "RECTANGLE",
+   "size": [
+    10.0,
+    16.0
+   ],
+   "loc": [
+    0.5,
+    7.0,
+    4.5
+   ],
+   "direction": [
+    0.0,
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Back Light",
+   "light": "AREA",
+   "power": 400.0,
+   "color": [
+    1.0,
+    0.9,
+    0.75
+   ],
+   "shape": "RECTANGLE",
+   "size": [
+    3.0,
+    3.0
+   ],
+   "loc": [
+    2.0,
+    4.0,
+    2.6
+   ],
+   "direction": [
+    0.3,
+    1.0,
+    0.5
+   ]
+  }
+ ]
+}

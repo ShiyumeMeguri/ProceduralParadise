@@ -3,7 +3,7 @@ Place a prop of the cast (her scythe) on its silhouette, frame by frame (PyTorch
 the starting grips for fitting her and the prop together.
 
     python fit_prop.py <rig.npz> <profile.json> <camera.json> <performance.json> <prop mesh> <masks dir> <first> <last>
-                       [--occluders DIR] [--part NAME=DIR ...] [--out performance.json]
+                       --grip NAME [--occluders DIR] [--part NAME=DIR ...] [--out performance.json]
 
 The prop (``prop.py``), as large as its maker made it, is placed on every
 frame so that, seen through the shot's solved camera, it fills its
@@ -13,9 +13,11 @@ points of the materials the cast profile names for it: the blade, the
 hub) fills its own silhouette (``NAME=DIR``) and
 the rest of the prop the rest, so the blade cannot lie where the shaft is.
 The search runs per frame over many orientations, each at the distance the
-silhouette's size implies, keeps the best few, refines them, and takes the
+silhouette's size implies, keeps the best few -- each also rolled a quarter, a
+half and three quarters of a turn about its shaft, which the silhouette cannot
+tell apart where the blade is out of the picture -- refines them, and takes the
 path through them that turns least from frame to frame; a frame whose own
-fit strays is placed between its neighbours, and the whole shot is refined
+fit strays, or where the prop is not seen (no mask), is placed between its neighbours, and the whole shot is refined
 together with smoothness.
 
 The picture places the prop up to how far it is: twice as large twice as
@@ -24,13 +26,15 @@ written into the performance (``placements``), and a first guess of how
 large the film's prop is (``film_scales``): the median, over the frames, of
 the size at which the shaft (the cast profile's ``props``) lies as far from
 the camera as the wrist of the performance's hand where the wrist crosses
-it in the picture.  ``fit_pose.py --prop`` then fits her to it: the prop
+it in the picture -- the hand of the grip the shot holds it in (``--grip``:
+one of the prop's ``grips``, right or left).  ``fit_pose.py --prop`` then fits her to it: the prop
 stays where the picture has it, her hand closes on it, and its size is
 fitted with her.  The card is shared (``gpu_budget.py``): orientations,
 candidates and frames are worked through in batches the claim holds.
 """
 import argparse
 import json
+import math
 import os
 
 import numpy as np
@@ -50,6 +54,7 @@ parser.add_argument("prop")
 parser.add_argument("masks")
 parser.add_argument("first", type=int)
 parser.add_argument("last", type=int)
+parser.add_argument("--grip", required=True, help="which of the prop's grips (the profile's props.<prop>.grips) holds it in this shot")
 parser.add_argument("--occluders", default=None)
 parser.add_argument("--part", action="append", default=[], help="NAME=DIR -- a part of the prop (the profile's parts) and its masks")
 parser.add_argument("--smooth-weight", type=float, default=5.0)
@@ -70,8 +75,7 @@ profile = json.load(open(args.profile, encoding="utf-8"))
 prop_profile = profile["props"][args.prop]
 performance = json.load(open(args.performance, encoding="utf-8"))
 items = {item["frame"]: item for item in performance["frames"]}
-frames = [frame for frame in range(args.first, args.last + 1)
-          if frame in items and os.path.exists(os.path.join(args.masks, "m%04d.png" % frame))]
+frames = [frame for frame in range(args.first, args.last + 1) if frame in items]
 count = len(frames)
 camera = Camera(args.camera, frames, width, height, device)
 prop = Prop(skeleton, args.prop)
@@ -91,7 +95,7 @@ for name in frame_items[0]["bones"]:
     matrix = torch.eye(4, device=device).repeat(count, 1, 1)
     matrix[:, :3, :3] = quaternion_matrices(torch.tensor([item["bones"][name] for item in frame_items], dtype=torch.float64)).float().to(device)
     keyed[skeleton.index[name]] = matrix
-hand = skeleton.index[prop_profile["hand"]]
+hand = skeleton.index[prop_profile["grips"][args.grip]["hand"]]
 body = skeleton.pose(object_matrix, lambda b: keyed.get(b), skeleton.ancestry([hand]))
 hand_world = body[hand]
 body_depth = [float(-(camera.rotation[k].T @ (object_matrix[k, :3, 3] - camera.location[k]))[2]) for k in range(count)]
@@ -145,6 +149,9 @@ def rotation_angle(a, b):
 
 quaternions = torch.randn(args.orientations, 4, generator=generator, dtype=torch.float64)
 orientations = quaternion_matrices(quaternions / quaternions.norm(dim=1, keepdim=True)).float().to(device)
+shaft_axis = torch.tensor(prop_profile["shaft"][1], dtype=torch.float32) - torch.tensor(prop_profile["shaft"][0], dtype=torch.float32)
+shaft_axis = shaft_axis / shaft_axis.norm()
+rolls = axis_angle_matrices(torch.stack([shaft_axis * math.radians(angle) for angle in (0.0, 90.0, 180.0, 270.0)])).to(device)
 candidates_rotation, candidates_translation = [], []
 orientations_at_once = chunk(budget, bytes_each=len(search_points) * 40 + (height // 8) * (width // 8) * 16 * len(prop_parts), most=args.orientations)
 for k in range(count):
@@ -161,15 +168,17 @@ for k in range(count):
                 kept_slots.append(slot)
             if len(kept) == args.keep:
                 break
-    candidates_rotation.append(orientations[kept])
-    candidates_translation.append(translation[kept])
+        rolled = (orientations[kept][:, None] @ rolls[None]).reshape(-1, 3, 3)
+        _, rolled_translation = search(k, rolled)
+    candidates_rotation.append(rolled)
+    candidates_translation.append(rolled_translation)
 candidates_rotation = torch.stack(candidates_rotation)
 candidates_translation = torch.stack(candidates_translation)
 print("searched", count, "frames", flush=True)
 
 flat_rotation = candidates_rotation.reshape(-1, 3, 3)
 flat_translation = candidates_translation.reshape(-1, 3)
-flat_frame = torch.arange(count, device=device).repeat_interleave(args.keep)
+flat_frame = torch.arange(count, device=device).repeat_interleave(args.keep * len(rolls))
 refined_rotation, refined_translation, refined_cost = [], [], []
 cover_targets = 400
 candidates_at_once = chunk(budget, bytes_each=sum(len(part.search_points) for part in prop_parts) * cover_targets * 4 * 4, most=512)
@@ -193,9 +202,9 @@ for start in range(0, len(flat_frame), candidates_at_once):
         refined_rotation.append(rotation)
         refined_translation.append(flat_translation[start:stop] + shift)
         refined_cost.append(precision + coverage)
-refined_rotation = torch.cat(refined_rotation).reshape(count, args.keep, 3, 3)
-refined_translation = torch.cat(refined_translation).reshape(count, args.keep, 3)
-refined_cost = torch.cat(refined_cost).reshape(count, args.keep)
+refined_rotation = torch.cat(refined_rotation).reshape(count, args.keep * len(rolls), 3, 3)
+refined_translation = torch.cat(refined_translation).reshape(count, args.keep * len(rolls), 3)
+refined_cost = torch.cat(refined_cost).reshape(count, args.keep * len(rolls))
 
 with torch.no_grad():
     total = refined_cost[0].clone()
@@ -226,7 +235,8 @@ def slerp(a, b, share):
 
 
 typical = np.array([np.median(chosen_cost[max(0, k - 5):k + 6]) for k in range(count)])
-stray = (chosen_cost > np.maximum(0.15, 3.0 * typical)) & (present.cpu().numpy() > 0)
+seen = present.cpu().numpy() > 0
+stray = ((chosen_cost > np.maximum(0.15, 3.0 * typical)) & seen) | ~seen
 good = [k for k in range(count) if not stray[k]]
 for k in np.nonzero(stray)[0]:
     before = [g for g in good if g < k]
@@ -236,7 +246,12 @@ for k in np.nonzero(stray)[0]:
         share = (k - a) / (b - a)
         chosen_rotation[k] = slerp(chosen_rotation[a].cpu().numpy(), chosen_rotation[b].cpu().numpy(), share)
         chosen_translation[k] = (1 - share) * chosen_translation[a] + share * chosen_translation[b]
-print("frames placed between their neighbours (their own fit strayed):", [frames[k] for k in np.nonzero(stray)[0]], flush=True)
+    elif before or after:
+        nearest = before[-1] if before else after[0]
+        chosen_rotation[k] = chosen_rotation[nearest]
+        chosen_translation[k] = chosen_translation[nearest]
+print("frames placed between their neighbours (their own fit strayed, or the prop is not seen there):",
+      [frames[k] for k in np.nonzero(stray)[0]], flush=True)
 
 slots = torch.arange(count, device=device)
 turn = torch.zeros(count, 3, device=device, requires_grad=True)

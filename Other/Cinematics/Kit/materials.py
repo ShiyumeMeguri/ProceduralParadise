@@ -139,6 +139,68 @@ def debris():
     return S.material("CIN.Debris", build)
 
 
+@register("CIN.OverlayBlack")
+def overlay_black():
+    """What an overlay covers the picture with: black, lit by nothing."""
+    return S.emission_mat("CIN.OverlayBlack", color=(0.0, 0.0, 0.0), strength=0.0)
+
+
+@register("CIN.OverlayWhite")
+def overlay_white():
+    """An overlay's glowing white (``CIN.OverlayWhite.strength``)."""
+    return S.emission_mat("CIN.OverlayWhite", color=(1.0, 1.0, 1.0), strength=param("CIN.OverlayWhite.strength", 2.0))
+
+
+def _ink(tree: Tree):
+    """An overlay's ink: (colour times glow, opacity) from its ``ink``, ``glow`` and ``alpha``, fading out
+    towards its ``edge`` (a halo's), laid in the stripes of its ``hatch`` (period along the direction angle,
+    in degrees, of its ``place``; inked share; a period of 0 is solid)."""
+    def attribute(name, socket="Fac"):
+        return tree.n("ShaderNodeAttribute", props={"attribute_name": name, "attribute_type": "GEOMETRY"})[socket]
+    soft = 1.0 - tree.clamp01(attribute("edge"))
+    soft = soft * soft
+    period, angle, share = tree.sep(attribute("hatch", "Vector"))
+    x, y, _ = tree.sep(attribute("place", "Vector"))
+    turn = tree.math("RADIANS", angle)
+    along = x * tree.math("COSINE", turn) + y * tree.math("SINE", turn)
+    inked = tree.math("LESS_THAN", tree.math("FRACT", along / tree.max(period, 0.000001)), share)
+    stripes = tree.max(inked, tree.math("LESS_THAN", period, 0.000001))
+    return attribute("ink", "Color"), attribute("glow") * soft, attribute("alpha") * soft * stripes
+
+
+@register("CIN.OverlayInk")
+def overlay_ink():
+    """The ink an overlay is drawn in (``Kit.overlays``): its own colour, glow and opacity."""
+    def build(tree: Tree):
+        color, glow, alpha = _ink(tree)
+        light = tree.n("ShaderNodeEmission", Color=color, Strength=glow)["Emission"]
+        clear = tree.n("ShaderNodeBsdfTransparent")["BSDF"]
+        return tree.n("ShaderNodeMixShader", tree.clamp01(alpha), clear, light)["Shader"]
+    return S.material("CIN.OverlayInk", build, settings={"surface_render_method": "BLENDED"})
+
+
+@register("CIN.OverlayContours")
+def overlay_contours():
+    """The contour lines of a landscape in an overlay's ink: lines ``CIN.OverlayContours.width`` of a step
+    apart, ``CIN.OverlayContours.levels`` steps over the landscape's height."""
+    def build(tree: Tree):
+        color, glow, alpha = _ink(tree)
+        place = tree.n("ShaderNodeAttribute", props={"attribute_name": "landscape", "attribute_type": "GEOMETRY"})["Vector"]
+        height = tree.n("ShaderNodeTexNoise", Vector=place, Scale=2.2, Detail=2.0, Roughness=0.5, props={"noise_dimensions": "3D"})["Fac"]
+        step = tree.math("FRACT", height * param("CIN.OverlayContours.levels", 14.0))
+        line = tree.map_range(tree.abs(step - 0.5), 0.5 - param("CIN.OverlayContours.width", 0.12), 0.5, 0.0, 1.0)
+        light = tree.n("ShaderNodeEmission", Color=color, Strength=glow)["Emission"]
+        clear = tree.n("ShaderNodeBsdfTransparent")["BSDF"]
+        return tree.n("ShaderNodeMixShader", tree.clamp01(alpha * line), clear, light)["Shader"]
+    return S.material("CIN.OverlayContours", build, settings={"surface_render_method": "BLENDED"})
+
+
+@register("CIN.HallGlow")
+def hall_glow():
+    """The light of a hall's ring and panels: the ``hall_glow`` colour at ``CIN.HallGlow.strength``."""
+    return S.emission_mat("CIN.HallGlow", color=color("hall_glow"), strength=param("CIN.HallGlow.strength", 12.0))
+
+
 @register("CIN.Air")
 def air():
     """Haze (a volume): ``CIN.Air.density`` per metre at the ground, thinning to 1/e every

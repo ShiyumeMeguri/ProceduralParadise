@@ -32,11 +32,15 @@ A shot (``shots/<id>.json``)::
      "camera": {"focal_px": 1315.0, "sensor": 36.0, "clip": [0.05, 8000.0],
                 "keys": [{"frame": 68, "location": [x, y, z], "rotation": [w, x, y, z]}, ...]
                         or "calibration/<file>.json" (a file holding them),
-                "place": "calibration/<shot>.place.json"},       (optional)
+                "place": "calibration/<shot>.place.json",        (optional)
+                "dof": {"fstop": 2.0, "focus": {"cast": "LaPluma", "bone": "Head"}}},   (optional)
      "render": {"engine": "EEVEE", "samples": 64, "eevee": {...}, "view": "AgX", "look": null,
                 "motion_blur": 0.5},
      "look": {...},                                 (Core.render.compositor)
-     "cast": {"LaPluma": {"performance": "performances/Breakout.json"}}}
+     "cast": {"LaPluma": {"performance": "performances/Breakout.json"}},
+     "items": [item, ...],                          (optional)
+     "overlays": [{"name", "asset", "inputs", "shown": [first, last]}, ...],   (optional)
+     "underlays": {"depth": 2.5, "items": [overlay, ...]}}                    (optional)
 
 Camera keys are the solved camera of every frame in set metres: Blender's
 convention, the camera looking along its local -Z with +Y up.  A camera
@@ -46,8 +50,29 @@ the set: the ``location`` of the origin and the direction it looks
 (``look``, or a ``target`` it looks at) with how far it turns about that
 direction from upright (``roll``, degrees).  A performance fitted against
 such a camera's picture moves with it (``"relative_to": "camera"``: her
-root on every frame is in the frame's camera's frame).  The film's
+root on every frame is in the frame's camera's frame).  A camera with
+``dof`` focuses on a bone of the shot's performer of a cast member, the
+lens open at ``fstop``.  The film's
 ``resolution`` and ``fps`` apply to every shot.
+
+A shot's own ``items`` are set items only its camera sees -- a crow
+passing its lens.  One with a ``camera_frame`` is placed in the frame of
+the shot's camera on that frame (looking along its -Z, +Y up): where the
+camera stood then, wherever the shot's camera is solved to stand.
+
+An overlay is an asset the shot's camera carries in front of its lens --
+a wipe, a title card -- drawn in the picture's own units: across from
+-aspect to +aspect, up from -1 to +1 (``OVERLAY_DISTANCE`` in front of the
+lens), each a hair nearer the lens than the one listed before it
+(``OVERLAY_LAYER``), so later ones are drawn over earlier ones.  The
+overlays are a scene of their own (``Shot.<id>.Overlays``): the shot's
+camera moving the same way but in focus everywhere (a lens focused on her
+would blur a card held at the lens), rendered on a transparent film and
+laid over the shot's finished picture, the look and all
+(``Core.render.compositor``).  Underlays are overlays standing ``depth``
+metres from the lens -- a title behind her: their own scene again, laid
+over the picture only where it shows something beyond that depth, so she
+and what she holds hide them, and sharp wherever the lens is focused.
 """
 from __future__ import annotations
 
@@ -64,6 +89,9 @@ from . import CINEMATICS, PALETTE, frames as FR
 from .Kit import materials as M, sky as SKY
 
 __all__ = ["build_film", "load_scene", "build_scene"]
+
+OVERLAY_DISTANCE = 0.1
+OVERLAY_LAYER = 0.0004
 
 
 def load_scene(folder):
@@ -291,6 +319,24 @@ def build_camera(name, folder, camera, film, collection):
     return obj, sources + place_sources, matrices
 
 
+def _camera_at(matrices, frame):
+    """The shot camera's matrix on ``frame`` from its keyed ``matrices`` (frame -> matrix): as its keys play it, straight
+    from key to key (location and quaternion component by component), held before the first and after the last."""
+    if frame in matrices:
+        return matrices[frame]
+    frames = sorted(matrices)
+    if frame < frames[0] or frame > frames[-1]:
+        return matrices[frames[0] if frame < frames[0] else frames[-1]]
+    after = next(key for key in frames if key > frame)
+    before = max(key for key in frames if key < frame)
+    share = (frame - before) / (after - before)
+    (location_a, rotation_a, _), (location_b, rotation_b, _) = matrices[before].decompose(), matrices[after].decompose()
+    if rotation_a.dot(rotation_b) < 0.0:
+        rotation_b = -rotation_b
+    rotation = Quaternion([a + (b - a) * share for a, b in zip(rotation_a, rotation_b)]).normalized()
+    return Matrix.Translation(location_a.lerp(location_b, share)) @ rotation.to_matrix().to_4x4()
+
+
 def _twist(quaternion, axis=Vector((0.0, 1.0, 0.0))):
     """Angle of ``quaternion`` about ``axis`` (its swing-twist split), within a half turn."""
     sign = -1.0 if quaternion.w < 0.0 else 1.0
@@ -341,7 +387,7 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
         frame = item["frame"]
         root = _key_matrix(item["location"], item["rotation"])
         if relative == "camera":
-            root = cameras[frame] @ root
+            root = _camera_at(cameras, frame) @ root
         location, rotation, _scale = root.decompose()
         rig.location = location
         rig.rotation_quaternion = _continuous(previous, None, rotation)
@@ -383,6 +429,55 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     return [path]
 
 
+def build_overlays(shot, camera, scene, items, kind):
+    """A scene of the shot's overlays or underlays (``kind``, see the module notes), rendered through a copy of
+    ``camera`` in focus everywhere and keyed by the same action, ``items`` carried in front of it in the
+    picture's units.  None without items."""
+    if not items:
+        return None
+    overlays = bpy.data.scenes.new(f"Shot.{shot['id']}.{kind}")
+    for attribute in ("resolution_x", "resolution_y", "resolution_percentage", "fps", "fps_base"):
+        setattr(overlays.render, attribute, getattr(scene.render, attribute))
+    overlays.frame_start, overlays.frame_end = scene.frame_start, scene.frame_end
+    overlays.render.engine = "BLENDER_EEVEE"
+    overlays.eevee.taa_render_samples = 8
+    overlays.render.film_transparent = True
+    overlays.view_settings.view_transform = scene.view_settings.view_transform
+    lens = camera.data.copy()
+    lens.dof.use_dof = False
+    viewer = bpy.data.objects.new(f"Shot.{shot['id']}.{kind} Camera", lens)
+    overlays.collection.objects.link(viewer)
+    viewer.rotation_mode = camera.rotation_mode
+    viewer.animation_data_create()
+    viewer.animation_data.action = camera.animation_data.action
+    viewer.animation_data.action_slot = camera.animation_data.action_slot
+    overlays.camera = viewer
+    width, height = overlays.render.resolution_x, overlays.render.resolution_y
+    half_height = OVERLAY_DISTANCE * lens.sensor_width / (2.0 * lens.lens) * height / width
+    for layer, item in enumerate(items):
+        name = f"Shot.{shot['id']}.{item['name']}"
+        obj = _modified_object(name, bpy.data.meshes.new(name), item["asset"], item.get("inputs", {}), overlays.collection)
+        obj.parent = viewer
+        distance = OVERLAY_DISTANCE - layer * OVERLAY_LAYER
+        obj.location = (0.0, 0.0, -distance)
+        scale = half_height * distance / OVERLAY_DISTANCE
+        obj.scale = (scale, scale, scale)
+        if "shown" in item:
+            _show_between(obj, *item["shown"])
+    return overlays
+
+
+def build_shot_items(shot, camera, scene):
+    """The shot's own items (see the module notes), each named after the shot, in a collection of the shot."""
+    collection = SC.collection(f"Shot.{shot['id']}.Items", parent=scene.collection)
+    for item in shot.get("items", []):
+        obj = build_item({**item, "name": f"Shot.{shot['id']}.{item['name']}"}, collection)
+        if "camera_frame" in item:
+            scene.frame_set(item["camera_frame"])
+            obj.matrix_basis = camera.matrix_world @ obj.matrix_basis
+    return collection
+
+
 def build_shot(folder, film, shot, built_set, args):
     scene = bpy.data.scenes.new(f"Shot.{shot['id']}")
     _activate(scene)
@@ -397,6 +492,7 @@ def build_shot(folder, film, shot, built_set, args):
     cameras = SC.collection(f"Shot.{shot['id']}.Camera", parent=scene.collection)
     camera, sources, camera_matrices = build_camera(f"Shot.{shot['id']}.Camera", folder, shot["camera"], film, cameras)
     scene.camera = camera
+    build_shot_items(shot, camera, scene)
     settings = shot["render"]
     engine = settings["engine"]
     RND.ENGINES[engine](samples=args.samples or settings.get("samples", 64), **settings.get(engine.lower(), {}))
@@ -405,17 +501,32 @@ def build_shot(folder, film, shot, built_set, args):
     if blur:
         scene.render.motion_blur_shutter = blur
     look = shot.get("look")
+    overlays = build_overlays(shot, camera, scene, shot.get("overlays", []), "Overlays")
+    underlay = None
+    if shot.get("underlays"):
+        underlay = (build_overlays(shot, camera, scene, shot["underlays"]["items"], "Underlays"), shot["underlays"]["depth"])
+        scene.view_layers[0].use_pass_z = True
     if look and not args.no_look:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), 0.0)
-        RND.compositor(look)
+        RND.compositor(look, overlay_scene=overlays, underlay=underlay)
     else:
         RND.color_management(settings.get("view", "AgX"), settings.get("look"), settings.get("exposure", 0.0))
+        if overlays is not None or underlay is not None:
+            RND.compositor({}, overlay_scene=overlays, underlay=underlay)
+    performers = {}
     for name, entry in shot.get("cast", {}).items():
         character = built_set["characters"][name]
         rig, objects = CAST.instance_character(character["rig"], character["objects"], cast, f"{shot['id']}.{name}",
                                                character["prefix"])
         profile_path = os.path.join(folder, film["cast"][name]["rig"])
         sources += perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices) + [profile_path]
+        performers[name] = rig
+    dof = shot["camera"].get("dof")
+    if dof:
+        camera.data.dof.use_dof = True
+        camera.data.dof.aperture_fstop = dof["fstop"]
+        camera.data.dof.focus_object = performers[dof["focus"]["cast"]]
+        camera.data.dof.focus_subtarget = dof["focus"]["bone"]
     scene.frame_set(first)
     path = os.path.join(folder, "shots", f"{shot['id']}.json")
     return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=cast,

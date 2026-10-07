@@ -2,11 +2,12 @@
  "id": "Breakout",
  "set": "District",
  "frames": [
-  70,
+  68,
   206
  ],
  "notes": [
-  "Low-angle shot at the facade: a slow drift, then the window bursts (94) and the camera pans after her out over the district."
+  "Low-angle shot at the facade: a slow drift, then the window bursts (94) and the camera pans after her out over the district.",
+  "The film comes in on this shot through a lattice of diamonds shrinking from the right (frames 68-76); the camera holds its frame-70 place on 68 and 69."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -15,7 +16,14 @@
    0.05,
    8000.0
   ],
-  "keys": "calibration/Breakout.camera.json"
+  "keys": "calibration/Breakout.camera.json",
+  "dof": {
+   "fstop": 4.0,
+   "focus": {
+    "cast": "LaPluma",
+    "bone": "Head"
+   }
+  }
  },
  "render": {
   "engine": "EEVEE",
@@ -41,5 +49,22 @@
   "LaPluma": {
    "performance": "performances/Breakout.json"
   }
- }
+ },
+ "overlays": [
+  {
+   "name": "Wipe",
+   "asset": "CIN.Overlay.DiamondWipe",
+   "shown": [
+    68,
+    80
+   ],
+   "inputs": {
+    "Columns": 7,
+    "Start": 66.5,
+    "Duration": 7.0,
+    "Sweep": 5.0,
+    "Edge": 0.0
+   }
+  }
+ ]
 }

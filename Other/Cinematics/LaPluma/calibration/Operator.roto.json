@@ -1,0 +1,11 @@
+{
+ "notes": ["Pixels of the reference video, keyed on frame 440 (no title card over her yet or still): the character -- her body, hair and the coat round her -- and the scythe across her shoulders, its hub at the upper right.", "A crow's blurred wing passes behind her at the left; it is not her."],
+ "groups": [
+  {"objects": ["character"], "keys": {
+     "440": {"boxes": {"character": [480, 120, 1920, 1080]}, "points": {"character": [[930, 560], [1000, 380], [800, 900], [1050, 330], [1350, 900], [1500, 550], [1700, 820]]}, "negative": [[300, 500], [150, 150], [1800, 250], [400, 760], [1620, 215]]}
+  }},
+  {"objects": ["scythe"], "keys": {
+     "440": {"boxes": {"scythe": [0, 50, 1920, 310]}, "points": {"scythe": [[300, 265], [700, 230], [1620, 215], [1150, 105], [1420, 185], [1760, 220]]}, "negative": [[930, 560], [1000, 380], [1050, 330], [1800, 400], [600, 120]]}
+  }}
+ ]
+}

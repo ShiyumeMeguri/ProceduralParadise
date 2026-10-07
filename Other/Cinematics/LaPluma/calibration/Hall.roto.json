@@ -1,0 +1,11 @@
+{
+ "notes": ["Pixels of the reference video, keyed on frame 565 (the hall settled, the result card only fading in): the character -- her body, hair and the coat off her shoulders -- and the scythe she holds down by her left side, its hub at her left hip and its blade by her shin."],
+ "groups": [
+  {"objects": ["character"], "keys": {
+     "565": {"boxes": {"character": [580, 30, 1250, 1080]}, "points": {"character": [[975, 165], [983, 240], [975, 495], [975, 675], [960, 840], [1035, 990], [645, 818], [750, 630], [1140, 700], [720, 975], [1170, 720]]}, "negative": [[450, 450], [1200, 180], [1170, 375], [450, 975], [1478, 743]]}
+  }},
+  {"objects": ["scythe"], "keys": {
+     "565": {"boxes": {"scythe": [1130, 550, 1640, 1080]}, "points": {"scythe": [[1478, 743], [1500, 600], [1470, 975], [1245, 758], [1575, 705]]}, "negative": [[960, 840], [1140, 900], [1725, 975], [1650, 600], [1035, 990]]}
+  }}
+ ]
+}

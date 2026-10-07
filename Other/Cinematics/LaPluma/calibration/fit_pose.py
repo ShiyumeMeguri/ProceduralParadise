@@ -3,7 +3,7 @@ Fit the cast's rig to the reference, frame by frame (PyTorch).
 
     python fit_pose.py <rig.npz> <profile.json> <keypoints.npz> <camera.json> <first> <last> <out performance.json>
                        [--masks DIR] [--occluders DIR] [--parts DIR] [--start performance.json] [--iterations N]
-                       [--anchor F:AXIS:V ...] [--prop MESH]
+                       [--anchor F:AXIS:V ...] [--prop MESH --grip NAME]
 
 The rig (``export_rig.py``) is posed with Blender's own forward kinematics
 (``skeleton.py``).  What the rig is -- which bones are fitted and how far
@@ -22,7 +22,9 @@ Every frame of the shot is fitted at once: the whole-body keypoints of the
 reference (``keypoints.py``) pull the rig's joints onto them through the
 shot's solved camera, a silhouette (``--masks``, and ``--occluders``: what
 may hide her, her scythe) keeps the rig inside the character's outline, and
-smoothness ties neighbouring frames together.
+smoothness ties neighbouring frames together.  A keypoint the detector puts
+outside that outline (grown by ``KEYPOINT_MARGIN`` pixels) is its mistake --
+seen from behind it finds a face in her coat -- and is not used.
 
 Keypoints and an outline place her limbs on the picture but not which is
 nearer: a leg folded towards the camera and the same leg folded away look
@@ -37,7 +39,8 @@ it holds), then body and limbs, then hands.
 An ``--anchor frame:axis:value`` pins the root's set coordinate on a frame
 where the reference shows where she is (breaking through a window).
 
-With ``--prop`` the prop she holds (the profile's ``props``) stays where
+With ``--prop`` the prop she holds (the profile's ``props``, in the grip
+the shot names: ``--grip``, one of its ``grips``, right or left) stays where
 its silhouette put it (``fit_prop.py``: the ``--start`` performance's
 ``placements``, one picture for any size) and the palm of her holding hand
 closes on its shaft: her arm reaches it, and how large the prop is drawn in
@@ -45,7 +48,8 @@ the film -- how far, then, it is -- is fitted as one scale for the shot.
 That scale is only how the picture is matched: the prop is as large as its
 maker made it (the cast's character sheet).  The grips written (the prop in
 the hand's frame) hang it on the hand at that size, turned as the picture
-has it, the point of its shaft under the palm kept under the palm.
+has it, the point of its shaft nearest the palm in the palm: where her hand
+and the picture's prop still part, the prop goes with her hand.
 
 The card is shared (``gpu_budget.py``): the terms each frame answers for
 alone are added up a batch of frames at a time, as many as the claim
@@ -59,6 +63,7 @@ import argparse
 import json
 import os
 
+import cv2
 import numpy as np
 import torch
 from scipy.spatial.transform import Rotation as ScipyRotation
@@ -87,6 +92,7 @@ parser.add_argument("--iterations", type=int, default=1500)
 parser.add_argument("--exclude", nargs="*", default=["Scythe"])
 parser.add_argument("--anchor", nargs="*", default=[], help="frame:axis:value -- the root's set coordinate on that frame")
 parser.add_argument("--prop", default=None, help="the mesh of a prop she holds")
+parser.add_argument("--grip", default=None, help="which of the prop's grips (the profile's props.<prop>.grips) holds it")
 parser.add_argument("--grip-weight", type=float, default=40.0)
 parser.add_argument("--hand-weight", type=float, default=0.4, help="the hand keypoints' weight against the body's")
 parser.add_argument("--width", type=int, default=1920)
@@ -128,6 +134,28 @@ frames = [frame_list[k] for k in selected]
 observed = torch.tensor(data["points"][selected], dtype=torch.float32, device=device)
 scores = torch.tensor(data["scores"][selected], dtype=torch.float32, device=device)
 count = len(frames)
+KEYPOINT_MARGIN = 40
+if args.masks:
+    outside = np.zeros(tuple(scores.shape), bool)
+    pixels = data["points"][selected]
+    for slot, frame in enumerate(frames):
+        outline = None
+        for directory in [args.masks] + ([args.occluders] if args.occluders else []):
+            path = os.path.join(directory, "m%04d.png" % frame)
+            if os.path.exists(path):
+                layer = cv2.imread(path, cv2.IMREAD_GRAYSCALE) > 127
+                outline = layer if outline is None else outline | layer
+        if outline is None:
+            continue
+        grown = cv2.dilate(outline.astype(np.uint8), np.ones((2 * KEYPOINT_MARGIN + 1, 2 * KEYPOINT_MARGIN + 1), np.uint8)) > 0
+        u = np.clip(np.round(pixels[slot, :, 0]).astype(int), 0, grown.shape[1] - 1)
+        v = np.clip(np.round(pixels[slot, :, 1]).astype(int), 0, grown.shape[0] - 1)
+        outside[slot] = ~grown[v, u]
+    dropped = outside & (data["scores"][selected] > 1.5)
+    scores = torch.where(torch.tensor(outside, device=device), torch.zeros_like(scores), scores)
+    worst = sorted(((int(dropped[slot].sum()), frame) for slot, frame in enumerate(frames)), reverse=True)[:8]
+    print("keypoints outside her outline, not used:", int(dropped.sum()), "of", int((data["scores"][selected] > 1.5).sum()),
+          "-- most on", [(frame, n) for n, frame in worst if n], flush=True)
 
 camera = Camera(args.camera, frames, args.width, args.height, device)
 focal = camera.focal
@@ -167,8 +195,11 @@ kept_meshes = [name for name in skeleton.meshes if name not in set(args.exclude)
 samples, sample_bones, sample_weights = skeleton.samples(kept_meshes)
 prop = Prop(skeleton, args.prop) if args.prop else None
 prop_profile = profile["props"][args.prop] if prop is not None else None
-hand_bone = index[prop_profile["hand"]] if prop is not None else None
-palm_bones = [index[name] for name in prop_profile["palm"]] if prop is not None else []
+if prop is not None and args.grip not in prop_profile["grips"]:
+    raise SystemExit(f"--prop {args.prop} needs --grip, one of {sorted(prop_profile['grips'])}")
+grip = prop_profile["grips"][args.grip] if prop is not None else None
+hand_bone = index[grip["hand"]] if prop is not None else None
+palm_bones = [index[name] for name in grip["palm"]] if prop is not None else []
 order = skeleton.ancestry([bone for bone, _, _ in KEYPOINTS.values()] + [int(b) for b in sample_bones.unique()]
                          + palm_bones + ([hand_bone] if hand_bone is not None else []))
 
@@ -342,19 +373,19 @@ def grip_distance(world, slots):
 
 
 def held_at_model_size(world, slots):
-    """The prop as large as its maker made it on the frames ``slots``, turned as the fitted one:
-    the point of its shaft under the palm where the fitted prop has it."""
+    """The prop as large as its maker made it on the frames ``slots``, turned as the fitted one,
+    in her hand: the point of its shaft nearest the palm in the palm."""
     held = placed_prop(slots)
     scale = torch.exp(log_film_scale)
+    palm = palm_of(world)
     ends = torch.einsum("fij,nj->fni", held[:, :3, :3], shaft) + held[:, None, :3, 3]
     axis = ends[:, 1] - ends[:, 0]
-    along = (((palm_of(world) - ends[:, 0]) * axis).sum(-1) / (axis * axis).sum(-1)).clamp(0.0, 1.0)
-    under = ends[:, 0] + along[:, None] * axis
+    along = (((palm - ends[:, 0]) * axis).sum(-1) / (axis * axis).sum(-1)).clamp(0.0, 1.0)
     rotation = held[:, :3, :3] / scale
     local = shaft[0][None] + along[:, None] * (shaft[1] - shaft[0])[None]
     matrix = torch.eye(4, device=device).repeat(len(slots), 1, 1)
     matrix[:, :3, :3] = rotation
-    matrix[:, :3, 3] = under - torch.einsum("fij,fj->fi", rotation, local)
+    matrix[:, :3, 3] = palm - torch.einsum("fij,fj->fi", rotation, local)
     return matrix
 
 
@@ -521,6 +552,6 @@ with torch.no_grad():
                                  "bones": bones})
     if prop is not None:
         prop.write_grips(result["frames"], torch.linalg.inv(world[hand_bone]) @ held_at_model_size(world, torch.arange(count, device=device)))
-        result["held"] = {prop.name: prop_profile["hand"]}
+        result["held"] = {prop.name: grip["hand"]}
 json.dump(result, open(args.out, "w", encoding="utf-8"), indent=1)
 print("wrote", args.out)

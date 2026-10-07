@@ -1,0 +1,16 @@
+{
+ "notes": [
+  "Where the hall shot's camera stands: still, level (the hall's verticals stand straight in the reference to a third of a degree), at the height her root's mean (on the floor under her, legs straight) is below it, so that she stands at the hall's origin with the camera looking along +Y."
+ ],
+ "location": [
+  -0.0271,
+  -1.6082,
+  1.0614
+ ],
+ "look": [
+  0.0,
+  1.0,
+  0.0
+ ],
+ "roll": 0.0
+}

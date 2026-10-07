@@ -8,14 +8,22 @@
   "Round the tower stands the district's high-rise (CIN.City.Field, blocks 45-140 m, clear within 72 m of the tower) and, past its right end along its face, the skeletal Annex: Breakout's frame 180 sees its top 114 m up some 80 m away (its storeys 65 px apart) and everything else in the picture above 76 m.  The breach throws dust (Breach Dust, from frame 96, rolling along the face towards +X and down: Breakout's camera hovers 4 m in front of the breach the whole shot and the reference keeps the dust at the left of the picture, off the lens) and debris (Breach Debris, Falling Debris); dust fills the storey behind the glass before it (Room Dust).",
   "The district's air is hazy low down (CIN.Air: 0.0025 per metre at the ground, thinning to 1/e every 140 m): Breakout's far towers fade, the hand shot's sky overhead stays clear.",
   "Above the breach storey the tower is its front frame alone (Tower Crown, storeys 19-26: columns, edge beams and braces, no floors, no mullions, roof 108.7 m up): from frame 116 on the reference shows sky through big braces over her, while the breach storey keeps its mullions and the floor over it (frames 76-92).",
-  "What the breach throws into the air is shown only while Breakout looks at it (frames up to 206): the hand shot that cuts in at 207 shows clear sky and crows."
+  "What the breach throws into the air is shown only while Breakout looks at it (frames up to 206): the hand shot that cuts in at 207 shows clear sky and crows.",
+  "Round her after the breach (the hand and flight shots, frames 200-379) a flock wheels close by (Crows Round: headings all round, 2-20 m from her), as the reference's crows cross the lens.",
+  "Inside the tower's frame below its crown stands its dark core (Tower Core, set 2.5 m back from the face): the reference sees a dark interior through the facade (frames 76-92), never the sky through the building.",
+  "The bay she breaks out through (storey 18, between x -8.2 and 0.0) is left open in the tower and stands as a panel of its own (Breach Panel: its braces and mullions, inside ghosts of the tower's own column and beams) until the frame before she breaks it (95); its pieces are the Breach Debris."
  ],
  "materials": {
   "CIN.Air.density": 0.0025,
   "CIN.Air.height": 140.0,
   "CIN.Dust.density": 2.0,
   "CIN.Dust.billow": 1.5,
-  "CIN.Cloud.glow": 0.6
+  "CIN.Cloud.glow": 0.3,
+  "color:interior": [
+   0.035,
+   0.036,
+   0.04
+  ]
  },
  "sky": {
   "zenith": [
@@ -223,9 +231,26 @@
     },
     "faces": {
      "front": {
-      "cycle": [
+      "rows": [
        "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
-       "A+P A+P A+P A+P A+P A+P A+P A+P A+P"
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P V+P V+P V+P V+P V+P V+P",
+       "A+P A+P A+P A+P A+P A+P A+P A+P A+P",
+       "V+P V+P V+P - V+P V+P V+P V+P V+P"
       ]
      },
      "back": {
@@ -258,6 +283,213 @@
      }
     ],
     "slab_edge": 0.11
+   }
+  },
+  {
+   "name": "Breach Panel",
+   "shown": [
+    0,
+    95
+   ],
+   "loc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "frame": {
+    "x": [
+     -8.2,
+     0.0
+    ],
+    "y": [
+     0.0
+    ],
+    "z": [
+     75.24,
+     79.42
+    ],
+    "sections": {
+     "column": {
+      "shape": "box",
+      "width": 0.88,
+      "depth": 0.88,
+      "finish": "concrete"
+     },
+     "edge_beam": {
+      "shape": "box",
+      "width": 0.77,
+      "depth": 0.5,
+      "finish": "concrete",
+      "offset": -0.14
+     },
+     "ibeam": {
+      "shape": "I",
+      "width": 0.55,
+      "depth": 0.3,
+      "finish": "steel",
+      "offset": -0.18
+     },
+     "brace_front": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.39
+     },
+     "brace_back": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.88
+     },
+     "post": {
+      "shape": "box",
+      "width": 0.16,
+      "depth": 0.16,
+      "finish": "steel",
+      "offset": -0.77
+     },
+     "brace": {
+      "shape": "box",
+      "width": 0.24,
+      "depth": 0.24,
+      "finish": "steel",
+      "offset": -0.6
+     },
+     "ghost_column": {
+      "shape": "box",
+      "width": 0.88,
+      "depth": 0.001,
+      "finish": "concrete"
+     },
+     "ghost_beam": {
+      "shape": "box",
+      "width": 0.77,
+      "depth": 0.001,
+      "finish": "concrete",
+      "offset": -0.14
+     }
+    },
+    "columns": "ghost_column",
+    "beams": "ghost_beam",
+    "slab": 0.0,
+    "beam_drop": 0.605,
+    "slab_edge": 0.11,
+    "modules": {
+     "V": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         1.0
+        ],
+        "to": [
+         0.327,
+         0.0
+        ],
+        "section": "brace_back"
+       },
+       {
+        "from": [
+         0.655,
+         0.0
+        ],
+        "to": [
+         1.0,
+         1.0
+        ],
+        "section": "brace_front"
+       }
+      ]
+     },
+     "A": {
+      "members": [
+       {
+        "from": [
+         0.0,
+         0.0
+        ],
+        "to": [
+         0.333,
+         1.0
+        ],
+        "section": "brace"
+       },
+       {
+        "from": [
+         0.667,
+         1.0
+        ],
+        "to": [
+         1.0,
+         0.0
+        ],
+        "section": "brace"
+       }
+      ]
+     },
+     "P": {
+      "members": [
+       {
+        "from": [
+         0.38,
+         0
+        ],
+        "to": [
+         0.38,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.43,
+         0
+        ],
+        "to": [
+         0.43,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.48,
+         0
+        ],
+        "to": [
+         0.48,
+         1
+        ],
+        "section": "post"
+       },
+       {
+        "from": [
+         0.6,
+         0
+        ],
+        "to": [
+         0.6,
+         1
+        ],
+        "section": "post"
+       }
+      ]
+     }
+    },
+    "faces": {
+     "front": {
+      "rows": [
+       "V+P"
+      ]
+     }
+    }
    }
   },
   {
@@ -453,6 +685,28 @@
      }
     },
     "slab_edge": 0.11
+   }
+  },
+  {
+   "name": "Tower Core",
+   "asset": "CIN.Box",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "inputs": {
+    "Min": [
+     -31.5,
+     2.5,
+     0.0
+    ],
+    "Max": [
+     39.5,
+     23.0,
+     79.0
+    ],
+    "Material": "CIN.Interior"
    }
   },
   {
@@ -1097,6 +1351,44 @@
      1700.0,
      450.0
     ]
+   }
+  },
+  {
+   "name": "Crows Round",
+   "asset": "CIN.Birds.Flock",
+   "loc": [
+    0,
+    0,
+    0
+   ],
+   "shown": [
+    200,
+    379
+   ],
+   "inputs": {
+    "Count": 110,
+    "Seed": 5,
+    "Origin": [
+     -18.0,
+     -20.0,
+     90.0
+    ],
+    "Extent": [
+     24.0,
+     20.0,
+     12.0
+    ],
+    "Heading": [
+     1.0,
+     0.2,
+     0.0
+    ],
+    "Spread": 180.0,
+    "Climb": 20.0,
+    "Speed": 6.5,
+    "Beat": 4.2,
+    "Glide": 0.3,
+    "Start": 290.0
    }
   }
  ],

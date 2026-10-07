@@ -17,7 +17,14 @@
    20000.0
   ],
   "keys": "calibration/Hand.camera.json",
-  "place": "calibration/Hand.place.json"
+  "place": "calibration/Hand.place.json",
+  "dof": {
+   "fstop": 2.8,
+   "focus": {
+    "cast": "LaPluma",
+    "bone": "Hand_R"
+   }
+  }
  },
  "render": {
   "engine": "EEVEE",

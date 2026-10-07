@@ -18,6 +18,7 @@ import bpy
 
 from .nodes import Tree
 from .gn import set_menu
+from .anim import fcurves_of
 
 __all__ = ["ENGINES", "setup_cycles", "setup_eevee", "set_samples", "color_management", "compositor", "lines", "LINES_LAYER",
            "ink", "INK_LAYER", "INK_SKIP", "INK_ID", "INK_QUIET",
@@ -213,7 +214,93 @@ def vignette_nodes(t, img, v):
     return t.n("CompositorNodeCombineColor", sep[0] * gain, sep[1] * gain, sep[2] * gain, 1.0).o
 
 
-def compositor(look: dict | None = None, lines_layer: str | None = None, ink_layer: str | None = None):
+def _keyed_value(t, name, keys):
+    """A Value node named ``name`` keyed through ``keys`` [(frame, value), ...]: straight from key to key,
+    held before the first and after the last."""
+    node = t.n("ShaderNodeValue")
+    node.n.name = node.n.label = name
+    socket = node.n.outputs[0]
+    for frame, value in keys:
+        socket.default_value = value
+        socket.keyframe_insert("default_value", frame=frame)
+    path = socket.path_from_id("default_value")
+    for curve in fcurves_of(socket.id_data):
+        if curve.data_path == path:
+            for point in curve.keyframe_points:
+                point.interpolation = "LINEAR"
+    return node.o
+
+
+def _band_hash(t, band, salt):
+    """A draw in [0, 1) for every band (the fractional part of a large sine)."""
+    return t.math("FRACT", t.math("SINE", band * salt) * 43758.5453)
+
+
+def glitch_nodes(t, img, g):
+    """A picture breaking up (``look["glitch"]``): of its horizontal ``bands`` the keyed share is slid
+    sideways, each by up to ``shift`` of its width -- the red slid a little further and the blue a little
+    less, the picture's edge smeared into what a band leaves bare -- the bands drawn afresh as the share
+    moves.  ``keys`` are [frame, share] (0 leaves the picture
+    as it is)."""
+    share = _keyed_value(t, "Glitch Share", g["keys"])
+    coordinates = t.n("CompositorNodeImageCoordinates")
+    t.link(img, coordinates.n.inputs[0])
+    x, y, _ = t.sep(coordinates["Normalized"])
+    pixel_x, _, _ = t.sep(coordinates["Pixel"])
+    width = pixel_x / x
+    band = t.math("FLOOR", y * float(g.get("bands", 48))) + share * 97.0
+    chosen = t.math("LESS_THAN", _band_hash(t, band, 78.233), share)
+    slide = (_band_hash(t, band, 12.9898) - 0.5) * (2.0 * float(g.get("shift", 0.12))) * chosen * width
+    channels = []
+    for index, spread in ((0, 1.15), (1, 1.0), (2, 0.85)):
+        moved = t.n("CompositorNodeDisplace")
+        t.link(img, moved.n.inputs["Image"])
+        t.link(t.vec(slide * spread, 0.0, 0.0), moved.n.inputs["Displacement"])
+        _set(moved, "Extension X", "Extend")
+        channels.append(t.n("CompositorNodeSeparateColor", moved.o)[index])
+    alpha = t.n("CompositorNodeSeparateColor", img)[3]
+    return t.n("CompositorNodeCombineColor", channels[0], channels[1], channels[2], alpha).o
+
+
+def fade_nodes(t, img, keys, display):
+    """The finished picture faded towards black (``look["fade"]``: [frame, level], 1 the picture as it
+    is, 0 black) the way an editor fades a film: its displayed values -- the picture encoded for the
+    ``display`` -- scaled by the keyed level."""
+    level = _keyed_value(t, "Fade Level", keys)
+    encode = t.n("CompositorNodeConvertColorSpace")
+    t.link(img, encode.n.inputs[0])
+    encode.n.from_color_space, encode.n.to_color_space = "scene_linear", display
+    parts = t.n("CompositorNodeSeparateColor", encode.o)
+    faded = t.n("CompositorNodeCombineColor", parts[0] * level, parts[1] * level, parts[2] * level, parts[3]).o
+    decode = t.n("CompositorNodeConvertColorSpace")
+    t.link(faded, decode.n.inputs[0])
+    decode.n.from_color_space, decode.n.to_color_space = display, "scene_linear"
+    return decode.o
+
+
+def underlay_nodes(t, img, depth, scene, distance):
+    """``scene`` (a transparent render through the same camera: a title card) laid over the picture where what the picture
+    shows lies beyond ``distance`` metres (its ``depth`` pass), the edge of what stands nearer smoothed as the picture's
+    own edges are -- a card standing behind her, sharp, wherever the lens is focused."""
+    layer = t.n("CompositorNodeRLayers")
+    layer.n.scene = scene
+    layer.n.layer = scene.view_layers[0].name
+    beyond = t.math("GREATER_THAN", depth, distance)
+    smoothed = t.n("CompositorNodeAntiAliasing")
+    t.link(t.n("CompositorNodeCombineColor", beyond, beyond, beyond, 1.0).o, smoothed.n.inputs[0])
+    mask = t.n("CompositorNodeSeparateColor", smoothed.o)[0]
+    card = t.n("CompositorNodeSeparateColor", layer["Image"])
+    held = t.n("CompositorNodeCombineColor", card[0] * mask, card[1] * mask, card[2] * mask, card[3] * mask).o
+    over = t.n("CompositorNodeAlphaOver")
+    background, foreground = [s for s in over.n.inputs if s.type == "RGBA"][:2]
+    t.link(img, background)
+    t.link(held, foreground)
+    _set(over, "Straight Alpha", False)
+    return over.o
+
+
+def compositor(look: dict | None = None, lines_layer: str | None = None, ink_layer: str | None = None, overlay_scene=None,
+               underlay=None):
     """Build the compositor graph from a ``look`` dict::
 
         {"bloom": {"threshold": 1.0, "size": 7, "strength": 0.6},
@@ -224,11 +311,19 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
          "hue_sat": {"hue": 0.5, "saturation": 1.0, "value": 1.0},
          "curves": {"C": [[x,y],...], "R": [...], "G": [...], "B": [...]},
          "grade": {...}, "engine_transfer": {...},   (Core.grade dicts)
-         "backdrop": [r, g, b]}
+         "glitch": {"bands": 48, "shift": 0.12, "keys": [[frame, share], ...]},
+         "backdrop": [r, g, b],
+         "fade": [[frame, level], ...]}
 
     The ``grade`` carries the look of the scene; the ``engine_transfer``
     after it carries the render engine's own response onto the look the
     grade was made for (a shot fitted on another engine's renders).
+
+    An ``overlay_scene`` (a scene rendered on a transparent film through the
+    same camera: titles, wipes) is laid over everything, so the look never
+    touches it; only the ``fade`` comes after it, the whole picture going
+    to black together.  An ``underlay`` (scene, metres) is laid under it,
+    over what the picture shows beyond that distance (:func:`underlay_nodes`).
 
     A ``backdrop`` is the sheet a transparent render is laid on (the shot's
     ``render.transparent``), last of all: a drawing's paper, which must not
@@ -363,6 +458,9 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
         mapping.update()
         img = cv.o
 
+    if look.get("glitch"):
+        img = glitch_nodes(t, img, look["glitch"])
+
     if look.get("backdrop"):
         over = t.n("CompositorNodeAlphaOver")
         background, foreground = [s for s in over.n.inputs if s.type == "RGBA"][:2]
@@ -370,6 +468,23 @@ def compositor(look: dict | None = None, lines_layer: str | None = None, ink_lay
         t.link(img, foreground)
         _set(over, "Straight Alpha", False)
         img = over.o
+
+    if underlay is not None:
+        img = underlay_nodes(t, img, rl["Depth"], *underlay)
+
+    if overlay_scene is not None:
+        layer = t.n("CompositorNodeRLayers")
+        layer.n.scene = overlay_scene
+        layer.n.layer = overlay_scene.view_layers[0].name
+        over = t.n("CompositorNodeAlphaOver")
+        background, foreground = [s for s in over.n.inputs if s.type == "RGBA"][:2]
+        t.link(img, background)
+        t.link(layer["Image"], foreground)
+        _set(over, "Straight Alpha", False)
+        img = over.o
+
+    if look.get("fade"):
+        img = fade_nodes(t, img, look["fade"], sc.display_settings.display_device)
 
     if new_api:
         out = t.n("NodeGroupOutput")

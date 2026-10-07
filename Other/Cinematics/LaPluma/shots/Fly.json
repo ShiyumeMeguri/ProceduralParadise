@@ -1,0 +1,142 @@
+{
+ "id": "Fly",
+ "set": "District",
+ "frames": [
+  279,
+  379
+ ],
+ "notes": [
+  "She flies on past the tower, the scythe held high, and the camera swings round and under her until it looks up at her from behind; crows all round.  The camera turns with the sky (calibration/sky_rotation.py) where the place stands it.",
+  "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py): her body by its keypoints and outline, the scythe by its outline, her hand held to its shaft lightly (--grip-weight 4) -- the joint fit at full weight pulled her off her keypoints, the picture's scythe and hand disagreeing in depth -- and the scythe hung in her hand at its model size."
+ ],
+ "camera": {
+  "focal_px": 1315.0,
+  "sensor": 36.0,
+  "clip": [
+   0.05,
+   20000.0
+  ],
+  "keys": "calibration/Fly.camera.json",
+  "place": "calibration/Fly.place.json",
+  "dof": {
+   "fstop": 2.8,
+   "focus": {
+    "cast": "LaPluma",
+    "bone": "Spine2"
+   }
+  }
+ },
+ "render": {
+  "engine": "EEVEE",
+  "samples": 32,
+  "eevee": {
+   "shadow_pool": "1024",
+   "volume_range": [
+    0.5,
+    2500.0
+   ],
+   "volume_tile": "4",
+   "volume_samples": 96,
+   "volume_shadows": true,
+   "volume_distribution": 1.0
+  },
+  "view": "Standard",
+  "motion_blur": 0.5
+ },
+ "look": {
+  "exposure": 0.0
+ },
+ "cast": {
+  "LaPluma": {
+   "performance": "performances/Fly.json",
+   "relative_to": "camera"
+  }
+ },
+ "underlays": {
+  "depth": 3.5,
+  "items": [
+   {
+    "name": "Band Sweep",
+    "asset": "CIN.Overlay.Rect",
+    "shown": [
+     379,
+     379
+    ],
+    "inputs": {
+     "Size": [
+      4.8148,
+      0.6185,
+      0.0
+     ],
+     "Position": [
+      0.0,
+      0.1076,
+      0.0
+     ],
+     "Angle": 16.5,
+     "Color": [
+      0.0437,
+      0.0437,
+      0.0437,
+      1.0
+     ],
+     "Glow": 1.0,
+     "Slide In": [
+      2.8463,
+      0.8431,
+      0.0
+     ],
+     "Slide Time": [
+      379.0,
+      2.0,
+      0.0
+     ]
+    }
+   }
+  ]
+ },
+ "items": [
+  {
+   "name": "Lens Crow F1",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 379,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    377,
+    379
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 20,
+    "Origin": [
+     -0.5715,
+     0.4665,
+     0.0262
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.5644,
+     -0.6661,
+     0.4877
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 6.873,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 379.0
+   }
+  }
+ ]
+}

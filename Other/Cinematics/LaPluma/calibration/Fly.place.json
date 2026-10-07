@@ -1,0 +1,17 @@
+{
+ "notes": [
+  "Where the flight shot's camera stands in the set: 19 m out from the main tower's face and 87 m up, by where the hand shot leaves her, looking along the face turned 14.6 degrees towards it, up 28.9 degrees and rolled 16.9 degrees (the tower's columns lean in the picture).",
+  "Chosen so the tower fills the middle left of frame 279 and the left of frames 291 and 303 as the reference's open frame does and has turned out of the picture by frame 315 with the sky's measured turn (calibration/Fly.camera.json), the camera looking up enough that the district's roofs stay below the picture as the reference's cloud does."
+ ],
+ "location": [
+  -16.28,
+  -19.4,
+  87.09
+ ],
+ "look": [
+  0.847195,
+  0.220678,
+  0.483282
+ ],
+ "roll": 16.9
+}

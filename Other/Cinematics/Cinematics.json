@@ -17,7 +17,17 @@
     "roof_far": [0.3, 0.31, 0.32],
     "dust": [0.7, 0.71, 0.72],
     "debris": [0.3, 0.3, 0.31],
-    "air": [0.86, 0.89, 0.93]
+    "air": [0.86, 0.89, 0.93],
+    "hall_wall": [0.8, 0.8, 0.78],
+    "hall_floor": [0.24, 0.28, 0.32],
+    "hall_paint": [0.85, 0.86, 0.87],
+    "hall_metal": [0.62, 0.62, 0.64],
+    "gold": [0.95, 0.7, 0.3],
+    "hall_glow": [1.0, 0.86, 0.62]
+  },
+  "fonts": {
+    "ui": "Dengb.ttf",
+    "title": "impact.ttf"
   },
   "finishes": {
     "CIN.Concrete": {
@@ -51,6 +61,51 @@
       "grime": [0.0, 1.0],
       "streaks": [0.0, 1.0],
       "note": "service pipes under a ceiling"
+    },
+    "CIN.HallWall": {
+      "color": "hall_wall",
+      "grime_color": "hall_wall",
+      "roughness": 0.35,
+      "metallic": 0.0,
+      "grime": [0.0, 1.0],
+      "streaks": [0.0, 1.0],
+      "note": "the painted walls, ceiling and fittings of a bright hall"
+    },
+    "CIN.HallFloor": {
+      "color": "hall_floor",
+      "grime_color": "hall_floor",
+      "roughness": 0.14,
+      "metallic": 0.0,
+      "grime": [0.0, 1.0],
+      "streaks": [0.0, 1.0],
+      "note": "a hall's polished floor, catching the room in it"
+    },
+    "CIN.HallPaint": {
+      "color": "hall_paint",
+      "grime_color": "hall_paint",
+      "roughness": 0.45,
+      "metallic": 0.0,
+      "grime": [0.0, 1.0],
+      "streaks": [0.0, 1.0],
+      "note": "the lines painted on a hall's floor"
+    },
+    "CIN.HallMetal": {
+      "color": "hall_metal",
+      "grime_color": "hall_metal",
+      "roughness": 0.3,
+      "metallic": 1.0,
+      "grime": [0.0, 1.0],
+      "streaks": [0.0, 1.0],
+      "note": "brushed metal of handles and trim"
+    },
+    "CIN.Gold": {
+      "color": "gold",
+      "grime_color": "gold",
+      "roughness": 0.22,
+      "metallic": 1.0,
+      "grime": [0.0, 1.0],
+      "streaks": [0.0, 1.0],
+      "note": "polished gold of a hanging crystal"
     }
   },
   "modules": {

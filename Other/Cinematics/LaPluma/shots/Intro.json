@@ -1,0 +1,362 @@
+{
+ "id": "Intro",
+ "set": "Void",
+ "frames": [
+  0,
+  67
+ ],
+ "notes": [
+  "The recruitment's opening on black: a line of light shoots across from the left (frames 4-8) over the company's logo in gold, a curtain of light floods the picture -- green and sea blue, then gold to white, then deep orange under green -- with six rarity emblems on the line, and dies away (frames 8-50); then the logo in grey with the six emblems in white (frames 52-67).",
+  "Measured on the reference in pixels and written in the picture's units (half its height = 1): the emblems 82 px apart round the middle, the logo 590 px wide just above it, the contour triangle 640 px across."
+ ],
+ "camera": {
+  "focal_px": 1315.0,
+  "sensor": 36.0,
+  "clip": [
+   0.05,
+   100.0
+  ],
+  "keys": [
+   {
+    "frame": 0,
+    "location": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rotation": [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ]
+ },
+ "render": {
+  "engine": "EEVEE",
+  "samples": 16,
+  "eevee": {
+   "shadow_pool": "512"
+  },
+  "view": "Standard",
+  "motion_blur": 0.5
+ },
+ "look": {
+  "exposure": 0.0,
+  "bloom": {
+   "threshold": 0.9,
+   "size": 8,
+   "strength": 0.45
+  }
+ },
+ "cast": {},
+ "overlays": [
+  {
+   "name": "Curtain",
+   "asset": "CIN.Overlay.Curtain",
+   "shown": [
+    6,
+    52
+   ],
+   "inputs": {
+    "Count": 120,
+    "Seed": 3,
+    "First": 8.0,
+    "Times": [
+     14.0,
+     24.0,
+     40.0
+    ],
+    "Stagger": 5.0,
+    "Drift": 0.006,
+    "Foot": 0.55,
+    "Color A": [
+     0.12,
+     0.85,
+     0.3,
+     1.0
+    ],
+    "Color B": [
+     0.25,
+     0.85,
+     1.0,
+     1.0
+    ],
+    "Color C": [
+     1.0,
+     0.92,
+     0.55,
+     1.0
+    ],
+    "Color D": [
+     1.0,
+     0.38,
+     0.08,
+     1.0
+    ],
+    "Fade In": [
+     7.0,
+     3.0,
+     0.0
+    ],
+    "Fade Out": [
+     44.0,
+     6.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Logo Gold Contours",
+   "asset": "CIN.Overlay.Contours",
+   "shown": [
+    3,
+    24
+   ],
+   "inputs": {
+    "Size": 1.2,
+    "Position": [
+     0.0,
+     0.06,
+     -0.002
+    ],
+    "Color": [
+     1.0,
+     0.78,
+     0.25,
+     1.0
+    ],
+    "Glow": 0.8,
+    "Fade In": [
+     3.0,
+     2.0,
+     0.0
+    ],
+    "Fade Out": [
+     14.0,
+     8.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Logo Gold",
+   "asset": "CIN.Overlay.Text",
+   "shown": [
+    3,
+    24
+   ],
+   "inputs": {
+    "Text": "终末地",
+    "Size": 0.17,
+    "Stretch": 1.9,
+    "Position": [
+     0.0,
+     0.02,
+     0.001
+    ],
+    "Color": [
+     1.0,
+     0.8,
+     0.28,
+     1.0
+    ],
+    "Glow": 1.4,
+    "Fade In": [
+     3.0,
+     2.0,
+     0.0
+    ],
+    "Fade Out": [
+     14.0,
+     8.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Beam",
+   "asset": "CIN.Overlay.Beam",
+   "shown": [
+    4,
+    50
+   ],
+   "inputs": {
+    "Height": 0.0,
+    "Width": 0.012,
+    "Halo": 7.0,
+    "Grow": [
+     4.0,
+     4.0,
+     0.0
+    ],
+    "Color": [
+     1.0,
+     0.97,
+     0.75,
+     1.0
+    ],
+    "Glow": 6.0,
+    "Fade Out": [
+     24.0,
+     6.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Emblems Dark",
+   "asset": "CIN.Overlay.Emblems",
+   "shown": [
+    9,
+    50
+   ],
+   "inputs": {
+    "Count": 6,
+    "Position": [
+     0.0,
+     0.0,
+     0.003
+    ],
+    "Spacing": 0.152,
+    "Size": 0.14,
+    "Color": [
+     0.05,
+     0.05,
+     0.06,
+     1.0
+    ],
+    "Glow": 0.0,
+    "Fade In": [
+     9.0,
+     2.0,
+     0.0
+    ],
+    "Fade Out": [
+     48.0,
+     2.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Logo Grey Contours",
+   "asset": "CIN.Overlay.Contours",
+   "shown": [
+    51,
+    67
+   ],
+   "inputs": {
+    "Size": 1.2,
+    "Position": [
+     0.0,
+     0.06,
+     -0.002
+    ],
+    "Color": [
+     0.32,
+     0.32,
+     0.34,
+     1.0
+    ],
+    "Glow": 0.7,
+    "Fade In": [
+     51.0,
+     3.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Logo Grey",
+   "asset": "CIN.Overlay.Text",
+   "shown": [
+    51,
+    67
+   ],
+   "inputs": {
+    "Text": "终末地",
+    "Size": 0.17,
+    "Stretch": 1.9,
+    "Position": [
+     0.0,
+     0.02,
+     0.001
+    ],
+    "Color": [
+     0.3,
+     0.3,
+     0.32,
+     1.0
+    ],
+    "Glow": 1.0,
+    "Fade In": [
+     51.0,
+     3.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Company",
+   "asset": "CIN.Overlay.Text",
+   "shown": [
+    51,
+    67
+   ],
+   "inputs": {
+    "Text": "ENDFIELD INDUSTRIES",
+    "Size": 0.034,
+    "Spacing": 1.9,
+    "Position": [
+     0.0,
+     -0.104,
+     0.001
+    ],
+    "Color": [
+     0.3,
+     0.3,
+     0.32,
+     1.0
+    ],
+    "Glow": 1.0,
+    "Fade In": [
+     51.0,
+     3.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "name": "Emblems White",
+   "asset": "CIN.Overlay.Emblems",
+   "shown": [
+    51,
+    67
+   ],
+   "inputs": {
+    "Count": 6,
+    "Position": [
+     0.0,
+     0.0,
+     0.003
+    ],
+    "Spacing": 0.152,
+    "Size": 0.14,
+    "Color": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "Glow": 1.6,
+    "Fade In": [
+     51.0,
+     2.0,
+     0.0
+    ]
+   }
+  }
+ ]
+}

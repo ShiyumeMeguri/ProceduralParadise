@@ -1,0 +1,8 @@
+{
+ "id": "Void",
+ "notes": ["Nothing but black: the stage of the recruitment's opening, where the picture is all overlays (the shot's own)."],
+ "materials": {},
+ "sky": {"zenith": [0.0, 0.0, 0.0], "horizon": [0.0, 0.0, 0.0], "ground": [0.0, 0.0, 0.0], "strength": 0.0, "haze": 10.0},
+ "items": [],
+ "lights": []
+}

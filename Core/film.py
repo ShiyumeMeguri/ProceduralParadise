@@ -12,7 +12,8 @@ A film item is a folder with ``film.json``, pure data::
      "cast": {"LaPluma": {...}},                (Core.cast entries)
      "sets": ["District", ...],                 (sets/<name>.json)
      "shots": ["Breakout", ...],                (shots/<name>.json, in the order they are cut)
-     "holds": [208, ...]}                       (frames that repeat the frame before them)
+     "holds": [208, ...],                       (frames that repeat the frame before them)
+     "audio": {"environment": "LAPLUMA_MUSIC", "offset": 1.62}}   (optional: the soundtrack)
 
 Frame numbers are the reference video's own, so a render of frame ``f`` is
 compared with frame ``f`` of the reference.  Every shot covers ``frames``
@@ -26,7 +27,10 @@ returns ``{"shots": {id: {"scene", "frames", "camera", "set", "cast"}}}``
 everything around it: the command line, saving, rendering each shot's
 frames into a folder of its own (a shot's frames survive interruption and
 are kept apart by the inputs they were made with), and the ``Film`` scene
-whose sequencer cuts the shots into the video.
+whose sequencer cuts the shots into the video.  The soundtrack is a sound
+file of its owner's named by an environment variable (as the cast's files
+are), never part of the project; the film's frame 0 plays it from
+``offset`` seconds in.
 
 Command line (after ``--``)::
 
@@ -250,10 +254,22 @@ def inspect_cast(shot, frame, path):
     return written
 
 
-def edit_scene(film, shots, folders, name="Film"):
+def soundtrack(film):
+    """The film's soundtrack file (``film["audio"]``: an environment variable naming it), or None without one."""
+    audio = film.get("audio")
+    if not audio:
+        return None
+    path = os.environ.get(audio["environment"])
+    if not path or not os.path.isfile(path):
+        raise FileNotFoundError(f"soundtrack: set the environment variable {audio['environment']} to the film's sound file")
+    return os.path.abspath(path)
+
+
+def edit_scene(film, shots, folders, music=None, name="Film"):
     """The ``Film`` scene: a sequencer cut of every shot's frames in film
-    order, each hold showing the frame before it; rendering it writes the
-    video."""
+    order, each hold showing the frame before it, over the soundtrack
+    ``music`` (the file :func:`soundtrack` names, for the video); rendering
+    it writes the video."""
     from . import render as RND
     holds = set(film.get("holds", ()))
     first, last = film_frames(film)
@@ -276,6 +292,11 @@ def edit_scene(film, shots, folders, name="Film"):
         for file in files[1:]:
             strip.elements.append(file)
         strip.colorspace_settings.name = "sRGB"
+    if music is not None:
+        offset = int(round(film["audio"]["offset"] * film["fps"]))
+        sound = sequences.strips.new_sound("Soundtrack", music, channel=2, frame_start=first - offset)
+        sound.frame_final_start = first
+        sound.frame_final_end = last + 1
     edit.render.use_sequencer = True
     edit.render.use_compositing = False
     image = RND._output_kind("VIDEO", edit)
@@ -283,8 +304,8 @@ def edit_scene(film, shots, folders, name="Film"):
     ffmpeg = edit.render.ffmpeg
     ffmpeg.format = "MPEG4"
     ffmpeg.codec = "H264"
-    for attribute, value in (("constant_rate_factor", "HIGH"), ("ffmpeg_preset", "GOOD"), ("audio_codec", "NONE"),
-                             ("gopsize", film["fps"])):
+    for attribute, value in (("constant_rate_factor", "HIGH"), ("ffmpeg_preset", "GOOD"),
+                             ("audio_codec", "AAC" if music is not None else "NONE"), ("audio_bitrate", 256), ("gopsize", film["fps"])):
         try:
             setattr(ffmpeg, attribute, value)
         except (AttributeError, TypeError):
@@ -310,7 +331,7 @@ def run(here, root, script_path, argv=None):
     cast_digests = [CAST.blend_digest(path) for path in production.get("cast_files", ())]
     folders = {shot_id: os.path.join(build_dir, "frames", shot_id, shot_fingerprint(shot, root, script_path, args, cast_digests))
                for shot_id, shot in shots.items()}
-    edit = edit_scene(film, shots, folders)
+    edit = edit_scene(film, shots, folders, soundtrack(film) if args.video else None)
     video = os.path.join(build_dir, "video", f"{film['id']}.mp4")
     edit.render.filepath = video
     out = os.path.abspath(args.out or os.path.join(build_dir, f"{item}.blend"))
