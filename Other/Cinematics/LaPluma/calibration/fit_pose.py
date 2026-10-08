@@ -3,7 +3,8 @@ Fit the cast's rig to the reference, frame by frame (PyTorch).
 
     python fit_pose.py <rig.npz> <profile.json> <keypoints.npz> <camera.json> <first> <last> <out performance.json>
                        [--masks DIR] [--occluders DIR] [--parts DIR] [--start performance.json] [--iterations N]
-                       [--anchor F:AXIS:V ...] [--prop MESH --grip NAME]
+                       [--anchor F:AXIS:V ...] [--prop MESH --grip NAME] [--held-weight W] [--drift-weight W]
+                       [--steady-weight W] [--still FIRST:LAST ...]
 
 The rig (``export_rig.py``) is posed with Blender's own forward kinematics
 (``skeleton.py``).  What the rig is -- which bones are fitted and how far
@@ -22,7 +23,20 @@ Every frame of the shot is fitted at once: the whole-body keypoints of the
 reference (``keypoints.py``) pull the rig onto them through the shot's
 solved camera, a silhouette (``--masks``, and ``--occluders``: what may hide
 her, her scythe) keeps the rig inside the character's outline, and
-smoothness ties neighbouring frames together.  A keypoint the detector puts
+smoothness ties neighbouring frames together: the joints' turns change
+smoothly, and what is drawn -- her keypoints and the points of a prop she
+holds -- does not shake: its acceleration in the world, as many pixels as
+that shakes it on the picture at its depth, costs ``--steady-weight`` a
+point and a frame (the joints' smoothness alone weighs a wrist's turn as a
+toe's, and a scythe held a metre from the hand shook).  It moves the arm
+and the grip's drift, never the grip: a prop the hand turns about its
+length shakes least, and the grip would turn the shaft onto that axis.
+It is weighed in the last stage, once the pose is found: a start's shake
+outweighs every other term and turns the arm wherever it shakes least.
+Over the frames a ``--still first:last`` names -- the reference holding
+her still -- what is drawn does not move either: its speed is weighed as
+its acceleration is (a fit that is only kept from shaking wanders after
+the keypoints' slow drift).  A keypoint the detector puts
 outside that outline (grown by ``KEYPOINT_MARGIN`` pixels) is its mistake --
 seen from behind it finds a face in her coat -- and is not used; nor is one
 within ``--edge-margin`` pixels of the frame's edge: what lies beyond the
@@ -63,16 +77,26 @@ An ``--anchor frame:axis:value`` pins the root's set coordinate on a frame
 where the reference shows where she is (breaking through a window).
 
 With ``--prop`` the prop she holds (the profile's ``props``, in the grip
-the shot names: ``--grip``, one of its ``grips``, right or left) stays where
-its silhouette put it (``fit_prop.py``: the ``--start`` performance's
-``placements``, one picture for any size) and the palm of her holding hand
-closes on its shaft: her arm reaches it, and how large the prop is drawn in
-the film -- how far, then, it is -- is fitted as one scale for the shot.
-That scale is only how the picture is matched: the prop is as large as its
-maker made it (the cast's character sheet).  The grips written (the prop in
-the hand's frame) hang it on the hand at that size, turned as the picture
-has it, the point of its shaft nearest the palm in the palm: where her hand
-and the picture's prop still part, the prop goes with her hand.
+the shot names: ``--grip``, one of its ``grips``, right or left) is held as a
+hand holds it: hung on the hand by one grip for the whole shot -- the prop
+turned so in the hand's frame, the hand on one point of its shaft -- with a
+small drift of that turn, slow from frame to frame (``--drift-weight``: what
+the drift and its changes cost), and the arm turns it as the picture turns
+the prop: the prop's turn against its silhouette's (``fit_prop.py``: the
+``--start`` performance's ``placements``, one picture for any size; robust
+-- a placement flipped end for end is let go, ``--held-weight``), the palm
+on the grip's point of the picture's shaft (``--grip-weight``).  How large
+the prop is drawn in the film -- how far, then, it is -- is fitted as one
+scale for the shot; that scale is only how the picture is matched: the prop
+is as large as its maker made it (the cast's character sheet).  The grip
+starts as the hand holds the placed prop on most frames (the turn closest to
+all the frames' turns), on the point of the picture's shaft the palm lies
+nearest on the middle frame of the shot.  Fitted freely frame by frame -- the
+silhouette's turn, the shaft's point nearest the palm -- the prop shimmered
+in her hand: in the hall's still picture its outline moved 8 px a frame
+where the reference's moves under one.  The grips written (the prop in the
+hand's frame, frame by frame: the grip and its drift) hang it on the hand at
+that size.
 
 The card is shared (``gpu_budget.py``): the terms each frame answers for
 alone are added up a batch of frames at a time, as many as the claim
@@ -120,6 +144,10 @@ parser.add_argument("--anchor", nargs="*", default=[], help="frame:axis:value --
 parser.add_argument("--prop", default=None, help="the mesh of a prop she holds")
 parser.add_argument("--grip", default=None, help="which of the prop's grips (the profile's props.<prop>.grips) holds it")
 parser.add_argument("--grip-weight", type=float, default=40.0)
+parser.add_argument("--held-weight", type=float, default=1.0, help="the held prop's turn against its silhouette's")
+parser.add_argument("--drift-weight", type=float, default=10.0, help="the grip's drift from frame to frame and in all")
+parser.add_argument("--steady-weight", type=float, default=0.02, help="what is drawn shaking: a point's acceleration (px at its depth) squared")
+parser.add_argument("--still", nargs="*", default=[], help="first:last -- frames the reference holds her still on: what is drawn does not move")
 parser.add_argument("--hand-weight", type=float, default=0.4, help="the hand keypoints' weight against the body's")
 parser.add_argument("--edge-margin", type=float, default=24.0, help="keypoints this near the frame's edge are not used (px)")
 parser.add_argument("--width", type=int, default=1920)
@@ -153,6 +181,9 @@ SWAP_GROUPS = list(profile["swap_groups"])
 GROUP_OF = {key: g for g, name in enumerate(SWAP_GROUPS) for first, last in profile["swap_groups"][name]["keys"] for key in range(first, last + 1)}
 SEGMENT_OF = {int(child): int(parent) for child, parent in profile["segments"].items()}
 PROPORTION_TOLERANCE = float(np.log(1.3))
+HELD_REACH = 0.3
+DRIFT_STEADY = 100.0
+STEADY_PROP_POINTS = 32
 REACH = (4.0, 2.0, 1.0)
 LEFT_KEYS = {left for left, _ in profile["mirror"]}
 RIGHT_KEYS = {right for _, right in profile["mirror"]}
@@ -426,6 +457,24 @@ if prop is not None:
     placements = prop.read_placements([by_frame[frame] for frame in frames])
     log_film_scale = torch.tensor([float(np.log(start["film_scales"][prop.name]))], device=device, requires_grad=True)
     shaft = torch.tensor(prop_profile["shaft"], dtype=torch.float32, device=device)
+    with torch.no_grad():
+        start_world = pose(angles_of(joint_parameters), root_rotation, root_location)
+        relative = start_world[hand_bone][:, :3, :3].transpose(1, 2) @ placements[:, :3, :3]
+        cosines = (((relative[:, None] * relative[None]).sum((-2, -1)) - 1.0) / 2.0).clamp(-1.0, 1.0)
+        spread = (torch.acos(cosines) ** 2 / (torch.acos(cosines) ** 2 + HELD_REACH ** 2)).sum(1)
+        typical = relative[int(spread.argmin())].cpu().numpy()
+        grip_turn = torch.tensor(ScipyRotation.from_matrix(typical).as_rotvec(), dtype=torch.float32, device=device)
+        middle = count // 2
+        ends = placements[middle, :3, :3] @ shaft.T + placements[middle, :3, 3:4]
+        ends = camera_location[middle][:, None] + torch.exp(log_film_scale) * (ends - camera_location[middle][:, None])
+        axis = ends[:, 1] - ends[:, 0]
+        palm = sum(start_world[bone][middle, :3, 3] for bone in palm_bones) / len(palm_bones)
+        share = float((((palm - ends[:, 0]) * axis).sum() / (axis * axis).sum()).clamp(0.05, 0.95))
+    grip_turn.requires_grad_(True)
+    grip_drift = torch.zeros(count, 3, device=device, requires_grad=True)
+    grip_along = torch.tensor([float(np.log(share / (1.0 - share)))], device=device, requires_grad=True)
+    steady_samples = prop.subset(STEADY_PROP_POINTS, torch.Generator().manual_seed(0))
+    print(f"held: the grip starts from frame {frames[int(spread.argmin())]}'s, on {share:.2f} of the shaft", flush=True)
 
 
 def placed_prop(slots):
@@ -441,30 +490,69 @@ def palm_of(world):
     return sum(world[bone][:, :3, 3] for bone in palm_bones) / len(palm_bones)
 
 
+def gripped_share():
+    """Where along the shaft the hand holds it (0 its first end, 1 its second)."""
+    return torch.sigmoid(grip_along)
+
+
 def grip_distance(world, slots):
+    """How far the palm is from the grip's point of the picture's shaft on the frames ``slots``."""
     held = placed_prop(slots)
     ends = torch.einsum("fij,nj->fni", held[:, :3, :3], shaft) + held[:, None, :3, 3]
-    axis = ends[:, 1] - ends[:, 0]
-    palm = palm_of(world)
-    along = (((palm - ends[:, 0]) * axis).sum(-1) / (axis * axis).sum(-1)).clamp(0.0, 1.0)
-    return (palm - (ends[:, 0] + along[:, None] * axis)).norm(dim=-1)
+    return (palm_of(world) - (ends[:, 0] + gripped_share() * (ends[:, 1] - ends[:, 0]))).norm(dim=-1)
 
 
-def held_at_model_size(world, slots):
-    """The prop as large as its maker made it on the frames ``slots``, turned as the fitted one,
-    in her hand: the point of its shaft nearest the palm in the palm."""
-    held = placed_prop(slots)
-    scale = torch.exp(log_film_scale)
-    palm = palm_of(world)
-    ends = torch.einsum("fij,nj->fni", held[:, :3, :3], shaft) + held[:, None, :3, 3]
-    axis = ends[:, 1] - ends[:, 0]
-    along = (((palm - ends[:, 0]) * axis).sum(-1) / (axis * axis).sum(-1)).clamp(0.0, 1.0)
-    rotation = held[:, :3, :3] / scale
-    local = shaft[0][None] + along[:, None] * (shaft[1] - shaft[0])[None]
+def held_turn(world, slots, grip=None):
+    """The held prop's turn on the frames ``slots``: the holding hand's, turned by the grip (``grip``, the fitted one
+    unless given) and its drift there."""
+    grip = grip_turn if grip is None else grip
+    return world[hand_bone][:, :3, :3] @ axis_angle_matrices(grip[None].expand(len(slots), 3)) @ axis_angle_matrices(grip_drift[slots])
+
+
+def held_misfit(world, slots):
+    """How far (radians) the held prop is turned from its silhouette's turn on the frames ``slots``."""
+    cosine = (((held_turn(world, slots) * placements[slots][:, :3, :3]).sum((-2, -1)) - 1.0) / 2.0).clamp(-1.0 + 1e-6, 1.0 - 1e-6)
+    return torch.acos(cosine)
+
+
+def held_at_model_size(world, slots, fixed_grip=False):
+    """The prop as large as its maker made it on the frames ``slots``, in her hand: turned by the grip and its drift
+    from the hand, the grip's point of its shaft in the palm (the grip taken as it stands, not fitted through this,
+    with ``fixed_grip``)."""
+    rotation = held_turn(world, slots, grip_turn.detach() if fixed_grip else None)
+    share = gripped_share().detach() if fixed_grip else gripped_share()
+    local = shaft[0] + share * (shaft[1] - shaft[0])
     matrix = torch.eye(4, device=device).repeat(len(slots), 1, 1)
     matrix[:, :3, :3] = rotation
-    matrix[:, :3, 3] = palm - torch.einsum("fij,fj->fi", rotation, local)
+    matrix[:, :3, 3] = palm_of(world) - rotation @ local
     return matrix
+
+
+def drawn_points(world, slots):
+    """What is drawn on the frames ``slots`` (B, N, 3): her keypoints and, held, points over the prop."""
+    points = keypoint_positions(world)
+    if prop is None:
+        return points
+    held = held_at_model_size(world, slots, fixed_grip=True)
+    return torch.cat([points, Prop.place(held[:, :3, :3], held[:, :3, 3], steady_samples)], 1)
+
+
+def shake(world):
+    """How far (px at their depth) what is drawn accelerates from frame to frame, the shot's inner frames (F - 2, N), and
+    how far it moves from each frame to the next (F - 1, N)."""
+    points = drawn_points(world, everything)
+    _, depth = project_frames(points, everything)
+    scale = focal / depth.detach().clamp(min=0.3)
+    accel = points[2:] - 2 * points[1:-1] + points[:-2]
+    speed = points[1:] - points[:-1]
+    return torch.sqrt((accel ** 2).sum(-1) + 1e-12) * scale[1:-1], torch.sqrt((speed ** 2).sum(-1) + 1e-12) * scale[:-1]
+
+
+still_steps = torch.zeros(max(count - 1, 0), dtype=torch.bool, device=device)
+for span in args.still:
+    first_text, last_text = span.split(":")
+    still_steps |= torch.tensor([int(first_text) <= frames[k] and frames[k + 1] <= int(last_text) for k in range(count - 1)],
+                                dtype=torch.bool, device=device)
 
 
 def misordered(pixels, depth, slots):
@@ -547,10 +635,12 @@ def frame_terms(stage, slots):
         terms["order"] = args.order_weight * misordered(pixels, depth, slots) / (count * args.part_samples)
     if prop is not None:
         terms["grip"] = args.grip_weight * torch.sqrt(grip_distance(world, slots) ** 2 + 0.01 ** 2).sum() / count
+    if prop is not None and stage >= 1:
+        terms["held"] = args.held_weight * robust(held_misfit(world, slots), HELD_REACH).sum() / count
     return terms
 
 
-def shot_terms():
+def shot_terms(stage):
     """The terms that tie the frames together."""
     joint_angles = angles_of(joint_parameters)
     terms = {}
@@ -565,6 +655,14 @@ def shot_terms():
             k = frames.index(int(frame_text))
             terms[f"anchor {anchor}"] = 50.0 * (root_location[k, "XYZ".index(axis_name)] - float(value_text)) ** 2
     terms["prior"] = 0.005 * (joint_angles ** 2).sum() / count
+    if args.steady_weight > 0.0 and count > 2 and stage == len(REACH) - 1:
+        accel, speed = shake(pose(joint_angles, root_rotation, root_location))
+        terms["steady"] = args.steady_weight * (accel ** 2).sum() / count
+        if bool(still_steps.any()):
+            terms["still"] = args.steady_weight * (speed[still_steps] ** 2).sum() / count
+    if prop is not None:
+        drift_change = grip_drift[2:] - 2 * grip_drift[1:-1] + grip_drift[:-2]
+        terms["drift"] = args.drift_weight * ((grip_drift ** 2).sum() + DRIFT_STEADY * (drift_change ** 2).sum()) / count
     return terms
 
 
@@ -578,6 +676,7 @@ for stage, steps, parameters, rate in stages:
     groups = [{"params": parameters, "lr": rate}]
     if prop is not None and stage >= 1:
         groups.append({"params": [log_film_scale], "lr": 0.003})
+        groups.append({"params": [grip_turn, grip_drift, grip_along], "lr": 0.01})
     optimizer = torch.optim.Adam(groups)
     for step in range(steps):
         optimizer.zero_grad()
@@ -587,7 +686,7 @@ for stage, steps, parameters, rate in stages:
             sum(terms.values()).backward()
             for key, value in terms.items():
                 values[key] = values.get(key, 0.0) + float(value)
-        terms = shot_terms()
+        terms = shot_terms(stage)
         sum(terms.values()).backward()
         values.update({key: float(value) for key, value in terms.items()})
         optimizer.step()
@@ -632,6 +731,16 @@ with torch.no_grad():
             if share > 0.2:
                 held_at_limit[name] = round(share, 2)
     print("joints held at a limit (share of frames):", held_at_limit)
+    if count > 2:
+        shaken, moved = shake(world)
+        keys = len(KEYPOINTS)
+        if bool(still_steps.any()):
+            print(f"moving while still (px/frame at depth): keypoints median {float(moved[still_steps][:, :keys].median()):.2f}"
+                  + (f"; prop median {float(moved[still_steps][:, keys:].median()):.2f} 90% "
+                     f"{float(moved[still_steps][:, keys:].quantile(0.9)):.2f}" if prop is not None else ""))
+        print(f"shake (px/frame^2 at depth): keypoints median {float(shaken[:, :keys].median()):.2f} "
+              f"90% {float(shaken[:, :keys].quantile(0.9)):.2f}" + (f"; prop median {float(shaken[:, keys:].median()):.2f} "
+              f"90% {float(shaken[:, keys:].quantile(0.9)):.2f}" if prop is not None else ""))
     if part_names:
         sample_pixels, sample_depth = project(skeleton.skin(world, samples, sample_bones, sample_weights, count))
         for name in part_names:
@@ -651,6 +760,11 @@ with torch.no_grad():
         distance = grip_distance(world, torch.arange(count, device=device))
         print("film scale", round(float(torch.exp(log_film_scale)), 4))
         print("palm to shaft (cm):", " ".join(f"{frames[k]}:{float(distance[k]) * 100:.0f}" for k in range(0, count, 5)))
+        misfit = torch.rad2deg(held_misfit(world, torch.arange(count, device=device)))
+        drift = torch.rad2deg(grip_drift.norm(dim=-1))
+        print(f"held on {float(gripped_share()):.2f} of the shaft; turned from its silhouette (deg) median {float(misfit.median()):.1f} "
+              f"90% {float(misfit.quantile(0.9)):.1f}; drift (deg) median {float(drift.median()):.1f} most {float(drift.max()):.1f}")
+        print("turned from its silhouette (deg):", " ".join(f"{frames[k]}:{float(misfit[k]):.0f}" for k in range(0, count, 5)))
 
 result = {"armature": profile["armature"], "frames": []}
 with torch.no_grad():
