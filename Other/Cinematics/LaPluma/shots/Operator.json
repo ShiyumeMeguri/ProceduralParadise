@@ -11,7 +11,8 @@
   "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
   "Its picture shows no building past the crown over her (the skeletal Annex and the district high-rise that Breakout sees east of the tower would stand behind her left shoulder): it leaves them out.",
   "Its clouds stand where the reference shows them, all round the camera: a shell 600-1500 m out about where it stands (Kit.clouds), its share of cloud by direction (calibration/cloud_map.py, frames 380-542) -- laid on a plane, the sky of a camera turning where it stands streaked out where its rays ran low.",
-  "Its overlays are keyed frame by frame as the reference draws them (calibration/fit_overlays.py with Operator.overlay_fit.json)."
+  "Its overlays are keyed frame by frame as the reference draws them (calibration/fit_overlays.py with Operator.overlay_fit.json).",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [430, 450, 470, 490]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -83,6 +84,103 @@
     ]
    ],
    "smear": 0.04
+  },
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.018577874101166982
+     ],
+     [
+      0.125,
+      0.037155748202333964
+     ],
+     [
+      0.1875,
+      0.05573362230350095
+     ],
+     [
+      0.25,
+      0.07431149640466793
+     ],
+     [
+      0.3125,
+      0.09288937050583491
+     ],
+     [
+      0.375,
+      0.12093266833638122
+     ],
+     [
+      0.4375,
+      0.17263428460923336
+     ],
+     [
+      0.5,
+      0.29468360031317486
+     ],
+     [
+      0.5625,
+      0.412916980212081
+     ],
+     [
+      0.625,
+      0.5016990654119196
+     ],
+     [
+      0.6875,
+      0.5712882113166524
+     ],
+     [
+      0.75,
+      0.6362714978595704
+     ],
+     [
+      0.8125,
+      0.685407179964608
+     ],
+     [
+      0.875,
+      0.7275751480887038
+     ],
+     [
+      0.9375,
+      0.8011928291880572
+     ],
+     [
+      1.0,
+      0.9616600585863831
+     ]
+    ]
+   },
+   "highlight_rolloff": true
   }
  },
  "cast": {
@@ -11239,20 +11337,20 @@
  "sky": {
   "zenith": [
    0.0,
-   0.16999999999999998,
-   0.46874999999999994
+   0.155,
+   0.45625
   ],
   "horizon": [
-   0.04,
-   0.4999999999999998,
+   0.0,
+   0.45999999999999974,
    0.47999999999999965
   ],
   "strength": 0.13125000000000012,
   "clouds": {
    "color": [
-    1.6962500000000007,
-    1.7146875000000008,
-    1.7515625000000006
+    0.8682500000000012,
+    0.8776875000000013,
+    0.8965625000000012
    ],
    "loc": [
     -14.88,
@@ -11267,21 +11365,21 @@
    "threshold": 0.6825,
    "climb": 0.0,
    "gather": 0.675,
-   "soft": 0.11875000000000001,
+   "soft": 0.32875,
    "billow": 55.0,
-   "erode": 0.8125000000000004,
-   "density": 0.03249999999999998,
+   "erode": 0.8625000000000005,
+   "density": 0.05749999999999998,
    "map": "calibration/Operator.clouds.json",
-   "shade_low": 1.7875000000000008,
-   "shade_high": 2.6874999999999982,
-   "forward": 0.31250000000000006,
+   "shade_low": 1.3374999999999995,
+   "shade_high": 2.987499999999996,
+   "forward": 0.5125000000000001,
    "shell": 0.44666666666666677,
-   "reach": 0.4875
+   "reach": 0.42500000000000004
   },
   "ambient": [
-   0.2353,
-   0.29,
-   0.3482
+   0.2299,
+   0.2817,
+   0.3406
   ]
  },
  "wind": [
@@ -11297,7 +11395,7 @@
  ],
  "lights": {
   "Key": {
-   "power": 1.5134
+   "power": 2.5452
   }
  }
 }

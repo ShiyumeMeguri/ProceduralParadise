@@ -9,7 +9,8 @@
   "Low-angle shot at the facade: a slow drift, then the window bursts (94) and the camera pans after her out over the district.",
   "The film comes in on this shot through a lattice of diamonds shrinking from the right (frames 68-76); the camera holds its frame-70 place on 68 and 69.",
   "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 68-206).",
-  "Its crows are the reference's own (calibration/track_crows.py from frame 112 -- before she breaks out a dark blot is the building --, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out."
+  "Its crows are the reference's own (calibration/track_crows.py from frame 112 -- before she breaks out a dark blot is the building --, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out.",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [110, 131, 150, 180, 200]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -45,7 +46,104 @@
   "motion_blur": 0.25
  },
  "look": {
-  "exposure": 0.0
+  "exposure": 0.0,
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.057210277169150774
+     ],
+     [
+      0.125,
+      0.11404641377600769
+     ],
+     [
+      0.1875,
+      0.14059651309113003
+     ],
+     [
+      0.25,
+      0.1709717784311221
+     ],
+     [
+      0.3125,
+      0.2056092306247065
+     ],
+     [
+      0.375,
+      0.2545682187998255
+     ],
+     [
+      0.4375,
+      0.31724516544955983
+     ],
+     [
+      0.5,
+      0.38222313672428093
+     ],
+     [
+      0.5625,
+      0.4451199618267172
+     ],
+     [
+      0.625,
+      0.5019205768716015
+     ],
+     [
+      0.6875,
+      0.5701744874613275
+     ],
+     [
+      0.75,
+      0.6678539932996308
+     ],
+     [
+      0.8125,
+      0.7633395955428579
+     ],
+     [
+      0.875,
+      0.8636610698966714
+     ],
+     [
+      0.9375,
+      0.9418267298322821
+     ],
+     [
+      1.0,
+      0.9909087941934115
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
  },
  "cast": {
   "LaPluma": {
@@ -1436,7 +1534,7 @@
  ],
  "lights": {
   "Key": {
-   "power": 1.1764
+   "power": 1.9731
   }
  }
 }

@@ -3,13 +3,15 @@ Where a shot's reference shows cloud, as a map over the floor of its sky's cloud
 
     blender -b --factory-startup -P cloud_map.py -- <frames dir> <shot> <out.json> [<masks dir> ...]
             [--every 3] [--range first,last] [--windows 1] [--block 4] [--cell 20] [--degrees 1] [--above 100]
-            [--darkest 55] [--margin 2] [--least 12]
+            [--darkest 55] [--margin 2] [--least 12] [--blue S]
 
 The shot's camera -- built by the film's own builder from its keys and place -- looks at the reference frame by
 frame (every ``every`` frames of the shot, or of its ``range``: a title's grey card reads as cloud over the frames it
 stands on; ``<frames dir>/f####.png``) in blocks of ``block`` pixels; what of it shows sky is
 :mod:`sky_reads`'.  A sky block reads as cloud by how little colour it has: its saturation between the shot's blue
-(the 85th percentile of every sky block's) and its cloud (the 10th) gives its share of cloud.  Its ray from the
+(the 85th percentile of every sky block's, or ``blue`` where the shot shows too little clear sky for its percentile to
+be blue: a sky mostly cloud read its grey as blue and mapped half its cloud as gaps) and its cloud (the 10th) gives its
+share of cloud.  Its ray from the
 camera meets the plane ``above`` metres over the floor of the shot's cloud deck (its sky's ``clouds``) at a point of
 the map, if within the deck; every cell of the map (``cell`` metres) keeps the mean share of the rays that met it,
 over the smallest neighbourhood (up to 16 cells round) that ``least`` rays met -- far off, where the rays thin out,
@@ -61,6 +63,7 @@ def _arguments():
     parser.add_argument("--darkest", type=float, default=55.0)
     parser.add_argument("--margin", type=int, default=2)
     parser.add_argument("--least", type=float, default=12.0)
+    parser.add_argument("--blue", type=float, default=None)
     return parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
 
 
@@ -121,7 +124,8 @@ def main():
         found.append((frame, hits[keep], saturation[keep]))
         print(f"[cloud map] {args.shot} {frame}: {int(keep.sum())} sky blocks of {keep.size}", flush=True)
     every_saturation = np.concatenate([saturation for _, _, saturation in found])
-    blue, cloud = np.percentile(every_saturation, 85), np.percentile(every_saturation, 10)
+    blue = np.percentile(every_saturation, 85) if args.blue is None else args.blue
+    cloud = np.percentile(every_saturation, 10)
     points = np.concatenate([hits for _, hits, _ in found])
     low = np.floor(points.min(axis=0) / cell) * cell
     high = np.ceil(points.max(axis=0) / cell) * cell

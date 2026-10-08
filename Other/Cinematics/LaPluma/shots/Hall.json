@@ -8,7 +8,8 @@
  "notes": [
   "The recruitment result: she stands in the hall holding the scythe down by her left side; the camera stands still in front of her.  The picture comes in breaking up out of the dark the crows made of the title shot (543-560), crows crossing the lens, the result card comes in (564-578) and the film fades to black (714-726).",
   "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py: the lens the best of a scan of focal lengths, the scythe in her left hand), placed so she stands upright (calibration/Hall.place.json).",
-  "The result card's marks are the reference's own (Drawings/CardWeapon and CardClass, traced by calibration/trace_drawing.py off frames 600-713): a black sword on the white box, a white blade on the dark grey one; NEW is white beside its yellow bar."
+  "The result card's marks are the reference's own (Drawings/CardWeapon and CardClass, traced by calibration/trace_drawing.py off frames 600-713): a black sword on the white box, a white blade on the dark grey one; NEW is white beside its yellow bar.",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [600, 640, 680, 700]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -104,6 +105,103 @@
    "threshold": 0.4000000000000001,
    "size": 2.75,
    "strength": 0.48749999999999993
+  },
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.06224380563769259
+     ],
+     [
+      0.125,
+      0.12443509045426163
+     ],
+     [
+      0.1875,
+      0.16771978681542332
+     ],
+     [
+      0.25,
+      0.20089538228732523
+     ],
+     [
+      0.3125,
+      0.26122236768943674
+     ],
+     [
+      0.375,
+      0.3456262123885172
+     ],
+     [
+      0.4375,
+      0.43005574126924806
+     ],
+     [
+      0.5,
+      0.5011224319000032
+     ],
+     [
+      0.5625,
+      0.5698674580056828
+     ],
+     [
+      0.625,
+      0.6345688273884207
+     ],
+     [
+      0.6875,
+      0.6902151360029557
+     ],
+     [
+      0.75,
+      0.7477800417641969
+     ],
+     [
+      0.8125,
+      0.8333979924370947
+     ],
+     [
+      0.875,
+      0.8828100738203544
+     ],
+     [
+      0.9375,
+      0.9153950411769568
+     ],
+     [
+      1.0,
+      0.9835139584118231
+     ]
+    ]
+   },
+   "highlight_rolloff": true
   }
  },
  "cast": {
@@ -652,7 +750,7 @@
  ],
  "lights": {
   "Key": {
-   "power": 58.3972
+   "power": 44.6661
   }
  }
 }

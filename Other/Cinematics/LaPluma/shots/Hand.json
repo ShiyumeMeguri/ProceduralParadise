@@ -10,7 +10,8 @@
   "Fitted with the camera at the origin (calibration/fit_prop.py, fit_pose.py): the performance is the camera's own, and moves with it.  The scythe is placed on frames 219-278 and carried back over 207-218 at its own pace (calibration/extend_placements.py: the search reads its shaft end for end on the opening frames); her arm fills the sleeve's outline lightly (--cover-weight 0.3: the sleeve in the picture is the coat's, wider than her arm) and the rest of her is kept out of the picture, which shows none of her but the arm (--silhouette-weight 20).",
   "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
   "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 207-278).",
-  "Its crows are the reference's own (calibration/track_crows.py, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out."
+  "Its crows are the reference's own (calibration/track_crows.py, fit_crows.py: every crow followed through the picture and flown straight as the camera saw it), so the set's flocks are left out.",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [215, 230, 250, 270]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -47,7 +48,104 @@
   "motion_blur": 0.5
  },
  "look": {
-  "exposure": 0.0
+  "exposure": 0.0,
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.06012310856146489
+     ],
+     [
+      0.125,
+      0.12008699131772164
+     ],
+     [
+      0.1875,
+      0.16602764504358564
+     ],
+     [
+      0.25,
+      0.2080514169476524
+     ],
+     [
+      0.3125,
+      0.24456421605720513
+     ],
+     [
+      0.375,
+      0.270433553343076
+     ],
+     [
+      0.4375,
+      0.3020804616249699
+     ],
+     [
+      0.5,
+      0.33480004255820345
+     ],
+     [
+      0.5625,
+      0.3847073330591056
+     ],
+     [
+      0.625,
+      0.45638863531938156
+     ],
+     [
+      0.6875,
+      0.527381296693195
+     ],
+     [
+      0.75,
+      0.5731406437808766
+     ],
+     [
+      0.8125,
+      0.6125812267312964
+     ],
+     [
+      0.875,
+      0.6705853019379735
+     ],
+     [
+      0.9375,
+      0.7735399199750614
+     ],
+     [
+      1.0,
+      0.9572195406955019
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
  },
  "cast": {
   "LaPluma": {
@@ -2468,7 +2566,7 @@
  ],
  "lights": {
   "Key": {
-   "power": 9.4625
+   "power": 15.447
   }
  }
 }

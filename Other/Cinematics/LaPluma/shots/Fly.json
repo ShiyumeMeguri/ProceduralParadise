@@ -9,7 +9,8 @@
   "She flies on past the tower, the scythe held high, and the camera swings round and under her until it looks up at her from behind; crows all round.  The camera turns with the sky (calibration/sky_rotation.py) where the place stands it.",
   "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py): her body by its keypoints and outline, the scythe by its outline, her hand held to its shaft lightly (--grip-weight 4) -- the joint fit at full weight pulled her off her keypoints, the picture's scythe and hand disagreeing in depth -- and the scythe hung in her hand at its model size.",
   "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
-  "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 279-379)."
+  "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 279-379).",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [290, 303, 330, 350, 370]."
  ],
  "camera": {
   "focal_px": 1315.0,
@@ -46,7 +47,104 @@
   "motion_blur": 0.5
  },
  "look": {
-  "exposure": 0.0
+  "exposure": 0.0,
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.05592044180136336
+     ],
+     [
+      0.125,
+      0.11137057061969168
+     ],
+     [
+      0.1875,
+      0.13324557061969167
+     ],
+     [
+      0.25,
+      0.15512057061969167
+     ],
+     [
+      0.3125,
+      0.17699557061969168
+     ],
+     [
+      0.375,
+      0.19887057061969168
+     ],
+     [
+      0.4375,
+      0.2207455706196917
+     ],
+     [
+      0.5,
+      0.35957162550979865
+     ],
+     [
+      0.5625,
+      0.4521810991794125
+     ],
+     [
+      0.625,
+      0.5291904309021097
+     ],
+     [
+      0.6875,
+      0.5922071029256237
+     ],
+     [
+      0.75,
+      0.6542154592460182
+     ],
+     [
+      0.8125,
+      0.7404881362479603
+     ],
+     [
+      0.875,
+      0.830469499087498
+     ],
+     [
+      0.9375,
+      0.8931842792986295
+     ],
+     [
+      1.0,
+      0.9799099194470223
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
  },
  "cast": {
   "LaPluma": {
@@ -747,7 +845,7 @@
  ],
  "lights": {
   "Key": {
-   "power": 2.3148
+   "power": 2.8054
   }
  }
 }
