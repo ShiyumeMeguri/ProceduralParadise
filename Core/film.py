@@ -51,6 +51,9 @@ Command line (after ``--``)::
                                  picture a grade is fitted on)
     --cast NAME=PATH             the .blend of a cast member (else its environment variable)
     --out PATH / --no-save       where the .blend goes / do not save it
+    --project DIR                save it as a project of its own instead (Core.project): DIR/<film id>_Film.blend
+                                 with its soundtrack in the cut and every file it reads from outside in DIR/Data,
+                                 after what is rendered (the cut's frames are copied: with --render-shots)
 """
 from __future__ import annotations
 
@@ -106,6 +109,7 @@ def parse(argv):
     parser.add_argument("--cast", action="append", default=[])
     parser.add_argument("--out", default=None)
     parser.add_argument("--no-save", action="store_true")
+    parser.add_argument("--project", default=None)
     args = parser.parse_args(argv)
     args.cast = dict(entry.split("=", 1) for entry in args.cast)
     args.shots = [name for name in args.shots.split(",") if name] if args.shots else None
@@ -349,11 +353,11 @@ def run(here, root, script_path, argv=None):
     cast_digests = [CAST.blend_digest(path) for path in production.get("cast_files", ())]
     folders = {shot_id: os.path.join(build_dir, "frames", shot_id, shot_fingerprint(shot, root, script_path, args, cast_digests))
                for shot_id, shot in shots.items()}
-    edit = edit_scene(film, shots, folders, soundtrack(film) if args.video else None)
+    edit = edit_scene(film, shots, folders, soundtrack(film) if args.video or args.project else None)
     video = os.path.join(build_dir, "video", f"{film['id']}.mp4")
     edit.render.filepath = video
     out = os.path.abspath(args.out or os.path.join(build_dir, f"{item}.blend"))
-    if not args.no_save:
+    if not args.no_save and not args.project:
         os.makedirs(os.path.dirname(out), exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=out, compress=True)
         print(f"[film] saved {out}")
@@ -387,4 +391,7 @@ def run(here, root, script_path, argv=None):
         present(edit)
         bpy.ops.render.render(animation=True, scene=edit.name)
         print(f"[film] video -> {video}")
+    if args.project:
+        from . import project
+        project.export(args.project, f"{film['id']}_Film", production.get("cast_files", ()))
     return production
