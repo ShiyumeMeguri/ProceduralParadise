@@ -28,8 +28,11 @@ input ``Sun Direction``: a plume's dust shading its own billows) is told
 where the set's sun is, its lamp's ``direction``, unless it gives one.
 Inputs are data: degrees for angles, palette names for colours, library
 names for materials.  A lamp is ``{"name", "light": "SUN" | "AREA" |
-"POINT" | "SPOT", "power", "color", "angle" (a sun's disc, degrees),
-"size", "loc", "direction" (towards the light), "lighting"}``: a lamp with
+"POINT" | "SPOT", "power", "color", "temperature", "angle" (a sun's disc,
+degrees), "size", "loc", "direction" (towards the light), "lighting"}``
+-- with a ``temperature`` (Kelvin) its colour is a blackbody's, ``color``
+a tint over it (Blender's: the blackbody as bright at any temperature, so
+the temperature turns only the colour); a lamp with
 ``lighting`` "cast" lights the cast alone, one with "set" all but the cast
 (light linking) -- the cast's materials are the character's own, toon-shaded,
 and want a key of their own (a shot's ``lights``, from her skin:
@@ -354,6 +357,9 @@ def build_lamp(item, collection):
     data = bpy.data.lights.new(item["name"], item["light"])
     data.energy = item["power"]
     data.color = tuple(PALETTE[item["color"]]) if isinstance(item.get("color"), str) else tuple(item.get("color", (1.0, 1.0, 1.0)))
+    if "temperature" in item:
+        data.use_temperature = True
+        data.temperature = item["temperature"]
     if item["light"] == "SUN":
         data.angle = math.radians(item.get("angle", 1.0))
     if item["light"] == "AREA":

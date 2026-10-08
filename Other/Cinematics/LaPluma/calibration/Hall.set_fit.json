@@ -1,6 +1,6 @@
 {
  "notes": [
-  "The hall's lamps, finishes, sky and the lens's bloom fitted to the reference (fit_set.py): its background stands still from frame 563, so two frames of her standing in it are enough; her name and card are drawn over the picture, the worst sixteenth of the blocks left out (what they cover, no more: the blown windows must count).  Lamps stay white, their tints turned a little; vents, glow and trim keep their own colours (a few pixels each: a fit would spend them on what they do not show)."
+  "The hall's lamps, finishes, sky and the lens's bloom fitted to the reference (fit_set.py): its background stands still from frame 563, so two frames of her standing in it are enough; her name, LA PLUMA, the result card and the uploader's marks are left out where they stand (boxes) and every other block counts -- the worst sixteenth trimmed instead were the lockers and the blown haze by the windows, the very blocks the hall was off on.  The sky stays neutral, only its strength turned (a yellow zenith lit her olive); a lamp's colour is a blackbody's, its temperature turned (its channels turned freely, the floor lamp went magenta and the ceiling lamp yellow); vents, glow and trim keep their own colours, and so do the crystal's gold, core and net (a few pixels each, or a narrow cone before a bright plate: a fit spends them on what they do not show -- the net went dark red)."
  ],
  "frames": [
   640,
@@ -8,18 +8,18 @@
  ],
  "scale": 0.25,
  "samples": 16,
- "trim": 0.06,
+ "trim": 0.0,
  "rounds": 4,
  "parameters": [
   {
    "light": "Window Light",
    "power": 1500.0,
-   "color": 0.05
+   "temperature": 500.0
   },
   {
    "light": "Ceiling Light",
    "power": 300.0,
-   "color": 0.05
+   "temperature": 500.0
   },
   {
    "light": "Back Light",
@@ -28,12 +28,7 @@
   {
    "light": "Deck Light",
    "power": 150.0,
-   "color": 0.05
-  },
-  {
-   "light": "Fill Light",
-   "power": 100.0,
-   "color": 0.05
+   "temperature": 500.0
   },
   {
    "material": "CIN.HallGlow.strength",
@@ -68,19 +63,7 @@
    "step": 0.1
   },
   {
-   "material": "color:gold",
-   "step": 0.1
-  },
-  {
-   "material": "color:hall_core",
-   "step": 0.03
-  },
-  {
    "material": "color:hall_recess",
-   "step": 0.1
-  },
-  {
-   "sky": "zenith",
    "step": 0.1
   },
   {
@@ -107,11 +90,32 @@
    "material": "CIN.HallFloor.roughness",
    "start": 0.14,
    "step": 0.05
-  },
-  {
-   "material": "CIN.HallNet.strand",
-   "start": 0.5,
-   "step": 0.1
   }
+ ],
+ "boxes": [
+  [
+   150,
+   670,
+   720,
+   800
+  ],
+  [
+   1240,
+   630,
+   1830,
+   830
+  ],
+  [
+   1580,
+   35,
+   1915,
+   100
+  ],
+  [
+   1795,
+   1030,
+   1915,
+   1075
+  ]
  ]
 }

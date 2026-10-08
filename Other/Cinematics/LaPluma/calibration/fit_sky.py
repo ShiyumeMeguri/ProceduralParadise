@@ -36,13 +36,14 @@ from Core import render as RND  # noqa: E402
 from Cinematics import scenes as SCN  # noqa: E402
 from Cinematics.Kit import clouds as CL  # noqa: E402
 
-PARAMETERS = [(("zenith", 0), 0.02, 0.0), (("zenith", 1), 0.03, 0.0), (("zenith", 2), 0.05, 0.0), (("horizon", 0), 0.08, 0.0),
-              (("horizon", 1), 0.08, 0.0), (("horizon", 2), 0.08, 0.0), (("strength", None), 0.15, 0.0),
-              (("clouds.shade_low", None), 0.1, 0.0), (("clouds.shade_high", None), 0.1, 0.0), (("clouds.whiteness", None), 0.15, 0.5),
-              (("clouds.density", None), 0.01, 0.002), (("clouds.soft", None), 0.03, 0.01), (("clouds.threshold", None), 0.03, 0.0),
-              (("clouds.gather", None), 0.15, 0.0), (("clouds.height", None), 80.0, 60.0), (("clouds.climb", None), 0.05, 0.0),
-              (("clouds.billow", None), 30.0, 10.0), (("clouds.erode", None), 0.1, 0.0), (("clouds.forward", None), 0.1, 0.0),
-              (("clouds.reach", None), 0.05, 0.05)]
+FREE = float("inf")
+PARAMETERS = [(("zenith", 0), 0.02, 0.0, FREE), (("zenith", 1), 0.03, 0.0, FREE), (("zenith", 2), 0.05, 0.0, FREE), (("horizon", 0), 0.08, 0.0, FREE),
+              (("horizon", 1), 0.08, 0.0, FREE), (("horizon", 2), 0.08, 0.0, FREE), (("strength", None), 0.15, 0.0, FREE),
+              (("clouds.shade_low", None), 0.1, 0.0, FREE), (("clouds.shade_high", None), 0.1, 0.0, FREE), (("clouds.whiteness", None), 0.15, 0.5, FREE),
+              (("clouds.density", None), 0.01, 0.002, FREE), (("clouds.soft", None), 0.03, 0.01, FREE), (("clouds.threshold", None), 0.03, 0.0, FREE),
+              (("clouds.gather", None), 0.15, 0.0, FREE), (("clouds.height", None), 80.0, 60.0, FREE), (("clouds.climb", None), 0.05, 0.0, FREE),
+              (("clouds.billow", None), 30.0, 10.0, FREE), (("clouds.erode", None), 0.1, 0.0, FREE), (("clouds.forward", None), 0.1, 0.0, FREE),
+              (("clouds.reach", None), 0.05, 0.05, FREE)]
 
 
 def _arguments():

@@ -4,25 +4,30 @@ sky.
 
     blender -b --factory-startup -P fit_set.py -- <frames dir> <shot> <spec.json> [<masks dir> ...] [--write]
 
-The shot's set as the shot renders it -- its items (what is there for a while too, while it is), lamps and sky,
+The shot's set as the shot renders it -- its items (what is there for a while too, while it is), lamps, sky and light
+probes (baked as the film bakes them, again whenever what lights the set changes: its lamps, finishes, items or sky),
 through the shot's camera (focused as the film focuses it, on its performer's bone, the performer posed but not
 drawn), render settings and look -- is rendered at the spec's ``scale`` on its ``frames`` and compared with the
-reference on the blocks the masks leave (the cast and what it holds) by eye (:mod:`picture_fit`, leaving out the
-worst ``trim`` of the blocks: the shot's titles and cards, drawn over the picture, are not the set's; the spread of
-colours weighed by the spec's ``spread``, 3 unless it says, the picture's detail by its ``texture``, none unless it
-says).  The spec names
-what is turned and by how much a step::
+reference on the blocks the masks leave (the cast and what it holds) and its ``boxes`` (reference pixels [x0, y0, x1,
+y1]: the shot's titles and cards, drawn over the picture where they stand, are not the set's) by eye
+(:mod:`picture_fit`, leaving out the worst ``trim`` of the blocks besides -- what a box cannot hold, a title sliding
+over a moving picture; the spread of colours weighed by the spec's ``spread``, 3 unless it says, the picture's detail
+by its ``texture``, none unless it says).  The spec names what is turned and by how much a step::
 
-    {"frames": [700], "scale": 0.25, "trim": 0.15, "rounds": 4,
-     "parameters": [{"light": "Window Light", "power": 600.0}, {"light": "Window Light", "color": 0.05},
+    {"frames": [700], "scale": 0.25, "trim": 0.15, "boxes": [[150, 670, 720, 800]], "rounds": 4,
+     "parameters": [{"light": "Window Light", "power": 600.0, "temperature": 500.0},
                     {"material": "CIN.HallGlow.strength", "step": 2.0}, {"material": "color:hall_wall", "step": 0.05},
                     {"sky": "zenith", "step": 0.05}, ...]}
 
-a colour turned channel by channel; a material parameter the set does not give starts from the entry's ``start``
+a lamp's colour turned as its ``temperature`` (Kelvin, within Blender's range; a lamp the set gives none starts from
+Blender's default) -- never channel by channel: left free, a lamp turns any colour that makes up for what the set lacks
+(the hall's floor lamp went magenta, its ceiling lamp yellow); a palette colour turned channel by channel within [0, 1]
+(a reflectance; an emitter's colour, its strength how bright); a material parameter the set does not give starts from
+the entry's ``start``
 (the library's own value), a colour from the palette's.  ``{"look": "glow.strength", "step": 0.1}`` turns a field of
 one of the shot's look's glares (``glow``, ``bloom``: the light the lens spreads round what is bright), which the shot
 must have.  ``{"item": "Breach Cloud", "input": "Growth", "step": 0.2}`` turns an input the set gives one of its
-items (a vector input channel by channel; ``lowest``, 0 by default, bounds it below).  With ``write`` the best lamps,
+items (a vector input channel by channel; ``lowest``, 0 by default, and ``highest`` bound it).  With ``write`` the best lamps,
 materials and items' inputs (and sky, if fitted) are written into the set, the look's glares into the shot.
 """
 import argparse
@@ -44,6 +49,9 @@ from Cinematics.Kit import materials as M  # noqa: E402
 
 
 SPREAD = 3.0
+FREE = float("inf")
+TEMPERATURE = bpy.types.Light.bl_rna.properties["temperature"]
+LAMP_FIELDS = {"light", "power", "temperature"}
 
 def _arguments():
     parser = argparse.ArgumentParser()
@@ -56,30 +64,35 @@ def _arguments():
 
 
 def _parameters(spec, state):
-    """The turned values as (key, step, lowest): a key is (part, name, field, channel)."""
+    """The turned values as (key, step, lowest, highest): a key is (part, name, field, channel)."""
     keys = []
     for entry in spec["parameters"]:
         if "light" in entry:
-            lamp = next(lamp for lamp in state["lights"] if lamp["name"] == entry["light"])
+            unknown = sorted(set(entry) - LAMP_FIELDS)
+            if unknown:
+                raise KeyError(f"lamp {entry['light']}: {unknown} are not turned (only {sorted(LAMP_FIELDS - {'light'})})")
             if "power" in entry:
-                keys.append((("lights", entry["light"], "power", None), entry["power"], 0.0))
-            if "color" in entry:
-                keys += [(("lights", entry["light"], "color", channel), entry["color"], 0.0) for channel in range(len(lamp["color"]))]
+                keys.append((("lights", entry["light"], "power", None), entry["power"], 0.0, FREE))
+            if "temperature" in entry:
+                keys.append((("lights", entry["light"], "temperature", None), entry["temperature"], TEMPERATURE.hard_min,
+                             TEMPERATURE.hard_max))
         elif "material" in entry:
             value = state["materials"][entry["material"]]
             channels = range(len(value)) if isinstance(value, list) else [None]
-            keys += [(("materials", entry["material"], None, channel), entry["step"], 0.0) for channel in channels]
+            highest = 1.0 if entry["material"].startswith("color:") else FREE
+            keys += [(("materials", entry["material"], None, channel), entry["step"], 0.0, highest) for channel in channels]
         elif "sky" in entry:
             value = state["sky"][entry["sky"]]
             channels = range(len(value)) if isinstance(value, list) else [None]
-            keys += [(("sky", entry["sky"], None, channel), entry["step"], 0.0) for channel in channels]
+            keys += [(("sky", entry["sky"], None, channel), entry["step"], 0.0, FREE) for channel in channels]
         elif "look" in entry:
             glare, field = entry["look"].split(".")
-            keys.append((("look", glare, field, None), entry["step"], 0.0))
+            keys.append((("look", glare, field, None), entry["step"], 0.0, FREE))
         elif "item" in entry:
             value = state["items"][entry["item"]][entry["input"]]
             channels = range(len(value)) if isinstance(value, list) else [None]
-            keys += [(("items", entry["item"], entry["input"], channel), entry["step"], entry.get("lowest", 0.0)) for channel in channels]
+            keys += [(("items", entry["item"], entry["input"], channel), entry["step"], entry.get("lowest", 0.0), entry.get("highest", FREE))
+                     for channel in channels]
     return keys
 
 
@@ -123,6 +136,9 @@ class Fit:
             raise ValueError(f"{args.shot} lights {sorted(fitted)} its own way: fit them in the shot, not into the set")
         lamps = SCN.shot_lights(set_spec.get("lights", []), shot)
         self.lamps = {lamp["name"]: SCN.build_lamp(lamp, lights) for lamp in SCN.set_lamps(lamps)}
+        probes = sky_reads.SC.collection("Fit Probes", parent=scene.collection)
+        self.probes = [SCN.build_probe(probe, probes) for probe in set_spec.get("probes", [])]
+        self.baked = None
         self.sun = SCN.sky_sun(lamps)
         settings = shot["render"]
         RND.ENGINES[settings["engine"]](samples=spec.get("samples", 16), **settings.get(settings["engine"].lower(), {}))
@@ -142,7 +158,7 @@ class Fit:
         self.frames = spec["frames"]
         pictures, weights = {}, {}
         for frame in self.frames:
-            pictures[frame], blocked = self.reads.read(args.frames_dir, args.masks, frame)
+            pictures[frame], blocked = self.reads.read(args.frames_dir, args.masks, frame, spec.get("boxes", ()))
             weights[frame] = (~blocked).astype(float)
         self.measure = picture_fit.Measure(pictures, weights, spec.get("trim", 0.0), spec.get("spread", SPREAD),
                                            spec.get("texture", 0.0))
@@ -159,6 +175,9 @@ class Fit:
             shown = {**lamp, **self.changes.get(lamp["name"], {})}
             data.energy = shown["power"]
             data.color = shown["color"]
+            if "temperature" in shown:
+                data.use_temperature = True
+                data.temperature = shown["temperature"]
         SCN.set_materials({"materials": state["materials"]})
         for name, builder in M.LIBRARY.builders.items():
             material = bpy.data.materials.get(name)
@@ -173,6 +192,10 @@ class Fit:
         world, collection, _files = SCN.build_sky(sky_reads.FILM, state["sky"], self.sun, "Fit", bpy.context.scene.collection)
         bpy.context.scene.world = world
         self.sky = (world, collection)
+        lighting = json.dumps({part: state[part] for part in ("lights", "materials", "items", "sky")}, sort_keys=True)
+        if self.probes and lighting != self.baked:
+            SCN.bake_probes(bpy.context.scene, self.probes)
+            self.baked = lighting
 
     def score(self, state):
         self._apply(state)
@@ -199,6 +222,9 @@ def main():
              "sky": copy.deepcopy(fit.reads.sky), "look": copy.deepcopy(fit.reads.shot.get("look", {})), "items": {}}
     items = {item["name"]: item for item in set_spec.get("items", [])}
     for entry in spec["parameters"]:
+        if "temperature" in entry:
+            lamp = next(lamp for lamp in state["lights"] if lamp["name"] == entry["light"])
+            lamp.setdefault("temperature", TEMPERATURE.default)
         if "item" in entry:
             inputs = state["items"].setdefault(entry["item"], {})
             inputs[entry["input"]] = copy.deepcopy(items[entry["item"]]["inputs"][entry["input"]])

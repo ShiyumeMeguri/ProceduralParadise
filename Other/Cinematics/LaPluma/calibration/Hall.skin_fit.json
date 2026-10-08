@@ -1,0 +1,18 @@
+{
+ "notes": [
+  "Her face where the reference shows it lit in the hall (fit_skin.py)."
+ ],
+ "lamp": "Key",
+ "frames": [
+  600,
+  650,
+  700
+ ],
+ "points": [
+  [
+   "Nose01Joint_M"
+  ]
+ ],
+ "radius": 0.012,
+ "rounds": 7
+}

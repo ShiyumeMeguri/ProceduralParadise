@@ -91,23 +91,23 @@ class Measure:
 
 
 def descend(state, parameters, score, rounds, read, changed, log):
-    """Coordinate descent from ``state`` (each value raised to its lowest first): ``parameters`` [(key, step, lowest)],
-    ``score(state)`` -> (value, parts), ``read(state, key)`` the value, ``changed(state, key, value)`` a new state.
-    Each parameter is stepped either way and, the better way found, on that way while it keeps getting better (up to
-    :data:`REACH` steps), the steps halving round by round.  Returns the best state and score."""
-    for key, _step, lowest in parameters:
-        if read(state, key) < lowest:
-            state = changed(state, key, lowest)
+    """Coordinate descent from ``state`` (each value brought within its bounds first): ``parameters`` [(key, step,
+    lowest, highest)], ``score(state)`` -> (value, parts), ``read(state, key)`` the value, ``changed(state, key, value)``
+    a new state.  Each parameter is stepped either way and, the better way found, on that way while it keeps getting
+    better (up to :data:`REACH` steps), the steps halving round by round.  Returns the best state and score."""
+    for key, _step, lowest, highest in parameters:
+        if not lowest <= read(state, key) <= highest:
+            state = changed(state, key, min(max(read(state, key), lowest), highest))
     best, parts = score(state)
     log(f"start {best:.3f} {[round(part, 2) for part in parts]}")
     for round_index in range(rounds):
-        for key, step, lowest in parameters:
+        for key, step, lowest, highest in parameters:
             step = step * 0.5 ** round_index
             for direction in (-1.0, 1.0):
                 moved = False
                 for _ in range(REACH):
                     current = read(state, key)
-                    candidate = max(current + direction * step, lowest)
+                    candidate = min(max(current + direction * step, lowest), highest)
                     if candidate == current:
                         break
                     trial = changed(state, key, candidate)

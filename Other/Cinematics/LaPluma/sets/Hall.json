@@ -7,81 +7,73 @@
   "Her name, LA PLUMA, behind her is the shot's underlay (shots/Hall.json), not the set's.",
   "The windows on the right glow at 0.9: seen through the shot's exposure they come to the light grey the reference shows there (a display value of about 170), not white; the window lamp lights the hall.",
   "The deck's edge is a strip of light (Deck Light, warm): the reference's lockers and wall warm towards their feet.",
-  "The light the bright floor throws back up onto the ceiling, the saucer and the walls (the engine bounces only what the screen shows) is a broad lamp lying on the floor facing up (Fill Light), its power and tint fitted.",
   "The right side as the plate shows it: the partition's near part (to 12 m along it) a solid wall with a yellowed trim stripe 8.5 m along, its far part glass before the bright windows; the terminal a monitor (a dark housing, a glass screen) with a pole beside it.",
-  "The crystal's net is a fine gold mesh (cells about 2.5 cm, the gold over most of it) crumpled into folds a hand wide, its hem wandering; below it the dark glassy core shows, as the reference's lower third."
+  "The crystal's net is a fine gold mesh (cells about 2.5 cm, the gold over most of it) crumpled into folds a hand wide, its hem wandering; below it the dark glassy core shows, as the reference's lower third.",
+  "The hall's lamps light the hall alone; she and her scythe are lit by a key of her own (Key, soft, from the windows' side before her, its power fitted from her face: fit_skin.py) and the hall's sky.",
+  "The hall's sky (the world: the daylight its windows and bounce shed everywhere, on her too) is neutral, its strength fitted -- its warm light is its lamps' and glows'; a yellow zenith lit her and her scythe olive.",
+  "The hall is lit as a room: a light probe volume over it (Hall Air) carries the light of its windows, glows and lamps bounced off every wall, floor and ceiling, seen or not -- without it EEVEE bounced only what the screen shows, the partition on the right stood dark grey where the reference's glows, and a lamp lying on the floor stood in for the floor's bounce."
  ],
  "materials": {
-  "CIN.HallGlow.strength": 14.0,
-  "CIN.HallWindow.strength": 2.0749999999999997,
+  "CIN.HallGlow.strength": 40.25,
+  "CIN.HallWindow.strength": 6.925000000000002,
   "color:hall_wall": [
-   0.8375,
+   0.7375,
    0.8250000000000001,
-   0.905
+   0.805
   ],
   "color:hall_floor": [
-   0.1625,
-   0.23750000000000002,
+   0.125,
+   0.2,
    0.43750000000000006
   ],
   "color:hall_paint": [
-   0.95,
+   0.8624999999999999,
    0.96,
-   0.87
+   1.0
   ],
   "color:hall_metal": [
    0.62,
    0.62,
    0.64
   ],
-  "color:gold": [
-   1.0374999999999999,
-   0.825,
-   0.19062499999999996
-  ],
   "color:hall_glow": [
    1.0,
    0.86,
    0.62
   ],
-  "CIN.HallStrip.strength": 7.5,
-  "CIN.HallRecess.strength": 1.4,
+  "CIN.HallStrip.strength": 14.375,
+  "CIN.HallRecess.strength": 0.7999999999999999,
   "color:hall_shell": [
-   0.6937500000000002,
-   0.8350000000000001,
-   1.066875
+   0.7062500000000003,
+   0.8225000000000001,
+   0.9875
   ],
   "color:hall_vent": [
    0.5,
    0.52,
    0.55
   ],
-  "color:hall_core": [
-   0.051250000000000004,
-   0.01875,
-   0.0
-  ],
   "color:hall_recess": [
-   1.4375,
-   1.0975,
-   0.5162500000000002
+   1.0,
+   0.935,
+   0.6662500000000001
   ],
   "color:hall_trim": [
-   0.65,
-   0.6325,
-   0.4750000000000001
+   1.0,
+   1.0,
+   0.0
   ],
   "CIN.HallNet.around": 100.0,
   "CIN.HallNet.height": 0.022,
-  "CIN.HallNet.strand": 0.5875,
+  "CIN.HallNet.strand": 0.5,
   "CIN.HallNet.roughness": 0.22,
-  "CIN.HallFloor.roughness": 0.08375
+  "CIN.HallFloor.roughness": 0.0
  },
  "sky": {
   "zenith": [
-   0.8375,
-   0.741875,
-   0.4156250000000001
+   0.62,
+   0.62,
+   0.6
   ],
   "horizon": [
    0.62,
@@ -93,7 +85,7 @@
    0.21,
    0.22
   ],
-  "strength": 0.5374999999999999,
+  "strength": 0.2499999999999999,
   "haze": 30.0
  },
  "items": [
@@ -694,11 +686,11 @@
   {
    "name": "Window Light",
    "light": "AREA",
-   "power": 7000.0,
+   "power": 2812.5,
    "color": [
-    0.9343750000000001,
-    1.00125,
-    1.025
+    1.0,
+    1.0,
+    1.0
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -714,16 +706,18 @@
     1.0,
     0.0,
     0.0
-   ]
+   ],
+   "lighting": "set",
+   "temperature": 6437.5
   },
   {
    "name": "Ceiling Light",
    "light": "AREA",
-   "power": 2518.75,
+   "power": 2846.05,
    "color": [
-    0.9881249999999998,
-    0.989375,
-    1.084375
+    1.0,
+    1.0,
+    1.0
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -739,12 +733,14 @@
     0.0,
     0.0,
     1.0
-   ]
+   ],
+   "lighting": "set",
+   "temperature": 2312.5
   },
   {
    "name": "Back Light",
    "light": "AREA",
-   "power": 237.5,
+   "power": 75.0,
    "color": [
     1.0,
     1.0,
@@ -764,16 +760,17 @@
     0.3,
     1.0,
     0.5
-   ]
+   ],
+   "lighting": "set"
   },
   {
    "name": "Deck Light",
    "light": "AREA",
-   "power": 600.0,
+   "power": 590.52,
    "color": [
-    1.0312499999999998,
-    0.9762500000000001,
-    0.8500000000000001
+    1.0,
+    1.0,
+    1.0
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -789,31 +786,54 @@
     0.4004,
     -0.1992,
     -0.8944
-   ]
+   ],
+   "lighting": "set",
+   "temperature": 5500.0
   },
   {
-   "name": "Fill Light",
+   "name": "Key",
    "light": "AREA",
-   "power": 200.0,
+   "power": 60.0,
    "color": [
-    1.0187500000000003,
-    0.8887500000000002,
-    1.1012499999999998
+    1.0,
+    0.98,
+    0.95
    ],
    "shape": "RECTANGLE",
    "size": [
-    20.0,
-    30.0
+    1.5,
+    1.5
    ],
    "loc": [
-    0.0,
-    8.0,
-    0.05
+    1.5,
+    -2.0,
+    2.2
    ],
    "direction": [
-    0.0,
-    0.0,
-    -1.0
+    1.5,
+    -2.0,
+    1.0
+   ],
+   "lighting": "cast"
+  }
+ ],
+ "probes": [
+  {
+   "name": "Hall Air",
+   "min": [
+    -9.5,
+    -8.0,
+    0.0
+   ],
+   "max": [
+    7.5,
+    22.0,
+    4.6
+   ],
+   "resolution": [
+    18,
+    30,
+    6
    ]
   }
  ]
