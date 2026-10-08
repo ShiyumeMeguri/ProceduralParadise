@@ -27,7 +27,9 @@ smoothness ties neighbouring frames together: the joints' turns change
 smoothly, and what is drawn -- her keypoints and the points of a prop she
 holds -- does not shake: its acceleration in the world, as many pixels as
 that shakes it on the picture at its depth, costs ``--steady-weight`` a
-point and a frame (the joints' smoothness alone weighs a wrist's turn as a
+point and a frame (none unless the shot asks: where the camera flies with her,
+her motion in the world is the flight, and holding it steady pulled her off
+her keypoints) (the joints' smoothness alone weighs a wrist's turn as a
 toe's, and a scythe held a metre from the hand shook).  It moves the arm
 and the grip's drift, never the grip: a prop the hand turns about its
 length shakes least, and the grip would turn the shaft onto that axis.
@@ -146,7 +148,7 @@ parser.add_argument("--grip", default=None, help="which of the prop's grips (the
 parser.add_argument("--grip-weight", type=float, default=40.0)
 parser.add_argument("--held-weight", type=float, default=1.0, help="the held prop's turn against its silhouette's")
 parser.add_argument("--drift-weight", type=float, default=10.0, help="the grip's drift from frame to frame and in all")
-parser.add_argument("--steady-weight", type=float, default=0.02, help="what is drawn shaking: a point's acceleration (px at its depth) squared")
+parser.add_argument("--steady-weight", type=float, default=0.0, help="what is drawn shaking: a point's acceleration (px at its depth) squared")
 parser.add_argument("--still", nargs="*", default=[], help="first:last -- frames the reference holds her still on: what is drawn does not move")
 parser.add_argument("--hand-weight", type=float, default=0.4, help="the hand keypoints' weight against the body's")
 parser.add_argument("--edge-margin", type=float, default=24.0, help="keypoints this near the frame's edge are not used (px)")
