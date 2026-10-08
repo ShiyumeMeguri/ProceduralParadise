@@ -13,7 +13,9 @@ names the set's lamp to turn, the frames where the reference shows her skin lit 
 places to read it: each the middle of its bones' heads, read over a disc ``radius`` metres across as the shot's camera
 sees it there.  The shot is rendered as the film renders it (its look and all) with the lamp at one power after
 another, and the linear brightness of the discs compared with the reference's: the power is bisected (on its log)
-until the median over frames and places of the render's over the reference's is one.  The film's skin is shaded by
+until the median over frames and places of the render's over the reference's is one -- or, where even the lamp
+at its strongest leaves her duller than the reference (her toon skin stops brightening once lit), to the least power
+that brings her within :data:`PLATEAU` of as bright as it can (what is left is not the lamp's).  The film's skin is shaded by
 the character's own materials, which no set fit sees (her colours are masked out of every fit): under the district's
 sun at the sky's power her face clipped white where the reference's is a lit, soft skin.  With ``SKIN_WRITE`` the
 power is written as the shot's light (its ``lights``); its sky, lit by that lamp, must be fitted again after.  With
@@ -32,6 +34,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FILM = os.path.join(HERE, "..")
 LUMINANCE = np.array([0.2126, 0.7152, 0.0722])
 LOW, HIGH = 1.0 / 16.0, 2.0
+PLATEAU = 0.005
 
 
 def image(path):
@@ -115,9 +118,14 @@ def main():
     low, high = math.log(start * LOW), math.log(start * HIGH)
     if ratio(math.exp(low)) > 1.0:
         raise SystemExit(f"[skin] even at {math.exp(low):.4f} her skin is brighter than the reference's: the lamp is not what lights it")
+    brightest = ratio(math.exp(high))
+    goal = 1.0 if brightest > 1.0 else brightest - PLATEAU
+    if brightest <= 1.0:
+        print(f"[skin] at its strongest the lamp leaves her skin {brightest:.3f} of the reference's: the least power within "
+              f"{PLATEAU} of that", flush=True)
     for _round in range(spec.get("rounds", 7)):
         middle = 0.5 * (low + high)
-        if ratio(math.exp(middle)) > 1.0:
+        if ratio(math.exp(middle)) > goal:
             high = middle
         else:
             low = middle
