@@ -13,6 +13,7 @@ is pure data::
      "sky": {...},                                 (Kit.sky.sky_world; its "clouds": Kit.clouds)
      "items": [item, ...],
      "lights": [lamp, ...],
+     "probes": [{"name", "min": [x, y, z], "max": [x, y, z], "resolution": [nx, ny, nz]}, ...],
      "views": {"name": {"location", "target", "lens"}, ...}}   (free cameras of the set scene)
 
 An item is one object: ``name``, ``loc``, ``rot`` (degrees), ``scale`` and
@@ -34,6 +35,12 @@ names for materials.  A lamp is ``{"name", "light": "SUN" | "AREA" |
 and want a key of their own (a shot's ``lights``, from her skin:
 calibration/fit_skin.py) where the set's sun lights the set as its fits found
 it.  The set's sky is lit by the sun that lights the set (:func:`sky_sun`).
+A probe is a light probe volume over a box of the set (``resolution`` samples
+along each axis), baked once the set's items, lamps and sky are built: inside
+it the light of the sky and the lamps is what reaches each place -- an
+interior lit only through its walls; without one EEVEE lights every surface
+with the whole sky, and the storeys behind a tower's facade come out as light
+as its face.
 
 A shot (``shots/<id>.json``)::
 
@@ -360,6 +367,26 @@ def build_lamp(item, collection):
     return obj
 
 
+def build_probe(item, collection):
+    """A light probe volume between ``min`` and ``max``, ``resolution`` samples along each axis."""
+    data = bpy.data.lightprobes.new(item["name"], "VOLUME")
+    data.resolution_x, data.resolution_y, data.resolution_z = item["resolution"]
+    obj = bpy.data.objects.new(item["name"], data)
+    collection.objects.link(obj)
+    low, high = _vector(item["min"]), _vector(item["max"])
+    obj.location = (low + high) * 0.5
+    obj.scale = (high - low) * 0.5
+    return obj
+
+
+def bake_probes(scene, probes):
+    """Bake every probe of ``scene`` as it stands."""
+    for probe in probes:
+        with bpy.context.temp_override(scene=scene, active_object=probe, selected_objects=[probe], object=probe):
+            if bpy.ops.object.lightprobe_cache_bake(subset="ACTIVE") != {"FINISHED"}:
+                raise RuntimeError(f"light probe {probe.name} not baked")
+
+
 def set_materials(spec):
     """The set's material parameters and colours (its ``materials``) for every material built after."""
     M.PARAMS.clear()
@@ -460,6 +487,7 @@ def build_set(folder, set_name, film, args):
         build_item(item, collection, sun)
     lights = SC.collection(f"{set_name}.Lights", parent=collection)
     lamps = [build_lamp(lamp, lights) for lamp in spec.get("lights", [])]
+    bake_probes(scene, [build_probe(probe, collection) for probe in spec.get("probes", [])])
     cast_lit, cast_unlit = bpy.data.collections.new(f"{set_name}.Cast Lit"), bpy.data.collections.new(f"{set_name}.Cast Unlit")
     _link_cast_lighting(spec.get("lights", []), lamps, cast_lit, cast_unlit)
     for name, view in spec.get("views", {}).items():

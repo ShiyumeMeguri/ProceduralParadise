@@ -10,11 +10,13 @@
   "Above the breach storey the tower is its front frame alone (Tower Crown, storeys 19-26: columns, edge beams and braces, no floors, no mullions, roof 108.7 m up): from frame 116 on the reference shows sky through big braces over her, while the breach storey keeps its mullions and the floor over it (frames 76-92).",
   "What the breach throws into the air is shown only while Breakout looks at it (frames up to 206): the hand shot that cuts in at 207 shows clear sky and crows.",
   "Round her after the breach (the hand and flight shots, frames 200-379) a flock wheels close by (Crows Round: headings all round, 2-20 m from her), as the reference's crows cross the lens.",
-  "Inside the tower's frame below its crown stands its dark core (Tower Core, set 2.5 m back from the face): the reference sees a dark interior through the facade (frames 76-92), never the sky through the building.",
+  "Inside the tower's frame below its crown stands its dark core (Tower Core, from 16 m behind the face, before its last column line): the reference sees through the facade (frames 76-92) a deep dark storey -- its ceiling, beams and columns going back -- never the sky through the building.",
   "The bay she breaks out through (storey 18, between x -8.2 and 0.0) is left open in the tower and stands as a panel of its own (Breach Panel: its braces and mullions, inside ghosts of the tower's own column and beams) until the frame before she breaks it (95); its pieces are the Breach Debris.",
   "Before she breaks out the sill of the breach smokes: small grey puffs on the edge beam of its floor, 4-7 m from the camera, between x -5 and -1.8 (Ledge Dust, frames 68-100), where the reference's puffs on 76-94 lie on the facade's plane.",
   "What the breach throws is mostly shards and slabs of pale concrete and glass, a few chunks among them (Breach Debris, Falling Debris: color:debris 0.75, seven in ten flat, two thousand of them a hand across and smaller), as the reference's pieces glint grey against the sky; thrown fast and slowed by the air (Breach Debris: 14 m/s, a third of a second to slow), they streak out of the breach and hang round her, sinking slowly.",
-  "The sun lights the set (lighting: set); her own key (Key: the sun's direction and colour, lighting her alone) is as strong as each shot's reference shows her skin lit (the shots' lights, calibration/fit_skin.py): under the set's sun her toon-shaded skin clips white."
+  "The sun lights the set (lighting: set); her own key (Key: the sun's direction and colour, lighting her alone) is as strong as each shot's reference shows her skin lit (the shots' lights, calibration/fit_skin.py): under the set's sun her toon-shaded skin clips white.",
+  "The breach floor's edge is a steel I-beam (the tower's spandrel at level 18) standing at the front of the floor's edge, its outer flange 9 cm before the slab's: the reference's sill (frames 76-92) is the beam's flanges and web.",
+  "The storeys round the breach are lit through their walls (Breach Storeys, a light probe volume baked as the set is built): the reference sees them dark behind the facade, their ceilings and beams going back."
  ],
  "materials": {
   "CIN.Air.density": 0.0075,
@@ -160,7 +162,7 @@
       "width": 0.55,
       "depth": 0.3,
       "finish": "steel",
-      "offset": -0.18
+      "offset": 0.05
      },
      "brace_front": {
       "shape": "box",
@@ -766,7 +768,7 @@
    "inputs": {
     "Min": [
      -31.5,
-     2.5,
+     16.0,
      0.0
     ],
     "Max": [
@@ -1570,6 +1572,26 @@
     0.7
    ],
    "lighting": "cast"
+  }
+ ],
+ "probes": [
+  {
+   "name": "Breach Storeys",
+   "min": [
+    -24.0,
+    -1.0,
+    66.0
+   ],
+   "max": [
+    12.0,
+    17.0,
+    84.0
+   ],
+   "resolution": [
+    24,
+    12,
+    12
+   ]
   }
  ],
  "views": {
