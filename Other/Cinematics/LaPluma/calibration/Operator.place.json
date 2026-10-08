@@ -1,16 +1,16 @@
 {
  "notes": [
-  "Where the title shot's camera stands: close in front of her where the flight leaves her, beside the tower's open crown, its frame below to the left as the shot begins (frame 388) and up to the left behind her as the camera turns with her (frames 400-480), the camera rolled as the reference's horizon is (calibration: the tower's two boxes fitted to those regions, then refined)."
+  "Where the title shot's camera stands (place_fit.py): beside the tower's open crown as her flight leaves it, its frame below to the left as the shot begins (frame 384), up to the left behind her as the camera turns with her (400-420), a corner of it at 440 and then gone: from 460 on the reference shows only cloud round her, the camera rolled as its horizon is.  The tower is its lower block and its crown's front frame, as boxes."
  ],
  "location": [
-  -16.86,
-  -18.36,
-  88.14
+  -14.88,
+  -20.6,
+  88.61
  ],
  "look": [
-  0.680663,
-  0.453946,
-  0.575005
+  0.647508,
+  0.409338,
+  0.642788
  ],
- "roll": 56.7
+ "roll": 77.7
 }

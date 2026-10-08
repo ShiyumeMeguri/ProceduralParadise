@@ -1,0 +1,168 @@
+{
+ "notes": [
+  "The title card over her first second as the reference draws it: the block of her name and rarity (in front of her; its code line, emblems, name and the icon's blade too fine to read, keyed with it), the three yellow rules, the two shards, the band that sweeps in and fades out over the title as it comes (frame 385), OPERATOR (its last letters hatched, the stripes read off the reference) and the card under it.",
+  "Frames 380-425; each group found first where it stands whole in the picture, fitted in the order listed -- the big grey items -- the card, the band, then the title over them -- before the shards in their ink, or the shards would grow over them.",
+  "The card is shown 386-417 (gone on 418) and found first on 392, where both its ends show: its left end on 391-393, its right end clear of the title's O on 392-395 -- later it hides under the O, of its ink, and the left end is off the picture -- so its outline is fitted on 391-394 together."
+ ],
+ "groups": [
+  {
+   "items": [
+    "Info Strip",
+    "Info Box",
+    "Info Logo 1",
+    "Info Logo 2",
+    "Info Logo 3",
+    "Info Logo 4",
+    "Info Logo 5",
+    "Info Logo Stem",
+    "Info Arrow",
+    "Info Arrow Head",
+    "Name Tag",
+    "Name Icon"
+   ],
+   "riding": [
+    "Info Code",
+    "Info Emblems",
+    "Name",
+    "Name Icon Blade"
+   ],
+   "frames": [
+    381,
+    421
+   ],
+   "anchor": 396
+  },
+  {
+   "items": [
+    "Rule Right"
+   ],
+   "frames": [
+    383,
+    425
+   ],
+   "anchor": 400,
+   "shaped": [
+    "Height",
+    "Slant",
+    "Angle"
+   ]
+  },
+  {
+   "items": [
+    "Rule High"
+   ],
+   "frames": [
+    395,
+    425
+   ],
+   "anchor": 405,
+   "shaped": [
+    "Height",
+    "Slant",
+    "Angle"
+   ]
+  },
+  {
+   "items": [
+    "Rule Low"
+   ],
+   "frames": [
+    383,
+    425
+   ],
+   "anchor": 395,
+   "shaped": [
+    "Height",
+    "Slant",
+    "Angle"
+   ]
+  },
+  {
+   "items": [
+    "Band"
+   ],
+   "frames": [
+    386,
+    417
+   ],
+   "anchor": 392,
+   "shaped": [
+    "Width",
+    "Height",
+    "Slant",
+    "Round",
+    "Angle"
+   ],
+   "shaped_on": [
+    391,
+    392,
+    393,
+    394
+   ]
+  },
+  {
+   "items": [
+    "Band Sweep"
+   ],
+   "frames": [
+    380,
+    385
+   ],
+   "anchor": 383,
+   "shaped": [
+    "Height",
+    "Angle"
+   ]
+  },
+  {
+   "items": [
+    "Word",
+    "Word Hatched"
+   ],
+   "frames": [
+    385,
+    421
+   ],
+   "anchor": 403,
+   "sized": true,
+   "hatch": [
+    403,
+    1680,
+    250,
+    1850,
+    380
+   ]
+  },
+  {
+   "items": [
+    "Shard High"
+   ],
+   "frames": [
+    388,
+    419
+   ],
+   "anchor": 400,
+   "shaped": [
+    "Corners"
+   ]
+  },
+  {
+   "items": [
+    "Shard Low"
+   ],
+   "frames": [
+    388,
+    422
+   ],
+   "anchor": 400,
+   "shaped": [
+    "Corners"
+   ]
+  }
+ ],
+ "replaces": [
+  "Word Late",
+  "Word Hatched Late",
+  "Rule Low Leaving"
+ ]
+}
