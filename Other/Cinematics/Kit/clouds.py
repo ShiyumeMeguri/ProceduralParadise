@@ -18,15 +18,18 @@ sphere ends it), its edges eaten into billows ``billow`` metres across (``erode`
 per metre at its thickest.  A sky whose clouds were measured on its picture (``map``: a file
 of the film, ``calibration/cloud_map.py``) gathers them by its measure where it has one --
 each cell's share of cloud standing in for the weather over the cell, a flat deck's cells
-laid over the ground, a shell's by direction from its middle -- and by the broad pattern
-beyond it.
+laid over the ground, a shell's by direction from its middle; the map of each stretch of the
+shot blended into the next's as the film plays (an AI picture's clouds swell and drift from
+second to second) -- and by the broad pattern beyond it.
 
 It glows with the light it scatters, worked out in its own shading rather than by the
 renderer, whose froxels -- tens of metres deep a kilometre out -- cannot hold the sunlit skin
 of a cloud.  The sun (the set's SUN lamp: its direction, power and colour) reaches a point
 through the cloud sampled at the ``light_steps`` towards it (shuffled sample by sample), in
-three octaves of ever fainter, ever further-reaching and ever less forward light (what a cloud
-scatters on many times over), seen through a phase mixing a forward lobe (``forward``) with a
+``octaves`` octaves of ever fainter (each half the last), ever further-reaching (each ``reach`` as
+deep) and ever less forward light (what a cloud scatters on many times over: three octaves each
+reaching twice as deep left a thick cloud's body all but black under a side sun, its thin edges
+alone lit), seen through a phase mixing a forward lobe (``forward``) with a
 share ``back_share`` of a backward one (``backward``) and scattered in the ``color`` of the
 cloud; the sky fills its shade with its own light -- its colour between the horizon's and the
 zenith's (:data:`SKYLIGHT` of the way up), as strong as the sky shines -- the share
@@ -41,6 +44,7 @@ import math
 import bpy
 import numpy as np
 
+from Core import anim
 from Core import shaders as S
 from Core.gn import GN, asset
 from Core.nodes import Tree
@@ -48,8 +52,8 @@ from .. import PALETTE
 
 CLOUDS = {"cell": 2500.0, "lump": 450.0, "stretch": 1.6, "threshold": 0.57, "climb": 0.12, "gather": 0.6, "soft": 0.06,
           "billow": 110.0, "erode": 0.6, "density": 0.04, "light_steps": [20.0, 50.0, 120.0, 300.0], "forward": 0.6,
-          "backward": 0.3, "back_share": 0.3, "color": list(PALETTE["cloud"]), "shade_low": 0.25, "shade_high": 0.6}
-OCTAVES = 3
+          "backward": 0.3, "back_share": 0.3, "color": list(PALETTE["cloud"]), "shade_low": 0.25, "shade_high": 0.6,
+          "octaves": 6, "reach": 0.5}
 SKYLIGHT = 0.6
 
 
@@ -63,13 +67,16 @@ def deck():
 
 
 def coverage_image(name, coverage):
-    """The measured ``coverage`` (a cloud map) as the image ``name``: red its cells' share of cloud, green whether the
-    cell was measured; packed, so a saved film keeps it."""
-    rows = np.array([[np.nan if value is None else value / 100.0 for value in row] for row in coverage["shares"]], np.float32)
-    height, width = rows.shape
+    """The measured ``coverage`` (a cloud map: a map a stretch of the shot) as the image ``name``: the maps one above
+    another, each a row taller at either end (its edge again: a map's edge is not blended with the next map's), red a
+    cell's share of cloud, green whether the cell was measured; packed, so a saved film keeps it."""
+    maps = [np.array([[np.nan if value is None else value / 100.0 for value in row] for row in shares], np.float32)
+            for shares in coverage["shares"]]
+    stacked = np.concatenate([np.concatenate([measured[:1], measured, measured[-1:]]) for measured in maps])
+    height, width = stacked.shape
     pixels = np.zeros((height, width, 4), np.float32)
-    pixels[..., 0] = np.nan_to_num(rows)
-    pixels[..., 1] = ~np.isnan(rows)
+    pixels[..., 0] = np.nan_to_num(stacked)
+    pixels[..., 1] = ~np.isnan(stacked)
     pixels[..., 3] = 1.0
     image = bpy.data.images.get(name)
     if image is not None:
@@ -83,18 +90,30 @@ def coverage_image(name, coverage):
 
 def _weather(tree: Tree, spec, x, y, coverage, direction):
     """How much the weather gathers cloud over (``x``, ``y``): the broad pattern, or the measured share where measured
-    (a shell's map read by the ``direction`` from its middle)."""
+    (a shell's map read by the ``direction`` from its middle), the maps of the two stretches the ``frame`` lies between
+    blended."""
     weather = tree.n("ShaderNodeTexNoise", Vector=tree.vec(x, y, 0.0), Scale=1.0 / spec["cell"], Detail=1.0, Roughness=0.5,
                      props={"noise_dimensions": "2D"})["Fac"]
     if coverage is None:
         return weather
-    image, box = coverage
+    image, box, times, rows, frame = coverage
     if direction is not None:
         east, north, up = tree.sep(direction)
         x = tree.math("ARCTAN2", north, east) * (180.0 / math.pi)
         y = tree.math("ARCSINE", tree.math("MAXIMUM", tree.math("MINIMUM", up, 1.0), -1.0)) * (180.0 / math.pi)
-    place = tree.vec((x - box[0]) / (box[2] - box[0]), (y - box[1]) / (box[3] - box[1]), 0.0)
-    measured = tree.n("ShaderNodeTexImage", Vector=place, props={"image": image, "interpolation": "Linear", "extension": "CLIP"})["Color"]
+    across, upward = (x - box[0]) / (box[2] - box[0]), (y - box[1]) / (box[3] - box[1])
+    count, band = len(times), rows + 2
+
+    def read(stretch):
+        upward_in_band = (stretch * float(band) + 1.0 + upward * float(rows)) * (1.0 / (count * band))
+        return tree.n("ShaderNodeTexImage", Vector=tree.vec(across, upward_in_band, 0.0),
+                      props={"image": image, "interpolation": "Linear", "extension": "CLIP"})["Color"]
+    if count == 1:
+        measured = read(0.0)
+    else:
+        along = tree.min(tree.max((frame - times[0]) * ((count - 1) / (times[-1] - times[0])), 0.0), count - 1.0)
+        stretch = tree.min(tree.floor(along), count - 2.0)
+        measured = tree.mix(along - stretch, read(stretch), read(stretch + 1.0), "RGBA")
     share, known, _ = tree.sep(measured)
     return tree.mix(known, weather, share)
 
@@ -155,13 +174,19 @@ def cloud_material(name, clouds, sun, sky, measured=None):
         raise ValueError(f"{name}: a cloud map is named and handed over together")
     if measured is not None and ("shell" in clouds) != ("centre" in measured):
         raise ValueError(f"{name}: a shell's map is read by direction (a map with a centre), a flat deck's over the ground")
-    coverage = (coverage_image(f"{name}.Map", measured), measured["box"]) if measured is not None else None
+    if measured is not None and (len(measured["times"]) != len(measured["shares"]) or len({len(shares) for shares in measured["shares"]}) != 1):
+        raise ValueError(f"{name}: a cloud map has a map of the same cells for each of its times")
     spec = {**CLOUDS, **clouds}
     length = math.sqrt(sum(component * component for component in sun["direction"]))
     toward = tuple(component / length for component in sun["direction"])
     sunlight = tuple(sun["power"] * channel * albedo for channel, albedo in zip(sun.get("color", (1.0, 1.0, 1.0)), spec["color"]))
 
     def build(tree: Tree):
+        coverage = None
+        if measured is not None:
+            clock = tree.n("ShaderNodeValue")
+            anim.key_seconds(clock.n.outputs[0], "default_value", clock.n.outputs[0].id_data, 1.0)
+            coverage = (coverage_image(f"{name}.Map", measured), measured["box"], measured["times"], len(measured["shares"][0]), clock.o)
         geometry = tree.n("ShaderNodeNewGeometry")
         position, incoming = geometry["Position"], geometry["Incoming"]
         sigma = spec["density"]
@@ -172,11 +197,11 @@ def cloud_material(name, clouds, sun, sky, measured=None):
             travelled += step
         cosine = tree.vmath("DOT_PRODUCT", incoming, tuple(-component for component in toward))
         lit = 0.0
-        for octave in range(OCTAVES):
+        for octave in range(int(spec["octaves"])):
             fading = 0.5 ** octave
             phase = tree.mix(spec["back_share"], _phase(tree, cosine, spec["forward"] * fading),
                              _phase(tree, cosine, -spec["backward"] * fading))
-            lit = lit + tree.math("EXPONENT", depth * (-sigma * fading)) * phase * fading
+            lit = lit + tree.math("EXPONENT", depth * (-sigma * spec["reach"] ** octave)) * phase * fading
         height = _height(tree, spec, tree.n("ShaderNodeTexCoord")["Object"])
         shade = tree.vec(*skylight(sky)) * tree.mix(height, spec["shade_low"], spec["shade_high"])
         extinction = _density(tree, spec, position, coverage) * sigma

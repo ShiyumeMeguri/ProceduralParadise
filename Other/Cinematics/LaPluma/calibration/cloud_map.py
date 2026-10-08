@@ -2,19 +2,28 @@
 Where a shot's reference shows cloud, as a map over the floor of its sky's cloud deck (the clouds' ``map``).
 
     blender -b --factory-startup -P cloud_map.py -- <frames dir> <shot> <out.json> [<masks dir> ...]
-            [--every 3] [--block 4] [--cell 20] [--degrees 1] [--above 100] [--darkest 55] [--margin 2] [--least 12]
+            [--every 3] [--range first,last] [--windows 1] [--block 4] [--cell 20] [--degrees 1] [--above 100]
+            [--darkest 55] [--margin 2] [--least 12]
 
 The shot's camera -- built by the film's own builder from its keys and place -- looks at the reference frame by
-frame (every ``every`` frames, ``<frames dir>/f####.png``) in blocks of ``block`` pixels; what of it shows sky is
+frame (every ``every`` frames of the shot, or of its ``range``: a title's grey card reads as cloud over the frames it
+stands on; ``<frames dir>/f####.png``) in blocks of ``block`` pixels; what of it shows sky is
 :mod:`sky_reads`'.  A sky block reads as cloud by how little colour it has: its saturation between the shot's blue
 (the 85th percentile of every sky block's) and its cloud (the 10th) gives its share of cloud.  Its ray from the
 camera meets the plane ``above`` metres over the floor of the shot's cloud deck (its sky's ``clouds``) at a point of
 the map, if within the deck; every cell of the map (``cell`` metres) keeps the mean share of the rays that met it,
 over the smallest neighbourhood (up to 16 cells round) that ``least`` rays met -- far off, where the rays thin out,
-a cell is read wider -- and cells further from every ray stay empty.  The map covers the box the rays met:
+a cell is read wider -- and cells further from every ray stay empty.  The map covers the box the rays met.
+
+An AI picture's clouds are not still: they swell and drift from second to second (two frames of the title shot 20
+apart, as the solved camera sees them, correlate 0.4-0.6 where a still sky is over 0.9, and a small turn of the camera
+mends little), and one map of the whole shot averages them into mush.  So the frames are read in ``windows`` stretches
+of equal length, each its own map over the same cells -- filled, where its rays did not look, from the map of all the
+frames -- kept at the stretch's middle frame (``times``); the cloud material blends the two maps whose times the frame
+lies between:
 
     {"plane": metres up, "cell": metres, "box": [x0, y0, x1, y1], "frames": [first, last, every],
-     "shares": [[percent or null, ...], ...]}   (rows from y0 upwards, columns from x0)
+     "times": [frame, ...], "shares": [[[percent or null, ...], ...], ...]}   (a map a time: rows from y0 upwards, columns from x0)
 
 A deck that is a shell (its ``shell``, :mod:`Kit.clouds`) is mapped by direction instead: where a block's ray (made
 unit: the camera's rays reach a depth of one across the picture's breadth, and unnormalised a corner's met the sphere
@@ -43,6 +52,8 @@ def _arguments():
     parser.add_argument("out")
     parser.add_argument("masks", nargs="*")
     parser.add_argument("--every", type=int, default=3)
+    parser.add_argument("--range", default=None)
+    parser.add_argument("--windows", type=int, default=1)
     parser.add_argument("--block", type=int, default=4)
     parser.add_argument("--cell", type=float, default=20.0)
     parser.add_argument("--degrees", type=float, default=1.0)
@@ -82,7 +93,9 @@ def main():
     plane = middle[2] - reach[2] + args.above
     radius = reach[0] * (shell + 1.0) / 2.0 if shell is not None else None
     cell = args.degrees if shell is not None else args.cell
-    first, last = reads.shot["frames"]
+    first, last = reads.shot["frames"] if args.range is None else [int(value) for value in args.range.split(",")]
+    if not reads.shot["frames"][0] <= first <= last <= reads.shot["frames"][1]:
+        raise ValueError(f"range {first},{last} is not within the shot's frames {reads.shot['frames']}")
     found = []
     for frame in range(first, last + 1, args.every):
         colour, blocked = reads.read(args.frames, args.masks, frame)
@@ -105,29 +118,42 @@ def main():
             within = np.all(np.abs(hits - middle[:2]) < reach[:2], axis=-1)
             keep = climbing & within & ~blocked
         keep &= ~reads.hidden_by_set(origin, rays, keep, distance)
-        found.append((hits[keep], saturation[keep]))
+        found.append((frame, hits[keep], saturation[keep]))
         print(f"[cloud map] {args.shot} {frame}: {int(keep.sum())} sky blocks of {keep.size}", flush=True)
-    every_saturation = np.concatenate([saturation for _, saturation in found])
+    every_saturation = np.concatenate([saturation for _, _, saturation in found])
     blue, cloud = np.percentile(every_saturation, 85), np.percentile(every_saturation, 10)
-    points = np.concatenate([hits for hits, _ in found])
-    shares = np.concatenate([np.clip((blue - saturation) / max(blue - cloud, 1e-6), 0.0, 1.0) for _, saturation in found])
+    points = np.concatenate([hits for _, hits, _ in found])
     low = np.floor(points.min(axis=0) / cell) * cell
     high = np.ceil(points.max(axis=0) / cell) * cell
     cells = np.round((high - low) / cell).astype(int)
-    index = np.clip(((points - low) / cell).astype(int), 0, cells - 1)
-    total = np.zeros((cells[1], cells[0]))
-    count = np.zeros((cells[1], cells[0]))
-    np.add.at(total, (index[:, 1], index[:, 0]), shares)
-    np.add.at(count, (index[:, 1], index[:, 0]), 1.0)
-    mean = _filled(total, count, args.least)
-    rows = [[None if np.isnan(value) else int(round(value * 100.0)) for value in row] for row in mean]
+
+    def mapped(reads_of):
+        total = np.zeros((cells[1], cells[0]))
+        count = np.zeros((cells[1], cells[0]))
+        for _frame, hits, saturation in reads_of:
+            index = np.clip(((hits - low) / cell).astype(int), 0, cells - 1)
+            np.add.at(total, (index[:, 1], index[:, 0]), np.clip((blue - saturation) / max(blue - cloud, 1e-6), 0.0, 1.0))
+            np.add.at(count, (index[:, 1], index[:, 0]), 1.0)
+        return _filled(total, count, args.least), count
+
+    whole, count = mapped(found)
+    span = (last - first + 1) / args.windows
+    maps, times = [], []
+    for window in range(args.windows):
+        start, end = first + window * span, first + (window + 1) * span
+        own, _ = mapped([read for read in found if start <= read[0] < end])
+        maps.append(np.where(np.isnan(own), whole, own))
+        times.append(round((start + end - 1.0) / 2.0, 2))
+    shares = [[[None if np.isnan(value) else int(round(value * 100.0)) for value in row] for row in mean] for mean in maps]
     placed = {"centre": [float(value) for value in middle], "radius": float(radius)} if shell is not None else {"plane": plane}
     result = {**placed, "cell": cell, "box": [float(low[0]), float(low[1]), float(high[0]), float(high[1])],
-              "frames": [first, last, args.every], "blue": round(float(blue), 3), "cloud": round(float(cloud), 3), "shares": rows}
+              "frames": [first, last, args.every], "blue": round(float(blue), 3), "cloud": round(float(cloud), 3), "times": times,
+              "shares": shares}
     with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(result, separators=(",", ":")) + "\n")
-    print(f"[cloud map] {args.shot}: {cells[0]} x {cells[1]} cells over {result['box']}, blue {blue:.2f} cloud {cloud:.2f}, "
-          f"{int((count > 0).sum())} cells read, mean share {np.nanmean(mean):.2f} -> {args.out}", flush=True)
+    print(f"[cloud map] {args.shot}: {cells[0]} x {cells[1]} cells over {result['box']} in {args.windows} stretches {times}, blue "
+          f"{blue:.2f} cloud {cloud:.2f}, {int((count > 0).sum())} cells read, mean share {np.nanmean(whole):.2f} -> {args.out}",
+          flush=True)
 
 
 if __name__ == "__main__":

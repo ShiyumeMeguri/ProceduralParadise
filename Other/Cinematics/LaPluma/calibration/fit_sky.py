@@ -13,7 +13,8 @@ blocks too left out, and the picture's ``exclude`` boxes: what the sky alone can
 The parameters (:data:`PARAMETERS`: the zenith's and the horizon's colours, the sky's
 strength; the clouds' shade below and on top, their whiteness -- no less than half the palette's: a cloud is white
 --, density, softness, threshold, gathering, height (a flat deck's top over its floor, a shell's thickness), thinning
-with height, billows, erosion and how much they throw forwards) are turned one after another (:func:`picture_fit.descend`).  The light the fitted sky sheds on the set (its
+with height, billows, erosion, how much they throw forwards and how deep their many-times-scattered light reaches) are
+turned one after another (:func:`picture_fit.descend`).  The light the fitted sky sheds on the set (its
 ``ambient``) is then measured: the mean scene-linear colour of its sky blocks, rendered unmapped, over the frames -- the
 sky as the set sees it, clouds and all.  With ``write`` the best and the ambient are written into the shot's sky.
 """
@@ -40,7 +41,8 @@ PARAMETERS = [(("zenith", 0), 0.02, 0.0), (("zenith", 1), 0.03, 0.0), (("zenith"
               (("clouds.shade_low", None), 0.1, 0.0), (("clouds.shade_high", None), 0.1, 0.0), (("clouds.whiteness", None), 0.15, 0.5),
               (("clouds.density", None), 0.01, 0.002), (("clouds.soft", None), 0.03, 0.01), (("clouds.threshold", None), 0.03, 0.0),
               (("clouds.gather", None), 0.15, 0.0), (("clouds.height", None), 80.0, 60.0), (("clouds.climb", None), 0.05, 0.0),
-              (("clouds.billow", None), 30.0, 10.0), (("clouds.erode", None), 0.1, 0.0), (("clouds.forward", None), 0.1, 0.0)]
+              (("clouds.billow", None), 30.0, 10.0), (("clouds.erode", None), 0.1, 0.0), (("clouds.forward", None), 0.1, 0.0),
+              (("clouds.reach", None), 0.05, 0.05)]
 
 
 def _arguments():
