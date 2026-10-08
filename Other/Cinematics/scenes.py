@@ -141,6 +141,7 @@ __all__ = ["build_film", "load_scene", "build_scene"]
 
 OVERLAY_DISTANCE = 0.1
 OVERLAY_LAYER = 0.0004
+SPEC_NAME = "spec_name"
 
 
 def load_scene(folder):
@@ -298,11 +299,17 @@ def _key_over(data, path, value, first, last):
                 point.interpolation = "CONSTANT"
 
 
+def set_object(set_collection, name):
+    """The object of ``set_collection`` its spec names ``name`` (Blender gives another name to one whose name an
+    object of another set already holds), or None."""
+    return next((obj for obj in set_collection.all_objects if obj.get(SPEC_NAME) == name), None)
+
+
 def light_set_lamps(shot, set_collection):
     """Key the set's lamps the shot's ``lights`` change over its frames (see the module notes)."""
     first, last = shot["frames"]
     for name, change in shot.get("lights", {}).items():
-        obj = set_collection.all_objects.get(name)
+        obj = set_object(set_collection, name)
         if obj is None or obj.type != "LIGHT":
             raise KeyError(f"shot {shot['id']} lights '{name}', which its set has no lamp of")
         if "power" in change:
@@ -318,7 +325,7 @@ def hide_set_items(shot, set_collection):
     """Leave the set items the shot's ``hidden`` names out of its frames (see the module notes)."""
     first, last = shot["frames"]
     for name in shot.get("hidden", []):
-        obj = set_collection.all_objects.get(name)
+        obj = set_object(set_collection, name)
         if obj is None:
             raise KeyError(f"shot {shot['id']} hides '{name}', which its set has no item of")
         _hide_over(obj, first, last)
@@ -326,6 +333,7 @@ def hide_set_items(shot, set_collection):
 
 def build_item(item, collection, sun=None):
     obj = _build_item(item, collection)
+    obj[SPEC_NAME] = item["name"]
     if sun is not None:
         _face_sun(obj, item, sun)
     if "shown" in item:
@@ -366,6 +374,7 @@ def build_lamp(item, collection):
         data.shape = item.get("shape", "RECTANGLE")
         data.size, data.size_y = item["size"]
     obj = bpy.data.objects.new(item["name"], data)
+    obj[SPEC_NAME] = item["name"]
     collection.objects.link(obj)
     obj.location = _vector(item.get("loc"))
     if "direction" in item:
@@ -378,6 +387,7 @@ def build_probe(item, collection):
     data = bpy.data.lightprobes.new(item["name"], "VOLUME")
     data.resolution_x, data.resolution_y, data.resolution_z = item["resolution"]
     obj = bpy.data.objects.new(item["name"], data)
+    obj[SPEC_NAME] = item["name"]
     collection.objects.link(obj)
     low, high = _vector(item["min"]), _vector(item["max"])
     obj.location = (low + high) * 0.5

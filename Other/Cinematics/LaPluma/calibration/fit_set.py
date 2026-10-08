@@ -169,7 +169,7 @@ class Fit:
             RND.compositor(state["look"])
             self.look = copy.deepcopy(state["look"])
         for name, inputs in state["items"].items():
-            SCN.set_item_inputs(self.reads.set_collection.all_objects[name], inputs)
+            SCN.set_item_inputs(SCN.set_object(self.reads.set_collection, name), inputs)
         for lamp in SCN.set_lamps(state["lights"]):
             data = self.lamps[lamp["name"]].data
             shown = {**lamp, **self.changes.get(lamp["name"], {})}
