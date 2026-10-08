@@ -16,10 +16,11 @@ a cell is read wider -- and cells further from every ray stay empty.  The map co
     {"plane": metres up, "cell": metres, "box": [x0, y0, x1, y1], "frames": [first, last, every],
      "shares": [[percent or null, ...], ...]}   (rows from y0 upwards, columns from x0)
 
-A deck that is a shell (its ``shell``, :mod:`Kit.clouds`) is mapped by direction instead: where a block's ray meets the
-sphere half way through the shell, as an azimuth (degrees from east towards north) and elevation from its middle, in
-cells of ``degrees`` -- laid on a plane, the sky of a camera turning where it stands streaks out wherever its rays run
-low:
+A deck that is a shell (its ``shell``, :mod:`Kit.clouds`) is mapped by direction instead: where a block's ray (made
+unit: the camera's rays reach a depth of one across the picture's breadth, and unnormalised a corner's met the sphere
+past it and read as straight up) meets the sphere half way through the shell, as an azimuth (degrees from east towards
+north) and elevation from its middle, in cells of ``degrees`` -- laid on a plane, the sky of a camera turning where it
+stands streaks out wherever its rays run low:
 
     {"centre": [x, y, z], "radius": metres, "cell": degrees, "box": [azimuth0, elevation0, azimuth1, elevation1], ...}
 """
@@ -89,6 +90,7 @@ def main():
         saturation = (brightest - dullest) / np.maximum(brightest, 1.0)
         origin, rays = reads.rays(frame)
         if shell is not None:
+            rays = rays / np.linalg.norm(rays, axis=-1, keepdims=True)
             offset = origin - middle
             along = rays @ offset
             distance = -along + np.sqrt(np.maximum(along * along - (offset @ offset - radius * radius), 0.0))

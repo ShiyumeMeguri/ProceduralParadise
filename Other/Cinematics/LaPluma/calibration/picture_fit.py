@@ -11,7 +11,9 @@ clouds cannot stand exactly where the picture's do is drawn grey to spare them u
 plus how much detail it has (:func:`detail`: the energy of its lightness's bands at :data:`TEXTURE_SCALES` blocks
 where the band's whole reach is fitted, the absolute log of each band's ratio to the reference's summed) times
 ``texture`` (a sky of small torn cloudlets and one of big soft clouds blur to the same blocks).  Parameters are turned
-one after another (:func:`descend`), each to the better of a step either way, the steps halving round by round.
+one after another (:func:`descend`), each a step the better way and on that way while it keeps getting better (up to
+:data:`REACH` steps: a step a round, the steps halving round by round, no value could move more than two of its steps
+in all, and a sky a tenth too sparse stayed so).
 """
 import numpy as np
 
@@ -20,6 +22,7 @@ QUANTILES = [10, 30, 50, 70, 90]
 TEXTURE_SCALES = [1.0, 2.0, 4.0]
 TEXTURE_REACH = 0.9
 TEXTURE_FLOOR = 0.05
+REACH = 8
 
 
 def lab(rgb):
@@ -90,7 +93,8 @@ class Measure:
 def descend(state, parameters, score, rounds, read, changed, log):
     """Coordinate descent from ``state`` (each value raised to its lowest first): ``parameters`` [(key, step, lowest)],
     ``score(state)`` -> (value, parts), ``read(state, key)`` the value, ``changed(state, key, value)`` a new state.
-    Returns the best state and score."""
+    Each parameter is stepped either way and, the better way found, on that way while it keeps getting better (up to
+    :data:`REACH` steps), the steps halving round by round.  Returns the best state and score."""
     for key, _step, lowest in parameters:
         if read(state, key) < lowest:
             state = changed(state, key, lowest)
@@ -99,13 +103,19 @@ def descend(state, parameters, score, rounds, read, changed, log):
     for round_index in range(rounds):
         for key, step, lowest in parameters:
             step = step * 0.5 ** round_index
-            current = read(state, key)
-            for candidate in (current - step, current + step):
-                candidate = max(candidate, lowest)
-                trial = changed(state, key, candidate)
-                value, trial_parts = score(trial)
-                if value < best - 1e-4:
-                    best, state, parts = value, trial, trial_parts
+            for direction in (-1.0, 1.0):
+                moved = False
+                for _ in range(REACH):
+                    current = read(state, key)
+                    candidate = max(current + direction * step, lowest)
+                    if candidate == current:
+                        break
+                    trial = changed(state, key, candidate)
+                    value, trial_parts = score(trial)
+                    if value >= best - 1e-4:
+                        break
+                    best, state, parts, moved = value, trial, trial_parts, True
                     log(f"round {round_index} {key} -> {candidate:.4f}: {best:.3f} {[round(part, 2) for part in parts]}")
+                if moved:
                     break
     return state, best
