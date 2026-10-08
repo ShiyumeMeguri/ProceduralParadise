@@ -25,8 +25,10 @@ density-metres the dust's material dims the sun's and the sky's light by.
 in ``Drag`` seconds), falling under ``Gravity`` (to no faster than gravity times the drag) and
 turning about axes of their own at up to ``Spin`` turns a second.  Sizes run from ``Size`` down by the
 power ``Size Power`` of a draw (a few large pieces, many small ones); a share ``Flat`` of them
-are slabs and shards, the rest chunks.  Every piece carries a draw of its own (``variant``)
-for its shading.
+are slabs and shards, the rest chunks.  A share ``Girders`` of all the pieces are broken girders
+instead -- lengths of the tower's I-section in its steel paint (``Girder Material``), between half
+``Girder Size`` and ``Girder Size`` deep (a girder is never a crumb) and ``Girder Length`` times as
+long as deep.  Every piece carries a draw of its own (``variant``) for its shading.
 """
 from __future__ import annotations
 
@@ -35,6 +37,7 @@ import math
 from Core.gn import GN, asset
 from Core.nodes import Node
 from . import materials as M
+from .structure import i_section
 
 CHUNKS = 6
 PLATES = 3
@@ -42,7 +45,8 @@ SWELL = 1.0
 SHADE_STEPS = [0.06, 0.12, 0.24, 0.48, 0.96, 1.92]
 SEEDS = {"leave": 1.0, "x": 2.0, "y": 3.0, "z": 4.0, "aim x": 5.0, "aim y": 6.0, "aim z": 7.0, "speed": 8.0, "radius": 9.0,
          "turn": 10.0, "spin": 11.0, "size": 12.0, "flat": 13.0, "shape": 14.0, "variant": 15.0, "axis x": 16.0,
-         "axis y": 17.0, "axis z": 18.0, "pattern x": 19.0, "pattern y": 20.0, "pattern z": 21.0}
+         "axis y": 17.0, "axis z": 18.0, "pattern x": 19.0, "pattern y": 20.0, "pattern z": 21.0, "girder": 22.0,
+         "girder size": 23.0}
 
 
 def _draws(graph, seed, salt):
@@ -188,10 +192,14 @@ def debris():
     size = graph.inp("Size", default=0.6, min=0.0, subtype="DISTANCE")
     size_power = graph.inp("Size Power", default=3.0, min=0.1, desc="Above 1: many small pieces, few large ones")
     flat = graph.inp("Flat", default=0.35, min=0.0, max=1.0, desc="Share of slabs and shards")
+    girders = graph.inp("Girders", default=0.0, min=0.0, max=1.0, desc="Share of broken girders")
+    girder_size = graph.inp("Girder Size", default=0.4, min=0.0, subtype="DISTANCE", desc="The deepest girder's depth")
+    girder_length = graph.inp("Girder Length", default=5.0, min=1.0, desc="A girder's length over its depth")
     start = graph.inp("Start", default=0.0)
     burst = graph.inp("Burst", default=4.0, min=0.0, desc="Frames over which the pieces leave")
     fps = graph.inp("FPS", default=30.0, min=1.0)
     material = graph.inp("Material", "MATERIAL", default=M.get("CIN.Debris"))
+    girder_material = graph.inp("Girder Material", "MATERIAL", default=M.get("CIN.SteelPaint"))
     draw = _draws(graph, seed, 61)
     leave = start + draw("leave") * burst
     age = graph.max((graph.scene_frame() - leave) * (1.0 / fps), 0.0)
@@ -202,15 +210,18 @@ def debris():
     pieces = graph.set_pos(pieces, pos=place)
     pieces = graph.store(pieces, "variant", draw("variant"))
     pieces = graph.delete(pieces, graph.compare(graph.scene_frame(), leave, "LESS_THAN"))
+    girder = graph.transform(i_section(graph, 0.18, 0.12), s=graph.vec(1.0, 0.65, girder_length))
     shapes = [graph.mat(shape, material) for shape in
               [_chunk(graph, k / CHUNKS) for k in range(CHUNKS)] + [_plate(graph, k / PLATES) for k in range(PLATES)]]
+    shapes.append(graph.mat(girder, girder_material))
     library = graph.n("GeometryNodeGeometryToInstance", Geometry=list(reversed(shapes))).o
     is_flat = graph.compare(draw("flat"), flat, "LESS_THAN")
+    is_girder = graph.compare(draw("girder"), girders, "LESS_THAN")
     chunk = graph.to_int(draw("shape") * CHUNKS, "FLOOR")
     plate = CHUNKS + graph.to_int(draw("shape") * PLATES, "FLOOR")
-    shape = graph.switch(is_flat, chunk, plate, "INT")
+    shape = graph.switch(is_girder, graph.switch(is_flat, chunk, plate, "INT"), CHUNKS + PLATES, "INT")
     axis = graph.vec(draw("axis x", -1.0, 1.0), draw("axis y", -1.0, 1.0), draw("axis z", -1.0, 1.0)).normalized()
     tumble = graph.axis_angle(axis, draw("turn") * (2.0 * math.pi) + draw("spin", -1.0, 1.0) * spin * (2.0 * math.pi) * age)
-    scale = size * (draw("size") ** size_power)
+    scale = graph.switch(is_girder, size * (draw("size") ** size_power), girder_size * draw("girder size", 0.5, 1.0), "FLOAT")
     graph.result(graph.iop(pieces, library, rot=tumble, scale=graph.vec(scale, scale, scale), pick=True, index=shape))
     return graph

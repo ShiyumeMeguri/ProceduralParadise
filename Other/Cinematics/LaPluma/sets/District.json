@@ -16,16 +16,17 @@
   "What the breach throws is mostly shards and slabs of pale concrete and glass, a few chunks among them (Breach Debris, Falling Debris: color:debris 0.75, seven in ten flat, two thousand of them a hand across and smaller), as the reference's pieces glint grey against the sky; thrown fast and slowed by the air (Breach Debris: 14 m/s, a third of a second to slow), they streak out of the breach and hang round her, sinking slowly.",
   "The sun lights the set (lighting: set); her own key (Key: the sun's direction and colour, lighting her alone) is as strong as each shot's reference shows her skin lit (the shots' lights, calibration/fit_skin.py): under the set's sun her toon-shaded skin clips white.",
   "The breach floor's edge is a steel I-beam (the tower's spandrel at level 18) standing at the front of the floor's edge, its outer flange 9 cm before the slab's: the reference's sill (frames 76-92) is the beam's flanges and web.",
-  "The storeys round the breach are lit through their walls (Breach Storeys, a light probe volume baked as the set is built): the reference sees them dark behind the facade, their ceilings and beams going back."
+  "The storeys round the breach are lit through their walls (Breach Storeys, a light probe volume baked as the set is built): the reference sees them dark behind the facade, their ceilings and beams going back.",
+  "The breach throws broken girders among its chunks and slabs (Breach and Falling Debris: Girders, lengths of the tower's I-section a few metres long): the reference's foreground tumbles with them as she bursts out (99-114)."
  ],
  "materials": {
   "CIN.Air.density": 0.0075,
   "CIN.Air.height": 60.0,
   "CIN.Dust.density": 2.0,
   "color:interior": [
-   0.07250000000000001,
-   0.0435,
-   0.0375
+   0.32,
+   0.15850000000000003,
+   0.024999999999999994
   ],
   "color:dust": [
    0.515,
@@ -39,33 +40,33 @@
    0.78
   ],
   "color:steel_paint": [
-   0.51375,
-   0.62375,
+   0.6887500000000002,
+   0.6737500000000001,
    0.63375
   ],
   "color:steel_grime": [
-   0.43375,
-   0.36874999999999997,
-   0.45375
+   0.6837500000000002,
+   0.25625,
+   0.40375
   ],
   "color:concrete": [
-   0.47375,
+   0.42375,
    0.515,
    0.59375
   ],
   "color:concrete_grime": [
-   0.19624999999999998,
-   0.36874999999999997,
-   0.40375
+   0.30874999999999997,
+   0.39999999999999997,
+   0.4725
   ],
   "color:glass": [
    0.86,
    0.9,
-   0.9075000000000001
+   0.8950000000000001
   ],
-  "CIN.SteelPaint.roughness": 0.6475000000000001,
-  "CIN.Concrete.roughness": 0.7050000000000001,
-  "CIN.Glass.reflect": 1.0,
+  "CIN.SteelPaint.roughness": 0.14750000000000013,
+  "CIN.Concrete.roughness": 0.78,
+  "CIN.Glass.reflect": 1.2,
   "CIN.Dust.anisotropy": 0.25,
   "color:air": [
    0.7725,
@@ -1426,7 +1427,10 @@
     "Flat": 0.7,
     "Start": 96.0,
     "Burst": 8.0,
-    "Drag": 0.3
+    "Drag": 0.3,
+    "Girders": 0.004,
+    "Girder Size": 0.22,
+    "Girder Length": 6.0
    },
    "shown": [
     0,
@@ -1470,7 +1474,10 @@
     "Flat": 0.75,
     "Start": 100.0,
     "Burst": 110.0,
-    "Drag": 1.5
+    "Drag": 1.5,
+    "Girders": 0.006,
+    "Girder Size": 0.16,
+    "Girder Length": 5.0
    },
    "shown": [
     0,
