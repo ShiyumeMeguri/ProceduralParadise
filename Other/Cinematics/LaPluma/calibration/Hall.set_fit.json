@@ -102,6 +102,16 @@
   {
    "material": "color:hall_trim",
    "step": 0.1
+  },
+  {
+   "material": "CIN.HallFloor.roughness",
+   "start": 0.14,
+   "step": 0.05
+  },
+  {
+   "material": "CIN.HallNet.strand",
+   "start": 0.5,
+   "step": 0.1
   }
  ]
 }

@@ -8,11 +8,12 @@
   "The windows on the right glow at 0.9: seen through the shot's exposure they come to the light grey the reference shows there (a display value of about 170), not white; the window lamp lights the hall.",
   "The deck's edge is a strip of light (Deck Light, warm): the reference's lockers and wall warm towards their feet.",
   "The light the bright floor throws back up onto the ceiling, the saucer and the walls (the engine bounces only what the screen shows) is a broad lamp lying on the floor facing up (Fill Light), its power and tint fitted.",
-  "The right side as the plate shows it: the partition's near part (to 12 m along it) a solid wall with a yellowed trim stripe 8.5 m along, its far part glass before the bright windows; the terminal a monitor (a dark housing, a glass screen) with a pole beside it."
+  "The right side as the plate shows it: the partition's near part (to 12 m along it) a solid wall with a yellowed trim stripe 8.5 m along, its far part glass before the bright windows; the terminal a monitor (a dark housing, a glass screen) with a pole beside it.",
+  "The crystal's net is a fine gold mesh (cells about 2.5 cm, the gold over most of it) crumpled into folds a hand wide, its hem wandering; below it the dark glassy core shows, as the reference's lower third."
  ],
  "materials": {
-  "CIN.HallGlow.strength": 14.375,
-  "CIN.HallWindow.strength": 2.275,
+  "CIN.HallGlow.strength": 14.0,
+  "CIN.HallWindow.strength": 2.0749999999999997,
   "color:hall_wall": [
    0.8375,
    0.8250000000000001,
@@ -24,9 +25,9 @@
    0.43750000000000006
   ],
   "color:hall_paint": [
-   0.9437500000000001,
-   0.9600000000000002,
-   0.8231250000000001
+   0.95,
+   0.96,
+   0.87
   ],
   "color:hall_metal": [
    0.62,
@@ -34,16 +35,16 @@
    0.64
   ],
   "color:gold": [
-   0.875,
-   0.8374999999999999,
-   0.35312499999999997
+   1.0374999999999999,
+   0.825,
+   0.19062499999999996
   ],
   "color:hall_glow": [
    1.0,
    0.86,
    0.62
   ],
-  "CIN.HallStrip.strength": 6.75,
+  "CIN.HallStrip.strength": 7.5,
   "CIN.HallRecess.strength": 1.4,
   "color:hall_shell": [
    0.6937500000000002,
@@ -56,20 +57,25 @@
    0.55
   ],
   "color:hall_core": [
-   0.09500000000000001,
-   0.095,
-   0.041999999999999996
+   0.051250000000000004,
+   0.01875,
+   0.0
   ],
   "color:hall_recess": [
-   1.2999999999999998,
-   1.06,
-   0.5912500000000002
+   1.4375,
+   1.0975,
+   0.5162500000000002
   ],
   "color:hall_trim": [
-   0.6875,
-   0.7699999999999999,
-   0.55
-  ]
+   0.65,
+   0.6325,
+   0.4750000000000001
+  ],
+  "CIN.HallNet.around": 100.0,
+  "CIN.HallNet.height": 0.022,
+  "CIN.HallNet.strand": 0.5875,
+  "CIN.HallNet.roughness": 0.22,
+  "CIN.HallFloor.roughness": 0.08375
  },
  "sky": {
   "zenith": [
@@ -87,7 +93,7 @@
    0.21,
    0.22
   ],
-  "strength": 0.6374999999999998,
+  "strength": 0.5374999999999999,
   "haze": 30.0
  },
  "items": [
@@ -407,8 +413,8 @@
     "Radius": 0.41,
     "Taper": 0.7,
     "Hem": 0.6,
-    "Wobble": 0.06,
-    "Crumple": 0.015,
+    "Wobble": 0.12,
+    "Crumple": 0.035,
     "Seed": 3
    }
   },
@@ -688,11 +694,11 @@
   {
    "name": "Window Light",
    "light": "AREA",
-   "power": 7750.0,
+   "power": 7000.0,
    "color": [
-    0.9906250000000001,
-    1.0387499999999998,
-    1.05625
+    0.9343750000000001,
+    1.00125,
+    1.025
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -713,11 +719,11 @@
   {
    "name": "Ceiling Light",
    "light": "AREA",
-   "power": 2106.25,
+   "power": 2518.75,
    "color": [
-    0.9318749999999997,
-    0.945625,
-    1.128125
+    0.9881249999999998,
+    0.989375,
+    1.084375
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -767,7 +773,7 @@
    "color": [
     1.0312499999999998,
     0.9762500000000001,
-    0.8750000000000001
+    0.8500000000000001
    ],
    "shape": "RECTANGLE",
    "size": [
@@ -788,11 +794,11 @@
   {
    "name": "Fill Light",
    "light": "AREA",
-   "power": 225.0,
+   "power": 200.0,
    "color": [
-    1.0125000000000002,
-    0.9325000000000001,
-    1.0825
+    1.0187500000000003,
+    0.8887500000000002,
+    1.1012499999999998
    ],
    "shape": "RECTANGLE",
    "size": [
