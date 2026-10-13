@@ -13,7 +13,7 @@ import bpy
 from .nodes import Tree, Sock, Node
 from .gn import GN, asset
 
-__all__ = ["material", "principled", "emission_mat", "glass_mat", "new_world", "MaterialLibrary",
+__all__ = ["material", "principled", "emission_mat", "thin_glass", "glass_mat", "new_world", "MaterialLibrary",
            "THICKNESS_ATTRIBUTE", "EEVEE_REFRACTION", "beer_lambert", "eevee_refraction"]
 
 THICKNESS_ATTRIBUTE = "thickness"
@@ -169,10 +169,11 @@ def emission_mat(name, color=(1, 1, 1), strength=5.0):
     return material(name, build)
 
 
-def glass_mat(name, color=(0.9, 0.95, 1.0), roughness=0.0, ior=1.45, thin=True, reflect=1.0,
-              camera_boost=1.0, coating=None):
-    """Architectural glass. ``thin`` uses a fresnel mix of transparent +
-    glossy, which renders clean window panes without refraction offsets.
+def thin_glass(t: Tree, color=(0.9, 0.95, 1.0), roughness=0.0, ior=1.45, reflect=1.0, camera_boost=1.0,
+               coating=None):
+    """Shader of a thin pane: a fresnel mix of transparent + glossy, which
+    renders clean window panes without refraction offsets (and lets EEVEE,
+    which refracts through one layer only, show what is behind).
 
     ``camera_boost`` > 1 brightens what *cameras* see through the pane (an
     exposure pull for the exterior, like a photographer's window blend)
@@ -182,32 +183,39 @@ def glass_mat(name, color=(0.9, 0.95, 1.0), roughness=0.0, ior=1.45, thin=True, 
     ``glass_out`` attribute (the exterior side of a facade) the look of
     coated curtain-wall glass for camera rays: a minimum reflectance and a
     tinted view into the building.  Light transport is unchanged."""
+    # Reflect only on front faces: on the exit (back) face the Fresnel node
+    # would see glass->air and report total internal reflection beyond
+    # ~42 deg, turning grazing views of a pane into a dark mirror.
+    fres = t.n("ShaderNodeFresnel", IOR=ior)["Fac"]
+    back = t.n("ShaderNodeNewGeometry")["Backfacing"]
+    fres = fres * (1.0 - back)
+    tcol = color
+    if camera_boost != 1.0:
+        cam = t.n("ShaderNodeLightPath")["Is Camera Ray"]
+        k = 1.0 + (camera_boost - 1.0) * cam
+        tcol = t.vmath("SCALE", tuple(color[:3]), scale=k)
+    fac = fres * reflect if reflect != 1.0 else fres
+    if coating:
+        lp = t.n("ShaderNodeLightPath")
+        outside = t.n("ShaderNodeAttribute", props={"attribute_name": "glass_out",
+                                                    "attribute_type": "GEOMETRY"})["Fac"]
+        k = outside * lp["Is Camera Ray"] * (1.0 - back)
+        fac = t.mix(k, fac, t.max(fres, coating.get("reflect", 0.3)))
+        tint = coating.get("tint", (0.6, 0.7, 0.8))
+        tcol = mix_color(t, k, tcol, tuple(tint[:3]))
+    transp = t.n("ShaderNodeBsdfTransparent", Color=tcol)["BSDF"]
+    gloss = t.n("ShaderNodeBsdfGlossy", Color=(1, 1, 1), Roughness=roughness)["BSDF"]
+    return t.n("ShaderNodeMixShader", fac, transp, gloss)["Shader"]
+
+
+def glass_mat(name, color=(0.9, 0.95, 1.0), roughness=0.0, ior=1.45, thin=True, reflect=1.0,
+              camera_boost=1.0, coating=None):
+    """Architectural glass: a :func:`thin_glass` pane, or with ``thin``
+    false a refracting Glass BSDF."""
     def build(t):
         if not thin:
             return t.n("ShaderNodeBsdfGlass", Color=color, Roughness=roughness, IOR=ior)["BSDF"]
-        # Reflect only on front faces: on the exit (back) face the Fresnel node
-        # would see glass->air and report total internal reflection beyond
-        # ~42 deg, turning grazing views of a pane into a dark mirror.
-        fres = t.n("ShaderNodeFresnel", IOR=ior)["Fac"]
-        back = t.n("ShaderNodeNewGeometry")["Backfacing"]
-        fres = fres * (1.0 - back)
-        tcol = color
-        if camera_boost != 1.0:
-            cam = t.n("ShaderNodeLightPath")["Is Camera Ray"]
-            k = 1.0 + (camera_boost - 1.0) * cam
-            tcol = t.vmath("SCALE", tuple(color[:3]), scale=k)
-        fac = fres * reflect if reflect != 1.0 else fres
-        if coating:
-            lp = t.n("ShaderNodeLightPath")
-            outside = t.n("ShaderNodeAttribute", props={"attribute_name": "glass_out",
-                                                        "attribute_type": "GEOMETRY"})["Fac"]
-            k = outside * lp["Is Camera Ray"] * (1.0 - back)
-            fac = t.mix(k, fac, t.max(fres, coating.get("reflect", 0.3)))
-            tint = coating.get("tint", (0.6, 0.7, 0.8))
-            tcol = mix_color(t, k, tcol, tuple(tint[:3]))
-        transp = t.n("ShaderNodeBsdfTransparent", Color=tcol)["BSDF"]
-        gloss = t.n("ShaderNodeBsdfGlossy", Color=(1, 1, 1), Roughness=roughness)["BSDF"]
-        return t.n("ShaderNodeMixShader", fac, transp, gloss)["Shader"]
+        return thin_glass(t, color, roughness, ior, reflect, camera_boost, coating)
     return material(name, build)
 
 

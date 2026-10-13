@@ -35,7 +35,7 @@ __all__ = ["fresh_modules", "script_args", "base_parser", "parse", "fingerprint"
            "render_setup", "build_animation", "build_scene_folder", "activate_animation", "activate_still",
            "viewport_through_camera", "run"]
 
-OUTPUT_OPTIONS = {"out", "no_save", "render", "view", "render_animation"}
+OUTPUT_OPTIONS = {"out", "no_save", "render", "view", "render_animation", "asset_library"}
 
 
 def fresh_modules(root):
@@ -70,6 +70,7 @@ def base_parser(description, target, default_target):
     parser.add_argument("--render", default=None)
     parser.add_argument("--view", default=None)
     parser.add_argument("--render-animation", nargs="?", const="", default=None)
+    parser.add_argument("--asset-library", default=None)
     parser.add_argument("--samples", type=int, default=None)
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--no-look", action="store_true")
@@ -254,7 +255,8 @@ def build_scene_folder(here, args):
     animation = None
     if animation_name and animation_name.lower() != "none":
         animation = build_animation(scene_dir, animation_name, shot, identity, look)
-    return dict(scene=sc, built=built, camera=camera, shot=shot, animation=animation, shot_camera=camera, **look)
+    return dict(scene=sc, built=built, camera=camera, shot=shot, animation=animation, shot_camera=camera,
+                package=package, **look)
 
 
 def activate_animation(context, samples, video, inputs):
@@ -325,6 +327,12 @@ def run(context, args, out, root, script_path):
     if context["engine"] == "CYCLES":
         backend = RND.use_gpu_if_available()
         print(f"[build] Cycles device: {backend or 'CPU'}")
+    if args.asset_library:
+        if "package" not in context:
+            raise RuntimeError("--asset-library exports the kit of a scene folder (driver.build_scene_folder)")
+        from . import assetlibrary
+        written = assetlibrary.export(args.asset_library, context["package"])
+        print(f"[build] asset library: {len(written)} files in {os.path.abspath(args.asset_library)}")
     if not args.no_save:
         os.makedirs(os.path.dirname(out), exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=out, compress=True)
