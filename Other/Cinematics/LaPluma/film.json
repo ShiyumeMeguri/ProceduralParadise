@@ -36,7 +36,6 @@
       "armature": "Avatar_LaPluma",
       "rig": "cast/LaPluma.json",
       "hidden": [
-        "Avatar_LaPluma_Edges.002",
         "S_actor_lapluma_cloth_03_lod0.003",
         "S_actor_lapluma_cloth_04_lod0"
       ],
@@ -50,7 +49,7 @@
         "Hall"
       ],
       "notes": [
-        "The coat is rigged (10-07); its two pieces with no bone weights would stand in the rest pose beside her and stay hidden, as does the edge helper."
+        "The coat is rigged (10-07); its two pieces with no bone weights would stand in the rest pose beside her and stay hidden."
       ],
       "cloth": {
         "file": "cast/LaPluma.cloth.json",

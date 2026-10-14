@@ -45,7 +45,9 @@ def _placed(source, folder, kind, taken):
 
 
 def _strips(folder, taken):
-    """Every scene's image and movie strips read from the project: an image strip's frames copied as a folder."""
+    """Every scene's image and movie strips read from the project: an image strip's frames copied as a folder that
+    mirrors them -- a frame not rendered yet is no file there either (an earlier copy of it would show a picture the
+    film no longer makes)."""
     count = 0
     for scene in bpy.data.scenes:
         if scene.sequence_editor is None:
@@ -60,10 +62,14 @@ def _strips(folder, taken):
                 for element in strip.elements:
                     source = os.path.join(directory, element.filename)
                     destination = os.path.join(target, element.filename)
+                    if not os.path.isfile(source):
+                        if os.path.exists(destination):
+                            os.remove(destination)
+                        continue
                     if not os.path.exists(destination) or os.path.getsize(destination) != os.path.getsize(source):
                         shutil.copy2(source, destination)
+                    count += 1
                 strip.directory = target + os.sep
-                count += len(strip.elements)
             elif strip.type == "MOVIE":
                 strip.filepath = _placed(os.path.abspath(bpy.path.abspath(strip.filepath)), folder, "Video", taken)
                 count += 1

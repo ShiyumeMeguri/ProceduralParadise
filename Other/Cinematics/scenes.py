@@ -633,8 +633,9 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     placement and bone rotations every frame of it (her root in the frame's
     camera's frame when it is ``relative_to`` the camera: ``cameras``, the
     shot camera's matrix every frame), constant outside the
-    shot's ``frames`` (motion blur never reads the next shot's pose), the
-    cast hidden on the shot's frames the performance does not cover.  A
+    shot's ``frames`` (motion blur never reads the next shot's pose).
+    Returns its sources and the frames it covers (:func:`key_presence`
+    keeps the cast away from the others).  A
     wrist's twist is shared out along the forearm's twist bones (the cast
     profile's ``twists``: a share each), so the forearm turns with the hand.
     A held prop's bone (``held``: prop bone -> hand bone) hangs on the hand
@@ -714,15 +715,38 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
             bone.keyframe_insert("rotation_quaternion", frame=frame)
             bone.keyframe_insert("scale", frame=frame)
     shown = (keyed[0]["frame"], keyed[-1]["frame"]) if keyed else (last + 1, last)
-    switches = [(first, shown[0] > first), (shown[0], False), (shown[1] + 1, True)]
-    for obj in collection_objects:
-        if obj.hide_viewport:
-            continue
-        for frame, hidden in switches:
-            if first <= frame <= last:
-                obj.hide_render = hidden
-                obj.keyframe_insert("hide_render", frame=frame)
-    return [path]
+    return [path], shown
+
+
+def key_presence(rig, scene, frames, shown, anchor_bone):
+    """Key the performer of ``rig`` present on the frames ``shown`` of the shot's ``frames`` alone, on the armature object
+    and nothing else: off them its delta scale is zero, so the rig and all it carries -- its meshes, its props -- fold into
+    one point, and its delta location puts that point on ``anchor_bone`` as the pose holds it there (the bone the camera
+    focuses on keeps its place), else on the rig's origin.  The keys are constant and sit half a frame off each shown
+    edge, so the motion blur of a frame beside an edge never spans the switch.  Keyed after the cloth is baked: the cloth
+    reads the rig unfolded."""
+    from Core.anim import fcurves_of
+    first, last = frames
+    switches = []
+    if shown[0] > first:
+        switches += [(first, first), (shown[0] - 0.5, None)]
+    if shown[1] < last:
+        switches += [(shown[1] + 0.5, shown[1] + 1)]
+    anchors = {}
+    for _frame, held in switches:
+        if held is not None:
+            scene.frame_set(held)
+            point = rig.matrix_world @ rig.pose.bones[anchor_bone].head if anchor_bone else rig.matrix_world.translation
+            anchors[held] = point - rig.matrix_world.translation
+    for frame, held in switches:
+        rig.delta_location = anchors[held] if held is not None else (0.0, 0.0, 0.0)
+        rig.delta_scale = (0.0, 0.0, 0.0) if held is not None else (1.0, 1.0, 1.0)
+        rig.keyframe_insert("delta_location", frame=frame)
+        rig.keyframe_insert("delta_scale", frame=frame)
+    for curve in fcurves_of(rig):
+        if curve.data_path in ("delta_location", "delta_scale"):
+            for point in curve.keyframe_points:
+                point.interpolation = "CONSTANT"
 
 
 def build_overlays(shot, camera, scene, items, kind):
@@ -881,9 +905,13 @@ def build_shot(folder, film, shot, built_set, args):
                                                character["prefix"])
         _add_to_cast_lighting(objects, *built_set["cast_lighting"])
         profile_path = os.path.join(folder, film["cast"][name]["rig"])
-        sources += perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices) + [profile_path]
+        performed, shown = perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices)
+        sources += performed + [profile_path]
         if film["cast"][name].get("cloth"):
             sources += simulate_cloth(rig, scene, folder, film["cast"][name]["cloth"], (first, last), built_set["collection"])
+        dof = shot["camera"].get("dof")
+        anchor = dof["focus"]["bone"] if dof and dof["focus"]["cast"] == name else None
+        key_presence(rig, scene, (first, last), shown, anchor)
         performers[name] = rig
     dof = shot["camera"].get("dof")
     if dof:
