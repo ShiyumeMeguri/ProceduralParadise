@@ -22,8 +22,8 @@ its cadence -- and are never rendered: the edit shows the frame before.
 
 The family's interpreter (``<family>.scenes.build_film(folder, film,
 args)``) builds the sets, the cast and one Blender scene per shot and
-returns ``{"shots": {id: {"scene", "frames", "camera", "set", "cast"}}}``
-(the set's and the cast's collections); this module owns
+returns ``{"shots": {id: {"scene", "frames", "camera", "set", "cast", "performers"}}}``
+(the set's and the cast's collections, the rigs that perform in it); this module owns
 everything around it: the command line, saving, rendering each shot's
 frames into a folder of its own (a shot's frames survive interruption and
 are kept apart by the inputs they were made with; rendering a shot anew
@@ -172,6 +172,13 @@ def present(scene, frame=None):
     bpy.context.window.scene = scene
     if frame is not None:
         scene.frame_set(frame)
+
+
+def working_scene(shots):
+    """The scene a saved film opens on: the first shot in film order where the cast performs, at its first frame --
+    the ``Film`` scene only cuts rendered frames, so opened on it the file shows nothing to work on."""
+    shot = next((shot for shot in shots.values() if shot["performers"]), next(iter(shots.values())))
+    present(shot["scene"], shot["frames"][0])
 
 
 def prune_renderings(folder):
@@ -358,6 +365,7 @@ def run(here, root, script_path, argv=None):
     edit.render.filepath = video
     out = os.path.abspath(args.out or os.path.join(build_dir, f"{item}.blend"))
     if not args.no_save and not args.project:
+        working_scene(shots)
         os.makedirs(os.path.dirname(out), exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=out, compress=True)
         print(f"[film] saved {out}")
@@ -393,5 +401,6 @@ def run(here, root, script_path, argv=None):
         print(f"[film] video -> {video}")
     if args.project:
         from . import project
+        working_scene(shots)
         project.export(args.project, f"{film['id']}_Film", production.get("cast_files", ()))
     return production

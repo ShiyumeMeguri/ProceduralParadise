@@ -894,7 +894,7 @@ def build_shot(folder, film, shot, built_set, args):
     scene.frame_set(first)
     path = os.path.join(folder, "shots", f"{shot['id']}.json")
     return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=cast,
-                sources=[path, built_set["source"], os.path.join(folder, "film.json")] + sources)
+                performers=performers, sources=[path, built_set["source"], os.path.join(folder, "film.json")] + sources)
 
 
 def build_film(folder, film, args):
