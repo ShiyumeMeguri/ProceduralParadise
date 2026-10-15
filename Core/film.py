@@ -371,13 +371,14 @@ def soundtrack(film):
 
 def lay_soundtrack(scene, film, music):
     """The soundtrack ``music`` on the sequencer of ``scene``, on a channel of its own: the film's first frame plays it from
-    ``audio.offset`` seconds in, and the scene plays it with its timeline."""
+    ``audio.offset`` seconds in, and the scene plays it with its timeline, dropping frames to keep in step with it."""
     first, last = film_frames(film)
     offset = int(round(film["audio"]["offset"] * film["fps"]))
     sequences = scene.sequence_editor_create()
     sound = sequences.strips.new_sound("Soundtrack", music, channel=2, frame_start=first - offset)
     sound.frame_final_start = first
     sound.frame_final_end = last + 1
+    scene.sync_mode = "AUDIO_SYNC"
 
 
 def edit_scene(film, shots, folders, music=None, name="Film"):
