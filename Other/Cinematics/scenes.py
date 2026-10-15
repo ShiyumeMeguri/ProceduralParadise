@@ -725,7 +725,8 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
 
 
 def key_presence(rig, scene, frames, shown, anchor_bone):
-    """Key the performer of ``rig`` present on the frames ``shown`` of the shot's ``frames`` alone, on the armature object
+    """Key the performer of ``rig`` present on the frames ``shown`` of ``frames`` (the film's: the other shots' frames are
+    no frames of hers, and the scene that has every shot on one timeline shows her on her own alone), on the armature object
     and nothing else: off them its delta scale is zero, so the rig and all it carries -- its meshes, its props -- fold into
     one point, and its delta location puts that point on ``anchor_bone`` as the pose holds it there (the bone the camera
     focuses on keeps its place), else on the rig's origin.  The keys are constant and sit half a frame off each shown
@@ -756,8 +757,8 @@ def key_presence(rig, scene, frames, shown, anchor_bone):
 
 
 def light_by_scene(scene):
-    """Have a viewport that previews ``scene`` -- the material preview, a sequencer strip of it -- light it by the scene's own
-    lamps and world, as its render does, not by a studio light."""
+    """Have a viewport that previews ``scene`` -- the material preview -- light it by the scene's own lamps and world, as its
+    render does, not by a studio light."""
     shading = scene.display.shading
     shading.use_scene_lights = shading.use_scene_world = True
     shading.use_scene_lights_render = shading.use_scene_world_render = True
@@ -776,7 +777,6 @@ def build_overlays(shot, camera, scene, items, kind):
     overlays.render.engine = "BLENDER_EEVEE"
     overlays.eevee.taa_render_samples = 8
     overlays.render.film_transparent = True
-    light_by_scene(overlays)
     overlays.view_settings.view_transform = scene.view_settings.view_transform
     lens = camera.data.copy()
     lens.dof.use_dof = False
@@ -818,10 +818,11 @@ def build_shot_items(shot, camera, scene, sun):
 
 
 def blow_wind(shot, scene):
-    """The shot's wind zones (see the module notes), registered with the scene's cloth."""
+    """The shot's wind zones (see the module notes), registered with the scene's cloth; returns them."""
     from RuriClothPhysics.blender_host import world
+    zones = []
     if not shot.get("wind"):
-        return
+        return zones
     collection = SC.collection(f"Shot.{shot['id']}.Wind", parent=scene.collection)
     for index, wind in enumerate(shot["wind"]):
         zone = bpy.data.objects.new(f"Shot.{shot['id']}.Wind.{index + 1}", None)
@@ -833,6 +834,8 @@ def blow_wind(shot, scene):
         settings.main = wind["strength"]
         settings.turbulence = wind.get("turbulence", 1.0)
         world.enroll_wind(scene, zone)
+        zones.append(zone)
+    return zones
 
 
 def enable_cloth(rig, scene, folder, cloth):
@@ -902,7 +905,7 @@ def build_shot(folder, film, shot, built_set, args):
         if overlays or underlay is not None:
             RND.compositor({}, overlay_scenes=overlays, underlay=underlay)
     performers = {}
-    blow_wind(shot, scene)
+    zones = blow_wind(shot, scene)
     for name, entry in shot.get("cast", {}).items():
         character = built_set["characters"][name]
         rig, objects = CAST.instance_character(character["rig"], character["objects"], cast, f"Shot.{shot['id']}.{name}",
@@ -915,7 +918,7 @@ def build_shot(folder, film, shot, built_set, args):
             sources += enable_cloth(rig, scene, folder, film["cast"][name]["cloth"])
         dof = shot["camera"].get("dof")
         anchor = dof["focus"]["bone"] if dof and dof["focus"]["cast"] == name else None
-        key_presence(rig, scene, (first, last), shown, anchor)
+        key_presence(rig, scene, tuple(film["frames"]), shown, anchor)
         performers[name] = rig
     dof = shot["camera"].get("dof")
     if dof:
@@ -926,8 +929,63 @@ def build_shot(folder, film, shot, built_set, args):
     scene.frame_set(first)
     path = os.path.join(folder, "shots", f"{shot['id']}.json")
     return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=cast,
-                performers=performers, overlays=[layer for layer in overlays if layer is not None],
+                performers=performers, wind=zones,
                 sources=[path, built_set["source"], os.path.join(folder, "film.json")] + sources)
+
+
+STAGE = "Preview"
+
+
+def build_stage(film, shots, sets, built):
+    """The ``Preview`` scene: every shot on one timeline, for the 3D viewport.  The shots' collections are linked into it --
+    their objects are the shots' own, so the motion edited here is the motion of the shots -- and each is shown over its
+    shot's frames alone, keyed as ``hidden`` is (:func:`_hide_over`): an object of a set, which shots share, is hidden over the
+    frames of the shots that stand in another set, what only one shot has -- its items, its sky, its wind -- over the frames of
+    all the others.  The cast is the exception, it folds itself away off its frames (:func:`key_presence`, keyed over the
+    whole film), and the cameras stay where they are: a marker on the first frame of every shot holds its camera, so the
+    camera -- and the viewport that looks through it -- cuts from shot to shot as the video does.  The cloth of the cast
+    simulates live here as in its shot, each shot's wind blowing over its own frames.  The world is the one of the set the
+    most shots stand in; the shots that have a sky of their own keep its clouds, not its colour."""
+    first, last = film["frames"]
+    stage = bpy.data.scenes.new(STAGE)
+    stage.frame_start, stage.frame_end = first, last
+    stage.render.fps, stage.render.fps_base = film["fps"], 1.0
+    stage.render.resolution_x, stage.render.resolution_y = film["resolution"]
+    owners = {}
+    exempt = set()
+    for shot_id, shot in built.items():
+        exempt.add(shot["cast"])
+        exempt.update(shot["camera"].users_collection)
+        for child in shot["scene"].collection.children:
+            owners.setdefault(child, set()).add(shot_id)
+    for collection, users in owners.items():
+        stage.collection.children.link(collection)
+        if collection in exempt:
+            continue
+        for shot_id, shot in built.items():
+            if shot_id not in users:
+                for obj in collection.all_objects:
+                    _hide_over(obj, *shot["frames"])
+    for shot_id, shot in built.items():
+        marker = stage.timeline_markers.new(shot_id, frame=shot["frames"][0])
+        marker.camera = shot["camera"]
+    stage.camera = next(iter(built.values()))["camera"]
+    standing = {}
+    for shot_id in built:
+        standing[shots[shot_id]["set"]] = standing.get(shots[shot_id]["set"], 0) + 1
+    stage.world = sets[max(standing, key=standing.get)]["world"]
+    stage.view_settings.view_transform = next(iter(built.values()))["scene"].view_settings.view_transform
+    light_by_scene(stage)
+    simulating = [rig for shot in built.values() for rig in shot["performers"].values()]
+    winds = [zone for shot in built.values() for zone in shot["wind"]]
+    if simulating or winds:
+        from RuriClothPhysics.blender_host import world
+        for rig in simulating:
+            if len(rig.ruri_cloth_physics.configs):
+                world.enroll_body(stage, rig).live = True
+        for zone in winds:
+            world.enroll_wind(stage, zone)
+    return stage
 
 
 def build_film(folder, film, args):
@@ -941,9 +999,11 @@ def build_film(folder, film, args):
         if shot["set"] not in sets:
             sets[shot["set"]] = build_set(folder, shot["set"], film, args)
     built = {shot_id: build_shot(folder, film, shot, sets[shot["set"]], args) for shot_id, shot in shots.items()}
+    stage = build_stage(film, shots, sets, built)
     first = next(iter(built.values()))["scene"]
     _activate(first)
     for scene in list(bpy.data.scenes):
         if scene.name == "Scene" and not scene.objects:
             bpy.data.scenes.remove(scene)
-    return {"shots": built, "cast_files": sorted({path for built_set in sets.values() for path in built_set["cast_files"]})}
+    return {"shots": built, "preview": stage,
+            "cast_files": sorted({path for built_set in sets.values() for path in built_set["cast_files"]})}
