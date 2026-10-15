@@ -52,8 +52,7 @@
         "The coat is rigged (10-07); its two pieces with no bone weights would stand in the rest pose beside her and stay hidden."
       ],
       "cloth": {
-        "file": "cast/LaPluma.cloth.json",
-        "settle": 30
+        "file": "cast/LaPluma.cloth.json"
       }
     }
   },

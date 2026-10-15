@@ -21,7 +21,7 @@ either a ``frame`` (a frame building, see :mod:`frames`) or an ``asset``
 with its ``inputs`` (one geometry-nodes modifier on an empty mesh).  An
 item that is only there for a while -- what a breach throws into the air,
 gone by the time another shot looks -- names its frames (``shown``:
-[first, last]); outside them it is not rendered.  An item with ``shadows``
+[first, last]); outside them it is neither rendered nor shown in the viewport.  An item with ``shadows``
 false casts none (debris by the hundred would comb the dust with shadows
 the reference does not show).  An item that lights itself (its asset has an
 input ``Sun Direction``: a plume's dust shading its own billows) is told
@@ -82,20 +82,20 @@ lens open at ``fstop``.  The film's
 ``resolution`` and ``fps`` apply to every shot.
 
 A cast member with ``cloth`` (film.json: ``{"file": <RuriClothPhysics
-payload>, "settle": frames}``) wears cloth simulated on its bones -- the
+payload>}``) wears cloth simulated on its bones -- the
 coat, the hair -- by the RuriClothPhysics add-on (which must be enabled):
 the payload (the add-on's own configuration file: the chains, their
 parameters and the colliders on the body) is set on the shot's performer,
 the shot's ``wind`` zones blow (each a global wind along ``direction``, as
-strong and as gusty as given) and the cloth is baked into keys over the
-shot's frames, from ``settle`` frames before its first so it has hung
-still before the shot begins.  A scene's sky is its world and its clouds -- a deck of cumulus of its own
+strong and as gusty as given) and the cloth simulates live as the shot plays: it
+is solved in real time, so nothing is baked into the performance and the cloth
+follows whatever motion the shot is edited to.  A scene's sky is its world and its clouds -- a deck of cumulus of its own
 (``Kit.clouds``), lit by the set's SUN lamp.  A shot's ``sky`` changes the set's for its frames alone (the weather
 of a picture: one shot under a pale haze, the next under cloud), its ``clouds`` key by key.  A shot's own
 ``items`` are set items only its camera sees -- a crow passing its lens.  One with a ``camera_frame`` is placed in the frame of
 the shot's camera on that frame (looking along its -Z, +Y up): where the
 camera stood then, wherever the shot's camera is solved to stand.  The set
-items a shot's ``hidden`` names are not rendered over its frames: the
+items a shot's ``hidden`` names are neither rendered nor shown in the viewport over its frames: the
 reference leaves a building out of one picture that another shows, or flies
 crows of its own (fitted to its picture, calibration/fit_crows.py) where the
 set's flocks would wheel.  A shot's ``lights`` change the set's lamps over its
@@ -232,12 +232,17 @@ def _key_inputs(obj, keys):
                 point.interpolation = "CONSTANT"
 
 
+VISIBILITY = ("hide_render", "hide_viewport")
+
+
 def _key_hidden(obj, keys):
-    """Key ``obj`` (and what hangs under it) hidden from renders or not: ``keys`` are (frame, hidden)."""
+    """Key ``obj`` (and what hangs under it) hidden or not, from the render and from the viewport alike -- what the film
+    does not show its preview does not show either: ``keys`` are (frame, hidden)."""
     for part in [obj] + list(obj.children_recursive):
         for frame, hidden in keys:
-            part.hide_render = hidden
-            part.keyframe_insert("hide_render", frame=frame)
+            for path in VISIBILITY:
+                setattr(part, path, hidden)
+                part.keyframe_insert(path, frame=frame)
 
 
 def _show_between(obj, first, last):
@@ -249,16 +254,17 @@ def _hide_over(obj, first, last):
     """Key ``obj`` (and what hangs under it) hidden on the frames ``first``..``last``, as it was before and after them."""
     from Core.anim import fcurves_of
     for part in [obj] + list(obj.children_recursive):
-        curve = next((curve for curve in fcurves_of(part) if curve.data_path == "hide_render"), None)
-        before = bool(curve.evaluate(first - 1)) if curve else part.hide_render
-        after = bool(curve.evaluate(last + 1)) if curve else part.hide_render
-        inside = [] if curve is None else [point for point in curve.keyframe_points if first - 1 < point.co.x < last + 1]
-        while inside:
-            curve.keyframe_points.remove(inside[0])
-            inside = [point for point in curve.keyframe_points if first - 1 < point.co.x < last + 1]
-        for frame, hidden in ((first - 1, before), (first, True), (last, True), (last + 1, after)):
-            part.hide_render = hidden
-            part.keyframe_insert("hide_render", frame=frame)
+        for path in VISIBILITY:
+            curve = next((curve for curve in fcurves_of(part) if curve.data_path == path), None)
+            before = bool(curve.evaluate(first - 1)) if curve else getattr(part, path)
+            after = bool(curve.evaluate(last + 1)) if curve else getattr(part, path)
+            inside = [] if curve is None else [point for point in curve.keyframe_points if first - 1 < point.co.x < last + 1]
+            while inside:
+                curve.keyframe_points.remove(inside[0])
+                inside = [point for point in curve.keyframe_points if first - 1 < point.co.x < last + 1]
+            for frame, hidden in ((first - 1, before), (first, True), (last, True), (last + 1, after)):
+                setattr(part, path, hidden)
+                part.keyframe_insert(path, frame=frame)
 
 
 def shot_lights(set_lights, shot):
@@ -723,8 +729,8 @@ def key_presence(rig, scene, frames, shown, anchor_bone):
     and nothing else: off them its delta scale is zero, so the rig and all it carries -- its meshes, its props -- fold into
     one point, and its delta location puts that point on ``anchor_bone`` as the pose holds it there (the bone the camera
     focuses on keeps its place), else on the rig's origin.  The keys are constant and sit half a frame off each shown
-    edge, so the motion blur of a frame beside an edge never spans the switch.  Keyed after the cloth is baked: the cloth
-    reads the rig unfolded."""
+    edge, so the motion blur of a frame beside an edge never spans the switch.  The cloth sits the folded frames out:
+    a rig with no extent has no frame to simulate in, and the cloth starts afresh from the pose when it unfolds."""
     from Core.anim import fcurves_of
     first, last = frames
     switches = []
@@ -749,6 +755,14 @@ def key_presence(rig, scene, frames, shown, anchor_bone):
                 point.interpolation = "CONSTANT"
 
 
+def light_by_scene(scene):
+    """Have a viewport that previews ``scene`` -- the material preview, a sequencer strip of it -- light it by the scene's own
+    lamps and world, as its render does, not by a studio light."""
+    shading = scene.display.shading
+    shading.use_scene_lights = shading.use_scene_world = True
+    shading.use_scene_lights_render = shading.use_scene_world_render = True
+
+
 def build_overlays(shot, camera, scene, items, kind):
     """A scene of the shot's overlays or underlays (``kind``, see the module notes), rendered through a copy of
     ``camera`` in focus everywhere and keyed by the same action, ``items`` carried in front of it in the
@@ -762,6 +776,7 @@ def build_overlays(shot, camera, scene, items, kind):
     overlays.render.engine = "BLENDER_EEVEE"
     overlays.eevee.taa_render_samples = 8
     overlays.render.film_transparent = True
+    light_by_scene(overlays)
     overlays.view_settings.view_transform = scene.view_settings.view_transform
     lens = camera.data.copy()
     lens.dof.use_dof = False
@@ -820,32 +835,20 @@ def blow_wind(shot, scene):
         world.enroll_wind(scene, zone)
 
 
-def simulate_cloth(rig, scene, folder, cloth, frames, set_collection):
-    """Simulate the cloth of the cast member performed by ``rig`` (see the module notes) and bake it into
-    its action.  The set is left out of the view layer while the cloth runs: the cloth reads only the
-    rig and the colliders on it."""
+def enable_cloth(rig, scene, folder, cloth):
+    """Give the cast member performed by ``rig`` its cloth (see the module notes) and let it simulate live in ``scene``:
+    nothing is baked into the performance, so the cloth follows whatever motion the shot is edited to.  Returns the
+    payload file."""
     from types import SimpleNamespace
-    from RuriClothPhysics.blender_host import config_io
+    from RuriClothPhysics.blender_host import config_io, world
     path = os.path.join(folder, cloth["file"])
-    view_layer = scene.view_layers[0]
     report = config_io.deserialize(rig.ruri_cloth_physics, jsonio.load(path), config_io.MODE_REPLACE,
-                                   SimpleNamespace(scene=scene, view_layer=view_layer))
+                                   SimpleNamespace(scene=scene, view_layer=scene.view_layers[0]))
     problems = {key: value for key, value in report.items() if key in ("error", "missing_bones", "missing_colliders", "unresolved_bones")}
     if problems:
         raise ValueError(f"{path} on {rig.name}: {problems} -- a rig remade since it was written: write it again from its spec "
                          f"(LaPluma/calibration/author_cloth.py)")
-    first, last = frames
-    set_layer = next(child for child in view_layer.layer_collection.children if child.collection == set_collection)
-    excluded = set_layer.exclude
-    set_layer.exclude = True
-    try:
-        with bpy.context.temp_override(scene=scene, view_layer=view_layer, object=rig, active_object=rig):
-            result = bpy.ops.ruri_cloth_physics.bake(frame_start=first - int(cloth["settle"]), frame_end=last,
-                                                     mute_existing=True, disable_live=True)
-    finally:
-        set_layer.exclude = excluded
-    if result != {"FINISHED"}:
-        raise RuntimeError(f"cloth of {rig.name}: the bake ended {result}")
+    world.enroll_body(scene, rig).live = True
     return [path]
 
 
@@ -874,6 +877,7 @@ def build_shot(folder, film, shot, built_set, args):
     build_shot_items(shot, camera, scene, sun)
     hide_set_items(shot, built_set["collection"])
     light_set_lamps(shot, built_set["collection"])
+    light_by_scene(scene)
     settings = shot["render"]
     engine = settings["engine"]
     RND.ENGINES[engine](samples=args.samples or settings.get("samples", 64), **settings.get(engine.lower(), {}))
@@ -908,7 +912,7 @@ def build_shot(folder, film, shot, built_set, args):
         performed, shown = perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera_matrices)
         sources += performed + [profile_path]
         if film["cast"][name].get("cloth"):
-            sources += simulate_cloth(rig, scene, folder, film["cast"][name]["cloth"], (first, last), built_set["collection"])
+            sources += enable_cloth(rig, scene, folder, film["cast"][name]["cloth"])
         dof = shot["camera"].get("dof")
         anchor = dof["focus"]["bone"] if dof and dof["focus"]["cast"] == name else None
         key_presence(rig, scene, (first, last), shown, anchor)
@@ -922,7 +926,8 @@ def build_shot(folder, film, shot, built_set, args):
     scene.frame_set(first)
     path = os.path.join(folder, "shots", f"{shot['id']}.json")
     return dict(id=shot["id"], scene=scene, frames=(first, last), camera=camera, set=built_set["collection"], cast=cast,
-                performers=performers, sources=[path, built_set["source"], os.path.join(folder, "film.json")] + sources)
+                performers=performers, overlays=[layer for layer in overlays if layer is not None],
+                sources=[path, built_set["source"], os.path.join(folder, "film.json")] + sources)
 
 
 def build_film(folder, film, args):
