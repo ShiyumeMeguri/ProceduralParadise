@@ -724,36 +724,45 @@ def perform(rig, folder, entry, frames, collection_objects, profile, cameras):
     return [path], shown
 
 
-def key_presence(rig, scene, frames, shown, anchor_bone):
+PRESENCE = "Shown"
+
+
+def key_presence(rig, objects, frames, shown):
     """Key the performer of ``rig`` present on the frames ``shown`` of ``frames`` (the film's: the other shots' frames are
-    no frames of hers, and the scene that has every shot on one timeline shows her on her own alone), on the armature object
-    and nothing else: off them its delta scale is zero, so the rig and all it carries -- its meshes, its props -- fold into
-    one point, and its delta location puts that point on ``anchor_bone`` as the pose holds it there (the bone the camera
-    focuses on keeps its place), else on the rig's origin.  The keys are constant and sit half a frame off each shown
-    edge, so the motion blur of a frame beside an edge never spans the switch.  The cloth sits the folded frames out:
-    a rig with no extent has no frame to simulate in, and the cloth starts afresh from the pose when it unfolds."""
+    no frames of hers, and the scene that has every shot on one timeline shows her on her own alone).  The one key is the
+    rig's custom property ``Shown`` -- 1 on those frames, 0 off them, constant, half a frame off each shown edge so the
+    motion blur of a frame beside an edge never spans the switch -- and what she shows (the meshes and the props among
+    ``objects``) hides from the viewport and the render by drivers that read it; her own hidden parts stay hidden.  The rig
+    is never folded or moved: the cloth reads its world matrix every frame and the character's shading the inverse of it,
+    neither of which a rig with no extent has, and the bone the camera focuses on stays where the pose holds it; and the
+    cloth runs through the frames she is away, as it would if she were there.  No mesh carries a key."""
     from Core.anim import fcurves_of
     first, last = frames
     switches = []
     if shown[0] > first:
-        switches += [(first, first), (shown[0] - 0.5, None)]
+        switches += [(first, 0.0), (shown[0] - 0.5, 1.0)]
     if shown[1] < last:
-        switches += [(shown[1] + 0.5, shown[1] + 1)]
-    anchors = {}
-    for _frame, held in switches:
-        if held is not None:
-            scene.frame_set(held)
-            point = rig.matrix_world @ rig.pose.bones[anchor_bone].head if anchor_bone else rig.matrix_world.translation
-            anchors[held] = point - rig.matrix_world.translation
-    for frame, held in switches:
-        rig.delta_location = anchors[held] if held is not None else (0.0, 0.0, 0.0)
-        rig.delta_scale = (0.0, 0.0, 0.0) if held is not None else (1.0, 1.0, 1.0)
-        rig.keyframe_insert("delta_location", frame=frame)
-        rig.keyframe_insert("delta_scale", frame=frame)
+        switches += [(shown[1] + 0.5, 0.0)]
+    for frame, value in switches:
+        rig[PRESENCE] = value
+        rig.keyframe_insert(f'["{PRESENCE}"]', frame=frame)
+    rig[PRESENCE] = 1.0
     for curve in fcurves_of(rig):
-        if curve.data_path in ("delta_location", "delta_scale"):
+        if curve.data_path == f'["{PRESENCE}"]':
             for point in curve.keyframe_points:
                 point.interpolation = "CONSTANT"
+    for part in objects:
+        if part.type in ("ARMATURE", "EMPTY") or part.hide_viewport:
+            continue
+        for path in VISIBILITY:
+            driver = part.driver_add(path).driver
+            driver.type = "SCRIPTED"
+            driver.expression = "shown < 0.5"
+            variable = driver.variables.new()
+            variable.name = "shown"
+            variable.type = "SINGLE_PROP"
+            variable.targets[0].id = rig
+            variable.targets[0].data_path = f'["{PRESENCE}"]'
 
 
 def light_by_scene(scene):
@@ -916,9 +925,7 @@ def build_shot(folder, film, shot, built_set, args):
         sources += performed + [profile_path]
         if film["cast"][name].get("cloth"):
             sources += enable_cloth(rig, scene, folder, film["cast"][name]["cloth"])
-        dof = shot["camera"].get("dof")
-        anchor = dof["focus"]["bone"] if dof and dof["focus"]["cast"] == name else None
-        key_presence(rig, scene, tuple(film["frames"]), shown, anchor)
+        key_presence(rig, objects, tuple(film["frames"]), shown)
         performers[name] = rig
     dof = shot["camera"].get("dof")
     if dof:
@@ -941,7 +948,7 @@ def build_stage(film, shots, sets, built):
     their objects are the shots' own, so the motion edited here is the motion of the shots -- and each is shown over its
     shot's frames alone, keyed as ``hidden`` is (:func:`_hide_over`): an object of a set, which shots share, is hidden over the
     frames of the shots that stand in another set, what only one shot has -- its items, its sky, its wind -- over the frames of
-    all the others.  The cast is the exception, it folds itself away off its frames (:func:`key_presence`, keyed over the
+    all the others.  The cast is the exception, it hides itself off its frames (:func:`key_presence`, keyed over the
     whole film), and the cameras stay where they are: a marker on the first frame of every shot holds its camera, so the
     camera -- and the viewport that looks through it -- cuts from shot to shot as the video does.  The cloth of the cast
     simulates live here as in its shot, each shot's wind blowing over its own frames.  The world is the one of the set the
@@ -962,9 +969,10 @@ def build_stage(film, shots, sets, built):
         stage.collection.children.link(collection)
         if collection in exempt:
             continue
+        objects = list(collection.all_objects)
         for shot_id, shot in built.items():
             if shot_id not in users:
-                for obj in collection.all_objects:
+                for obj in objects:
                     _hide_over(obj, *shot["frames"])
     for shot_id, shot in built.items():
         marker = stage.timeline_markers.new(shot_id, frame=shot["frames"][0])
