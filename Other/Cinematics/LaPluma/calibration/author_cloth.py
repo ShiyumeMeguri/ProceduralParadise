@@ -5,8 +5,10 @@ A cast member's cloth written as the RuriClothPhysics add-on's own payload, set 
 
 ``spec.json`` names the rig, the capsules on its bones (bone: radius in metres) and the chains (``chains``: a name, the add-on's
 connection ``mode``, the ``capsules`` they collide with -- ``"all"`` or bone names -- and their ``roots``: bone names, or the
-bones hanging from one bone whose names match a pattern, ``{"children_of", "matching"}``, case aside).  The set-up lives only in
-this session (the character file is not saved); a root the rig lacks is refused.
+bones hanging from one bone whose names match a pattern, ``{"children_of", "matching"}``, case aside) and the add-on's settings
+the chain changes (``settings``: the config's own property names, nested as the add-on nests them -- a value written as it stands,
+a dict into the property group of that name).  The set-up lives only in this session (the character file is not saved); a root
+the rig lacks is refused, and so is a setting the add-on has no property of.
 """
 import json
 import re
@@ -45,6 +47,16 @@ def roots(chain):
     return named
 
 
+def apply(group, changes, where):
+    for key, value in changes.items():
+        if not hasattr(group, key):
+            raise KeyError(f"{spec_path}: {where} has no setting '{key}'")
+        if isinstance(value, dict):
+            apply(getattr(group, key), value, f"{where}.{key}")
+        else:
+            setattr(group, key, value)
+
+
 for chain in spec["chains"]:
     config = settings.configs.add()
     config.name = chain["name"]
@@ -53,6 +65,7 @@ for chain in spec["chains"]:
         config.root_bones.add().bone = root
     for bone_name in (list(capsules) if chain["capsules"] == "all" else chain["capsules"]):
         operators._reference_collider(config, capsules[bone_name])
+    apply(config, chain.get("settings", {}), chain["name"])
     print(f"[cloth] {chain['name']}: roots {[item.bone for item in config.root_bones]}")
 payload = config_io.serialize(settings, config_io.SCOPE_OBJECT, scene)
 config_io.save(out, payload)

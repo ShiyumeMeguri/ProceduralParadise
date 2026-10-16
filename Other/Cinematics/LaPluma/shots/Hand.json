@@ -2,16 +2,16 @@
   "id": "Hand",
   "set": "District",
   "frames": [207, 278],
-  "notes": ["Close on her right hand as she dives head first -- the camera turned over with her, the district hanging above her in the picture: the scythe spins once and a half between her fingers and is caught hard on the beat (236), then the camera rises to her eyes as she looks at it (257)."],
+  "notes": ["Waist up as she drifts down: the scythe spins once and a half in her right hand before her and is caught on the beat (236), set upright at her side, and the camera swings round to her other side and in to her eyes as she looks at it (257)."],
   "camera": {
-    "lens": 50.0,
+    "lens": 40.0,
     "sensor": 36.0,
     "clip": [0.05, 20000.0],
     "dof": {
       "fstop": 4.0,
       "focus": {
         "cast": "LaPluma",
-        "bone": "Hand_R"
+        "bone": "Head"
       }
     },
     "follow": {
@@ -21,33 +21,34 @@
     "keys": [
       {
         "frame": 207,
-        "at": [0.62, -0.92, -0.38],
-        "aim": [0.27, -0.26, -0.47],
-        "roll": 180.0
+        "at": [-0.9, -1.5, 0.45],
+        "aim": [-0.12, -0.2, 0.35],
+        "lens": 40.0
       },
       {
         "frame": 236,
-        "at": [0.55, -0.85, -0.42],
-        "aim": [0.27, -0.28, -0.47],
-        "roll": 175.0
+        "at": [-0.85, -1.45, 0.45],
+        "aim": [-0.12, -0.22, 0.38],
+        "lens": 40.0
       },
       {
         "frame": 246,
-        "at": [0.5, -0.88, -0.46],
-        "aim": [0.22, -0.24, -0.5],
-        "roll": 176.0
+        "at": [-0.3, -1.25, 0.58],
+        "aim": [-0.04, -0.05, 0.5],
+        "lens": 45.0
       },
       {
         "frame": 257,
-        "at": [0.3, -0.95, -0.62],
-        "aim": [0.08, -0.08, -0.56],
-        "roll": 180.0
+        "at": [0.15, -1.0, 0.6],
+        "aim": [0.0, -0.03, 0.56],
+        "lens": 50.0
       },
       {
         "frame": 278,
-        "at": [0.25, -1.05, -0.6],
-        "aim": [0.06, -0.06, -0.56],
-        "roll": 182.0
+        "at": [0.2, -1.05, 0.6],
+        "aim": [0.0, -0.03, 0.56],
+        "lens": 50.0,
+        "roll": 1.5
       }
     ],
     "shake": [
@@ -72,7 +73,7 @@
     "motion_blur": 0.5
   },
   "look": {
-    "base": "Golden"
+    "base": "Daylight"
   },
   "cast": {
     "LaPluma": {
@@ -86,5 +87,13 @@
       "turbulence": 0.8
     }
   ],
-  "hidden": []
+  "hidden": [],
+  "lights": {
+    "Sunward": {
+      "power": 1.5
+    },
+    "Skyward": {
+      "power": 0.6
+    }
+  }
 }

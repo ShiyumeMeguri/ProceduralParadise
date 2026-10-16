@@ -1,109 +1,11 @@
 {
   "armature": "Avatar_LaPluma",
-  "notes": ["She bursts out of storey 18 through the glass, curled behind her crossed arms, rolls forward once and opens out over the district -- the scythe swung wide, her coat thrown open -- hangs at the top of her flight, looking down at the city, and tips back into the fall."],
-  "poses": {
-    "Shield": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.1, 1.32],
-        "hand_r": [-0.04, 0.3, 1.38],
-        "hand_l": [0.07, 0.27, 1.28],
-        "foot_l": [-0.1, 0.2, 0.7],
-        "foot_r": [0.12, 0.12, 0.62]
-      },
-      "aims": {
-        "head": [0.0, 1.0, -0.35]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.45,
-          "spin": 90
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.8
-      }
-    },
-    "Open": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.02, 1.38],
-        "hand_l": [-0.5, 0.08, 1.45],
-        "hand_r": [0.42, -0.18, 1.14],
-        "foot_l": [-0.24, 0.34, 0.36],
-        "foot_r": [0.14, -0.4, 0.26]
-      },
-      "aims": {
-        "head": [0.0, 1.0, -0.6]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.22,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.35
-      }
-    },
-    "Hang": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, -0.02, 1.38],
-        "hand_l": [-0.46, 0.18, 1.55],
-        "hand_r": [0.5, 0.1, 1.24],
-        "foot_l": [-0.08, 0.16, 0.42],
-        "foot_r": [0.08, -0.06, 0.2]
-      },
-      "aims": {
-        "chest": [0.0, 1.0, 0.3],
-        "head": [-0.35, 1.0, -0.25]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.22,
-          "spin": 20
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.3
-      }
-    },
-    "Tip": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.03, 1.37],
-        "hand_l": [-0.26, -0.04, 1.72],
-        "hand_r": [0.3, 0.06, 1.68],
-        "foot_l": [-0.1, 0.25, 0.32],
-        "foot_r": [0.12, 0.2, 0.46]
-      },
-      "aims": {
-        "head": [0.0, 0.6, 0.8]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.3,
-          "spin": 60
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.4
-      }
-    }
-  },
+  "notes": ["She bursts out of storey 18 through the glass curled small behind her crossed arms, rolls forward once, unfolds -- knees together, toes pointed -- and glides out over the district with the scythe standing tall behind her, looking down at the city as if she were somewhere else, and begins to drift down like one of her feathers."],
+  "library": ["performances/LaPluma.poses.json"],
   "keys": [
     {
       "frame": 90,
-      "pose": "Shield",
+      "pose": "Curl",
       "root": {
         "at": [-4.5, 3.6, 76.4],
         "turn": [-35, 0, 180]
@@ -111,7 +13,7 @@
     },
     {
       "frame": 96,
-      "pose": "Shield",
+      "pose": "Curl",
       "root": {
         "at": [-4.2, 0.4, 77.2],
         "turn": [-75, 0, 180]
@@ -119,7 +21,7 @@
     },
     {
       "frame": 100,
-      "pose": "Shield",
+      "pose": "Curl",
       "root": {
         "at": [-3.8, -3.2, 78.0],
         "turn": [-185, 0, 180]
@@ -127,52 +29,48 @@
     },
     {
       "frame": 104,
-      "pose": "Open",
+      "pose": "Unfold",
       "root": {
         "at": [-3.4, -5.6, 78.5],
-        "turn": [-290, 5, 180]
-      },
-      "points": {
-        "hand_l": [-0.4, 0.2, 1.3],
-        "hand_r": [0.4, 0.05, 1.2],
-        "foot_l": [-0.15, 0.25, 0.5],
-        "foot_r": [0.1, -0.1, 0.4]
+        "turn": [-290, 4, 180]
       }
     },
     {
       "frame": 110,
-      "pose": "Open",
+      "pose": "Glide",
       "root": {
         "at": [-3.0, -7.4, 78.7],
-        "turn": [-352, 10, 180]
+        "turn": [-350, 6, 180]
       }
     },
     {
       "frame": 122,
-      "pose": "Hang",
+      "pose": "Glide",
       "root": {
         "at": [-2.5, -9.4, 78.4],
-        "turn": [-368, 4, 186]
+        "turn": [-364, 3, 186]
+      },
+      "aims": {
+        "head": [-0.2, 1.0, -0.2]
       }
     },
     {
       "frame": 136,
-      "pose": "Hang",
+      "pose": "Glide",
       "root": {
         "at": [-2.0, -11.0, 77.0],
-        "turn": [-335, -12, 184]
+        "turn": [-352, -6, 184]
       },
       "aims": {
-        "chest": [0.0, 1.0, 0.45],
-        "head": [-0.1, 1.0, 0.2]
+        "head": [-0.1, 1.0, -0.5]
       }
     },
     {
       "frame": 152,
-      "pose": "Tip",
+      "pose": "FallFloat",
       "root": {
         "at": [-1.5, -12.5, 74.0],
-        "turn": [-280, -15, 182]
+        "turn": [-356, -4, 186]
       }
     }
   ]

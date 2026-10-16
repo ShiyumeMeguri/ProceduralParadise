@@ -1,35 +1,272 @@
 {
   "armature": "Avatar_LaPluma",
-  "notes": [
-    "Diving head first, she brings the scythe up beside her face and spins it once and a half between her fingers, catches it hard on the beat (236), the blade stopped edge-on to the camera, and turns her eyes to it."
-  ],
+  "notes": ["Drifting down feet first, she spins the scythe once and a half in her right hand before her, watching it turn as if her mind were elsewhere, catches it on the beat (236), sets it upright at her side and lifts her eyes to the camera (257)."],
+  "library": ["performances/LaPluma.poses.json"],
   "poses": {
     "Twirl": {
-      "points": {"pelvis": [0.0, 0.0, 0.95], "neck": [0.0, 0.03, 1.38], "hand_r": [0.27, 0.26, 1.42], "hand_l": [-0.32, 0.02, 1.08],
-                 "foot_l": [-0.06, -0.05, 0.2], "foot_r": [0.07, -0.12, 0.27]},
-      "aims": {"head": [0.15, 1.0, 0.25]},
-      "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 0}},
-      "curl": {"Hand_R": 0.75, "Hand_L": 0.3}
+      "points": {
+        "pelvis": [0.0, 0.0, 0.95],
+        "neck": [0.0, 0.03, 1.37],
+        "hand_r": [0.22, 0.34, 1.18],
+        "hand_l": [-0.22, 0.12, 1.02],
+        "foot_l": [-0.06, -0.02, 0.2],
+        "foot_r": [0.07, -0.1, 0.3],
+        "calf_l": [-0.035, 0.05, 0.56],
+        "calf_r": [0.035, 0.05, 0.58]
+      },
+      "aims": {
+        "head": [0.25, 1.0, -0.35]
+      },
+      "bones": {
+        "Foot_L": [-32, 0, 0],
+        "Foot_R": [-32, 0, 0],
+        "Head": [0, -5, 0]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 0
+        }
+      },
+      "curl": {
+        "Hand_R": 0.8,
+        "Hand_L": 0.35
+      }
     }
   },
   "keys": [
-    {"frame": 207, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 58.0], "turn": [0, 180, 180]}},
-    {"frame": 210, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 57.3], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 55}}},
-    {"frame": 213, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 56.6], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 115}}},
-    {"frame": 216, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 55.9], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 175}}},
-    {"frame": 219, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 55.2], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 235}}},
-    {"frame": 222, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 54.5], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 295}}},
-    {"frame": 225, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 53.8], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 355}}},
-    {"frame": 228, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 53.1], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 410}}},
-    {"frame": 231, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 52.4], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 460}}},
-    {"frame": 234, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 51.7], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 500}}},
-    {"frame": 236, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 51.2], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 528}},
-     "curl": {"Hand_R": 1.0}},
-    {"frame": 240, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 50.3], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 520}},
-     "curl": {"Hand_R": 1.0}},
-    {"frame": 257, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 46.4], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 520}},
-     "points": {"hand_r": [0.3, 0.22, 1.36]}, "aims": {"head": [0.45, 1.0, 0.1]}, "curl": {"Hand_R": 1.0}},
-    {"frame": 278, "pose": "Twirl", "root": {"at": [-0.9, -14.5, 41.6], "turn": [0, 180, 180]}, "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.5, "spin": 90, "twirl": 520}},
-     "points": {"hand_r": [0.32, 0.2, 1.33]}, "aims": {"head": [0.5, 1.0, 0.05]}, "curl": {"Hand_R": 1.0}}
+    {
+      "frame": 207,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 58.0],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 0
+        }
+      }
+    },
+    {
+      "frame": 210,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 57.31],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 55
+        }
+      }
+    },
+    {
+      "frame": 213,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 56.62],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 115
+        }
+      }
+    },
+    {
+      "frame": 216,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 55.93],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 175
+        }
+      }
+    },
+    {
+      "frame": 219,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 55.24],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 235
+        }
+      }
+    },
+    {
+      "frame": 222,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 54.55],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 295
+        }
+      }
+    },
+    {
+      "frame": 225,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 53.86],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 355
+        }
+      }
+    },
+    {
+      "frame": 228,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 53.17],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 410
+        }
+      }
+    },
+    {
+      "frame": 231,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 52.48],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 460
+        }
+      }
+    },
+    {
+      "frame": 234,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 51.79],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 500
+        }
+      }
+    },
+    {
+      "frame": 236,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 51.33],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 528
+        }
+      },
+      "curl": {
+        "Hand_R": 1.0
+      }
+    },
+    {
+      "frame": 240,
+      "pose": "Twirl",
+      "root": {
+        "at": [-0.9, -14.5, 50.41],
+        "turn": [0, 0, 180]
+      },
+      "props": {
+        "ScytheRoot": {
+          "hand": "Hand_R",
+          "along": 0.5,
+          "spin": 90,
+          "twirl": 520
+        }
+      },
+      "curl": {
+        "Hand_R": 1.0
+      }
+    },
+    {
+      "frame": 252,
+      "pose": "FloatReaper",
+      "root": {
+        "at": [-0.9, -14.5, 47.65],
+        "turn": [0, 0, 180]
+      },
+      "aims": {
+        "head": [-0.05, 1.0, -0.2]
+      }
+    },
+    {
+      "frame": 262,
+      "pose": "FloatReaper",
+      "root": {
+        "at": [-0.9, -14.5, 45.35],
+        "turn": [0, 0, 180]
+      },
+      "aims": {
+        "head": [-0.08, 1.0, -0.04]
+      }
+    },
+    {
+      "frame": 278,
+      "pose": "FloatReaper",
+      "root": {
+        "at": [-0.9, -14.5, 41.67],
+        "turn": [0, 0, 180]
+      },
+      "aims": {
+        "head": [-0.1, 1.0, -0.03]
+      }
+    }
   ]
 }

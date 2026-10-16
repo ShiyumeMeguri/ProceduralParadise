@@ -2,7 +2,7 @@
   "id": "Hall",
   "set": "Hall",
   "frames": [543, 726],
-  "notes": ["The recruitment: the picture breaks up into the hall out of the title shot's cut (543-560), crows wheeling out through it; she drops out of the dark above (552) and lands on one knee (562), the camera low before her; she rises slowly, winds the scythe back and on the beat of the music's drop (629) sweeps it round her into her pose, the camera pushed in on the blow; the result card comes in on it and the film fades to black (714-726)."],
+  "notes": ["The recruitment: the picture breaks up into the hall out of the title shot's cut (543-560), crows wheeling out through it and her feathers falling; she drifts down into it out of the dark above and touches down before the low camera (566), stands with her head bowed, lifts her eyes to it and on the beat of the music's drop (629) sweeps the scythe round her into her pose; the result card comes in on it and the film fades to black (714-726)."],
   "camera": {
     "lens": 24.0,
     "sensor": 36.0,
@@ -17,62 +17,45 @@
     "keys": [
       {
         "frame": 543,
-        "at": [0.8, -4.6, 0.4],
-        "aim": [0.0, 0.0, 2.4],
-        "lens": 24.0
-      },
-      {
-        "frame": 560,
-        "at": [0.6, -4.0, 0.45],
-        "aim": [0.0, 0.0, 0.9],
-        "lens": 24.0
-      },
-      {
-        "frame": 578,
-        "at": [0.5, -3.4, 0.5],
-        "aim": [0.0, 0.0, 0.65],
+        "at": [0.6, -3.6, 0.5],
+        "aim": [0.0, 0.0, 2.8],
         "lens": 26.0
       },
       {
-        "frame": 610,
-        "at": [0.35, -3.2, 0.9],
+        "frame": 566,
+        "at": [0.5, -3.4, 0.55],
+        "aim": [0.0, 0.0, 1.1],
+        "lens": 26.0
+      },
+      {
+        "frame": 600,
+        "at": [0.4, -3.1, 0.9],
         "aim": [0.0, 0.0, 1.15],
         "lens": 28.0
       },
       {
         "frame": 628,
-        "at": [0.4, -3.0, 1.0],
+        "at": [0.3, -2.9, 1.0],
         "aim": [0.0, 0.0, 1.2],
-        "lens": 30.0
+        "lens": 28.0
       },
       {
-        "frame": 637,
-        "at": [-0.45, -2.55, 1.1],
-        "aim": [0.0, 0.0, 1.15],
-        "lens": 35.0
-      },
-      {
-        "frame": 680,
-        "at": [-0.3, -2.4, 1.15],
-        "aim": [0.0, 0.0, 1.15],
-        "lens": 35.0
+        "frame": 640,
+        "at": [-0.4, -3.0, 0.95],
+        "aim": [0.0, 0.0, 1.3],
+        "lens": 26.0
       },
       {
         "frame": 726,
-        "at": [-0.2, -2.2, 1.18],
-        "aim": [0.0, 0.0, 1.15],
-        "lens": 36.0
+        "at": [-0.25, -2.7, 1.05],
+        "aim": [0.0, 0.0, 1.3],
+        "lens": 27.0
       }
     ],
     "shake": [
       {
-        "frames": [561, 570],
-        "amount": 1.0,
-        "scale": 2.0
-      },
-      {
-        "frames": [629, 637],
-        "amount": 0.8,
+        "frames": [629, 638],
+        "amount": 0.6,
         "scale": 2.0
       }
     ]
@@ -88,8 +71,8 @@
     "motion_blur": 0.5
   },
   "look": {
-    "base": "Golden",
-    "exposure": -0.2,
+    "base": "Daylight",
+    "exposure": -0.65,
     "glitch": {
       "bands": 64,
       "shift": 0.2,
@@ -109,7 +92,7 @@
       {
         "name": "Title",
         "asset": "CIN.Overlay.Text",
-        "shown": [628, 726],
+        "shown": [693, 726],
         "inputs": {
           "Text": "LA PLUMA",
           "Size": 0.2186,
@@ -130,7 +113,7 @@
     {
       "name": "Card Flash Bar",
       "asset": "CIN.Overlay.Rect",
-      "shown": [631, 571],
+      "shown": [696, 571],
       "inputs": {
         "Size": [0.267, 0.056, 0.0],
         "Position": [0.681, -0.213, 0.0],
@@ -145,7 +128,7 @@
     {
       "name": "Card New Bar",
       "asset": "CIN.Overlay.Rect",
-      "shown": [637, 726],
+      "shown": [702, 726],
       "inputs": {
         "Size": [0.015, 0.06, 0.0],
         "Position": [0.5537, -0.2148, 0.0],
@@ -157,7 +140,7 @@
     {
       "name": "Card New",
       "asset": "CIN.Overlay.Text",
-      "shown": [638, 726],
+      "shown": [703, 726],
       "inputs": {
         "Text": "NEW",
         "Size": 0.1,
@@ -171,7 +154,7 @@
     {
       "name": "Card Icon Box",
       "asset": "CIN.Overlay.Rect",
-      "shown": [629, 726],
+      "shown": [694, 726],
       "inputs": {
         "Size": [0.152, 0.152, 0.0],
         "Position": [0.625, -0.3787, 0.0],
@@ -184,7 +167,7 @@
       "name": "Card Icon",
       "asset": "CIN.Overlay.Drawing",
       "drawing": "CardWeapon",
-      "shown": [629, 726],
+      "shown": [694, 726],
       "inputs": {
         "Color": [0.0, 0.0, 0.0, 1.0],
         "Glow": 1.0,
@@ -194,7 +177,7 @@
     {
       "name": "Card Name",
       "asset": "CIN.Overlay.Text",
-      "shown": [632, 726],
+      "shown": [697, 726],
       "inputs": {
         "Text": "羽毛笔",
         "Size": 0.141,
@@ -210,7 +193,7 @@
     {
       "name": "Card Emblems",
       "asset": "CIN.Overlay.Emblems",
-      "shown": [635, 726],
+      "shown": [700, 726],
       "inputs": {
         "Count": 5,
         "Position": [0.958, -0.494, 0.0],
@@ -224,7 +207,7 @@
     {
       "name": "Card Class Box",
       "asset": "CIN.Overlay.Rect",
-      "shown": [633, 726],
+      "shown": [698, 726],
       "inputs": {
         "Size": [0.23, 0.061, 0.0],
         "Position": [1.441, -0.433, 0.0],
@@ -236,7 +219,7 @@
     {
       "name": "Card Class",
       "asset": "CIN.Overlay.Text",
-      "shown": [642, 726],
+      "shown": [707, 726],
       "inputs": {
         "Text": "物理",
         "Size": 0.036,
@@ -249,7 +232,7 @@
     {
       "name": "Card Class Icon",
       "asset": "CIN.Overlay.Rect",
-      "shown": [633, 726],
+      "shown": [698, 726],
       "inputs": {
         "Size": [0.08, 0.08, 0.0],
         "Position": [1.5333, -0.3519, 0.0],
@@ -262,7 +245,7 @@
       "name": "Card Class Glyph",
       "asset": "CIN.Overlay.Drawing",
       "drawing": "CardClass",
-      "shown": [633, 726],
+      "shown": [698, 726],
       "inputs": {
         "Color": [1.0, 1.0, 1.0, 1.0],
         "Glow": 1.2,

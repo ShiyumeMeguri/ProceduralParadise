@@ -93,7 +93,7 @@
     "motion_blur": 0.5
   },
   "look": {
-    "base": "Golden"
+    "base": "Daylight"
   },
   "cast": {
     "LaPluma": {
@@ -134,5 +134,51 @@
       "power": 1.5
     }
   },
-  "hidden": []
+  "hidden": [],
+  "items": [
+    {
+      "name": "Turn Feathers",
+      "asset": "CIN.FX.Feathers",
+      "loc": [0, 0, 0],
+      "shadows": false,
+      "inputs": {
+        "Count": 140,
+        "Seed": 7,
+        "Source": [-0.85, -14.65, 38.2],
+        "Source Size": [0.4, 0.4, 0.6],
+        "Direction": [0.0, 0.0, 1.0],
+        "Spread": 180.0,
+        "Speed": 4.5,
+        "Drag": 0.35,
+        "Fall": 0.5,
+        "Flutter": 0.15,
+        "Spin": 0.9,
+        "Size": 0.13,
+        "Start": 290.0,
+        "Burst": 8.0
+      }
+    },
+    {
+      "name": "Spin Feathers",
+      "asset": "CIN.FX.Feathers",
+      "loc": [0, 0, 0],
+      "shadows": false,
+      "inputs": {
+        "Count": 90,
+        "Seed": 8,
+        "Source": [-0.65, -15.35, 37.3],
+        "Source Size": [0.4, 0.4, 0.5],
+        "Direction": [0.0, 0.0, 1.0],
+        "Spread": 180.0,
+        "Speed": 4.0,
+        "Drag": 0.35,
+        "Fall": 0.5,
+        "Flutter": 0.15,
+        "Spin": 0.9,
+        "Size": 0.12,
+        "Start": 314.0,
+        "Burst": 8.0
+      }
+    }
+  ]
 }

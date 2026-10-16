@@ -1,5 +1,5 @@
 {
- "note": "Her cloth as the RuriClothPhysics add-on sets it up, written into the add-on's own payload (LaPluma.cloth.json) by calibration/author_cloth.py against her rig as it stands: the coat's hem woven into an open sheet round her, the hood, the sleeve flaps and the earrings as free chains, against capsules on her body's bones (radius in metres). Her hair is not simulated while its rig is being remade: blown about, the new chains of her fringe swept it off her forehead.",
+ "note": "Her dynamic bones as the RuriClothPhysics add-on sets them up, written into the add-on's own payload (LaPluma.cloth.json) by calibration/author_cloth.py against her rig as it stands: the coat's hem woven into an open sheet round her, the hood, the sleeve flaps, the earrings, every lock of her hair and her chest, each as free chains with settings of its own, against capsules on her body's bones (radius in metres). The hair keeps its shape and springs back (strong angle restoration, a cone it may not leave, light gravity) and lies on her head, neck and shoulders; the two tufts on her crown are stiffer still; the chest moves only a little; the hem trails her flight without ballooning (half the world's inertia).",
  "rig": "Avatar_LaPluma",
  "capsules": {
   "Pelvis": 0.13,
@@ -8,32 +8,39 @@
   "Spine2": 0.12,
   "Neck": 0.05,
   "Head": 0.1,
+  "Clavicle_L": 0.05,
+  "Clavicle_R": 0.05,
   "UpperArm_L": 0.05,
   "UpperArm_R": 0.05,
   "Forearm_L": 0.04,
   "Forearm_R": 0.04,
+  "Hand_L": 0.035,
+  "Hand_R": 0.035,
   "Thigh_L": 0.075,
   "Thigh_R": 0.075,
   "Calf_L": 0.05,
-  "Calf_R": 0.05
+  "Calf_R": 0.05,
+  "Foot_L": 0.04,
+  "Foot_R": 0.04
  },
  "chains": [
   {
    "name": "外套衣摆",
    "mode": "SEQUENTIAL_NON_LOOP_MESH",
    "capsules": "all",
-   "roots": ["Yibai_01_01_L", "Yibai_02_01_L", "Yibai_03_01_L", "Yibai_Center_01", "Yibai_03_01_R", "Yibai_02_01_R", "Yibai_01_01_R"]
+   "roots": ["Yibai_01_01_L", "Yibai_02_01_L", "Yibai_03_01_L", "Yibai_Center_01", "Yibai_03_01_R", "Yibai_02_01_R", "Yibai_01_01_R"],
+   "settings": {"inertia": {"world_inertia": 0.5}}
   },
   {
    "name": "外套兜帽",
    "mode": "LINE",
-   "capsules": ["Neck", "Head", "Spine2"],
+   "capsules": ["Neck", "Head", "Spine2", "Clavicle_L", "Clavicle_R"],
    "roots": ["Hat_Center_01"]
   },
   {
    "name": "外套袖口",
    "mode": "LINE",
-   "capsules": ["UpperArm_L", "UpperArm_R", "Spine2"],
+   "capsules": ["UpperArm_L", "UpperArm_R", "Forearm_L", "Forearm_R", "Spine2"],
    "roots": ["Sleeve_01_01_L", "Sleeve_01_01_R"]
   },
   {
@@ -41,6 +48,39 @@
    "mode": "LINE",
    "capsules": ["Neck", "Head"],
    "roots": ["Earring_01_Jnt_L", "Earring_01_Jnt_R"]
+  },
+  {
+   "name": "头发",
+   "mode": "LINE",
+   "capsules": ["Head", "Neck", "Spine2", "Clavicle_L", "Clavicle_R", "UpperArm_L", "UpperArm_R"],
+   "roots": ["HairC_01_Jnt_L", "HairC_01_Jnt_R", "hairA_01_jnt.001", "hairD_01_L", "hairD_01_R", "hairE_01_L", "hairE_01_R",
+             "hairF_01_jnt.001", "hairI_01_L", "hairI_01_R", "hairJ_01_jnt.001", "hairK_01_L", "hairK_01_R", "hairS_01_jnt"],
+   "settings": {"gravity": 2.5, "damping": {"value": 0.12}, "radius": {"value": 0.015},
+                "angle_restoration": {"stiffness": {"use_curve": false, "value": 0.55}, "velocity_attenuation": 0.75},
+                "angle_limit": {"use": true, "limit_angle": {"use_curve": false, "value": 45.0}},
+                "collider_collision": {"limit_distance": {"value": 0.015}},
+                "inertia": {"world_inertia": 0.6}}
+  },
+  {
+   "name": "呆毛",
+   "mode": "LINE",
+   "capsules": ["Head"],
+   "roots": ["Ahoge_01_01", "Ahoge_02_01"],
+   "settings": {"gravity": 1.0, "damping": {"value": 0.15}, "radius": {"value": 0.01},
+                "angle_restoration": {"stiffness": {"use_curve": false, "value": 0.8}, "velocity_attenuation": 0.7},
+                "angle_limit": {"use": true, "limit_angle": {"use_curve": false, "value": 25.0}},
+                "collider_collision": {"limit_distance": {"value": 0.01}},
+                "inertia": {"world_inertia": 0.5}}
+  },
+  {
+   "name": "胸部",
+   "mode": "LINE",
+   "capsules": [],
+   "roots": ["Breast_01_Jnt_L", "Breast_01_Jnt_R"],
+   "settings": {"gravity": 0.5, "damping": {"value": 0.2},
+                "angle_restoration": {"stiffness": {"use_curve": false, "value": 0.85}, "velocity_attenuation": 0.6},
+                "angle_limit": {"use": true, "limit_angle": {"use_curve": false, "value": 10.0}},
+                "inertia": {"world_inertia": 0.4}}
   }
  ]
 }

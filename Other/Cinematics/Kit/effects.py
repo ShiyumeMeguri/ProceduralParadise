@@ -29,6 +29,14 @@ are slabs and shards, the rest chunks.  A share ``Girders`` of all the pieces ar
 instead -- lengths of the tower's I-section in its steel paint (``Girder Material``), between half
 ``Girder Size`` and ``Girder Size`` deep (a girder is never a crumb) and ``Girder Length`` times as
 long as deep.  Every piece carries a draw of its own (``variant``) for its shading.
+
+``CIN.FX.Feathers``: black feathers shed into the air -- a crow's, hers.  ``Count`` feathers leave
+``Source`` +- ``Source Size`` between the frame ``Start`` and ``Burst`` frames after it, thrown along
+``Direction`` within ``Spread`` at about ``Speed`` m/s; the air takes the throw out of them (the speed
+falls to 1/e in ``Drag`` seconds) and they settle into a slow sink of ``Fall`` m/s, carried by ``Wind``,
+swaying sideways by up to ``Flutter`` metres ``Flutter Rate`` times a second and turning over at up to
+``Spin`` turns a second.  A feather is ``Size`` metres long or up to 40% shorter or longer: a vane round
+a quill, curled along its length, one of :data:`FEATHERS` shapes.
 """
 from __future__ import annotations
 
@@ -41,12 +49,13 @@ from .structure import i_section
 
 CHUNKS = 6
 PLATES = 3
+FEATHERS = 3
 SWELL = 1.0
 SHADE_STEPS = [0.06, 0.12, 0.24, 0.48, 0.96, 1.92]
 SEEDS = {"leave": 1.0, "x": 2.0, "y": 3.0, "z": 4.0, "aim x": 5.0, "aim y": 6.0, "aim z": 7.0, "speed": 8.0, "radius": 9.0,
          "turn": 10.0, "spin": 11.0, "size": 12.0, "flat": 13.0, "shape": 14.0, "variant": 15.0, "axis x": 16.0,
          "axis y": 17.0, "axis z": 18.0, "pattern x": 19.0, "pattern y": 20.0, "pattern z": 21.0, "girder": 22.0,
-         "girder size": 23.0}
+         "girder size": 23.0, "phase": 24.0, "sway": 25.0, "fall": 26.0}
 
 
 def _draws(graph, seed, salt):
@@ -224,4 +233,67 @@ def debris():
     tumble = graph.axis_angle(axis, draw("turn") * (2.0 * math.pi) + draw("spin", -1.0, 1.0) * spin * (2.0 * math.pi) * age)
     scale = graph.switch(is_girder, size * (draw("size") ** size_power), girder_size * draw("girder size", 0.5, 1.0), "FLOAT")
     graph.result(graph.iop(pieces, library, rot=tumble, scale=graph.vec(scale, scale, scale), pick=True, index=shape))
+    return graph
+
+
+def _feather(graph, variant):
+    """A feather a metre long along +X, centred: a vane round its quill, curled up along its length (``variant`` 0..1
+    widens it and curls it more)."""
+    width = 0.85 + variant * 0.45
+    vane = [(0.0, 0.0), (0.06, 0.05), (0.25, 0.1), (0.55, 0.095), (0.82, 0.06), (1.0, 0.0), (0.84, -0.045), (0.58, -0.08),
+            (0.28, -0.085), (0.07, -0.045)]
+    face = graph.fill(graph.polyline([(x - 0.5, y * width, 0.0) for x, y in vane], cyclic=True))
+    quill = graph.rod((-0.62, 0.0, 0.0), (0.5, 0.0, 0.0), r=0.008, res=6)
+    shape = graph.join(face, quill)
+    along = graph.position().x + 0.5
+    return graph.set_pos(shape, offset=graph.vec(0.0, 0.0, along * along * (0.1 + variant * 0.12)))
+
+
+@asset("CIN.FX.Feathers", "Effects")
+def feathers():
+    """Black feathers shed into the air (see the module notes)."""
+    graph = GN("CIN.FX.Feathers", feathers.__doc__)
+    count = graph.inp("Count", "INT", default=200, min=0)
+    seed = graph.inp("Seed", "INT", default=0)
+    source = graph.inp("Source", "VECTOR", default=(0.0, 0.0, 0.0), subtype="TRANSLATION")
+    source_size = graph.inp("Source Size", "VECTOR", default=(0.5, 0.5, 0.5), subtype="TRANSLATION")
+    direction = graph.inp("Direction", "VECTOR", default=(0.0, -1.0, 0.3))
+    spread = graph.inp("Spread", default=math.radians(70.0), min=0.0, max=math.pi, subtype="ANGLE")
+    speed = graph.inp("Speed", default=5.0, min=0.0, desc="m/s")
+    speed_spread = graph.inp("Speed Spread", default=0.6, min=0.0, max=1.0)
+    drag = graph.inp("Drag", default=0.5, min=0.01, desc="Seconds for the throw to fall to 1/e")
+    fall = graph.inp("Fall", default=0.6, min=0.0, desc="m/s, the sink a feather settles into")
+    wind = graph.inp("Wind", "VECTOR", default=(0.0, 0.0, 0.0), desc="m/s")
+    flutter = graph.inp("Flutter", default=0.15, min=0.0, subtype="DISTANCE")
+    flutter_rate = graph.inp("Flutter Rate", default=1.1, min=0.0, desc="Sways a second")
+    spin = graph.inp("Spin", default=0.6, min=0.0, desc="Turns a second at most")
+    size = graph.inp("Size", default=0.12, min=0.0, subtype="DISTANCE")
+    start = graph.inp("Start", default=0.0)
+    burst = graph.inp("Burst", default=6.0, min=0.0, desc="Frames over which the feathers leave")
+    fps = graph.inp("FPS", default=30.0, min=1.0)
+    material = graph.inp("Material", "MATERIAL", default=M.get("CIN.Feather"))
+    draw = _draws(graph, seed, 83)
+    leave = start + draw("leave") * burst
+    age = graph.max((graph.scene_frame() - leave) * (1.0 / fps), 0.0)
+    plumes = graph.new_points(count)
+    origin, velocity = _thrown(graph, draw, source, source_size, direction, spread, speed, speed_spread)
+    settled = 1.0 - graph.math("EXPONENT", age * -1.0 / drag)
+    slowed = drag * settled
+    sink = fall * draw("fall", 0.6, 1.4)
+    heading = draw("sway", 0.0, 2.0 * math.pi)
+    sway = graph.vec(graph.cos(heading), graph.sin(heading), 0.0)
+    swing = graph.sin(age * flutter_rate * (2.0 * math.pi) + draw("phase", 0.0, 2.0 * math.pi))
+    place = (origin + velocity * slowed + (wind + graph.vec(0.0, 0.0, -1.0) * sink) * (age - slowed)
+             + sway * (flutter * swing * settled))
+    plumes = graph.set_pos(plumes, pos=place)
+    plumes = graph.store(plumes, "variant", draw("variant"))
+    plumes = graph.delete(plumes, graph.compare(graph.scene_frame(), leave, "LESS_THAN"))
+    library = graph.n("GeometryNodeGeometryToInstance",
+                      Geometry=list(reversed([graph.mat(_feather(graph, k / max(FEATHERS - 1, 1)), material) for k in range(FEATHERS)]))).o
+    shape = graph.to_int(draw("shape") * FEATHERS, "FLOOR")
+    axis = graph.vec(draw("axis x", -1.0, 1.0), draw("axis y", -1.0, 1.0), draw("axis z", -1.0, 1.0)).normalized()
+    tumble = graph.axis_angle(axis, draw("turn") * (2.0 * math.pi) + draw("spin", -1.0, 1.0) * spin * (2.0 * math.pi) * age
+                              + swing * 0.6)
+    length = size * draw("size", 0.6, 1.4)
+    graph.result(graph.iop(plumes, library, rot=tumble, scale=graph.vec(length, length, length), pick=True, index=shape))
     return graph

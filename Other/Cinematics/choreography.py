@@ -4,8 +4,14 @@ Choreography -- a performance authored as key poses, played on a rig.
 A performance file (``performances/<shot>.json``) is data::
 
     {"armature": "Avatar_LaPluma",
-     "poses": {"Ready": pose, ...},                 (poses keys start from)
+     "library": ["performances/LaPluma.poses.json"],  (files of poses the film's performances share)
+     "poses": {"Ready": pose, ...},                 (poses of this performance alone)
      "keys": [{"frame": 96, "pose": "Ready", ...pose fields}, ...]}
+
+A key's ``pose`` names a pose of the performance or of its ``library`` (a file
+``{"poses": {...}}``: the character's vocabulary -- the way she floats, the way
+she holds her scythe -- said once for every shot); a performance's own pose of
+the same name is refused, two meanings of one name being one too many.
 
 Every key is a whole pose: its ``pose``'s fields, then its own over them
 (``points``, ``aims``, ``bones``, ``props``, ``grips`` and ``curl`` entry by
@@ -82,9 +88,15 @@ def _turn(value):
     return Euler([math.radians(angle) for angle in value], "XYZ").to_quaternion()
 
 
-def resolve(performance):
-    """The keys of ``performance``, each its pose with its own fields over it."""
-    poses = performance.get("poses", {})
+def resolve(performance, folder=None):
+    """The keys of ``performance``, each its pose with its own fields over it (its library read from ``folder``)."""
+    poses = dict(performance.get("poses", {}))
+    for library in performance.get("library", []):
+        shared = jsonio.load(os.path.join(folder, library))["poses"]
+        twice = sorted(set(shared) & set(poses))
+        if twice:
+            raise KeyError(f"{library}: poses {twice} are also the performance's own")
+        poses.update(shared)
     resolved = []
     for key in performance["keys"]:
         base = poses[key["pose"]] if "pose" in key else {}
@@ -243,7 +255,8 @@ def perform(rig, folder, entry, frames, collection_objects, profile):
     frames it covers -- from its first key to its last within the shot's ``frames``."""
     from Core.anim import fcurves_of
     path = os.path.join(folder, entry["performance"])
-    keys = resolve(jsonio.load(path))
+    performance = jsonio.load(path)
+    keys = resolve(performance, folder)
     twists = profile["twists"]
     for obj in collection_objects:
         if any(obj.name.endswith(f".{prop}") for prop in profile["props"]):
@@ -351,4 +364,4 @@ def perform(rig, folder, entry, frames, collection_objects, profile):
     first, last = frames
     inside = [key["frame"] for key in keys if first <= key["frame"] <= last]
     shown = (max(first, keys[0]["frame"]), min(last, keys[-1]["frame"])) if inside else (last + 1, last)
-    return [path], shown
+    return [path] + [os.path.join(folder, library) for library in performance.get("library", [])], shown

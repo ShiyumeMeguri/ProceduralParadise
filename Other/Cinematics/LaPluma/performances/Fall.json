@@ -1,43 +1,48 @@
 {
   "armature": "Avatar_LaPluma",
-  "notes": [
-    "She falls down the face of the tower on her back, loose, her coat streaming up past her, then rolls over -- one arm in, one out -- into a dive, head first, the scythe trailing behind her, and looks up at the camera falling with her."
-  ],
-  "poses": {
-    "Tip": {
-      "points": {"pelvis": [0.0, 0.0, 0.95], "neck": [0.0, 0.03, 1.37], "hand_l": [-0.26, -0.04, 1.72], "hand_r": [0.3, 0.06, 1.68],
-                 "foot_l": [-0.1, 0.25, 0.32], "foot_r": [0.12, 0.2, 0.46]},
-      "aims": {"head": [0.0, 0.6, 0.8]},
-      "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.3, "spin": 60}},
-      "curl": {"Hand_R": 1.0, "Hand_L": 0.4}
-    },
-    "Drift": {
-      "points": {"pelvis": [0.0, 0.0, 0.95], "neck": [0.0, 0.0, 1.38], "hand_l": [-0.42, -0.05, 1.5], "hand_r": [0.42, -0.05, 1.46],
-                 "foot_l": [-0.15, 0.12, 0.26], "foot_r": [0.12, -0.04, 0.3]},
-      "aims": {"head": [0.35, 1.0, 0.1]},
-      "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.3, "spin": 40}},
-      "curl": {"Hand_R": 1.0, "Hand_L": 0.25}
-    },
-    "Turnover": {
-      "points": {"pelvis": [0.0, 0.0, 0.95], "neck": [0.0, 0.06, 1.37], "hand_l": [-0.22, 0.22, 1.2], "hand_r": [0.46, 0.0, 1.3],
-                 "foot_l": [-0.1, 0.25, 0.45], "foot_r": [0.1, -0.1, 0.22]},
-      "aims": {"chest": [0.4, 1.0, 0.0], "head": [0.3, 1.0, 0.3]},
-      "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.3, "spin": 20}},
-      "curl": {"Hand_R": 1.0, "Hand_L": 0.5}
-    },
-    "Dive": {
-      "points": {"pelvis": [0.0, 0.0, 0.95], "neck": [0.0, 0.02, 1.38], "hand_l": [-0.25, -0.12, 0.98], "hand_r": [0.28, -0.16, 1.02],
-                 "foot_l": [-0.06, -0.05, 0.2], "foot_r": [0.07, -0.12, 0.27]},
-      "aims": {"head": [0.0, 0.6, 0.8]},
-      "props": {"ScytheRoot": {"hand": "Hand_R", "along": 0.25, "spin": 0}},
-      "curl": {"Hand_R": 1.0, "Hand_L": 0.3}
-    }
-  },
+  "notes": ["She drifts down the face of the tower feet first, like one of her feathers -- knees together, toes pointed, arms lifted a little, her coat and hair streaming up past her -- turning slowly as she looks down at the district, then up at the camera falling with her."],
+  "library": ["performances/LaPluma.poses.json"],
   "keys": [
-    {"frame": 153, "pose": "Tip", "root": {"at": [-1.5, -12.7, 73.6], "turn": [80, -15, 182]}},
-    {"frame": 168, "pose": "Drift", "root": {"at": [-1.3, -13.4, 70.8], "turn": [70, -60, 180]}},
-    {"frame": 184, "pose": "Turnover", "root": {"at": [-1.1, -13.9, 66.6], "turn": [35, -130, 180]}},
-    {"frame": 196, "pose": "Dive", "root": {"at": [-1.0, -14.2, 62.6], "turn": [10, -170, 180]}},
-    {"frame": 206, "pose": "Dive", "root": {"at": [-0.9, -14.4, 59.4], "turn": [5, -178, 180]}, "aims": {"head": [0.25, 0.4, 0.9]}}
+    {
+      "frame": 153,
+      "pose": "FallFloat",
+      "root": {
+        "at": [-1.5, -12.7, 73.6],
+        "turn": [-4, -4, 186]
+      }
+    },
+    {
+      "frame": 170,
+      "pose": "FallFloat",
+      "root": {
+        "at": [-1.3, -13.4, 70.4],
+        "turn": [-2, 4, 196]
+      },
+      "aims": {
+        "head": [-0.3, 1.0, -0.55]
+      }
+    },
+    {
+      "frame": 188,
+      "pose": "FallFloat",
+      "root": {
+        "at": [-1.1, -13.9, 65.8],
+        "turn": [3, -3, 210]
+      },
+      "points": {
+        "hand_l": [-0.3, 0.08, 1.28]
+      }
+    },
+    {
+      "frame": 206,
+      "pose": "FallFloat",
+      "root": {
+        "at": [-0.9, -14.4, 59.4],
+        "turn": [2, 2, 222]
+      },
+      "aims": {
+        "head": [0.1, 1.0, 0.1]
+      }
+    }
   ]
 }

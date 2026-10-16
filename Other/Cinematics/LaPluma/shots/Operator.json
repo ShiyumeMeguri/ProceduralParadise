@@ -79,7 +79,7 @@
     "motion_blur": 0.5
   },
   "look": {
-    "base": "Golden",
+    "base": "Daylight",
     "glitch": {
       "bands": 64,
       "shift": 0.2,
@@ -5342,5 +5342,30 @@
     "Skyward": {
       "power": 1.5
     }
-  }
+  },
+  "items": [
+    {
+      "name": "Drift Feathers",
+      "asset": "CIN.FX.Feathers",
+      "loc": [0, 0, 0],
+      "shadows": false,
+      "inputs": {
+        "Count": 60,
+        "Seed": 9,
+        "Source": [-0.2, -16.4, 36.6],
+        "Source Size": [2.5, 2.5, 1.5],
+        "Direction": [0.0, 0.0, 1.0],
+        "Spread": 180.0,
+        "Speed": 0.3,
+        "Drag": 1.0,
+        "Fall": 0.25,
+        "Flutter": 0.22,
+        "Flutter Rate": 0.8,
+        "Spin": 0.4,
+        "Size": 0.12,
+        "Start": 300.0,
+        "Burst": 80.0
+      }
+    }
+  ]
 }

@@ -18,10 +18,10 @@
     "The breach floor's edge is a steel I-beam (the tower's spandrel at level 18) standing at the front of the floor's edge, its outer flange 9 cm before the slab's: the reference's sill (frames 76-92) is the beam's flanges and web.",
     "The storeys round the breach are lit through their walls (Breach Storeys, a light probe volume baked as the set is built): the reference sees them dark behind the facade, their ceilings and beams going back.",
     "The breach throws broken girders among its chunks and slabs (Breach and Falling Debris: Girders, lengths of the tower's I-section a few metres long): the reference's foreground tumbles with them as she bursts out (99-114).",
-    "Golden hour: the sun stands 14 degrees up out over the district in front of the tower's face (-Y), warm (3600 K), the sky deep blue overhead and peach at the horizon, the shadows filled by the cool sky; she is lit by lamps of her own (lighting cast) -- Sunward from the sun's side, Skyward from the tower's -- each shot turning up the one in front of her face and leaving the other a rim."
+    "A clear day: the sun stands 45 degrees up out over the district in front of the tower's face (-Y), near white (5600 K), under a deep clear blue with white cumulus and a pale blue haze low down; she is lit by lamps of her own (lighting cast) -- Sunward from the sun's side, Skyward from the tower's -- each shot turning up the one in front of her face and leaving the other a rim."
   ],
   "materials": {
-    "CIN.Air.density": 0.0075,
+    "CIN.Air.density": 0.0015,
     "CIN.Air.height": 60.0,
     "CIN.Dust.density": 2.0,
     "color:interior": [0.32, 0.15850000000000003, 0.024999999999999994],
@@ -37,29 +37,29 @@
     "CIN.Concrete.roughness": 0.78,
     "CIN.Glass.reflect": 1.2,
     "CIN.Dust.anisotropy": 0.25,
-    "color:air": [1.0, 0.78, 0.6]
+    "color:air": [0.7, 0.82, 1.0]
   },
   "sky": {
-    "zenith": [0.05, 0.11, 0.3],
-    "horizon": [1.0, 0.58, 0.36],
-    "ground": [0.05, 0.045, 0.04],
-    "strength": 1.0,
-    "haze": 22.0,
+    "zenith": [0.05, 0.19, 0.66],
+    "horizon": [0.52, 0.7, 0.95],
+    "ground": [0.07, 0.075, 0.08],
+    "strength": 1.2,
+    "haze": 20.0,
     "clouds": {
       "loc": [0.0, 0.0, 950.0],
       "scale": [6000.0, 6000.0, 350.0],
       "cell": 2500.0,
       "lump": 450.0,
       "stretch": 1.6,
-      "threshold": 0.57,
+      "threshold": 0.6,
       "climb": 0.12,
       "gather": 0.6,
       "soft": 0.06,
       "billow": 110.0,
       "erode": 0.6,
-      "density": 0.04
+      "density": 0.05
     },
-    "ambient": [0.3, 0.33, 0.42]
+    "ambient": [0.4, 0.5, 0.7]
   },
   "items": [
     {
@@ -1023,31 +1023,57 @@
         "Glide": 0.3,
         "Start": 290.0
       }
+    },
+    {
+      "name": "Breach Feathers",
+      "asset": "CIN.FX.Feathers",
+      "loc": [0, 0, 0],
+      "shadows": false,
+      "inputs": {
+        "Count": 260,
+        "Seed": 3,
+        "Source": [-4.1, -0.8, 77.3],
+        "Source Size": [2.5, 0.5, 1.4],
+        "Direction": [0.1, -1.0, 0.35],
+        "Spread": 55.0,
+        "Speed": 7.0,
+        "Speed Spread": 0.6,
+        "Drag": 0.45,
+        "Fall": 0.7,
+        "Wind": [0.8, 0.0, 0.2],
+        "Flutter": 0.18,
+        "Flutter Rate": 1.2,
+        "Spin": 0.7,
+        "Size": 0.13,
+        "Start": 96.0,
+        "Burst": 10.0
+      },
+      "shown": [96, 206]
     }
   ],
   "lights": [
     {
       "name": "Sun",
       "light": "SUN",
-      "power": 4.5,
-      "temperature": 3600,
+      "power": 5.5,
+      "temperature": 5600,
       "angle": 2.0,
-      "direction": [-0.25, -1.0, 0.26],
+      "direction": [-0.35, -0.8, 0.9],
       "lighting": "set"
     },
     {
       "name": "Sunward",
       "light": "SUN",
-      "power": 2.2,
-      "temperature": 3800,
+      "power": 2.4,
+      "temperature": 5800,
       "angle": 6.0,
-      "direction": [-0.15, -1.0, 0.45],
+      "direction": [-0.25, -0.9, 0.75],
       "lighting": "cast"
     },
     {
       "name": "Skyward",
       "light": "SUN",
-      "power": 0.6,
+      "power": 0.7,
       "temperature": 9000,
       "angle": 20.0,
       "direction": [0.3, 1.0, 0.6],

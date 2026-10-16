@@ -83,7 +83,7 @@
     "motion_blur": 0.25
   },
   "look": {
-    "base": "Golden"
+    "base": "Daylight"
   },
   "cast": {
     "LaPluma": {

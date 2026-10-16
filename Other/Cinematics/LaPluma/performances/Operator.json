@@ -1,105 +1,11 @@
 {
   "armature": "Avatar_LaPluma",
-  "notes": ["Her title: she hangs in the air among the towers with the scythe laid across her shoulders behind her neck, her wrists over the shaft, and looks at the camera, unhurried; she turns her head, lifts the scythe off her shoulders (490), winds it up behind her (502) and cuts at the camera (516-532), the blade passing the lens."],
-  "poses": {
-    "Yoke": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, -0.01, 1.38],
-        "foot_l": [-0.07, -0.1, 0.2],
-        "foot_r": [0.08, 0.04, 0.16]
-      },
-      "aims": {
-        "head": [0.0, 1.0, -0.05]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.93,
-          "spin": 0,
-          "at": [-0.55, -0.14, 1.42],
-          "turn": [0, 90, 0]
-        }
-      },
-      "grips": {
-        "Hand_L": {
-          "prop": "ScytheRoot",
-          "along": 0.17,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 0.85,
-        "Hand_L": 0.85
-      }
-    },
-    "WindUp": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.03, -0.02, 1.37],
-        "hand_r": [0.3, -0.18, 1.52],
-        "foot_l": [-0.12, 0.12, 0.2],
-        "foot_r": [0.1, -0.12, 0.17]
-      },
-      "aims": {
-        "chest": [0.6, 1.0, 0.0],
-        "head": [-0.2, 1.0, 0.0]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.2,
-          "spin": 0
-        }
-      },
-      "grips": {
-        "Hand_L": {
-          "prop": "ScytheRoot",
-          "along": 0.5,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 1.0
-      }
-    },
-    "Cut": {
-      "points": {
-        "pelvis": [0.0, 0.03, 0.95],
-        "neck": [-0.04, 0.12, 1.35],
-        "hand_r": [-0.18, 0.4, 1.02],
-        "foot_l": [-0.1, -0.12, 0.18],
-        "foot_r": [0.12, 0.2, 0.2]
-      },
-      "aims": {
-        "chest": [-0.6, 1.0, -0.1],
-        "head": [0.0, 1.0, -0.05]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.2,
-          "spin": 0
-        }
-      },
-      "grips": {
-        "Hand_L": {
-          "prop": "ScytheRoot",
-          "along": 0.5,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 1.0
-      }
-    }
-  },
+  "notes": ["Her title: she hangs in the air among the towers, the scythe standing tall at her side, its blade curving out over her head, and looks at the camera with her head a little on one side; she looks away and back, then takes the scythe in both hands, draws it back (492-503) and sweeps it at the camera (516-532), the blade passing the lens."],
+  "library": ["performances/LaPluma.poses.json"],
   "keys": [
     {
       "frame": 380,
-      "pose": "Yoke",
+      "pose": "FloatReaper",
       "root": {
         "at": [-0.2, -16.4, 35.5],
         "turn": [0, 0, 0]
@@ -107,85 +13,82 @@
     },
     {
       "frame": 421,
-      "pose": "Yoke",
+      "pose": "FloatReaper",
       "root": {
         "at": [-0.18, -16.42, 35.3],
         "turn": [0, 2, 2]
       },
       "aims": {
-        "head": [0.12, 1.0, -0.08]
+        "head": [0.1, 1.0, -0.06]
       }
     },
     {
       "frame": 460,
-      "pose": "Yoke",
+      "pose": "FloatReaper",
       "root": {
         "at": [-0.15, -16.45, 35.05],
         "turn": [0, -1, -4]
       },
       "aims": {
-        "head": [-0.25, 1.0, 0.0]
+        "head": [-0.28, 1.0, 0.0]
       }
     },
     {
       "frame": 482,
-      "pose": "Yoke",
+      "pose": "FloatReaper",
       "root": {
         "at": [-0.13, -16.47, 34.9],
         "turn": [0, 0, -2]
       },
       "aims": {
-        "head": [0.0, 1.0, -0.05]
+        "head": [-0.05, 1.0, -0.05]
       }
     },
     {
       "frame": 492,
-      "pose": "WindUp",
+      "pose": "DrawAir",
       "root": {
         "at": [-0.12, -16.48, 34.85],
-        "turn": [0, 0, 2]
-      },
-      "points": {
-        "hand_r": [0.22, 0.05, 1.45]
+        "turn": [0, 0, 6]
       }
     },
     {
       "frame": 503,
-      "pose": "WindUp",
+      "pose": "DrawAir",
       "root": {
         "at": [-0.11, -16.5, 34.8],
-        "turn": [0, -4, 8]
+        "turn": [0, -4, 12]
       }
     },
     {
       "frame": 516,
-      "pose": "Cut",
+      "pose": "SweepAir",
       "root": {
         "at": [-0.1, -16.6, 34.75],
-        "turn": [0, 4, -8]
+        "turn": [0, 4, -10]
       },
       "ease": "LINEAR"
     },
     {
       "frame": 524,
-      "pose": "Cut",
+      "pose": "SweepAir",
       "root": {
         "at": [-0.08, -16.75, 34.7],
-        "turn": [-6, 6, -12]
+        "turn": [-4, 6, -24]
       },
       "points": {
-        "hand_r": [-0.25, 0.32, 0.9]
+        "hand_r": [-0.2, 0.4, 1.1]
       }
     },
     {
       "frame": 542,
-      "pose": "Cut",
+      "pose": "SweepAir",
       "root": {
         "at": [-0.06, -16.8, 34.65],
-        "turn": [-4, 5, -11]
+        "turn": [-3, 5, -22]
       },
       "points": {
-        "hand_r": [-0.24, 0.3, 0.92]
+        "hand_r": [-0.18, 0.38, 1.1]
       }
     }
   ]

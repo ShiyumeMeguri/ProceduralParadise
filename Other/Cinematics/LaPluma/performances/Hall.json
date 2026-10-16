@@ -1,315 +1,139 @@
 {
   "armature": "Avatar_LaPluma",
-  "notes": ["The recruitment: she drops into the hall out of the dark (552), lands hard in a low crouch with a hand on the floor and the scythe flung out behind her (562), holds, rises slowly with her head still down (590-612), winds the scythe back and on the beat (629) sweeps it round her and comes to rest in her pose -- weight on one leg, the scythe at her right side with its blade arched over her head, her left hand at her hip, chin a little down, looking at the camera -- breathing as the card comes in."],
-  "poses": {
-    "Drop": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.02, 1.38],
-        "hand_l": [-0.42, 0.0, 1.45],
-        "hand_r": [0.4, -0.05, 1.5],
-        "foot_l": [-0.1, 0.08, 0.3],
-        "foot_r": [0.1, -0.06, 0.22]
-      },
-      "aims": {
-        "head": [0.0, 1.0, -0.4]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.3,
-          "spin": 140
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.3
-      }
-    },
-    "Land": {
-      "points": {
-        "pelvis": [0.02, 0.02, 0.55],
-        "neck": [0.0, 0.26, 1.0],
-        "hand_l": [-0.24, 0.32, 0.22],
-        "hand_r": [0.5, -0.14, 0.66],
-        "foot_l": [-0.17, 0.3, 0.156],
-        "foot_r": [0.13, -0.36, 0.14]
-      },
-      "aims": {
-        "head": [0.0, 1.0, -0.7]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.3,
-          "spin": 140
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.15
-      }
-    },
-    "Rise": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.8],
-        "neck": [0.0, 0.16, 1.2],
-        "hand_l": [-0.3, 0.12, 0.8],
-        "hand_r": [0.42, -0.1, 0.85],
-        "foot_l": [-0.16, 0.22, 0.156],
-        "foot_r": [0.13, -0.24, 0.156]
-      },
-      "aims": {
-        "head": [0.0, 1.0, -0.6]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.3,
-          "spin": 140
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.3
-      }
-    },
-    "Coil": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.88],
-        "neck": [0.02, 0.0, 1.33],
-        "hand_r": [0.42, -0.25, 1.05],
-        "foot_l": [-0.17, 0.14, 0.156],
-        "foot_r": [0.15, -0.16, 0.156]
-      },
-      "aims": {
-        "chest": [0.7, 1.0, 0.0],
-        "head": [-0.3, 1.0, 0.0]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.15,
-          "spin": 0
-        }
-      },
-      "grips": {
-        "Hand_L": {
-          "prop": "ScytheRoot",
-          "along": 0.45,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 1.0
-      }
-    },
-    "Sweep": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.9],
-        "neck": [-0.02, 0.04, 1.35],
-        "hand_r": [-0.32, 0.3, 1.15],
-        "foot_l": [-0.17, 0.14, 0.156],
-        "foot_r": [0.15, -0.16, 0.156]
-      },
-      "aims": {
-        "chest": [-0.6, 1.0, 0.0],
-        "head": [0.1, 1.0, 0.0]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.15,
-          "spin": 0
-        }
-      },
-      "grips": {
-        "Hand_L": {
-          "prop": "ScytheRoot",
-          "along": 0.45,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 1.0
-      }
-    },
-    "Signature": {
-      "points": {
-        "pelvis": [0.03, 0.0, 0.935],
-        "neck": [0.0, 0.0, 1.375],
-        "hand_l": [-0.2, -0.04, 1.0],
-        "hand_r": [0.36, 0.06, 0.98],
-        "foot_l": [-0.13, 0.08, 0.156],
-        "foot_r": [0.12, -0.06, 0.156]
-      },
-      "aims": {
-        "chest": [0.2, 1.0, 0.0],
-        "head": [-0.2, 1.0, -0.06]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.35,
-          "at": [0.33, 0.2, 0.66],
-          "turn": [20, 10, 180]
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.45
-      }
-    }
-  },
+  "notes": ["The recruitment, in her own manner -- quiet, floaty, a little absent, and then one clean sweep: she drifts down into the hall like one of her feathers, knees together, toes pointed, the scythe held one-handed at its butt and standing tall behind her (543-562); touches down on the tip of one foot (566), sinks softly onto both and stands with her head bowed (572-606); lifts her eyes to the camera with her head a little on one side (606-618); takes the scythe in both hands, draws it back (624) and on the music's drop (629) sweeps it all the way round her in one turn, her coat flung out, and comes to rest facing the camera, the shaft standing at her side and the blade curving out over her head -- breathing as the card comes in."],
   "keys": [
     {
       "frame": 543,
-      "pose": "Drop",
+      "pose": "Float",
       "root": {
-        "at": [0.0, 0.25, 7.5],
-        "turn": [0, 0, 180]
-      }
-    },
-    {
-      "frame": 552,
-      "pose": "Drop",
-      "root": {
-        "at": [0.0, 0.18, 4.4],
-        "turn": [0, 0, 180]
-      }
-    },
-    {
-      "frame": 559,
-      "pose": "Drop",
-      "root": {
-        "at": [0.0, 0.05, 1.5],
-        "turn": [0, 0, 178]
-      },
-      "points": {
-        "foot_l": [-0.14, 0.18, 0.35],
-        "foot_r": [0.12, -0.15, 0.28]
-      }
-    },
-    {
-      "frame": 562,
-      "pose": "Land",
-      "root": {
-        "at": [0.0, 0.0, 0.95],
+        "at": [0.0, 0.12, 3.6],
         "turn": [0, 0, 176]
-      },
-      "ease": "BEZIER"
+      }
+    },
+    {
+      "frame": 555,
+      "pose": "Float",
+      "root": {
+        "at": [0.0, 0.06, 2.2],
+        "turn": [2, 0, 181]
+      }
     },
     {
       "frame": 566,
-      "pose": "Land",
+      "pose": "Touch",
       "root": {
-        "at": [0.0, 0.0, 0.92],
-        "turn": [0, 0, 176]
+        "at": [0.0, 0.0, 0.95],
+        "turn": [0, 0, 183]
+      }
+    },
+    {
+      "frame": 573,
+      "pose": "Settle",
+      "root": {
+        "at": [0.0, 0.0, 0.95],
+        "turn": [0, 0, 182]
+      }
+    },
+    {
+      "frame": 590,
+      "pose": "Settle",
+      "root": {
+        "at": [0.0, 0.0, 0.95],
+        "turn": [0, 0, 181]
       },
       "points": {
-        "pelvis": [0.02, 0.02, 0.5],
-        "neck": [0.0, 0.28, 0.95]
+        "neck": [0.0, 0.06, 1.335]
       }
     },
     {
-      "frame": 585,
-      "pose": "Land",
+      "frame": 606,
+      "pose": "Settle",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 176]
+        "turn": [0, 0, 181]
       }
     },
     {
-      "frame": 600,
-      "pose": "Rise",
+      "frame": 618,
+      "pose": "Look",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 172]
+        "turn": [0, 0, 180]
       }
     },
     {
-      "frame": 613,
-      "pose": "Rise",
+      "frame": 625,
+      "pose": "Draw",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 170]
-      },
-      "points": {
-        "pelvis": [0.0, 0.0, 0.9],
-        "neck": [0.0, 0.05, 1.33]
-      },
-      "aims": {
-        "head": [0.0, 1.0, -0.15]
-      }
-    },
-    {
-      "frame": 624,
-      "pose": "Coil",
-      "root": {
-        "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 160]
+        "turn": [0, 0, 165]
       }
     },
     {
       "frame": 629,
-      "pose": "Coil",
+      "pose": "Draw",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 158]
+        "turn": [0, 0, 162]
       }
     },
     {
-      "frame": 634,
+      "frame": 633,
       "pose": "Sweep",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 196]
-      },
-      "ease": "BEZIER"
-    },
-    {
-      "frame": 642,
-      "pose": "Signature",
-      "root": {
-        "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 162]
+        "turn": [0, 0, 300]
       }
     },
     {
-      "frame": 664,
-      "pose": "Signature",
+      "frame": 637,
+      "pose": "Sweep",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 161]
+        "turn": [0, 0, 470]
+      }
+    },
+    {
+      "frame": 643,
+      "pose": "Reaper",
+      "root": {
+        "at": [0.0, 0.0, 0.95],
+        "turn": [0, 0, 540]
+      }
+    },
+    {
+      "frame": 668,
+      "pose": "Reaper",
+      "root": {
+        "at": [0.0, 0.0, 0.95],
+        "turn": [0, 0, 539]
       },
       "points": {
-        "neck": [0.0, 0.0, 1.383],
-        "hand_l": [-0.2, -0.04, 1.005]
+        "neck": [0.0, 0.01, 1.381]
       }
     },
     {
-      "frame": 690,
-      "pose": "Signature",
+      "frame": 696,
+      "pose": "Reaper",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 162]
+        "turn": [0, 0, 540]
       },
       "aims": {
-        "head": [-0.24, 1.0, -0.04]
+        "head": [-0.14, 1.0, -0.04]
       }
     },
     {
       "frame": 726,
-      "pose": "Signature",
+      "pose": "Reaper",
       "root": {
         "at": [0.0, 0.0, 0.95],
-        "turn": [0, 0, 161]
+        "turn": [0, 0, 539.5]
       },
       "points": {
-        "neck": [0.0, 0.0, 1.382]
+        "neck": [0.0, 0.01, 1.38]
       }
     }
-  ]
+  ],
+  "library": ["performances/LaPluma.poses.json"]
 }

@@ -1,137 +1,14 @@
 {
   "armature": "Avatar_LaPluma",
-  "notes": ["The turn in the air: diving head first among the district's towers, she throws herself over on the beat (291) -- a cartwheel and a full twist at once, the scythe at arm's length sweeping a circle round her -- comes up facing the camera, sweeps again flat round her (312-322), and glides, the scythe drawn up and laid over her shoulder (354)."],
-  "poses": {
-    "Dive": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.02, 1.38],
-        "hand_l": [-0.25, -0.12, 0.98],
-        "hand_r": [0.28, -0.16, 1.02],
-        "foot_l": [-0.06, -0.05, 0.2],
-        "foot_r": [0.07, -0.12, 0.27]
-      },
-      "aims": {
-        "head": [0.0, 0.6, 0.8]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.25,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.3
-      }
-    },
-    "Coil": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.08, 1.35],
-        "hand_l": [0.05, 0.25, 1.2],
-        "hand_r": [-0.12, 0.2, 1.05],
-        "foot_l": [-0.1, 0.22, 0.6],
-        "foot_r": [0.1, 0.18, 0.5]
-      },
-      "aims": {
-        "chest": [-0.5, 1.0, 0.0],
-        "head": [0.3, 1.0, 0.0]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.15,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.7
-      }
-    },
-    "Sweep": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.0, 1.38],
-        "hand_l": [-0.48, 0.1, 1.36],
-        "hand_r": [0.53, 0.06, 1.33],
-        "foot_l": [-0.1, 0.2, 0.55],
-        "foot_r": [0.08, -0.1, 0.2]
-      },
-      "aims": {
-        "chest": [0.3, 1.0, 0.0],
-        "head": [0.5, 1.0, 0.0]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.1,
-          "spin": 0
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.2
-      }
-    },
-    "Glide": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.0, 1.38],
-        "hand_l": [-0.36, 0.02, 1.06],
-        "hand_r": [0.38, -0.2, 1.0],
-        "foot_l": [-0.06, -0.16, 0.22],
-        "foot_r": [0.08, -0.04, 0.15]
-      },
-      "aims": {
-        "head": [0.0, 1.0, 0.0]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.3,
-          "spin": 30
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.35
-      }
-    },
-    "Shoulder": {
-      "points": {
-        "pelvis": [0.0, 0.0, 0.95],
-        "neck": [0.0, 0.0, 1.38],
-        "hand_l": [-0.3, 0.05, 1.02],
-        "hand_r": [0.24, 0.16, 1.42],
-        "foot_l": [-0.07, -0.12, 0.22],
-        "foot_r": [0.08, 0.02, 0.17]
-      },
-      "aims": {
-        "head": [-0.15, 1.0, 0.05]
-      },
-      "props": {
-        "ScytheRoot": {
-          "hand": "Hand_R",
-          "along": 0.45,
-          "spin": 150
-        }
-      },
-      "curl": {
-        "Hand_R": 1.0,
-        "Hand_L": 0.3
-      }
-    }
-  },
+  "notes": ["The turn in the air among the district's towers: drifting down she curls up small, then opens on the beat (291) -- both hands on the butt of the scythe, sweeping it all the way round her in one turn -- curls and sweeps round again (311-322), and floats on, unhurried, the scythe standing tall at her side."],
+  "library": ["performances/LaPluma.poses.json"],
   "keys": [
     {
       "frame": 279,
-      "pose": "Dive",
+      "pose": "FallFloat",
       "root": {
         "at": [-0.9, -14.5, 41.2],
-        "turn": [0, 180, 0]
+        "turn": [0, 0, 0]
       }
     },
     {
@@ -139,23 +16,23 @@
       "pose": "Coil",
       "root": {
         "at": [-0.9, -14.5, 39.2],
-        "turn": [10, 195, 5]
+        "turn": [6, -8, -15]
       }
     },
     {
       "frame": 293,
-      "pose": "Sweep",
+      "pose": "SweepAir",
       "root": {
         "at": [-0.85, -14.65, 38.2],
-        "turn": [10, 275, 150]
+        "turn": [8, -10, 150]
       }
     },
     {
       "frame": 300,
-      "pose": "Sweep",
+      "pose": "SweepAir",
       "root": {
         "at": [-0.8, -14.8, 37.7],
-        "turn": [0, 350, 340]
+        "turn": [0, 6, 340]
       }
     },
     {
@@ -163,7 +40,7 @@
       "pose": "Glide",
       "root": {
         "at": [-0.75, -15.0, 37.5],
-        "turn": [0, 360, 360]
+        "turn": [0, 0, 360]
       }
     },
     {
@@ -171,23 +48,23 @@
       "pose": "Coil",
       "root": {
         "at": [-0.7, -15.2, 37.35],
-        "turn": [0, 360, 340]
+        "turn": [4, -6, 340]
       }
     },
     {
       "frame": 316,
-      "pose": "Sweep",
+      "pose": "SweepAir",
       "root": {
         "at": [-0.65, -15.35, 37.3],
-        "turn": [0, 360, 520]
+        "turn": [6, -8, 520]
       }
     },
     {
       "frame": 322,
-      "pose": "Sweep",
+      "pose": "SweepAir",
       "root": {
         "at": [-0.6, -15.5, 37.2],
-        "turn": [0, 360, 700]
+        "turn": [0, 6, 700]
       }
     },
     {
@@ -195,7 +72,7 @@
       "pose": "Glide",
       "root": {
         "at": [-0.55, -15.7, 37.0],
-        "turn": [-5, 360, 720]
+        "turn": [-4, 0, 720]
       }
     },
     {
@@ -203,29 +80,29 @@
       "pose": "Glide",
       "root": {
         "at": [-0.45, -15.9, 36.7],
-        "turn": [-3, 362, 722]
+        "turn": [-3, 2, 722]
       },
-      "points": {
-        "hand_r": [0.3, 0.1, 1.25]
+      "aims": {
+        "head": [0.0, 1.0, -0.1]
       }
     },
     {
       "frame": 356,
-      "pose": "Shoulder",
+      "pose": "FloatReaper",
       "root": {
         "at": [-0.4, -16.0, 36.4],
-        "turn": [0, 360, 720]
+        "turn": [0, 0, 720]
       }
     },
     {
       "frame": 379,
-      "pose": "Shoulder",
+      "pose": "FloatReaper",
       "root": {
         "at": [-0.25, -16.3, 35.7],
-        "turn": [2, 358, 718]
+        "turn": [2, -2, 718]
       },
       "aims": {
-        "head": [-0.05, 1.0, 0.08]
+        "head": [-0.05, 1.0, -0.04]
       }
     }
   ]
