@@ -1,184 +1,850 @@
 {
-  "id": "Fly",
-  "set": "District",
-  "frames": [279, 379],
-  "notes": ["The turn in the air, down among the district's towers: the camera falls with her, under and round her, as she throws herself over on the beat (291) -- a cartwheel and a twist, the scythe sweeping a circle round her -- sweeps again flat round her (312-322) and glides towards it, the scythe laid over her shoulder; the title's first band sweeps in on its last frame."],
-  "camera": {
-    "lens": 24.0,
-    "sensor": 36.0,
-    "clip": [0.05, 20000.0],
-    "dof": {
-      "fstop": 2.8,
-      "focus": {
-        "cast": "LaPluma",
-        "bone": "Spine2"
-      }
-    },
-    "follow": {
-      "cast": "LaPluma",
-      "bone": "Pelvis"
-    },
-    "keys": [
-      {
-        "frame": 279,
-        "at": [-1.5, 2.5, -2.0],
-        "aim": [-0.0, -0.0, 0.0],
-        "lens": 24.0,
-        "roll": 10.0
-      },
-      {
-        "frame": 291,
-        "at": [-2.8, 3.0, -1.0],
-        "aim": [-0.0, -0.0, 0.1],
-        "lens": 24.0,
-        "roll": 4.0
-      },
-      {
-        "frame": 312,
-        "at": [-1.0, 4.2, 0.3],
-        "aim": [-0.0, -0.0, 0.2],
-        "lens": 26.0
-      },
-      {
-        "frame": 322,
-        "at": [1.5, 4.0, 0.6],
-        "aim": [-0.0, -0.0, 0.25],
-        "lens": 28.0,
-        "roll": -3.0
-      },
-      {
-        "frame": 340,
-        "at": [0.8, 3.4, 0.45],
-        "aim": [-0.0, -0.0, 0.3],
-        "lens": 32.0,
-        "roll": -2.0
-      },
-      {
-        "frame": 356,
-        "at": [-0.2, 2.8, 0.3],
-        "aim": [-0.0, -0.0, 0.35],
-        "lens": 40.0
-      },
-      {
-        "frame": 379,
-        "at": [-0.4, 2.4, 0.25],
-        "aim": [-0.0, -0.0, 0.4],
-        "lens": 45.0
-      }
-    ],
-    "shake": [
-      {
-        "frames": [290, 299],
-        "amount": 1.0,
-        "scale": 2.0
-      },
-      {
-        "frames": [312, 319],
-        "amount": 0.7,
-        "scale": 2.0
-      }
-    ]
-  },
-  "render": {
-    "samples": 32,
-    "eevee": {
-      "shadow_pool": "1024",
-      "volume_range": [0.5, 6000.0],
-      "volume_tile": "4",
-      "volume_samples": 192,
-      "volume_shadows": false,
-      "volume_distribution": 1.0
-    },
-    "view": "Standard",
-    "motion_blur": 0.5
-  },
-  "look": {
-    "base": "Daylight"
-  },
-  "cast": {
-    "LaPluma": {
-      "performance": "performances/Fly.json"
-    }
-  },
-  "underlays": {
-    "depth": 3.5,
-    "items": [
-      {
-        "name": "Band Sweep",
-        "asset": "CIN.Overlay.Rect",
-        "shown": [379, 379],
-        "inputs": {
-          "Size": [4.8148, 0.6185, 0.0],
-          "Position": [0.0, 0.1076, 0.0],
-          "Angle": 16.5,
-          "Color": [0.0437, 0.0437, 0.0437, 1.0],
-          "Glow": 1.0,
-          "Slide In": [2.8463, 0.8431, 0.0],
-          "Slide Time": [379.0, 2.0, 0.0]
-        }
-      }
-    ]
-  },
-  "wind": [
-    {
-      "direction": [0.0, 0.0, 1.0],
-      "strength": 2.5,
-      "turbulence": 0.8
-    }
+ "id": "Fly",
+ "set": "District",
+ "frames": [
+  279,
+  379
+ ],
+ "notes": [
+  "She flies on past the tower, the scythe held high, and the camera swings round and under her until it looks up at her from behind; crows all round.  The camera turns with the sky (calibration/sky_rotation.py) where the place stands it.",
+  "Fitted with the camera at the origin (calibration/fit_pose.py, fit_prop.py): her body by its keypoints and outline, the scythe by its outline, her hand held to its shaft lightly (--grip-weight 4) -- the joint fit at full weight pulled her off her keypoints, the picture's scythe and hand disagreeing in depth -- and the scythe hung in her hand at its model size.",
+  "Its sky's zenith is the blue the reference shows between the clouds (linear, the median of the darker part of the sky).",
+  "Its clouds stand where the reference shows them (calibration/cloud_map.py: the share of cloud of every sky pixel, laid along its ray onto the deck's floor, frames 279-379).",
+  "Its look (look.grade) is the tone curve of calibration/fit_look.py on frames [290, 303, 330, 350, 370]."
+ ],
+ "camera": {
+  "focal_px": 1315.0,
+  "sensor": 36.0,
+  "clip": [
+   0.05,
+   20000.0
   ],
-  "lights": {
-    "Sunward": {
-      "power": 3.0
-    },
-    "Skyward": {
-      "power": 1.5
-    }
+  "keys": "calibration/Fly.camera.json",
+  "place": "calibration/Fly.place.json",
+  "dof": {
+   "fstop": 2.8,
+   "focus": {
+    "cast": "LaPluma",
+    "bone": "Spine2"
+   }
+  }
+ },
+ "render": {
+  "samples": 32,
+  "eevee": {
+   "shadow_pool": "1024",
+   "volume_range": [
+    0.5,
+    6000.0
+   ],
+   "volume_tile": "4",
+   "volume_samples": 192,
+   "volume_shadows": false,
+   "volume_distribution": 1.0
   },
-  "hidden": [],
+  "view": "Standard",
+  "motion_blur": 0.5
+ },
+ "look": {
+  "exposure": 0.0,
+  "grade": {
+   "matrix": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "curves": {
+    "L": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0625,
+      0.05592044180136336
+     ],
+     [
+      0.125,
+      0.11137057061969168
+     ],
+     [
+      0.1875,
+      0.13324557061969167
+     ],
+     [
+      0.25,
+      0.15512057061969167
+     ],
+     [
+      0.3125,
+      0.17699557061969168
+     ],
+     [
+      0.375,
+      0.19887057061969168
+     ],
+     [
+      0.4375,
+      0.2207455706196917
+     ],
+     [
+      0.5,
+      0.35957162550979865
+     ],
+     [
+      0.5625,
+      0.4521810991794125
+     ],
+     [
+      0.625,
+      0.5291904309021097
+     ],
+     [
+      0.6875,
+      0.5922071029256237
+     ],
+     [
+      0.75,
+      0.6542154592460182
+     ],
+     [
+      0.8125,
+      0.7404881362479603
+     ],
+     [
+      0.875,
+      0.830469499087498
+     ],
+     [
+      0.9375,
+      0.8931842792986295
+     ],
+     [
+      1.0,
+      0.9799099194470223
+     ]
+    ]
+   },
+   "highlight_rolloff": true
+  }
+ },
+ "cast": {
+  "LaPluma": {
+   "performance": "performances/Fly.json",
+   "relative_to": "camera"
+  }
+ },
+ "underlays": {
+  "depth": 3.5,
   "items": [
-    {
-      "name": "Turn Feathers",
-      "asset": "CIN.FX.Feathers",
-      "loc": [0, 0, 0],
-      "shadows": false,
-      "inputs": {
-        "Count": 140,
-        "Seed": 7,
-        "Source": [-0.85, -14.65, 38.2],
-        "Source Size": [0.4, 0.4, 0.6],
-        "Direction": [0.0, 0.0, 1.0],
-        "Spread": 180.0,
-        "Speed": 4.5,
-        "Drag": 0.35,
-        "Fall": 0.5,
-        "Flutter": 0.15,
-        "Spin": 0.9,
-        "Size": 0.13,
-        "Start": 290.0,
-        "Burst": 8.0
-      }
-    },
-    {
-      "name": "Spin Feathers",
-      "asset": "CIN.FX.Feathers",
-      "loc": [0, 0, 0],
-      "shadows": false,
-      "inputs": {
-        "Count": 90,
-        "Seed": 8,
-        "Source": [-0.65, -15.35, 37.3],
-        "Source Size": [0.4, 0.4, 0.5],
-        "Direction": [0.0, 0.0, 1.0],
-        "Spread": 180.0,
-        "Speed": 4.0,
-        "Drag": 0.35,
-        "Fall": 0.5,
-        "Flutter": 0.15,
-        "Spin": 0.9,
-        "Size": 0.12,
-        "Start": 314.0,
-        "Burst": 8.0
-      }
+   {
+    "name": "Band Sweep",
+    "asset": "CIN.Overlay.Rect",
+    "shown": [
+     379,
+     379
+    ],
+    "inputs": {
+     "Size": [
+      4.8148,
+      0.6185,
+      0.0
+     ],
+     "Position": [
+      0.0,
+      0.1076,
+      0.0
+     ],
+     "Angle": 16.5,
+     "Color": [
+      0.0437,
+      0.0437,
+      0.0437,
+      1.0
+     ],
+     "Glow": 1.0,
+     "Slide In": [
+      2.8463,
+      0.8431,
+      0.0
+     ],
+     "Slide Time": [
+      379.0,
+      2.0,
+      0.0
+     ]
     }
+   }
   ]
+ },
+ "items": [
+  {
+   "name": "Lens Crow F2",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 328,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    324,
+    331
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 330,
+    "Origin": [
+     -0.1066,
+     1.0706,
+     -0.2699
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.6347,
+     -0.7417,
+     0.2167
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 4.955,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 328.0
+   }
+  },
+  {
+   "name": "Lens Crow F3",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 332,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    327,
+    337
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 331,
+    "Origin": [
+     0.1528,
+     1.3304,
+     -0.0588
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.9669,
+     -0.0009,
+     -0.255
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 5.673,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 332.0
+   }
+  },
+  {
+   "name": "Lens Crow F4",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 340,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    339,
+    341
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 332,
+    "Origin": [
+     -0.1408,
+     1.3297,
+     0.2712
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.2137,
+     -0.8947,
+     0.3922
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 2.12,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 340.0
+   }
+  },
+  {
+   "name": "Lens Crow F5",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 346,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    341,
+    351
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 333,
+    "Origin": [
+     1.2652,
+     2.5839,
+     0.6197
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.8767,
+     0.476,
+     -0.0694
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 4.328,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 346.0
+   }
+  },
+  {
+   "name": "Lens Crow F6",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 350,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    343,
+    357
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 334,
+    "Origin": [
+     -0.8298,
+     1.5318,
+     -0.0619
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.9375,
+     -0.2565,
+     0.2349
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 3.081,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 350.0
+   }
+  },
+  {
+   "name": "Lens Crow F7",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 366,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    361,
+    371
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 335,
+    "Origin": [
+     0.0043,
+     1.3423,
+     -0.0562
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.9431,
+     -0.3322,
+     -0.0115
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 6.285,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 366.0
+   }
+  },
+  {
+   "name": "Lens Crow F8",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 362,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    361,
+    363
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 336,
+    "Origin": [
+     1.2143,
+     2.4665,
+     -0.307
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.4787,
+     -0.5101,
+     -0.7146
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 0.01,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 362.0
+   }
+  },
+  {
+   "name": "Lens Crow F9a",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 300,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    299,
+    301
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 337,
+    "Origin": [
+     0.4859,
+     1.5039,
+     0.3916
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.8097,
+     -0.5454,
+     0.2168
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 0.01,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 300.0
+   }
+  },
+  {
+   "name": "Lens Crow F9b",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 302,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    301,
+    303
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 338,
+    "Origin": [
+     0.1951,
+     2.9775,
+     -0.8084
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.0074,
+     -0.9977,
+     0.0675
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 32.659,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 302.0
+   }
+  },
+  {
+   "name": "Lens Crow F9c",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 302,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    301,
+    303
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 339,
+    "Origin": [
+     -1.2025,
+     5.4406,
+     1.0396
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     -0.259,
+     -0.521,
+     -0.8133
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 0.013,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 302.0
+   }
+  },
+  {
+   "name": "Lens Crow F9d",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 304,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    303,
+    305
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 340,
+    "Origin": [
+     -0.5713,
+     2.7789,
+     0.7099
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.9893,
+     -0.0169,
+     -0.1451
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 2.277,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 304.0
+   }
+  },
+  {
+   "name": "Lens Crow F9e",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 304,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    303,
+    305
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 341,
+    "Origin": [
+     0.5862,
+     2.1345,
+     -0.5245
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.3859,
+     -0.3303,
+     -0.8614
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 3.135,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 304.0
+   }
+  },
+  {
+   "name": "Lens Crow F10",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 310,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    309,
+    311
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 342,
+    "Origin": [
+     1.8489,
+     3.6405,
+     -0.4986
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.6952,
+     0.4459,
+     0.5638
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 0.01,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 310.0
+   }
+  },
+  {
+   "name": "Lens Crow F1",
+   "asset": "CIN.Birds.Flock",
+   "camera_frame": 379,
+   "rot": [
+    -90.0,
+    0.0,
+    0.0
+   ],
+   "shown": [
+    377,
+    379
+   ],
+   "inputs": {
+    "Count": 1,
+    "Seed": 343,
+    "Origin": [
+     -0.6019,
+     0.5182,
+     0.0351
+    ],
+    "Extent": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Heading": [
+     0.5831,
+     -0.6348,
+     0.507
+    ],
+    "Spread": 0.0,
+    "Climb": 0.0,
+    "Speed": 7.599,
+    "Speed Spread": 0.0,
+    "Beat": 5.0,
+    "Glide": 0.0,
+    "Size": 1.3,
+    "Size Spread": 0.0,
+    "Start": 379.0
+   }
+  }
+ ],
+ "sky": {
+  "zenith": [
+   0.005,
+   0.12625,
+   0.25250000000000006
+  ],
+  "clouds": {
+   "color": [
+    0.58075,
+    0.5870625,
+    0.5996874999999999
+   ],
+   "loc": [
+    0.0,
+    0.0,
+    1020.0
+   ],
+   "scale": [
+    6000.0,
+    6000.0,
+    420.0
+   ],
+   "threshold": 0.6,
+   "climb": 0.16374999999999998,
+   "gather": 0.7125,
+   "soft": 0.22125,
+   "billow": 65.0,
+   "erode": 0.6749999999999999,
+   "density": 0.055,
+   "map": "calibration/Fly.clouds.json",
+   "shade_low": 0.36250000000000004,
+   "shade_high": 0.875,
+   "forward": 0.6124999999999999,
+   "reach": 0.47500000000000003
+  },
+  "horizon": [
+   0.4599999999999998,
+   0.67,
+   0.7400000000000001
+  ],
+  "strength": 0.8625000000000003,
+  "ambient": [
+   0.2605,
+   0.3671,
+   0.4688
+  ]
+ },
+ "wind": [
+  {
+   "direction": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "strength": 2.5,
+   "turbulence": 0.8
+  }
+ ],
+ "lights": {
+  "Key": {
+   "power": 2.8054
+  }
+ }
 }

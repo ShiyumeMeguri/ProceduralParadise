@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "..", "..", ".."))
 sys.path.insert(0, os.path.join(HERE, "..", "..", ".."))
 
 from Core import cast as CAST, jsonio, scene as SC  # noqa: E402
-from Cinematics import scenes as SCN  # noqa: E402
+from Cinematics import choreography as CH, scenes as SCN  # noqa: E402
 
 FILM = os.path.join(HERE, "..")
 LUMINANCE = np.array([0.2126, 0.7152, 0.0722])
@@ -100,7 +100,7 @@ class ShotSky:
         rig, objects = CAST.link_character(CAST.resolve_blend(entry, {}, name), entry["armature"], collection,
                                              entry.get("hidden", ()), prefix=f"Sky Reads.{name}")
         profile = jsonio.load(os.path.join(FILM, entry["rig"]))
-        SCN.perform(rig, FILM, self.shot["cast"][name], tuple(self.shot["frames"]), objects, profile, self.matrices)
+        CH.perform(rig, FILM, self.shot["cast"][name], tuple(self.shot["frames"]), objects, profile, self.camera)
         for obj in objects:
             if obj != rig:
                 bpy.data.objects.remove(obj)

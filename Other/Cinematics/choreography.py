@@ -33,12 +33,23 @@ be enabled: the pelvis, the neck, the hands and the feet, and as many of the
 rest -- elbows, knees, where a hand or the head points -- as the pose cares
 to pin) -- are put where it says and the add-on's auto-posing finds the
 body that goes with them, its chest, head and pelvis facing the ``aims``.
+The aims turn the body about its length and no more: how her spine stands
+and her head nods the auto-posing would make up for itself (and makes up a
+slouch, her pelvis tucked under), so the points that hold them (the
+profile's ``posing`` ``posture``) are pinned for every pose that leaves
+them out -- one ``between`` two points where her rest has it off the
+first, carried as the line between them is turned, one ``from`` a point
+where her rest has it, turned as an aim faces (its turn about her up, then
+its nod).
 Every point and direction is the character's own as it stands at rest --
 facing +Y, its right +X, up +Z, the floor its feet stand on at Z = 0 -- and
 the ``root`` places that in the set: a pose is found standing and is then
 flown, flipped and turned however the root says -- ``at`` where the
 character's pivot (the profile's ``pivot``: a point of her at rest, her
-middle) is in the set, ``turn`` how she is turned about it, an XYZ Euler.  A
+middle) is in the set, ``turn`` how she is turned about it, an XYZ Euler --
+or in the frame of the shot's camera, for a performance ``relative_to`` it
+(the shot's cast entry): her staging fitted to a camera's picture moves with
+the camera, the root's empty hanging from it.  A
 somersault turns about her middle, not about her feet: the root is an empty
 of its own (``<rig> Pivot``) the rig hangs from.  The feet are always
 pinned (to where they stand at rest unless the pose says).  ``bones`` turn
@@ -148,7 +159,8 @@ class Choreographer:
         self.rest = {bone.name: bone.matrix_local.copy() for bone in rig.data.bones}
         self.poser = headless.Poser(rig, profile["posing"]["profile"], False)
         self.poser.rest()
-        self.rest_points = self.poser.points()
+        self.rest_points = {name: _vector(point) for name, point in self.poser.points().items()}
+        self.posture = profile["posing"].get("posture", {})
         self.grips = {}
 
     def grip(self, prop_bone, hand):
@@ -160,8 +172,24 @@ class Choreographer:
         """Pin the hand ``hand`` to stand as ``matrix`` (armature space): its point, and the point it aims carried along."""
         spec = self.profile["hands"][hand]
         targets[spec["point"]] = matrix.translation.copy()
-        aim = self.rest[hand].inverted() @ Vector(self.rest_points[spec["aim"]])
+        aim = self.rest[hand].inverted() @ self.rest_points[spec["aim"]]
         targets[spec["aim"]] = matrix @ aim
+
+    def _posture(self, pose, targets):
+        """Pin the points of the profile's ``posture`` the pose leaves out, where her rest carries them."""
+        rest = self.rest_points
+        for name, rule in self.posture.items():
+            if name in targets:
+                continue
+            if "between" in rule:
+                low, high = rule["between"]
+                rest_line = rest[high] - rest[low]
+                line = targets[high] - targets[low]
+                targets[name] = targets[low] + rest_line.rotation_difference(line) @ (rest[name] - rest[low])
+            else:
+                aim = _vector(pose.get("aims", {}).get(rule["aim"], (0.0, 1.0, 0.0))).normalized()
+                facing = Euler((math.asin(max(-1.0, min(1.0, aim.z))), 0.0, math.atan2(-aim.x, aim.y)), "XYZ")
+                targets[name] = targets[rule["from"]] + facing.to_quaternion() @ (rest[name] - rest[rule["from"]])
 
     def _set_hands(self, hands):
         pose_bones = self.rig.pose.bones
@@ -183,6 +211,7 @@ class Choreographer:
             pose_bone.matrix_basis.identity()
         self.poser.rest()
         targets = {name: _vector(point) for name, point in pose.get("points", {}).items()}
+        self._posture(pose, targets)
         props = pose.get("props", {})
         grips = pose.get("grips", {})
         placed = {}
@@ -250,7 +279,7 @@ def _twist(quaternion):
     return 2.0 * math.atan2(sign * quaternion.y, sign * quaternion.w)
 
 
-def perform(rig, folder, entry, frames, collection_objects, profile):
+def perform(rig, folder, entry, frames, collection_objects, profile, camera):
     """Key the performance file ``entry["performance"]`` on ``rig`` (see the module notes) and return its sources and the
     frames it covers -- from its first key to its last within the shot's ``frames``."""
     from Core.anim import fcurves_of
@@ -310,6 +339,12 @@ def perform(rig, folder, entry, frames, collection_objects, profile):
     pivot.rotation_mode = "XYZ"
     rig.parent = pivot
     rig.location = -_vector(profile["pivot"])
+    relative = entry.get("relative_to")
+    if relative not in (None, "camera"):
+        raise ValueError(f"{path}: a performance is relative to the set or to the 'camera', not '{relative}'")
+    if relative == "camera":
+        pivot.parent = camera
+        pivot.matrix_parent_inverse = Matrix.Identity(4)
     previous = {}
     holders = {}
     for key, basis, holds in found:

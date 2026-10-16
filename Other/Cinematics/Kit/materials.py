@@ -160,18 +160,6 @@ def debris():
     return S.material("CIN.Debris", build)
 
 
-@register("CIN.Feather")
-def feather():
-    """A crow's feather: near black, its vane glossed with a cold blue-violet sheen as a crow's is (a coat over the
-    black), a feather darker or lighter by its ``variant``."""
-    def build(tree: Tree):
-        variant = tree.n("ShaderNodeAttribute", props={"attribute_name": "variant", "attribute_type": "INSTANCER"})["Fac"]
-        base = tree.mix(variant, _scaled(color("feather"), 0.6), _scaled(color("feather"), 1.6), "RGBA")
-        return S.bsdf(tree, Base_Color=base, Roughness=param("CIN.Feather.roughness", 0.42), Coat_Weight=0.55,
-                      Coat_Roughness=0.25, Coat_Tint=color("feather_sheen"))["BSDF"]
-    return S.material("CIN.Feather", build)
-
-
 @register("CIN.OverlayBlack")
 def overlay_black():
     """What an overlay covers the picture with: black, lit by nothing."""

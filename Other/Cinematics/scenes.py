@@ -48,10 +48,14 @@ as its face.
 A shot (``shots/<id>.json``)::
 
     {"id": "Breakout", "set": "District", "frames": [68, 206],
-     "camera": {...},                               (Other.Cinematics.camerawork)
+     "camera": {"focal_px": 1315.0, "sensor": 36.0, "clip": [0.05, 8000.0],
+                "keys": [{"frame": 68, "location": [x, y, z], "rotation": [w, x, y, z]}, ...]
+                        or "calibration/<file>.json" (a file holding them),
+                "place": "calibration/<shot>.place.json",        (optional)
+                "dof": {"fstop": 2.0, "focus": {"cast": "LaPluma", "bone": "Head"}}},   (optional)
      "render": {"samples": 64, "eevee": {...}, "view": "AgX", "look": null,
                 "motion_blur": 0.5},
-     "look": {"base": "Golden", ...},               (Core.render.compositor: the film's look ``base`` with these over it)
+     "look": {...},                                 (Core.render.compositor)
      "cast": {"LaPluma": {"performance": "performances/Breakout.json"}},   (Other.Cinematics.choreography)
      "items": [item, ...],                          (optional)
      "hidden": ["Annex", ...],                      (optional: set items it leaves out)
@@ -62,12 +66,20 @@ A shot (``shots/<id>.json``)::
                    "keys": {input: [[frame, value], ...]}, "drawing": name, "layer": 0}, ...],
      "underlays": {"depth": 2.5, "items": [overlay, ...]}}                    (optional)
 
-The camera is keyed as an operator moves one (:mod:`camerawork`): where it
-stands, what it looks at, its roll and its lens, riding with a performer it
-follows; a camera with ``dof`` focuses on a bone of the shot's performer of a
-cast member, the lens open at ``fstop``.  Every performer plays its
-performance (:mod:`choreography`): key poses in set metres, keyed on the rig as
-an animator keys one.  The film's ``resolution`` and ``fps`` apply to every shot.
+Camera keys are the solved camera of every frame in set metres: Blender's
+convention, the camera looking along its local -Z with +Y up.  A camera
+solved against nothing in the set -- the sky, which only shows it turning
+-- is solved about the origin, and its ``place`` says where it stands in
+the set: the ``location`` of the origin and the direction it looks
+(``look``, or a ``target`` it looks at) with how far it turns about that
+direction from upright (``roll``, degrees), travelling from its first key at
+``velocity`` (set metres a second, none without one: the sky shows a camera
+turning, a building beside it shows it flying on).  A performance fitted against
+such a camera's picture moves with it (``"relative_to": "camera"``: her
+root on every frame is in the frame's camera's frame).  A camera with
+``dof`` focuses on a bone of the shot's performer of a cast member, the
+lens open at ``fstop``.  The film's
+``resolution`` and ``fps`` apply to every shot.
 
 A cast member with ``cloth`` (film.json: ``{"file": <RuriClothPhysics
 payload>}``) wears cloth simulated on its bones -- the
@@ -82,9 +94,11 @@ follows whatever motion the shot is edited to.  A scene's sky is its world and i
 of a picture: one shot under a pale haze, the next under cloud), its ``clouds`` key by key.  A shot's own
 ``items`` are set items only its camera sees -- a crow passing its lens.  One with a ``camera_frame`` is placed in the frame of
 the shot's camera on that frame (looking along its -Z, +Y up): where the
-camera stands then, as its keys and the performer it follows put it.  The set
-items a shot's ``hidden`` names are neither rendered nor shown in the viewport over its frames: a building
-one picture leaves out that another shows.  A shot's ``lights`` change the set's lamps over its
+camera stood then, wherever the shot's camera is solved to stand.  The set
+items a shot's ``hidden`` names are neither rendered nor shown in the viewport over its frames: the
+reference leaves a building out of one picture that another shows, or flies
+crows of its own (fitted to its picture, calibration/fit_crows.py) where the
+set's flocks would wheel.  A shot's ``lights`` change the set's lamps over its
 frames alone, keyed on them as ``hidden`` is (:func:`shot_lights`: a sun the
 picture's clouds hold back), and its sky's clouds are lit by its sun.
 
@@ -95,14 +109,13 @@ lens), each a hair nearer the lens than the one listed before it
 (``OVERLAY_LAYER``), so later ones are drawn over earlier ones.  The
 overlays of a ``layer`` (0 unless given) are a scene of their own
 (``Shot.<id>.Overlays <layer>``), blending in light as the scene renders them:
-a camera that copies the shot's wherever it moves but is in focus everywhere
-(a lens focused on her would blur a card held at the lens), rendered on a
+the shot's camera moving the same way but in focus everywhere (a lens
+focused on her would blur a card held at the lens), rendered on a
 transparent film; the layers are laid over the shot's finished picture,
 the look and all, the lowest first, each in display space as an editor
 lays titles (``Core.render.compositor``) -- pieces whose half-transparent
 parts lie over one another as an editor stacks them go in layers of their
-own.  A shot's look starts from one of the film's named looks (film.json ``looks``: the grade the
-film is graded with once) and changes what it gives -- the keys of a glitch, a fade.  Underlays are overlays standing ``depth``
+own.  Underlays are overlays standing ``depth``
 metres from the lens -- a title behind her: their own scene again, laid
 over the picture only where it shows something beyond that depth, so she
 and what she holds hide them, and sharp wherever the lens is focused.  An
@@ -116,12 +129,12 @@ import math
 import os
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Quaternion, Vector
 
 from Core import cast as CAST, jsonio, scene as SC, values as V
 from Core import render as RND
 from Core.gn import get_asset
-from . import CINEMATICS, PALETTE, camerawork as CW, choreography as CH, drawings as DR, frames as FR
+from . import CINEMATICS, PALETTE, choreography as CH, drawings as DR, frames as FR
 from .Kit import clouds as CL, materials as M, sky as SKY
 
 __all__ = ["build_film", "load_scene", "build_scene"]
@@ -529,6 +542,82 @@ def build_set(folder, set_name, film, args, linked):
                 cast_files=cast_files, source=os.path.join(folder, "sets", f"{set_name}.json"))
 
 
+def _camera_keys(folder, camera):
+    keys = camera["keys"]
+    if isinstance(keys, str):
+        path = os.path.join(folder, keys)
+        return jsonio.load(path)["keys"], [path]
+    return keys, []
+
+
+def _shot_place(folder, camera):
+    """The matrix carrying a camera solved about the origin to where its ``place`` stands it (identity without one), and
+    its ``velocity`` (set metres a second; none without one)."""
+    if "place" not in camera:
+        return Matrix.Identity(4), Vector((0.0, 0.0, 0.0)), []
+    path = os.path.join(folder, camera["place"])
+    place = jsonio.load(path)
+    location = _vector(place["location"])
+    look = (_vector(place["target"]) - location) if "target" in place else _vector(place["look"])
+    look.normalize()
+    upright = Vector((0.0, 0.0, 1.0)) - look * look.z
+    upright.normalize()
+    backward = -look
+    right = upright.cross(backward)
+    rotation = Matrix((right, upright, backward)).transposed() @ Matrix.Rotation(math.radians(place.get("roll", 0.0)), 3, "Z")
+    return Matrix.Translation(location) @ rotation.to_4x4(), _vector(place.get("velocity", (0.0, 0.0, 0.0))), [path]
+
+
+def _key_matrix(location, rotation):
+    return Matrix.Translation(_vector(location)) @ Quaternion(rotation).to_matrix().to_4x4()
+
+
+def build_camera(name, folder, camera, film, collection):
+    """The shot's camera, keyed every frame of its keys (placed by its ``place``); returns it, the
+    files it was read from and its matrix in the set on every keyed frame."""
+    data = bpy.data.cameras.new(name)
+    data.sensor_fit = "HORIZONTAL"
+    data.sensor_width = camera.get("sensor", 36.0)
+    width = film["resolution"][0]
+    data.lens = camera["focal_px"] / width * data.sensor_width
+    data.clip_start, data.clip_end = camera.get("clip", (0.05, 8000.0))
+    obj = bpy.data.objects.new(name, data)
+    collection.objects.link(obj)
+    obj.rotation_mode = "QUATERNION"
+    keys, sources = _camera_keys(folder, camera)
+    place, velocity, place_sources = _shot_place(folder, camera)
+    matrices = {}
+    previous = {}
+    first = min(key["frame"] for key in keys)
+    for key in keys:
+        travelled = Matrix.Translation(velocity * ((key["frame"] - first) / film["fps"]))
+        matrix = travelled @ place @ _key_matrix(key["location"], key["rotation"])
+        matrices[key["frame"]] = matrix
+        location, rotation, _scale = matrix.decompose()
+        obj.location = location
+        obj.rotation_quaternion = _continuous(previous, None, rotation)
+        obj.keyframe_insert("location", frame=key["frame"])
+        obj.keyframe_insert("rotation_quaternion", frame=key["frame"])
+        if "focal_px" in key:
+            data.lens = key["focal_px"] / width * data.sensor_width
+            data.keyframe_insert("lens", frame=key["frame"])
+    from Core.anim import fcurves_of
+    for curve in fcurves_of(obj) + fcurves_of(data):
+        for point in curve.keyframe_points:
+            point.interpolation = "LINEAR"
+    return obj, sources + place_sources, matrices
+
+
+def _continuous(previous, key, quaternion):
+    """``quaternion`` on the same side as the one keyed before it (``q`` and ``-q`` are one
+    rotation, but keys interpolated across a sign flip swing through every other one)."""
+    quaternion = Quaternion(quaternion)
+    if key in previous and previous[key].dot(quaternion) < 0.0:
+        quaternion.negate()
+    previous[key] = quaternion
+    return quaternion
+
+
 PRESENCE = "Shown"
 
 
@@ -578,20 +667,6 @@ def light_by_scene(scene):
     shading.use_scene_lights_render = shading.use_scene_world_render = True
 
 
-def shot_look(film, shot):
-    """The shot's compositor look: the film's look its ``base`` names with the shot's own entries over it (None without one)."""
-    look = shot.get("look")
-    if not look:
-        return None
-    base = look.get("base")
-    if base is None:
-        return dict(look)
-    looks = film.get("looks", {})
-    if base not in looks:
-        raise KeyError(f"shot {shot['id']} looks like '{base}', which the film has no look of: {sorted(looks)}")
-    return {**looks[base], **{key: value for key, value in look.items() if key != "base"}}
-
-
 def build_overlays(shot, camera, scene, items, kind):
     """A scene of the shot's overlays or underlays (``kind``, see the module notes), rendered through a copy of
     ``camera`` in focus everywhere and keyed by the same action, ``items`` carried in front of it in the
@@ -610,8 +685,10 @@ def build_overlays(shot, camera, scene, items, kind):
     lens.dof.use_dof = False
     viewer = bpy.data.objects.new(f"Shot.{shot['id']}.{kind} Camera", lens)
     overlays.collection.objects.link(viewer)
-    copy = viewer.constraints.new("COPY_TRANSFORMS")
-    copy.target = camera
+    viewer.rotation_mode = camera.rotation_mode
+    viewer.animation_data_create()
+    viewer.animation_data.action = camera.animation_data.action
+    viewer.animation_data.action_slot = camera.animation_data.action_slot
     overlays.camera = viewer
     width, height = overlays.render.resolution_x, overlays.render.resolution_y
     half_height = OVERLAY_DISTANCE * lens.sensor_width / (2.0 * lens.lens) * height / width
@@ -700,9 +777,10 @@ def build_shot(folder, film, shot, built_set, args):
     scene.render.resolution_x, scene.render.resolution_y = film["resolution"]
     scene.render.resolution_percentage = int(round(100 * (args.scale or 1.0)))
     cameras = SC.collection(f"Shot.{shot['id']}.Camera", parent=scene.collection)
-    camera = CW.build_camera(f"Shot.{shot['id']}.Camera", shot["camera"], film, cameras)
-    sources = list(sky_files)
+    camera, sources, camera_matrices = build_camera(f"Shot.{shot['id']}.Camera", folder, shot["camera"], film, cameras)
+    sources += sky_files
     scene.camera = camera
+    build_shot_items(shot, camera, scene, sun)
     hide_set_items(shot, built_set["collection"])
     light_set_lamps(shot, built_set["collection"])
     light_by_scene(scene)
@@ -712,7 +790,7 @@ def build_shot(folder, film, shot, built_set, args):
     scene.render.use_motion_blur = bool(blur)
     if blur:
         scene.render.motion_blur_shutter = blur
-    look = shot_look(film, shot)
+    look = shot.get("look")
     layers = sorted({item.get("layer", 0) for item in shot.get("overlays", [])})
     overlays = [build_overlays(shot, camera, scene, [item for item in shot["overlays"] if item.get("layer", 0) == layer], f"Overlays {layer}")
                 for layer in layers]
@@ -736,14 +814,12 @@ def build_shot(folder, film, shot, built_set, args):
                                                character["prefix"])
         _add_to_cast_lighting(objects, *built_set["cast_lighting"])
         profile_path = os.path.join(folder, film["cast"][name]["rig"])
-        performed, shown = CH.perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path))
+        performed, shown = CH.perform(rig, folder, entry, (first, last), objects, jsonio.load(profile_path), camera)
         sources += performed + [profile_path]
         if film["cast"][name].get("cloth"):
             sources += enable_cloth(rig, scene, folder, film["cast"][name]["cloth"])
         key_presence(rig, objects, tuple(film["frames"]), shown)
         performers[name] = rig
-    CW.follow(camera, shot["camera"], performers)
-    build_shot_items(shot, camera, scene, sun)
     dof = shot["camera"].get("dof")
     if dof:
         camera.data.dof.use_dof = True
