@@ -97,7 +97,7 @@ class ShotSky:
         what the camera's depth of field focuses on (the character's .blend as the film finds it)."""
         entry = self.film["cast"][name]
         collection = SC.collection("Sky Reads Cast", parent=bpy.context.scene.collection)
-        rig, objects = CAST.append_character(CAST.resolve_blend(entry, {}, name), entry["armature"], collection,
+        rig, objects = CAST.link_character(CAST.resolve_blend(entry, {}, name), entry["armature"], collection,
                                              entry.get("hidden", ()), prefix=f"Sky Reads.{name}")
         profile = jsonio.load(os.path.join(FILM, entry["rig"]))
         SCN.perform(rig, FILM, self.shot["cast"][name], tuple(self.shot["frames"]), objects, profile, self.matrices)

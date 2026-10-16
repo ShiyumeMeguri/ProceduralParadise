@@ -9,515 +9,209 @@
     "A prop is held in one of its `grips`, the one a shot names: that grip's `hand`, its palm the middle of its two `palm` bones' heads; it closes on the `shaft` (two points in the prop bone's rest frame); the prop's `parts` are told apart by material.  A part's `precision` (and the rest's `rest_precision`) is how hard it is held inside the film's silhouette of it: the film's scythe has the model's blade and hub disc (its ring about the disc's size) but a smaller housing.",
     "A body part is the surface skinned below its bones; a shot's roto masks it under the part's name (roto.py) -- her legs, told apart by the left one's knee pad and strapped thigh; her right arm (it holds the scythe).",
     "A keypoint detector seeing her from behind may swap one pair of limbs and not another: each swap group (inclusive keypoint ranges) is read left-right as it is or swapped.  A group with masked `parts` (left, right) is read by where its sure keypoints fall: a left knee on the right leg's mask is the detector's swap; elsewhere, whichever reading fits.",
-    "A limb is fitted by the angles of its `segments` (a keypoint and its parent keypoint): the reference's proportions are not the model's, so only the keypoints without a parent -- face, shoulders, hips -- are pulled onto their places; a hand's root keypoint hangs off its elbow (the wrist's own bone is the same head)."
+    "A limb is fitted by the angles of its `segments` (a keypoint and its parent keypoint): the reference's proportions are not the model's, so only the keypoints without a parent -- face, shoulders, hips -- are pulled onto their places; a hand's root keypoint hangs off its elbow (the wrist's own bone is the same head).",
+    "A fist (`fists`, by its hand) is the turn of each finger's first segment closed (the others copy it): a pose's curl goes from open (0) to it (1).",
+    "A prop is a bone of the rig (`bone`) its object rides; a hand closes on its shaft `closure` metres in from the palm, the shaft running along the knuckles (`knuckles`, index then little finger) -- `side` the palm's side of the hand.",
+    "Poses are found by the RuriMotionFlow add-on's auto-posing (`posing`: its bone mapping `profile`; a control point left further than `tolerance` metres from where a pose puts it is reported); a hand (`hands`) is pinned by its control `point` and the `aim` point that says which way it points.",
+    "Her `pivot` is the point of her at rest a performance's root places and turns her about: her middle, the pelvis's height."
   ],
   "props": {
     "Scythe": {
       "grips": {
         "right": {
           "hand": "Hand_R",
-          "palm": [
-            "Hand_R",
-            "Finger2_R"
-          ]
+          "palm": ["Hand_R", "Finger2_R"],
+          "knuckles": ["Finger1_R", "Finger4_R"],
+          "side": 1.0
         },
         "left": {
           "hand": "Hand_L",
-          "palm": [
-            "Hand_L",
-            "Finger2_L"
-          ]
+          "palm": ["Hand_L", "Finger2_L"],
+          "knuckles": ["Finger1_L", "Finger4_L"],
+          "side": -1.0
         }
       },
-      "shaft": [
-        [
-          0.006,
-          0.56,
-          0.0
-        ],
-        [
-          0.006,
-          0.84,
-          0.0
-        ]
-      ],
+      "shaft": [[0.006, 0.56, 0.0], [0.006, 0.84, 0.0]],
       "parts": {
         "blade": {
-          "materials": [
-            "WPN.Blackened",
-            "WPN.Steel"
-          ],
+          "materials": ["WPN.Blackened", "WPN.Steel"],
           "precision": 1.0
         },
         "hub": {
-          "materials": [
-            "WPN.Brushed"
-          ],
+          "materials": ["WPN.Brushed"],
           "precision": 1.0
         }
       },
-      "rest_precision": 0.25
+      "rest_precision": 0.25,
+      "bone": "ScytheRoot",
+      "closure": 0.018
     }
   },
   "parts": {
-    "leg_l": [
-      "Thigh_L"
-    ],
-    "leg_r": [
-      "Thigh_R"
-    ],
-    "arm_r": [
-      "UpperArm_R"
-    ]
+    "leg_l": ["Thigh_L"],
+    "leg_r": ["Thigh_R"],
+    "arm_r": ["UpperArm_R"]
   },
   "joints": {
     "Pelvis": {
-      "x": [
-        -45,
-        45
-      ],
-      "y": [
-        -45,
-        45
-      ],
-      "z": [
-        -45,
-        45
-      ]
+      "x": [-45, 45],
+      "y": [-45, 45],
+      "z": [-45, 45]
     },
     "Spine": {
-      "x": [
-        -35,
-        35
-      ],
-      "y": [
-        -35,
-        35
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-35, 35],
+      "y": [-35, 35],
+      "z": [-30, 30]
     },
     "Spine1": {
-      "x": [
-        -35,
-        35
-      ],
-      "y": [
-        -35,
-        35
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-35, 35],
+      "y": [-35, 35],
+      "z": [-30, 30]
     },
     "Spine2": {
-      "x": [
-        -35,
-        35
-      ],
-      "y": [
-        -35,
-        35
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-35, 35],
+      "y": [-35, 35],
+      "z": [-30, 30]
     },
     "Neck": {
-      "x": [
-        -45,
-        45
-      ],
-      "y": [
-        -60,
-        60
-      ],
-      "z": [
-        -35,
-        35
-      ]
+      "x": [-45, 45],
+      "y": [-60, 60],
+      "z": [-35, 35]
     },
     "Head": {
-      "x": [
-        -45,
-        45
-      ],
-      "y": [
-        -60,
-        60
-      ],
-      "z": [
-        -35,
-        35
-      ]
+      "x": [-45, 45],
+      "y": [-60, 60],
+      "z": [-35, 35]
     },
     "Clavicle_L": {
-      "x": [
-        -30,
-        30
-      ],
-      "y": [
-        -30,
-        30
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 30],
+      "y": [-30, 30],
+      "z": [-30, 30]
     },
     "Clavicle_R": {
-      "x": [
-        -30,
-        30
-      ],
-      "y": [
-        -30,
-        30
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 30],
+      "y": [-30, 30],
+      "z": [-30, 30]
     },
     "UpperArm_L": {
-      "x": [
-        -160,
-        160
-      ],
-      "y": [
-        -100,
-        100
-      ],
-      "z": [
-        -120,
-        120
-      ]
+      "x": [-160, 160],
+      "y": [-100, 100],
+      "z": [-120, 120]
     },
     "UpperArm_R": {
-      "x": [
-        -160,
-        160
-      ],
-      "y": [
-        -100,
-        100
-      ],
-      "z": [
-        -120,
-        120
-      ]
+      "x": [-160, 160],
+      "y": [-100, 100],
+      "z": [-120, 120]
     },
     "Forearm_L": {
-      "x": [
-        0,
-        150
-      ],
-      "y": [
-        -90,
-        90
-      ],
-      "z": [
-        0,
-        0
-      ]
+      "x": [0, 150],
+      "y": [-90, 90],
+      "z": [0, 0]
     },
     "Forearm_R": {
-      "x": [
-        0,
-        150
-      ],
-      "y": [
-        -90,
-        90
-      ],
-      "z": [
-        0,
-        0
-      ]
+      "x": [0, 150],
+      "y": [-90, 90],
+      "z": [0, 0]
     },
     "Hand_L": {
-      "x": [
-        -80,
-        80
-      ],
-      "y": [
-        -60,
-        60
-      ],
-      "z": [
-        -35,
-        35
-      ]
+      "x": [-80, 80],
+      "y": [-60, 60],
+      "z": [-35, 35]
     },
     "Hand_R": {
-      "x": [
-        -80,
-        80
-      ],
-      "y": [
-        -60,
-        60
-      ],
-      "z": [
-        -35,
-        35
-      ]
+      "x": [-80, 80],
+      "y": [-60, 60],
+      "z": [-35, 35]
     },
     "Thigh_L": {
-      "x": [
-        -45,
-        130
-      ],
-      "y": [
-        -50,
-        50
-      ],
-      "z": [
-        -30,
-        60
-      ]
+      "x": [-45, 130],
+      "y": [-50, 50],
+      "z": [-30, 60]
     },
     "Thigh_R": {
-      "x": [
-        -45,
-        130
-      ],
-      "y": [
-        -50,
-        50
-      ],
-      "z": [
-        -60,
-        30
-      ]
+      "x": [-45, 130],
+      "y": [-50, 50],
+      "z": [-60, 30]
     },
     "Calf_L": {
-      "x": [
-        -150,
-        0
-      ],
-      "y": [
-        -10,
-        10
-      ],
-      "z": [
-        0,
-        0
-      ]
+      "x": [-150, 0],
+      "y": [-10, 10],
+      "z": [0, 0]
     },
     "Calf_R": {
-      "x": [
-        -150,
-        0
-      ],
-      "y": [
-        -10,
-        10
-      ],
-      "z": [
-        0,
-        0
-      ]
+      "x": [-150, 0],
+      "y": [-10, 10],
+      "z": [0, 0]
     },
     "Foot_L": {
-      "x": [
-        -50,
-        50
-      ],
-      "y": [
-        -25,
-        25
-      ],
-      "z": [
-        -25,
-        25
-      ]
+      "x": [-50, 50],
+      "y": [-25, 25],
+      "z": [-25, 25]
     },
     "Foot_R": {
-      "x": [
-        -50,
-        50
-      ],
-      "y": [
-        -25,
-        25
-      ],
-      "z": [
-        -25,
-        25
-      ]
+      "x": [-50, 50],
+      "y": [-25, 25],
+      "z": [-25, 25]
     },
     "Toe0_L": {
-      "x": [
-        -70,
-        50
-      ],
-      "y": [
-        0,
-        0
-      ],
-      "z": [
-        0,
-        0
-      ]
+      "x": [-70, 50],
+      "y": [0, 0],
+      "z": [0, 0]
     },
     "Toe0_R": {
-      "x": [
-        -70,
-        50
-      ],
-      "y": [
-        0,
-        0
-      ],
-      "z": [
-        0,
-        0
-      ]
+      "x": [-70, 50],
+      "y": [0, 0],
+      "z": [0, 0]
     },
     "Finger0_L": {
-      "x": [
-        -60,
-        60
-      ],
-      "y": [
-        -60,
-        60
-      ],
-      "z": [
-        -60,
-        60
-      ]
+      "x": [-60, 60],
+      "y": [-60, 60],
+      "z": [-60, 60]
     },
     "Finger1_L": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     },
     "Finger2_L": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     },
     "Finger3_L": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     },
     "Finger4_L": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     },
     "Finger0_R": {
-      "x": [
-        -60,
-        60
-      ],
-      "y": [
-        -60,
-        60
-      ],
-      "z": [
-        -60,
-        60
-      ]
+      "x": [-60, 60],
+      "y": [-60, 60],
+      "z": [-60, 60]
     },
     "Finger1_R": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     },
     "Finger2_R": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     },
     "Finger3_R": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     },
     "Finger4_R": {
-      "x": [
-        -30,
-        100
-      ],
-      "y": [
-        -20,
-        20
-      ],
-      "z": [
-        -30,
-        30
-      ]
+      "x": [-30, 100],
+      "y": [-20, 20],
+      "z": [-30, 30]
     }
   },
   "curls": {
@@ -544,17 +238,11 @@
   },
   "twists": {
     "Hand_L": {
-      "bones": [
-        "ForeTwist_L",
-        "ForeTwist1_L"
-      ],
+      "bones": ["ForeTwist_L", "ForeTwist1_L"],
       "share": 0.3333333
     },
     "Hand_R": {
-      "bones": [
-        "ForeTwist_R",
-        "ForeTwist1_R"
-      ],
+      "bones": ["ForeTwist_R", "ForeTwist1_R"],
       "share": 0.3333333
     }
   },
@@ -617,19 +305,11 @@
     "18": {
       "bone": "Toe0_L",
       "along": 0.7,
-      "offset": [
-        0.03,
-        0.0,
-        0.0
-      ]
+      "offset": [0.03, 0.0, 0.0]
     },
     "19": {
       "bone": "Foot_L",
-      "offset": [
-        0.0,
-        -0.09,
-        -0.06
-      ]
+      "offset": [0.0, -0.09, -0.06]
     },
     "20": {
       "bone": "Toe0_R",
@@ -638,19 +318,11 @@
     "21": {
       "bone": "Toe0_R",
       "along": 0.7,
-      "offset": [
-        -0.03,
-        0.0,
-        0.0
-      ]
+      "offset": [-0.03, 0.0, 0.0]
     },
     "22": {
       "bone": "Foot_R",
-      "offset": [
-        0.0,
-        -0.09,
-        -0.06
-      ]
+      "offset": [0.0, -0.09, -0.06]
     },
     "91": {
       "bone": "Hand_L"
@@ -847,178 +519,83 @@
     "131": 130,
     "132": 131
   },
-  "torso": [
-    5,
-    6,
-    11,
-    12,
-    0,
-    1,
-    2
-  ],
+  "torso": [5, 6, 11, 12, 0, 1, 2],
   "swap_groups": {
     "head": {
-      "keys": [
-        [
-          0,
-          4
-        ]
-      ]
+      "keys": [[0, 4]]
     },
     "arms": {
-      "keys": [
-        [
-          5,
-          10
-        ],
-        [
-          91,
-          132
-        ]
-      ]
+      "keys": [[5, 10], [91, 132]]
     },
     "legs": {
-      "keys": [
-        [
-          11,
-          22
-        ]
-      ],
-      "parts": [
-        "leg_l",
-        "leg_r"
-      ]
+      "keys": [[11, 22]],
+      "parts": ["leg_l", "leg_r"]
     }
   },
   "body": 23,
   "mirror": [
-    [
-      1,
-      2
-    ],
-    [
-      3,
-      4
-    ],
-    [
-      5,
-      6
-    ],
-    [
-      7,
-      8
-    ],
-    [
-      9,
-      10
-    ],
-    [
-      11,
-      12
-    ],
-    [
-      13,
-      14
-    ],
-    [
-      15,
-      16
-    ],
-    [
-      17,
-      20
-    ],
-    [
-      18,
-      21
-    ],
-    [
-      19,
-      22
-    ],
-    [
-      91,
-      112
-    ],
-    [
-      92,
-      113
-    ],
-    [
-      93,
-      114
-    ],
-    [
-      94,
-      115
-    ],
-    [
-      95,
-      116
-    ],
-    [
-      96,
-      117
-    ],
-    [
-      97,
-      118
-    ],
-    [
-      98,
-      119
-    ],
-    [
-      99,
-      120
-    ],
-    [
-      100,
-      121
-    ],
-    [
-      101,
-      122
-    ],
-    [
-      102,
-      123
-    ],
-    [
-      103,
-      124
-    ],
-    [
-      104,
-      125
-    ],
-    [
-      105,
-      126
-    ],
-    [
-      106,
-      127
-    ],
-    [
-      107,
-      128
-    ],
-    [
-      108,
-      129
-    ],
-    [
-      109,
-      130
-    ],
-    [
-      110,
-      131
-    ],
-    [
-      111,
-      132
-    ]
-  ]
+    [1, 2],
+    [3, 4],
+    [5, 6],
+    [7, 8],
+    [9, 10],
+    [11, 12],
+    [13, 14],
+    [15, 16],
+    [17, 20],
+    [18, 21],
+    [19, 22],
+    [91, 112],
+    [92, 113],
+    [93, 114],
+    [94, 115],
+    [95, 116],
+    [96, 117],
+    [97, 118],
+    [98, 119],
+    [99, 120],
+    [100, 121],
+    [101, 122],
+    [102, 123],
+    [103, 124],
+    [104, 125],
+    [105, 126],
+    [106, 127],
+    [107, 128],
+    [108, 129],
+    [109, 130],
+    [110, 131],
+    [111, 132]
+  ],
+  "fists": {
+    "Hand_R": {
+      "Finger0_R": [25.0, 0.0, 35.0],
+      "Finger1_R": [72.0, 0.0, 0.0],
+      "Finger2_R": [78.0, 0.0, 0.0],
+      "Finger3_R": [80.0, 0.0, 0.0],
+      "Finger4_R": [82.0, 0.0, 0.0]
+    },
+    "Hand_L": {
+      "Finger0_L": [25.0, 0.0, 35.0],
+      "Finger1_L": [72.0, 0.0, 0.0],
+      "Finger2_L": [78.0, 0.0, 0.0],
+      "Finger3_L": [80.0, 0.0, 0.0],
+      "Finger4_L": [82.0, 0.0, 0.0]
+    }
+  },
+  "posing": {
+    "profile": "humanoid",
+    "tolerance": 0.02
+  },
+  "hands": {
+    "Hand_R": {
+      "point": "hand_r",
+      "aim": "hand_dir_r"
+    },
+    "Hand_L": {
+      "point": "hand_l",
+      "aim": "hand_dir_l"
+    }
+  },
+  "pivot": [0.0, 0.0, 0.95]
 }

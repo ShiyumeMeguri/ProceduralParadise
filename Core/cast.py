@@ -2,11 +2,17 @@
 Core.cast -- characters a scene borrows from a .blend of their own.
 
 A character is made and rigged elsewhere, in a file its author keeps
-working on; a build appends it afresh every time, so it always plays the
-character as that file has it now.  It is appended, never linked: the
-character's shading groups may themselves be links into other files, and a
-link of a link that fails to resolve renders black without a word, while
-appended data is the build's own.
+working on; a build links it to that file, so the scene plays the
+character as that file has it -- now and every time the scene is opened
+after.  The link is the RuriLinkSync add-on's (it must be enabled): the
+character's objects are the scene's own -- their transforms, modifiers,
+constraints, poses and actions -- while their data-blocks (meshes,
+armatures, the materials an object holds in its own slots) are library
+overrides of the author's, the one source they follow.  A part the
+author's file itself borrows from another file (a body it overrides from a
+shared base) follows that file, as the author's does.  The add-on records
+on every object which source it follows, so its panel binds, detaches and
+pushes the character as it does one made by hand.
 
 A cast entry is data::
 
@@ -22,9 +28,9 @@ with it; ``hidden`` parts are kept but neither drawn nor evaluated -- a
 coat that is not rigged yet, say.  Objects outside the rig's hierarchy (the
 author's reference meshes, curve tools, lights) are left behind.
 
-A character appended once can play in several shots: each gets a performer
+A character linked once can play in several shots: each gets a performer
 of its own (``instance_character``), copies of the rig and its objects that
-share the character's meshes, materials and armature and animate apart.
+share the character's data-blocks and animate apart.
 """
 from __future__ import annotations
 
@@ -33,7 +39,7 @@ import os
 
 import bpy
 
-__all__ = ["resolve_blend", "blend_digest", "append_character", "instance_character"]
+__all__ = ["resolve_blend", "blend_digest", "link_character", "instance_character"]
 
 
 def resolve_blend(entry, overrides=None, name=None):
@@ -104,13 +110,45 @@ def _drop_new_orphans(before):
         bpy.data.batch_remove(doomed)
 
 
-def append_character(path, armature, collection, hidden=(), prefix=None):
-    """Append the rig ``armature`` of ``path`` with every object under it
-    into ``collection``.  The rig's pose is cleared to its rest pose and
-    its action dropped: the scene animates it.  ``hidden`` objects are
-    neither drawn nor evaluated.  With ``prefix`` every appended object is
-    renamed ``<prefix>.<name>`` (two casts from one file keep apart).
-    Returns ``(armature object, [objects])``."""
+def _source(datablock, path):
+    """The (file, name) that ``datablock`` -- brought in by an append of ``path`` -- follows: an override's own reference
+    (a part the author's file borrows from another), else the data-block of its name in ``path`` (the append's record of
+    the name it had there)."""
+    override = datablock.override_library
+    if override is not None and override.reference is not None and override.reference.library is not None:
+        return os.path.abspath(bpy.path.abspath(override.reference.library.filepath)), override.reference.name
+    return path, datablock.library_weak_reference.id_name[2:]
+
+
+def _follow(obj, path, source_name):
+    """Make the data of ``obj`` (an object of ``path`` named ``source_name`` there, appended) and the materials it holds in
+    its own slots follow their sources through the RuriLinkSync add-on; returns the links it could not mend."""
+    from RuriLinkSync import character, linkage
+    unresolved = []
+    if obj.data is not None and linkage.collection_of(obj.data) is not None:
+        data_path, data_name = _source(obj.data, path)
+        if obj.data.override_library is None:
+            _override, missing = linkage.attach(obj.data, data_path, data_name)
+            unresolved += missing
+        character.remember_binding(obj, data_path, source_name)
+    for slot in getattr(obj, "material_slots", ()):
+        material = slot.material
+        if slot.link == "OBJECT" and material is not None and material.library is None and material.override_library is None:
+            material_path, material_name = _source(material, path)
+            _override, missing = linkage.attach(material, material_path, material_name)
+            unresolved += missing
+    if obj.type == "MESH" and any(slot.link == "OBJECT" for slot in obj.material_slots):
+        obj.shiyume_sync_materials = False
+    return unresolved
+
+
+def link_character(path, armature, collection, hidden=(), prefix=None):
+    """Bring the rig ``armature`` of ``path`` with every object under it
+    into ``collection``, its data following the file (see the module notes).
+    The rig's pose is cleared to its rest pose and its action dropped: the
+    scene animates it.  ``hidden`` objects are neither drawn nor evaluated.
+    With ``prefix`` every object is renamed ``<prefix>.<name>`` (two casts
+    from one file keep apart).  Returns ``(armature object, [objects])``."""
     before = {obj.name_full for obj in bpy.data.objects}
     identities = _identities()
     with bpy.data.libraries.load(path, link=False) as (source, target):
@@ -130,14 +168,18 @@ def append_character(path, armature, collection, hidden=(), prefix=None):
     missing = set(hidden) - {source_names[obj] for obj in kept}
     if missing:
         raise KeyError(f"{path}: hidden parts {sorted(missing)} are not under '{armature}'")
+    unresolved = []
     for obj in kept:
         source_name = source_names[obj]
         collection.objects.link(obj)
+        unresolved += _follow(obj, path, source_name)
         if prefix:
             _rename(obj, f"{prefix}.{source_name}")
         if source_name in hidden:
             obj.hide_render = True
             obj.hide_viewport = True
+    if unresolved:
+        raise RuntimeError(f"{path}: links of the character its overrides could not mend: {unresolved}")
     if rig.animation_data is not None:
         rig.animation_data_clear()
     for bone in rig.pose.bones:
@@ -175,14 +217,15 @@ def _retarget(item, copies):
 
 
 def instance_character(rig, objects, collection, prefix, original_prefix):
-    """Another performer of a character ``append_character`` brought in:
+    """Another performer of a character ``link_character`` brought in:
     copies of ``rig`` and its ``objects`` in ``collection``, each named
     ``<prefix>.<name>`` for the original's ``<original_prefix>.<name>``,
     that animate apart from the originals.  They share the originals'
     meshes, materials and armature; what they refer to among the originals
     -- a parent, a modifier's or a constraint's object, a driver's target
     -- is the copy of it, and a mesh whose drivers read one of them (shape
-    keys a bone opens, say) is copied along, its drivers reading the copy.
+    keys a bone opens, say) is overridden afresh from the source it follows,
+    its drivers reading the copy.
     Returns ``(armature object, [objects])``."""
     copies = {original: original.copy() for original in objects}
     for original, copy in copies.items():
@@ -197,7 +240,7 @@ def instance_character(rig, objects, collection, prefix, original_prefix):
         data = copy.data
         if data is not None and any(target.id in copies for holder in (data, getattr(data, "shape_keys", None))
                                     for target in _driver_targets(holder)):
-            copy.data = data.copy()
+            copy.data = data.override_library.reference.override_create(remap_local_usages=False)
         for holder in (copy, copy.data, getattr(copy.data, "shape_keys", None)):
             for target in _driver_targets(holder):
                 if target.id in copies:

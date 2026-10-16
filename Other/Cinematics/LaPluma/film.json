@@ -1,32 +1,15 @@
 {
   "id": "LaPluma",
   "name": "La Pluma (羽毛笔) -- recruitment film",
-  "notes": [
-    "Rebuilt from the reference video named by the environment variable LAPLUMA_REFERENCE (1920 x 1080, 30 fps); frame numbers are the video's own.",
-    "The cast's .blend is named by the environment variable LAPLUMA_BLEND (or --cast LaPluma=<path>).  Its shading is runtime data of the RuriRipperImporter add-on, which must be enabled in the Blender that builds the film.",
-    "The soundtrack is the game's recruitment music (its sound bank's stream 76944955, decoded by its owner), named by the environment variable LAPLUMA_MUSIC; the reference's frame 0 plays it from 1.62 s in."
-  ],
+  "notes": ["Rebuilt from the reference video named by the environment variable LAPLUMA_REFERENCE (1920 x 1080, 30 fps); frame numbers are the video's own.", "The cast's .blend is named by the environment variable LAPLUMA_BLEND (or --cast LaPluma=<path>).  Its shading is runtime data of the RuriRipperImporter add-on, which must be enabled in the Blender that builds the film.", "The soundtrack is the game's recruitment music (its sound bank's stream 76944955, decoded by its owner), named by the environment variable LAPLUMA_MUSIC; the reference's frame 0 plays it from 1.62 s in."],
   "fps": 30,
-  "resolution": [
-    1920,
-    1080
-  ],
-  "frames": [
-    0,
-    726
-  ],
+  "resolution": [1920, 1080],
+  "frames": [0, 726],
   "reference": {
     "video": {
       "environment": "LAPLUMA_REFERENCE"
     },
-    "masks": [
-      [
-        1560,
-        0,
-        1920,
-        130
-      ]
-    ]
+    "masks": [[1560, 0, 1920, 130]]
   },
   "cast": {
     "LaPluma": {
@@ -35,74 +18,47 @@
       },
       "armature": "Avatar_LaPluma",
       "rig": "cast/LaPluma.json",
-      "hidden": [
-        "S_actor_lapluma_cloth_03_lod0.003",
-        "S_actor_lapluma_cloth_04_lod0"
-      ],
+      "hidden": ["S_actor_lapluma_cloth_03_lod0.003", "S_actor_lapluma_cloth_04_lod0"],
       "shading": {
         "module": "RuriRipperImporter.Host.Blender.derived_state",
         "call": "flush",
         "error": "LAST_ERROR"
       },
-      "sets": [
-        "District",
-        "Hall"
-      ],
-      "notes": [
-        "The coat is rigged (10-07); its two pieces with no bone weights would stand in the rest pose beside her and stay hidden."
-      ],
+      "sets": ["District", "Hall"],
+      "notes": ["The coat is rigged (10-07); its two pieces with no bone weights would stand in the rest pose beside her and stay hidden."],
       "cloth": {
         "file": "cast/LaPluma.cloth.json"
       }
     }
   },
-  "shots": [
-    "Intro",
-    "Breakout",
-    "Hand",
-    "Fly",
-    "Operator",
-    "Hall"
-  ],
-  "holds": [
-    1,
-    41,
-    42,
-    60,
-    61,
-    208,
-    209,
-    215,
-    216,
-    226,
-    230,
-    241,
-    245,
-    256,
-    260,
-    271,
-    275,
-    286,
-    290,
-    301,
-    305,
-    316,
-    320,
-    331,
-    346,
-    350,
-    361,
-    373,
-    455,
-    481,
-    485,
-    511,
-    515,
-    591,
-    714
-  ],
+  "shots": ["Intro", "Breakout", "Fall", "Hand", "Fly", "Operator", "Hall"],
+  "holds": [1, 41, 42, 60, 61],
   "audio": {
     "environment": "LAPLUMA_MUSIC",
     "offset": 1.62
+  },
+  "looks": {
+    "Golden": {
+      "exposure": 0.0,
+      "bloom": {
+        "threshold": 0.9,
+        "size": 7,
+        "strength": 0.3
+      },
+      "vignette": {
+        "strength": 0.22,
+        "power": 2.2
+      },
+      "grade": {
+        "matrix": [[1.06299, -0.05722, -0.00578], [-0.01701, 1.02278, -0.00578], [-0.01701, -0.05722, 1.07422]],
+        "offset": [0.0, 0.0, 0.0],
+        "curves": {
+          "R": [[0.0, 0.0], [0.25, 0.22], [0.5, 0.51], [0.75, 0.79], [1.0, 1.0]],
+          "G": [[0.0, 0.0], [0.25, 0.235], [0.5, 0.5], [0.75, 0.765], [1.0, 1.0]],
+          "B": [[0.0, 0.02], [0.25, 0.26], [0.5, 0.49], [0.75, 0.73], [1.0, 0.97]]
+        },
+        "highlight_rolloff": true
+      }
+    }
   }
 }

@@ -114,7 +114,7 @@ class Fit:
             SCN.build_lamp(lamp, lights)
         self.sun = SCN.sky_sun(lamps)
         settings = shot["render"]
-        RND.ENGINES[settings["engine"]](samples=args.samples, **settings.get(settings["engine"].lower(), {}))
+        RND.setup_eevee(samples=args.samples, **settings.get("eevee", {}))
         scene.render.resolution_x, scene.render.resolution_y = self.reads.width, self.reads.height
         scene.render.resolution_percentage = int(round(100 * args.scale))
         scene.camera = self.reads.camera

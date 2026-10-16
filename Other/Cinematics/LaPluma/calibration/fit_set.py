@@ -141,7 +141,7 @@ class Fit:
         self.baked = None
         self.sun = SCN.sky_sun(lamps)
         settings = shot["render"]
-        RND.ENGINES[settings["engine"]](samples=spec.get("samples", 16), **settings.get(settings["engine"].lower(), {}))
+        RND.setup_eevee(samples=spec.get("samples", 16), **settings.get("eevee", {}))
         scene.render.resolution_x, scene.render.resolution_y = self.reads.width, self.reads.height
         scene.render.resolution_percentage = int(round(100 * spec.get("scale", 0.25)))
         scene.camera = self.reads.camera

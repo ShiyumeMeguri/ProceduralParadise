@@ -1,0 +1,80 @@
+{
+  "id": "Fall",
+  "set": "District",
+  "frames": [153, 206],
+  "notes": ["She falls down the face of the tower: the camera falls with her, beside and then below her, the tower's frame and the district wheeling past as she rolls from her back into a dive and looks up at it (206).", "Its sky and look are Breakout's: the same daylight a moment later."],
+  "camera": {
+    "lens": 32.0,
+    "sensor": 36.0,
+    "clip": [0.05, 8000.0],
+    "dof": {
+      "fstop": 2.8,
+      "focus": {
+        "cast": "LaPluma",
+        "bone": "Head"
+      }
+    },
+    "follow": {
+      "cast": "LaPluma",
+      "bone": "Pelvis"
+    },
+    "keys": [
+      {
+        "frame": 153,
+        "at": [3.2, -3.4, 1.2],
+        "aim": [0.0, 0.0, 0.1],
+        "lens": 32.0
+      },
+      {
+        "frame": 168,
+        "at": [2.6, -3.2, -1.2],
+        "aim": [0.0, 0.0, 0.0],
+        "lens": 32.0,
+        "roll": 4.0
+      },
+      {
+        "frame": 184,
+        "at": [1.0, -3.4, -2.2],
+        "aim": [0.0, 0.0, 0.0],
+        "lens": 35.0,
+        "roll": 8.0
+      },
+      {
+        "frame": 206,
+        "at": [-0.8, -2.6, -2.0],
+        "aim": [0.0, 0.0, -0.2],
+        "lens": 35.0,
+        "roll": 12.0
+      }
+    ]
+  },
+  "render": {
+    "samples": 32,
+    "eevee": {
+      "shadow_pool": "1024",
+      "volume_range": [0.5, 6000.0],
+      "volume_tile": "4",
+      "volume_samples": 192,
+      "volume_shadows": false,
+      "volume_distribution": 1.0
+    },
+    "view": "Standard",
+    "motion_blur": 0.25
+  },
+  "look": {
+    "base": "Golden"
+  },
+  "cast": {
+    "LaPluma": {
+      "performance": "performances/Fall.json"
+    }
+  },
+  "wind": [
+    {
+      "direction": [0.0, 0.0, 1.0],
+      "strength": 2.5,
+      "turbulence": 0.8
+    }
+  ],
+  "hidden": []
+}

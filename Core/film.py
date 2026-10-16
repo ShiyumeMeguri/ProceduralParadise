@@ -138,8 +138,11 @@ def _digest(paths, extra):
 
 
 def _code_files(root):
+    """The project's code the build imported: modules loaded from a file under ``root`` (a module whose ``__file__`` is no
+    absolute path was made in memory -- ``torch._classes`` says ``_classes.py`` -- and is nobody's file)."""
     return {os.path.abspath(module.__file__) for module in list(sys.modules.values())
-            if getattr(module, "__file__", None) and os.path.abspath(module.__file__).startswith(root + os.sep)}
+            if getattr(module, "__file__", None) and os.path.isabs(module.__file__)
+            and os.path.abspath(module.__file__).startswith(root + os.sep)}
 
 
 def shot_fingerprint(shot, root, script_path, args, cast_digests):

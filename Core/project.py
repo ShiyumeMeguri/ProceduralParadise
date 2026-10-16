@@ -2,11 +2,12 @@
 Core.project -- a built file made a project of its own: every file it reads from outside its folder copied into the
 folder's ``Data`` and read from there by a relative path, the .blend saved in the folder.
 
-``export(folder, name, sources)`` takes the open file as it stands: images, sounds, fonts, movie clips, volumes, cache files and
-libraries read from a file, and every image and movie strip of every scene's sequencer (an image strip's frames as a
+``export(folder, name, sources)`` takes the open file as it stands: images, sounds, fonts, movie clips, volumes and cache
+files read from a file, and every image and movie strip of every scene's sequencer (an image strip's frames as a
 folder of their own).  A file already inside ``folder`` stays where it is; one outside it goes to ``Data/<kind>`` (two of
-one name from different folders kept apart by a number).  What the file holds packed stays packed.  Opened from
-anywhere the project reads only what lies beside it.
+one name from different folders kept apart by a number).  What the file holds packed stays packed.  The libraries it
+links are never copied: a linked file is the one source of what the project borrows from it (a cast that follows its
+author's file), and a copy would be a second that stops following -- they are read where they live, by a relative path.
 """
 from __future__ import annotations
 
@@ -19,7 +20,7 @@ __all__ = ["export"]
 
 DATA = "Data"
 KINDS = (("images", "Textures"), ("sounds", "Audio"), ("fonts", "Fonts"), ("movieclips", "Video"), ("volumes", "Volumes"),
-         ("cache_files", "Caches"), ("libraries", "Libraries"))
+         ("cache_files", "Caches"))
 
 
 def _inside(path, folder):
