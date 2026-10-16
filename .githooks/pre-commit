@@ -1,0 +1,2 @@
+#!/bin/sh
+exec python "$(git rev-parse --show-toplevel)/.githooks/check_render_engine.py"

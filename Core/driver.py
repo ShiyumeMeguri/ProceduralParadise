@@ -126,9 +126,9 @@ def shot_cameras(shot, matrix):
 
 
 def render_setup(shot, args, lines_defaults=None):
-    """Render engine (the shot's ``render.engine``: CYCLES or EEVEE, with its
-    settings under ``render.cycles`` / ``render.eevee``; ``render.transparent``
-    for a film laid on the look's backdrop), colour management
+    """EEVEE (the shot's ``render``: its ``samples`` and settings under
+    ``render.eevee``; ``render.transparent`` for a film laid on the look's
+    backdrop), colour management
     and the compositor look of a shot -- without its ``grade`` for
     ``--no-grade`` (the image a new grade is fitted on), without its
     ``engine_transfer`` for ``--no-transfer`` (the image a transfer is
@@ -138,13 +138,11 @@ def render_setup(shot, args, lines_defaults=None):
     grade sees exactly the values it was fitted on; a view may carry its own
     camera exposure.  ``lines_defaults`` completes a look's ``lines`` entry
     (collections, occluders) for worlds that draw Freestyle ink lines.
-    Returns ``dict(engine, compositor, look_exposure, exposure)``."""
+    Returns ``dict(compositor, look_exposure, exposure)``."""
     from . import render as RND
     sc = bpy.context.scene
     settings = shot["render"]
-    engine = settings["engine"]
-    RND.ENGINES[engine](samples=args.samples or settings.get("samples", 128),
-                        **settings.get(engine.lower(), {}))
+    RND.setup_eevee(samples=args.samples or settings.get("samples", 128), **settings.get("eevee", {}))
     sc.render.film_transparent = settings.get("transparent", False)
     view = shot["views"][args.view] if args.view else None
     exposure = (view or {}).get("exposure", settings.get("exposure", 0.0))
@@ -174,7 +172,7 @@ def render_setup(shot, args, lines_defaults=None):
         sc.camera = bpy.data.objects[f"VIEW_{args.view}"]
         if "resolution" in view:
             sc.render.resolution_x, sc.render.resolution_y = view["resolution"]
-    return dict(engine=engine, compositor=compositor, look_exposure=look_exposure, exposure=exposure)
+    return dict(compositor=compositor, look_exposure=look_exposure, exposure=exposure)
 
 
 def build_animation(folder, name, shot, matrix, look):
@@ -271,7 +269,7 @@ def activate_animation(context, samples, video, inputs):
     width, height = spec.get("resolution", (1920, 1080))
     sc.render.resolution_x, sc.render.resolution_y = width, height
     if samples or "samples" in spec:
-        RND.set_samples(context["engine"], samples or spec["samples"], sc)
+        RND.set_samples(samples or spec["samples"], sc)
     stem = os.path.splitext(video)[0]
     RND.frame_output(f"{stem}/{inputs}/{bpy.path.basename(stem)}_", fps=spec.get("fps", 30))
     context["video_scene"] = RND.video_scene(video, f"{spec['id']} Video", sc)
@@ -322,9 +320,6 @@ def run(context, args, out, root, script_path):
             os.path.join(os.path.dirname(out), "video", f"{video_id}.mp4")
         in_blend = video if args.render_animation or args.no_save else f"//video/{video_id}.mp4"
         activate_animation(context, args.samples, in_blend, fingerprint(args, root, script_path)[:16])
-    if context["engine"] == "CYCLES":
-        backend = RND.use_gpu_if_available()
-        print(f"[build] Cycles device: {backend or 'CPU'}")
     if not args.no_save:
         os.makedirs(os.path.dirname(out), exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=out, compress=True)

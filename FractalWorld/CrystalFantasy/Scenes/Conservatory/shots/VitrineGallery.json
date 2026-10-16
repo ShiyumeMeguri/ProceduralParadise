@@ -10,15 +10,10 @@
     "roll_deg": 0.0
   },
   "render": {
-    "engine": "CYCLES",
     "samples": 256,
     "view": "Standard",
     "look": null,
-    "exposure": 0.8,
-    "cycles": {
-      "max_bounces": 16,
-      "clamp_indirect": 6.0
-    }
+    "exposure": 0.8
   },
   "look": {
     "glow": {

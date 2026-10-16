@@ -39,7 +39,7 @@ room                 room folder relative to BlueArchive/ (default Millennium/Ro
 --render-animation [PATH]  render the camera animation's missing frames and
                      assemble them into the MP4 at PATH
                      (default: <Build folder>/video/<Animation>.mp4)
---samples N          override Cycles samples
+--samples N          override the render samples
 --scale S            resolution scale (e.g. 0.5 for previews)
 --no-lines           skip the Freestyle ink lines (much faster animation renders)
 --standalone         build the room without the campus (own curtain wall, sky only)

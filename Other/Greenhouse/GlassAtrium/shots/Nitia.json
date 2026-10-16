@@ -11,7 +11,6 @@
     "roll_deg": -0.06
   },
   "render": {
-    "engine": "EEVEE",
     "samples": 64,
     "view": "Standard",
     "look": null,

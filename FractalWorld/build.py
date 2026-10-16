@@ -30,7 +30,7 @@ scene                scene folder relative to FractalWorld/ (default CrystalFant
 --render PATH        render the active shot to PATH (png)
 --view NAME          render a free view of scene.json "views" instead
 --render-animation [PATH]  render the flight's missing frames and assemble the MP4
---samples N          override Cycles samples
+--samples N          override the render samples
 --scale S            resolution scale (e.g. 0.5 for previews)
 --no-look            disable the compositor look
 """

@@ -4,7 +4,7 @@ Sub-packages
 ------------
 Kit      geometry-node assets: the steel-and-glass structure, furniture,
          glassware, plants and the outdoor backdrop, and the material
-         library (Cycles)
+         library (EEVEE)
 <Space>/ one folder per space (scene.json, shots, reference, renders) assembled
          from the kit
 

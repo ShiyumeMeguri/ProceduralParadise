@@ -68,8 +68,8 @@
 `<输入标识>` 由 Blender 版本、影响画面的参数和本次构建读入的全部代码与 JSON 算出：改了场景再构建，
 新帧进新文件夹，旧帧原样保留、绝不混进新视频；改回原样会接着用原来那批帧。
 
-若本机有显卡且 Cycles 还没配置计算设备，脚本会自动启用 GPU（OptiX / CUDA / HIP / Metal / oneAPI），
-降噪也放在显卡上做。长片建议用下面的命令行渲染，比在界面里按 Ctrl+F12 快。
+全仓只用 EEVEE 渲染：所有着色器都是为 EEVEE 写的，EEVEE 的成图就是正确的成图（提交钩子 `.githooks` 拒绝任何引入别的渲染引擎的改动）。
+长片建议用下面的命令行渲染，比在界面里按 Ctrl+F12 快。
 
 **命令行：**
 
@@ -118,7 +118,7 @@ Core/                     与游戏无关的通用框架
   nodes.py                节点树 DSL（运算符重载、版本兼容的节点解析）
   gn.py                   几何节点构建器 + 资产注册表（@asset）
   scene.py camera.py      场景/集合/GN 对象；摄影测量相机（焦距、主点偏移、两点透视）
-  shaders.py render.py    程序化材质；Cycles、合成器外观（曝光、辉光、调色、Freestyle 描边）、视频输出
+  shaders.py render.py    程序化材质；EEVEE、合成器外观（曝光、辉光、调色、Freestyle 描边）、视频输出
   anim.py                 相机动画：关键帧 + 平滑样条手柄，可在 Graph Editor 里继续调
   grade.py compare.py     调色拟合（直方图/色卡/回归）；与参考图的叠线、区域色差、SSIM 对比
   values.py               JSON 值到节点接口值的换算（角度、颜色、色板引用）

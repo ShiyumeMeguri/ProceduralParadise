@@ -8,14 +8,18 @@
     "yaw_deg": 35.942,
     "pitch_deg": -16.888,
     "roll_deg": 0.0,
-    "dof": {"focus_distance": 0.54167, "fstop": 2.8}
+    "dof": {
+      "focus_distance": 0.54167,
+      "fstop": 2.8
+    }
   },
   "render": {
-    "engine": "EEVEE",
     "samples": 128,
     "view": "AgX",
     "look": "Medium High Contrast",
     "exposure": 0.0,
-    "eevee": {"viewport_samples": 32}
+    "eevee": {
+      "viewport_samples": 32
+    }
   }
 }

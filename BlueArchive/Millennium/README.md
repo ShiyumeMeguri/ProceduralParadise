@@ -25,7 +25,7 @@
 | `MIL.Arch.WallPanel` `MIL.Arch.Column` `MIL.Arch.FloorSlab` | 隔墙（含开洞）、柱/壁柱/收口型材、楼板 |
 | `MIL.Arch.CeilingSystem` | 周边跌级吊顶 + 主吊顶 + 灯槽（coffer），含收边条 |
 | `MIL.Arch.GlassDoor` | 千年风格切角门框的玻璃双开门 |
-| `MIL.Fix.LinearPendant` | 吊装线性 LED 灯（配 Cycles 面光源做实际照明） |
+| `MIL.Fix.LinearPendant` | 吊装线性 LED 灯（配面光源做实际照明） |
 | `MIL.Fix.HoloSign` + `MIL.Emblem` `MIL.Wordmark` | 倒梯形全息标牌、校徽（按原画轮廓矢量化）、"MILLENNIUM" 字标（笔画字体） |
 | `MIL.Furn.Desk` | 实验/研讨桌单元（宽度参数化：房间里有 0.88 m 与 0.72 m 两种） |
 | `MIL.Furn.Chair` = `ChairShell` + `SledBase` + `Cushion` | 一体注塑椅壳（带把手镂空）、弓形钢管底座、可叠放坐垫 |

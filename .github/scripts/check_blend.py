@@ -81,7 +81,7 @@ def check(path, render_dir=None):
     if render_dir:
         r = sc.render
         r.resolution_percentage = 20
-        sc.cycles.samples = 8
+        sc.eevee.taa_render_samples = 8
         r.filepath = os.path.join(render_dir, os.path.splitext(os.path.basename(path))[0] + ".png")
         bpy.ops.render.render(write_still=True)
     for p in problems:

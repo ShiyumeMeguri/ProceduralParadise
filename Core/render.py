@@ -5,6 +5,9 @@ Handles the compositor API change in Blender 5.0 (``scene.node_tree`` ->
 ``scene.compositing_node_group`` with a Group Output) and the Glare node's
 properties -> sockets change, so shot files stay portable across 4.4 .. 5.x.
 
+Every render is EEVEE's (:func:`setup_eevee`): the shading of the whole
+repository is written for it, and its picture is the one that is right.
+
 Animations render to a PNG frame sequence that survives interruption
 (:func:`frame_output`, :func:`unfinished_frames`) and is assembled into the
 video by a sequencer scene (:func:`video_scene`).
@@ -20,10 +23,10 @@ from .nodes import Tree
 from .gn import set_menu
 from .anim import fcurves_of
 
-__all__ = ["ENGINES", "setup_cycles", "setup_eevee", "set_samples", "color_management", "compositor", "lines", "LINES_LAYER",
+__all__ = ["setup_eevee", "set_samples", "color_management", "compositor", "lines", "LINES_LAYER",
            "ink", "INK_LAYER", "INK_SKIP", "INK_ID", "INK_QUIET",
            "frame_output", "frame_paths", "unfinished_frames", "video_scene",
-           "use_gpu_if_available", "render_still"]
+           "render_still"]
 
 LINES_LAYER = "Lines"
 INK_LAYER = "Ink"
@@ -32,42 +35,6 @@ INK_ID = "ink_id"
 INK_QUIET = "ink_quiet"
 SOBEL_WIDTH = 2.0
 _PNG_END = b"\x00\x00\x00\x00IEND\xaeB`\x82"
-
-
-def setup_cycles(samples=128, denoise=True, device="CPU", max_bounces=8, clamp_indirect=10.0,
-                 caustics=False, adaptive_threshold=0.02, light_tree=True, diffuse_bounces=4, glossy_bounces=4,
-                 transmission_bounces=8):
-    """Cycles with per-kind bounce limits.  Light carried inside thin glass
-    -- a blown shell, a pane's edge -- travels by total internal reflection,
-    and Cycles counts every such reflection as a glossy bounce: glass-heavy
-    shots need ``glossy_bounces`` and ``transmission_bounces`` in the tens,
-    or the paths are cut off and the glass edges render black."""
-    sc = bpy.context.scene
-    sc.render.engine = "CYCLES"
-    cy = sc.cycles
-    cy.device = device
-    cy.samples = samples
-    cy.use_adaptive_sampling = True
-    cy.adaptive_threshold = adaptive_threshold
-    cy.use_denoising = denoise
-    try:
-        cy.denoiser = "OPENIMAGEDENOISE"
-    except TypeError:
-        pass
-    cy.max_bounces = max_bounces
-    cy.diffuse_bounces = diffuse_bounces
-    cy.glossy_bounces = glossy_bounces
-    cy.transmission_bounces = transmission_bounces
-    cy.transparent_max_bounces = 16
-    cy.sample_clamp_indirect = clamp_indirect
-    cy.caustics_reflective = caustics
-    cy.caustics_refractive = caustics
-    try:
-        cy.use_light_tree = light_tree
-    except AttributeError:
-        pass
-    sc.render.use_persistent_data = True
-    return sc
 
 
 def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resolution="1", trace_quality=0.75,
@@ -121,15 +88,8 @@ def setup_eevee(samples=64, viewport_samples=32, raytracing=True, trace_resoluti
     return sc
 
 
-ENGINES = {"CYCLES": setup_cycles, "EEVEE": setup_eevee}
-
-
-def set_samples(engine, samples, scene=None):
-    sc = scene or bpy.context.scene
-    if engine == "CYCLES":
-        sc.cycles.samples = samples
-    else:
-        sc.eevee.taa_render_samples = samples
+def set_samples(samples, scene=None):
+    (scene or bpy.context.scene).eevee.taa_render_samples = samples
 
 
 def color_management(view="AgX", look=None, exposure=0.0, gamma=1.0):
@@ -555,7 +515,6 @@ def lines(cfg: dict | None):
     for flag in ("use_solid", "use_sky", "use_strand", "use_volumes"):
         setattr(vl, flag, False)
     vl.samples = 1
-    vl.cycles.use_denoising = False
     fs = vl.freestyle_settings
     fs.mode = "EDITOR"
     fs.crease_angle = math.radians(cfg.get("crease_deg", 140.0))
@@ -849,41 +808,6 @@ def video_scene(video, name, scene=None):
         except (AttributeError, TypeError):
             pass
     return vs
-
-
-def use_gpu_if_available():
-    """Render Cycles on the GPU when this machine has one, and denoise there
-    too (OpenImageDenoise on the CPU costs a GPU render ~6 s per 1080p frame,
-    and again for the Freestyle strokes).  Only touches the Cycles
-    preferences when no compute backend is configured yet; returns the
-    backend in use or None (CPU)."""
-    try:
-        prefs = bpy.context.preferences.addons["cycles"].preferences
-    except (KeyError, AttributeError):
-        return None
-    sc = bpy.context.scene
-    if getattr(prefs, "compute_device_type", "NONE") == "NONE":
-        for backend in ("OPTIX", "CUDA", "HIP", "METAL", "ONEAPI"):
-            try:
-                prefs.compute_device_type = backend
-            except TypeError:
-                continue
-            try:
-                prefs.get_devices()
-            except Exception:
-                pass
-            devs = [d for d in prefs.devices if d.type == backend]
-            if devs:
-                for d in devs:
-                    d.use = True
-                break
-            prefs.compute_device_type = "NONE"
-    backend = getattr(prefs, "compute_device_type", "NONE")
-    if backend != "NONE":
-        sc.cycles.device = "GPU"
-        sc.cycles.denoising_use_gpu = True
-        return backend
-    return None
 
 
 def render_still(path, use_compositor=True):

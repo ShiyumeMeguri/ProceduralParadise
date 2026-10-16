@@ -25,7 +25,6 @@
   },
   "sun": null,
   "render": {
-    "engine": "CYCLES",
     "samples": 128,
     "scale": 1.0,
     "view": "Standard",
